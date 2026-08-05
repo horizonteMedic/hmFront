@@ -5,6 +5,7 @@ import {
     InputTextArea,
     InputCheckbox,
     InputTextOneLine,
+    CIE10List,
 } from '../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../components/reusableComponents/SectionFieldset';
 import { useForm } from '../../../../hooks/useForm';
@@ -49,7 +50,7 @@ export default function Triaje() {
         asistencial: false,
         recibo: false,
         nOrden: true,
-
+        conclusionesCie10: "",
         // Información del paciente
         nro: '',
         nomExam: '',
@@ -91,7 +92,7 @@ export default function Triaje() {
         handleChange,
         handleChangeNumber,
     } = useForm(initialFormState, { storageKey: 'triaje' });
-
+    console.log(form)
     // Estados adicionales para la tabla y UI
     const [refresh, setRefresh] = useState(0);
     const [, setHabilitar] = useState(true);
@@ -220,7 +221,7 @@ export default function Triaje() {
         <div className="flex flex-col md:flex-row w-full">
             {/* Columna 1 - Formulario */}
             <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[45%]">
-                <form className="space-y-3 text-md">
+                <form className="space-y-3 text-md" onSubmit={(e) => e.preventDefault()}>
                     {/* Sección: Tipo de paciente y búsqueda */}
                     <SectionFieldset legend="Información del Paciente" className="space-y-3">
                         <div className="flex gap-3 items-center">
@@ -541,6 +542,15 @@ export default function Triaje() {
                                 }));
                             }}
                         />
+                        <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                            <CIE10List
+                                value={form.conclusionesCie10}
+                                fieldName="conclusionesCie10"
+                                label="Conclusiones CIE10"
+                                token={token}
+                                setForm={setForm}
+                            />
+                        </div>
                         <section className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
                             <div className="flex gap-4">
                                 <button
@@ -701,20 +711,18 @@ export default function Triaje() {
                                     <tr
                                         key={i}
                                         className={`text-center cursor-pointer transition-all duration-200
-                      ${
-                          row.color === 'AMARILLO'
-                              ? 'bg-[#ffff00]'
-                              : row.color === 'VERDE'
-                              ? 'bg-[#00ff00]'
-                              : row.color === 'ROJO'
-                              ? 'bg-[#ff6767]'
-                              : ''
-                      }
-                      ${
-                          hoveredRow !== null && hoveredRow !== i
-                              ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
-                              : ''
-                      }`}
+                      ${row.color === 'AMARILLO'
+                                                ? 'bg-[#ffff00]'
+                                                : row.color === 'VERDE'
+                                                    ? 'bg-[#00ff00]'
+                                                    : row.color === 'ROJO'
+                                                        ? 'bg-[#ff6767]'
+                                                        : ''
+                                            }
+                      ${hoveredRow !== null && hoveredRow !== i
+                                                ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
+                                                : ''
+                                            }`}
                                         style={{ zIndex: 1, position: 'relative' }}
                                         onClick={() => handleRowClick(row)}
                                         onContextMenu={(e) => handleRowContextMenu(e, row)}

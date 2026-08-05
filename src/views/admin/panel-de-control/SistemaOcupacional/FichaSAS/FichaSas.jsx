@@ -3,7 +3,8 @@ import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
-    InputsBooleanRadioGroup
+    InputsBooleanRadioGroup,
+    CIE10List
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -27,6 +28,7 @@ export default function FichaSas() {
         fechaExam: today,
         tipoExamen: "",
         tipoLicencia: "",
+        conclusionesCie10: "",
         //datos personales
         nombres: "",
         dni: "",
@@ -1030,6 +1032,15 @@ export default function FichaSas() {
                         value={form?.observaciones}
                         onChange={handleChange}
                     />
+                    <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                        <CIE10List
+                            value={form.conclusionesCie10}
+                            fieldName="conclusionesCie10"
+                            label="Conclusiones CIE10"
+                            token={token}
+                            setForm={setForm}
+                        />
+                    </div>
                 </div>
 
                 <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">

@@ -14,7 +14,8 @@ import {
     InputTextOneLine,
     InputTextArea,
     InputsRadioGroup,
-    InputCheckbox
+    InputCheckbox,
+    CIE10List
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
@@ -49,6 +50,7 @@ export default function FichaConduccionVehiculos() {
         edad: "",
         sexo: "",
         experienciaAnios: "",
+        conclusionesCie10: "",
 
         empresa: "",
         contrata: "",
@@ -489,6 +491,15 @@ export default function FichaConduccionVehiculos() {
                                     onChange={handleChange}
                                     rows={6}
                                 />
+                                <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                                    <CIE10List
+                                        value={form.conclusionesCie10}
+                                        fieldName="conclusionesCie10"
+                                        label="Conclusiones CIE10"
+                                        token={token}
+                                        setForm={setForm}
+                                    />
+                                </div>
                                 <EmpleadoComboBox
                                     value={form.nombre_medico}
                                     label="Especialista"

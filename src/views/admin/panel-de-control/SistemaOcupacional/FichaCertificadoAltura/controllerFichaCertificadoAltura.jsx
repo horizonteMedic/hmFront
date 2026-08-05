@@ -401,6 +401,9 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Ingrese el Tiempo de Experiencia", "error");
         return;
     }
+    const observacionesFinal = form.conclusionesCie10?.trim()
+        ? `${form.observacionesRecomendaciones}\n${form.conclusionesCie10.trim()}`
+        : form.observacionesRecomendaciones;
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado,
@@ -471,7 +474,7 @@ export const SubmitDataService = async (
         detalleInformacion: form.detalleInformacionExamenFisico,
         noApto: form.conclusion === "NO APTO",
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",
-        observacionesRecomendaciones: form.observacionesRecomendaciones,
+        observacionesRecomendaciones: observacionesFinal,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
         examenFisicoSustentacionPie: form.sustentacionPie1,
         antecedentesInsuficienciaRenalCronicaSi: form.insuficienciaRenalCronicaGradoIV,

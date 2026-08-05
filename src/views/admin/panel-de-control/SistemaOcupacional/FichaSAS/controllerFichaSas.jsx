@@ -236,6 +236,9 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    const observacionesFinal = form.conclusionesCie10?.trim()
+        ? `${form.observaciones}\n${form.conclusionesCie10.trim()}`
+        : form.observaciones;
     const body = {
         norden: form.norden,
         codigoSas: form.codigoSas,
@@ -311,7 +314,7 @@ export const SubmitDataService = async (
         examenFisicoGradoIV: form.mallampati_grado === "4",
         conclusionAptoBajoRiesgoSi: form.apto_bajo_riesgo,
         conclusionAptoBajoRiesgoNo: !form.apto_bajo_riesgo,
-        conclusionObservaciones: form.observaciones,
+        conclusionObservaciones: observacionesFinal,
         dniUsuario: form.dniUsuario,
         fechaSas: form.fechaExam,
         conclusionRequierePsgSi: form.requiere_psg,

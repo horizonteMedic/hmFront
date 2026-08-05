@@ -248,7 +248,10 @@ export const handleSubmit = async (
             Swal.showLoading();
         },
     });
-    SubmitTriaje(form, edad, nro, fecha, token)
+    const formFinal = form.conclusionesCie10?.trim()
+        ? { ...form, diagnostico: `${form.diagnostico}\n${form.conclusionesCie10.trim()}` }
+        : form;
+    SubmitTriaje(formFinal, edad, nro, fecha, token)
         .then((res) => {
             if (res.id === 1) {
                 refreshtable();

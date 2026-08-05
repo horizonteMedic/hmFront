@@ -124,8 +124,8 @@ export const GetInfoServicio = async (
         }
 
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
-                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
+            (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
         const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
 
         set((prev) => ({
@@ -260,8 +260,8 @@ export const GetInfoServicioEditar = async (
             }
         }
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
-                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
+            (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
 
         const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
         const aptoDesde = res.fechaDesde_f_desde ?? prev.aptoDesde;
@@ -410,6 +410,9 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    const observacionesFinal = form.conclusionesCie10?.trim()
+        ? `${form.observacionesRecomendaciones}\n${form.conclusionesCie10.trim()}`
+        : form.observacionesRecomendaciones;
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado_cod_certificado,
@@ -477,7 +480,7 @@ export const SubmitDataService = async (
         noApto: form.conclusion === "NO APTO",
         observado: form.conclusion === "OBSERVADO",
         dniUsuario: form.dniUsuario,
-        observacionesRecomendaciones: form.observacionesRecomendaciones,
+        observacionesRecomendaciones: observacionesFinal,
         detalleMedicinas: form.medicinasTomando,
         detalleInformacion: form.detalleInformacionExamenMedico,
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",
