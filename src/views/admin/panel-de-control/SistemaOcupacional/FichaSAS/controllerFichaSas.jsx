@@ -217,6 +217,7 @@ export const GetInfoServicioEditar = async (
             // Apto con bajo riesgo de Apnea del sueño
             apto_bajo_riesgo: res.conclusionAptoBajoRiesgoSi_chkaptobajosi ?? false,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
+            conclusionesCie10: res.conclusionesCie10 ?? "",
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
@@ -239,6 +240,9 @@ export const SubmitDataService = async (
     const observacionesFinal = form.conclusionesCie10?.trim()
         ? `${form.observaciones}\n${form.conclusionesCie10.trim()}`
         : form.observaciones;
+
+     
+
     const body = {
         norden: form.norden,
         codigoSas: form.codigoSas,
@@ -315,6 +319,7 @@ export const SubmitDataService = async (
         conclusionAptoBajoRiesgoSi: form.apto_bajo_riesgo,
         conclusionAptoBajoRiesgoNo: !form.apto_bajo_riesgo,
         conclusionObservaciones: observacionesFinal,
+        conclusionesCie10: form.conclusionesCie10,
         dniUsuario: form.dniUsuario,
         fechaSas: form.fechaExam,
         conclusionRequierePsgSi: form.requiere_psg,

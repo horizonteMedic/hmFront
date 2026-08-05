@@ -1030,7 +1030,18 @@ export default function FichaSas() {
                         rows={6}
                         name="observaciones"
                         value={form?.observaciones}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                            const nuevaObs = e.target.value.toUpperCase();
+                            // Sincronizar CIE10 eliminados manualmente del textarea
+                            const cie10Lines = nuevaObs
+                                .split("\n")
+                                .filter(l => /^CIE 10:/i.test(l.trim()));
+                            setForm((d) => ({
+                                ...d,
+                                observaciones: nuevaObs,
+                                conclusionesCie10: cie10Lines.join("\n"),
+                            }));
+                        }}
                     />
                     <div className="bg-green-200 p-3 rounded-xl col-span-3">
                         <CIE10List
@@ -1039,6 +1050,9 @@ export default function FichaSas() {
                             label="Conclusiones CIE10"
                             token={token}
                             setForm={setForm}
+                            setAdditionalForm={setForm}
+                            additionalFieldName="observaciones"
+                            additionalDelimiter={"\n"}
                         />
                     </div>
                 </div>

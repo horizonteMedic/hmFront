@@ -177,6 +177,7 @@ export const GetInfoServicio = async (
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
             observacionesRecomendaciones: nuevasObservaciones,
+            conclusionesCie10: res.conclusionesCie10 ?? "",
             imcRed: imcRed,
 
             medicinasTomando: res.medicamentosAnexo16A ?? "",
@@ -370,6 +371,7 @@ export const GetInfoServicioEditar = async (
                             (res.observado_chk_observado ? "OBSERVADO" :
                                 (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" : null))),
             observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
+            conclusionesCie10: res.conclusionesCie10 ?? "",
             // nombreMedicoColegiatura:"",
             // Recomendaciones - 
             sobrepesoDietaHipocalorica: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."),
@@ -481,6 +483,7 @@ export const SubmitDataService = async (
         observado: form.conclusion === "OBSERVADO",
         dniUsuario: form.dniUsuario,
         observacionesRecomendaciones: observacionesFinal,
+        conclusionesCie10: form.conclusionesCie10 ?? "",
         detalleMedicinas: form.medicinasTomando,
         detalleInformacion: form.detalleInformacionExamenMedico,
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",
