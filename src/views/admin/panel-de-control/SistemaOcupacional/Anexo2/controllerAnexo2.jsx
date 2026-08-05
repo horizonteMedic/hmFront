@@ -17,7 +17,8 @@ export const SubmitDataService = async (
   user,
   limpiar,
   tabla,
-  datosFooter
+  datosFooter,
+  SinReestricciones
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -129,6 +130,10 @@ export const SubmitDataService = async (
     })),
 
     observacionesGeneralesCie10: form.observacionesGeneralesCie10,
+    ...(form.codigoAnexo == null
+      ? { registrado_sin_restriccion: SinReestricciones }
+      : { registrado_sin_restriccion: form.registrado_sin_restriccion }),
+
   };
   console.log(body);
 
@@ -1071,7 +1076,7 @@ export const GetInfoServicio = (
 
           //
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
@@ -1841,7 +1846,7 @@ export const GetInfoServicioEditar = (
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {

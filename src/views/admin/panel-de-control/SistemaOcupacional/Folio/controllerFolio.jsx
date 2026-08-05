@@ -38,6 +38,7 @@ export const nombresExamen = {
     "ANEXO 16A": "ANEXO 16A",
     "PSICOSENSOMETRICO ADMISION": "PSICOSENSOMETRICO",
     "TEST ALTURA ADMISION": "TEST ALTURA",
+    "MANEJO ALIMENTOS GREEN": "MANIPULADOR ALIMENTOS GREEN",
 }
 
 export const GetArchivosFolioStatus = async (nOrden, token) => {
@@ -160,7 +161,7 @@ export async function subirArchivoFolio(archivoData, { form, nomenclature, selec
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
+    if (res.norden) {
         console.log(res);
         set((prev) => ({
             ...prev,
@@ -175,6 +176,9 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
         }));
         await GetExamenesCheck(nro, set, token, ExamenesList);
+    } else {
+        Swal.fire("Error", "Sede incorrecta", "error")
+        return null
     }
 };
 

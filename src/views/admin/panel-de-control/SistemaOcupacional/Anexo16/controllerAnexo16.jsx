@@ -16,6 +16,7 @@ const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesR
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const construirBodyAnexo16 = (form, user, SinReestricciones) => {
+  console.log(SinReestricciones)
   const body = {
     norden: form.norden,
     codigoAnexo: form.codigoAnexo,
@@ -144,8 +145,9 @@ export const construirBodyAnexo16 = (form, user, SinReestricciones) => {
     mercurioOrina: form.mercurioOrina,
     plomoSangre: form.plomoSangre,
     ...(form.codigoAnexo == null
-      ? { registroSinRestriccion: SinReestricciones }
-      : {}),
+      ? { registrado_sin_restriccion: SinReestricciones, }
+      : { registrado_sin_restriccion: form.registrado_sin_restriccion }),
+
   };
   return body;
 };
@@ -1151,7 +1153,7 @@ export const GetInfoServicio = (
           data.plomoSangre = res.plomoSangre ?? "N/A";
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
@@ -2577,7 +2579,7 @@ export const GetInfoServicioEditar = (
           }
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {

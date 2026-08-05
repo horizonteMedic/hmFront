@@ -324,4 +324,5 @@ export const getAnexo16InitialFormState = ({ today, userlogued, userName, SinRee
   chkS4: false,
   chkS5: false,
   chkS6: false,
+  registrado_sin_restriccion: false
 });
