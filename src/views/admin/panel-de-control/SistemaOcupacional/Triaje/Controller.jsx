@@ -248,10 +248,7 @@ export const handleSubmit = async (
             Swal.showLoading();
         },
     });
-    const formFinal = form.conclusionesCie10?.trim()
-        ? { ...form, diagnostico: `${form.diagnostico}\n${form.conclusionesCie10.trim()}` }
-        : form;
-    SubmitTriaje(formFinal, edad, nro, fecha, token)
+    SubmitTriaje(form, edad, nro, fecha, token)
         .then((res) => {
             if (res.id === 1) {
                 refreshtable();
@@ -339,6 +336,7 @@ export const GetListTriajeMult = async (nro, set, get, token, jasper, setHTR) =>
                     diastolica: res.diastolica,
                     fRespiratoria: res.f_respiratoria,
                     diagnostico: res.conclusion,
+                    conclusionesCie10: res.conclusionesCie10
                 }));
             } else {
                 Swal.fire('Error', 'No se Encontro un Registro de Triaje para esta Historia Clinica', 'error');

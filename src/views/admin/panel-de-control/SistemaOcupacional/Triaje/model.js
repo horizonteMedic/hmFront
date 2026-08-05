@@ -1,6 +1,6 @@
 import { URLAzure } from "../../../../config/config"
 
-export function SubmitTriaje(data,edad,nOrden,fecha,token) {
+export function SubmitTriaje(data, edad, nOrden, fecha, token) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 8000)
     const body = {
@@ -26,48 +26,51 @@ export function SubmitTriaje(data,edad,nOrden,fecha,token) {
         conclusion: data.diagnostico,
         nOrden: nOrden,
         fCardiaca: data.fCardiaca,
-        fRespiratoria: data.fRespiratoria
+        fRespiratoria: data.fRespiratoria,
+        conclusionesCie10: data.conclusionesCie10
     }
 
     const url = `${URLAzure}/api/v01/ct/triaje/registrarActualizar`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body),
-            signal: controller.signal
-        }
-        return fetch(url,options)
-        .then(res =>  {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal
+    }
+    return fetch(url, options)
+        .then(res => {
             clearTimeout(timeout)
             if (!res.ok) {
                 return res
-            } return res.json()})
-        .then(response => response) 
-        
+            } return res.json()
+        })
+        .then(response => response)
+
 }
 
-export function GetHistoriaCTriaje(data,sede,token) {
+export function GetHistoriaCTriaje(data, sede, token) {
 
     const body = {
-      opcion_id_p: data.opcion_id_p,
-      norden_p: data.norden,
-      nombres_apellidos_p: data.nombres_apellidos_p,
-      cod_sede_p: sede
-    };    
+        opcion_id_p: data.opcion_id_p,
+        norden_p: data.norden,
+        nombres_apellidos_p: data.nombres_apellidos_p,
+        cod_sede_p: sede
+    };
     const url = `${URLAzure}/api/v01/ct/registroPacientes/listadoHistoriasOcupacionalesTriajeConFiltros`
-      const options = {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(body)
-      }
-      return fetch(url,options).then(res =>  {
-          if (!res.ok) {
-              return res
-          } return res.json()}).then(response => response) 
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options).then(res => {
+        if (!res.ok) {
+            return res
+        } return res.json()
+    }).then(response => response)
 }
