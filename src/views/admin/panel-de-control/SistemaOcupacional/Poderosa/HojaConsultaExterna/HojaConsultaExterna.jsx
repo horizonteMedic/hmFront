@@ -161,16 +161,16 @@ const HojaConsultaExterna = () => {
 
             {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">
-                <div className="flex gap-x-3 w-full">
+                <div className="w-full flex gap-x-3">
                     <InputTextOneLine
                         label="N° Orden"
                         name="norden"
-                        labelWidth="60px"
+                        labelWidth="100px"
                         value={form.norden}
                         onChange={handleChangeNumber}
                         onKeyUp={handleSearch}
                         disabled={nordenDisabled}
-                        className="w-full"
+                        className="flex-1"
                     />
                     <SearchButton onClick={executeSearch} className="lg:hidden" />
                 </div>
@@ -195,6 +195,7 @@ const HojaConsultaExterna = () => {
                 <InputTextOneLine
                     label="Hora"
                     name="horaSalida"
+                    labelWidth="100px"
                     disabled
                     value={form.tieneRegistro ? form.horaSalida : hora}
                 />

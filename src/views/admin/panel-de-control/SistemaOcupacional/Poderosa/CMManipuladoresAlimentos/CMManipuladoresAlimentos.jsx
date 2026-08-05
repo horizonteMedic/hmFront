@@ -1,254 +1,301 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBroom,
-  faPrint,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  InputTextOneLine,
-  InputTextArea,
-  InputsBooleanRadioGroup,
-  SectionFieldset,
-} from "../../../../../components/reusableComponents/ResusableComponents";
-import { useForm } from "../../../../../hooks/useForm";
-import { getToday } from "../../../../../utils/helpers";
-import { useSessionData } from "../../../../../hooks/useSessionData";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCMManipuladoresAlimentos";
+import { useState } from "react";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import InputsBooleanRadioGroup from "../../../../../components/reusableComponents/InputsBooleanRadioGroup";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerCMManipuladoresAlimentos";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "certificado_manipuladores_barrick";
 const today = getToday();
 
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExam",
+    "esApto",
+    "observaciones",
+    "recomendaciones",
+    "user_medicoFirma",
+    "nombre_medico",
+];
+
 export default function CMManipuladoresAlimentos() {
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
-  const { token, userlogued, selectedSede, datosFooter, userName } =
-    useSessionData();
+    const initialFormState = {
+        // Header
+        norden: "",
+        fechaExam: today,
+        nombreExamen: "",
+        esApto: undefined,
 
-  const initialFormState = {
-    // Header - Campos principales
-    norden: "",
-    fechaExam: today,
-    nombreExamen: "",
-    esApto: undefined,
+        // Datos personales
+        nombres: "",
+        dni: "",
+        edad: "",
+        sexo: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+        ocupacion: "",
 
-    // Datos personales
-    nombres: "",
-    dni: "",
-    edad: "",
-    sexo: "",
-    empresa: "",
-    contrata: "",
-    cargo: "",
-    areaTrabajo: "",
+        empresa: "",
+        contrata: "",
+        cargoDesempenar: "",
+        areaTrabajo: "",
 
-    // Recomendaciones
-    recomendaciones: "",
-    observaciones: "",
+        // Recomendaciones
+        recomendaciones: "",
+        observaciones: "",
 
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-  };
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
 
-  const {
-    form,
-    setForm,
-    handleChange,
-    handleChangeNumber,
-    handleChangeSimple,
-    handleRadioButtonBoolean,
-    handleClear,
-    handleClearnotO,
-    handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "CMManipuladoresAlimentos" });
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
 
-  const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-  };
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
+    };
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
-  };
+    const {
+        form,
+        setForm,
+        handleChange,
+        handleChangeNumber,
+        handleChangeSimple,
+        handleRadioButtonBoolean,
+        handleClear,
+        handleClearnotO,
+        handlePrintDefault,
+        handleChangeNumberDecimals,
+    } = useForm(initialFormState, { storageKey: "CMManipuladoresAlimentos" });
 
-  const handlePrint = () => {
-    handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    const [errors, setErrors] = useState({});
+
+    // Los errores se muestran solo tras intentar guardar y mientras el campo siga
+    // inválido; se limpian solos a medida que el usuario los corrige.
+    const fechaExamError = errors.fechaExam && !form.fechaExam ? errors.fechaExam : "";
+    const esAptoError = errors.esApto && form.esApto === undefined ? errors.esApto : "";
+
+    const validateForm = () => {
+        const next = {};
+        if (!form.fechaExam) {
+            next.fechaExam = "La fecha de examen es obligatoria.";
+        }
+        if (form.esApto === undefined) {
+            next.esApto = "Seleccione la aptitud.";
+        }
+        setErrors(next);
+        return Object.keys(next).length === 0;
+    };
+
+    const handleClearForm = () => {
+        setErrors({});
+        handleClear();
+    };
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        setErrors({});
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
+    const handleSearch = (e) => {
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
+
+    const handleSave = () => {
+        if (!validateForm()) return;
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        if (!validateForm()) return;
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
     });
-  };
 
-  return (
-    <div className="mx-auto bg-white">
-      <div className="w-full ">
-        {/* Datos del trabajador */}
-        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form?.norden}
-            onChange={handleChangeNumber}
-            onKeyUp={handleSearch}
-          />
-          <InputTextOneLine
-            label="Nombre Examen"
-            name="nombreExamen"
-            value={form?.nombreExamen}
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Examen "
-            name="fechaExam"
-            type="date"
-            value={form?.fechaExam}
-            onChange={handleChangeSimple}
-          />
-          <InputsBooleanRadioGroup
-            label="Aptitud"
-            name="esApto"
-            value={form.esApto}
-            trueLabel="APTO"
-            falseLabel="NO APTO"
-            onChange={handleRadioButtonBoolean}
-          />
-        </section>
+    return (
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            {hayRegistroCargado && (
+                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
+                </div>
+            )}
 
-        {/* Información del trabajador */}
-        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 gap-4">
-          <h3 className="font-bold mb-3">Datos del Paciente</h3>
-          {/* Fila 1: Nombres, DNI, Edad, Género */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <InputTextOneLine
-              label="Nombres y Apellidos"
-              name="nombres"
-              value={form?.nombres}
-              disabled
-              labelWidth="60px"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 ">
-              <InputTextOneLine
-                label="DNI"
-                name="dni"
-                value={form?.dni}
-                disabled
-                labelWidth="60px"
-              />
-              <InputTextOneLine
-                label="Sexo"
-                name="sexo"
-                value={form?.sexo}
-                disabled
-                labelWidth="60px"
-              />
-              <InputTextOneLine
-                label="Edad"
-                name="edad"
-                value={form?.edad}
-                disabled
-                labelWidth="60px"
-              />
-            </div>
-            <InputTextOneLine
-              label="Área Trabajo"
-              name="areaTrabajo"
-              value={form?.areaTrabajo}
-              disabled
-              labelWidth="60px"
-            />
-            <InputTextOneLine
-              label="Cargo"
-              name="cargo"
-              value={form?.cargo}
-              disabled
-              labelWidth="60px"
-            />
-            <InputTextOneLine
-              label="Empresa"
-              name="empresa"
-              value={form?.empresa}
-              disabled
-              labelWidth="60px"
-            />
-            <InputTextOneLine
-              label="Contrata"
-              name="contrata"
-              value={form?.contrata}
-              disabled
-              labelWidth="60px"
-            />
-          </div>
-        </section>
+            {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumber}
+                        onKeyUp={handleSearch}
+                        disabled={nordenDisabled}
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
+                <InputTextOneLine
+                    label="Nombre Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                />
+                <InputTextOneLine
+                    label="Fecha Examen"
+                    name="fechaExam"
+                    type="date"
+                    value={form.fechaExam}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaExam")}
+                    onRevert={() => revertField("fechaExam")}
+                    required
+                    error={fechaExamError}
+                />
+                <InputsBooleanRadioGroup
+                    label="Aptitud"
+                    name="esApto"
+                    value={form.esApto}
+                    trueLabel="APTO"
+                    falseLabel="NO APTO"
+                    onChange={handleRadioButtonBoolean}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("esApto")}
+                    onRevert={() => revertField("esApto")}
+                    required
+                    error={esAptoError}
+                />
+            </SectionFieldset>
 
-        {/* Conclusiones Finales */}
-        <fieldset className="bg-white border border-gray-200 rounded-lg p-4 mx-4 mt-4">
-          <legend className="font-bold mb-2 text-gray-800 text-[10px]">
-            Conclusiones Finales
-          </legend>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputTextArea
-              label="Observaciones"
-              name="observaciones"
-              value={form?.observaciones}
-              onChange={handleChange}
-              rows={4}
-            />
-            <InputTextArea
-              label="Recomendaciones"
-              name="recomendaciones"
-              value={form?.recomendaciones}
-              onChange={handleChange}
-              rows={4}
-            />
-          </div>
-          {/* Médico */}
-          <SectionFieldset legend="Asignación de Médico">
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              label="Especialista"
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </SectionFieldset>
-        </fieldset>
+            {/* ===== SECCIÓN: DATOS DEL PACIENTE ===== */}
+            <DatosPersonalesLaborales form={form} />
 
-        <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
+            {/* ===== SECCIÓN: CONCLUSIONES FINALES ===== */}
+            <SectionFieldset legend="Conclusiones Finales" className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <InputTextArea
+                        label="Observaciones"
+                        name="observaciones"
+                        value={form.observaciones}
+                        onChange={handleChange}
+                        rows={4}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("observaciones")}
+                        onRevert={() => revertField("observaciones")}
+                    />
+                    <InputTextArea
+                        label="Recomendaciones"
+                        name="recomendaciones"
+                        value={form.recomendaciones}
+                        onChange={handleChange}
+                        rows={4}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("recomendaciones")}
+                        onRevert={() => revertField("recomendaciones")}
+                    />
+                </div>
+
+                {/* Médico */}
+                <SectionFieldset legend="Asignación de Médico">
+                    <EmpleadoComboBox
+                        value={form.nombre_medico}
+                        label="Especialista"
+                        form={form}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isMedicoEdited}
+                        onRevert={revertMedico}
+                    />
+                </SectionFieldset>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClearForm}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
+        </div>
+    );
 }

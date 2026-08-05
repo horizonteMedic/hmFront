@@ -6,7 +6,6 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
     guardarRegistro,
     actualizarRegistro,
@@ -106,9 +105,7 @@ export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = (
         observacionesAuto: generarObservaciones(res),
         // Médico que certifica
         nombre_medico: res.nombreMedico ?? prev.nombre_medico,
-        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
-        // La creación se conserva para reenviarla al editar y que el backend no la borre.
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma, 
         fechaRegistro: res.fechaRegistro ?? "",
         userRegistro: res.userRegistro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
@@ -117,10 +114,9 @@ export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = (
     }));
 };
 
-// ===== Mapeo: Body base =====
+// ===== Mapeo: Body base ===== 
 const construirBase = (form) => ({
     norden: form.norden,
-    dni: form.dni,
     fechaExamen: form.fechaExamen,
     horaSalida: getHoraActual(),
     nombreMedico: form.nombre_medico,
@@ -133,7 +129,7 @@ const construirBase = (form) => ({
     usuarioFirma: form.user_medicoFirma,
 });
 
-// Body completo (creación / actualización).
+ 
 const construirBody = (form, user, esActualizacion) =>
     sellarAuditoria(construirBase(form), {
         user,
@@ -141,6 +137,7 @@ const construirBody = (form, user, esActualizacion) =>
         userRegistro: form.userRegistro,
         fechaRegistro: form.fechaRegistro,
     });
+
 
 // ===== Impresión =====
 export const PrintHojaR = (nro, token, tabla, datosFooter, sede) =>
