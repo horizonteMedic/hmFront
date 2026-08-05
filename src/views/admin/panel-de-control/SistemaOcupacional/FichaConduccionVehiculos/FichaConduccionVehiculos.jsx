@@ -15,7 +15,8 @@ import {
     InputTextArea,
     InputsRadioGroup,
     InputCheckbox,
-    CIE10List
+    CIE10List,
+    InputTextAreaUpper
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
@@ -484,12 +485,22 @@ export default function FichaConduccionVehiculos() {
 
                             {/* Columna Central - Observaciones */}
                             <div className="space-y-4">
-                                <InputTextArea
+                                <InputTextAreaUpper
                                     label="Observaciones y Recomendaciones"
+                                    rows={6}
                                     name="observacionesRecomendaciones"
                                     value={form?.observacionesRecomendaciones}
-                                    onChange={handleChange}
-                                    rows={6}
+                                    onChange={(upper) => {
+                                        const cie10Lines = upper
+                                            .split("\n")
+                                            .filter(l => /^CIE 10:/i.test(l.trim()));
+                                        const nuevoCie10 = cie10Lines.join("\n");
+                                        setForm((d) => ({
+                                            ...d,
+                                            observacionesRecomendaciones: upper,
+                                            ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                                        }));
+                                    }}
                                 />
                                 <div className="bg-green-200 p-3 rounded-xl col-span-3">
                                     <CIE10List
@@ -498,6 +509,9 @@ export default function FichaConduccionVehiculos() {
                                         label="Conclusiones CIE10"
                                         token={token}
                                         setForm={setForm}
+                                        setAdditionalForm={setForm}
+                                        additionalFieldName="observacionesRecomendaciones"
+                                        additionalDelimiter={"\n"}
                                     />
                                 </div>
                                 <EmpleadoComboBox

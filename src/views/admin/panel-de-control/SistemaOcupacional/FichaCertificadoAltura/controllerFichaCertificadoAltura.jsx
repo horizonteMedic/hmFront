@@ -164,6 +164,7 @@ export const GetInfoServicio = async (
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
             observacionesRecomendaciones: nuevasObservaciones,
+            conclusionesCie10: res.conclusionesCie10,
             obesidadIMC30: obesidadIMC30,
             imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
@@ -370,6 +371,8 @@ export const GetInfoServicioEditar = async (
                                 res.observado_chk_observado ? "OBSERVADO" : null)),
 
             observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
+            conclusionesCie10: res.conclusionesCie10 ?? "",
+
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
             // nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
@@ -401,9 +404,7 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Ingrese el Tiempo de Experiencia", "error");
         return;
     }
-    const observacionesFinal = form.conclusionesCie10?.trim()
-        ? `${form.observacionesRecomendaciones}\n${form.conclusionesCie10.trim()}`
-        : form.observacionesRecomendaciones;
+     
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado,
@@ -474,7 +475,8 @@ export const SubmitDataService = async (
         detalleInformacion: form.detalleInformacionExamenFisico,
         noApto: form.conclusion === "NO APTO",
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",
-        observacionesRecomendaciones: observacionesFinal,
+        observacionesRecomendaciones: form.observacionesRecomendaciones,
+        conclusionesCie10: form.conclusionesCie10,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
         examenFisicoSustentacionPie: form.sustentacionPie1,
         antecedentesInsuficienciaRenalCronicaSi: form.insuficienciaRenalCronicaGradoIV,

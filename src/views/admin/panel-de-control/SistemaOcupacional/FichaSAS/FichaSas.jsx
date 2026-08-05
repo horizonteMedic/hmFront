@@ -4,7 +4,8 @@ import {
     InputTextOneLine,
     InputTextArea,
     InputsBooleanRadioGroup,
-    CIE10List
+    CIE10List,
+    InputTextAreaUpper
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -1025,21 +1026,20 @@ export default function FichaSas() {
                         form={form}
                         onChange={handleChangeSimple}
                     />
-                    <InputTextArea
+                    <InputTextAreaUpper
                         label="Observaciones"
                         rows={6}
                         name="observaciones"
                         value={form?.observaciones}
-                        onChange={(e) => {
-                            const nuevaObs = e.target.value.toUpperCase();
-                            // Sincronizar CIE10 eliminados manualmente del textarea
-                            const cie10Lines = nuevaObs
+                        onChange={(upper) => {
+                            const cie10Lines = upper
                                 .split("\n")
                                 .filter(l => /^CIE 10:/i.test(l.trim()));
+                            const nuevoCie10 = cie10Lines.join("\n");
                             setForm((d) => ({
                                 ...d,
-                                observaciones: nuevaObs,
-                                conclusionesCie10: cie10Lines.join("\n"),
+                                observaciones: upper,
+                                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
                             }));
                         }}
                     />
