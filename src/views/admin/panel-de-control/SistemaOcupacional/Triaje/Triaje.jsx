@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBroom, faPencil, faSave } from '@fortawesome/free-solid-svg-icons';
 import {
     InputTextArea,
+    InputTextAreaUpper,
     InputCheckbox,
     InputTextOneLine,
     CIE10List,
@@ -92,7 +93,7 @@ export default function Triaje() {
         handleChange,
         handleChangeNumber,
     } = useForm(initialFormState, { storageKey: 'triaje' });
-    console.log(form)
+
     // Estados adicionales para la tabla y UI
     const [refresh, setRefresh] = useState(0);
     const [, setHabilitar] = useState(true);
@@ -530,21 +531,20 @@ export default function Triaje() {
                                 labelWidth="120px"
                             />
                         </div>
-                        <InputTextArea
+                        <InputTextAreaUpper
                             label="Diagnóstico"
                             name="diagnostico"
                             value={form.diagnostico}
                             rows={7}
-                            onChange={(e) => {
-                                const nuevoDiag = e.target.value.toUpperCase();
-                                // Sincronizar CIE10 eliminados manualmente del textarea
-                                const cie10Lines = nuevoDiag
+                            onChange={(upper) => {
+                                const cie10Lines = upper
                                     .split("\n")
                                     .filter(l => /^CIE 10:/i.test(l.trim()));
+                                const nuevoCie10 = cie10Lines.join("\n");
                                 setForm((d) => ({
                                     ...d,
-                                    diagnostico: nuevoDiag,
-                                    conclusionesCie10: cie10Lines.join("\n"),
+                                    diagnostico: upper,
+                                    ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
                                 }));
                             }}
                         />

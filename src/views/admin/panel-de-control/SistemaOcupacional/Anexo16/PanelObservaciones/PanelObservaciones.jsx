@@ -4,9 +4,9 @@ import {
   CIE10List,
   InputsRadioGroup,
   InputTextArea,
+  InputTextAreaUpper,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
-
 
 export default function PanelObservaciones({
   form,
@@ -18,6 +18,7 @@ export default function PanelObservaciones({
   setForm,
   token
 }) {
+
   return (
     <div className="p-4 h-full mt-16">
       <div className="space-y-4">
@@ -41,12 +42,22 @@ export default function PanelObservaciones({
           </button>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
-          <InputTextArea
-            rows={18}
+          <InputTextAreaUpper
             label="Observaciones Generales"
             name="observacionesGenerales"
             value={form.observacionesGenerales}
-            onChange={handleChange}
+            rows={18}
+            onChange={(upper) => {
+              const cie10Lines = upper
+                .split("\n")
+                .filter(l => /^CIE 10:/i.test(l.trim()));
+              const nuevoCie10 = cie10Lines.join("\n");
+              setForm((d) => ({
+                ...d,
+                observacionesGenerales: upper,
+                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+              }));
+            }}
           />
         </div>
         <div className="bg-green-200 p-3 rounded-xl col-span-3">
@@ -56,6 +67,9 @@ export default function PanelObservaciones({
             label="Observaciones Generales CIE10"
             token={token}
             setForm={setForm}
+            setAdditionalForm={setForm}
+            additionalFieldName="observacionesGenerales"
+            additionalDelimiter={"\n"}
           />
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
