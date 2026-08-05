@@ -12,6 +12,7 @@ import {
     validarSede,
     imprimirReporteJasper,
 } from "../../../../../utils/registroOcupacionalUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
 
 // ===== Configuración =====
 const obtenerReporteUrl = "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna";
