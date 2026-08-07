@@ -312,6 +312,17 @@ export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
 
+function limpiarObservaciones(texto) {
+  return [...new Set(
+    String(texto || '')
+      .split('\n')
+      .map(x => x.trim())
+      .filter(x => x !== '')
+  )]
+    .sort((a, b) => a.localeCompare(b, 'es'))
+    .join('\n');
+}
+
 export const GetInfoServicio = (
   nro,
   tabla,
@@ -331,7 +342,30 @@ export const GetInfoServicio = (
             contador: 1,
 
           };
-
+          data.conclusiones_cie_10 = "";
+          const valoresCie10 = {
+            ekgConclusionesCie10: res.ekg_conclusiones_cie_10,
+            ekgHallazgosCie10: res.ekg_hallazgos_cie_10,
+            audiometriaDiagnosticoCie10: res.audiometriapo_diagnostico_cie_10,
+            oftalmologiaVisionColoresCie10: res.oftalmologia_vision_colores_cie_10,
+            oftalmologiaEnfOcularesCie10: res.oftalmologia_enf_oculares_cie_10,
+            oftalmologiaPresenciaPterigionCie10: res.oftalmologia_presencia_pterigion_cie_10,
+            espirometriaInterpretacionCie10: res.espirometria_interpretacion_cie_10,
+            rayosxConclusionesCie10: res.rayosx_conclusiones_cie_10,
+            musculoEsqueleticoDiagnosticoCie10: res.musculoesq_diagnostico_cie_10,
+            rayoscolumnaConclusionCie10: res.rayoscolumna_conclusion_cie_10,
+            odontologiaObservacionesCie10: res.odontologia_observaciones_cie_10,
+            hematologiaObservacionesCie10: res.hematologia_observaciones_cie_10
+          };
+          try {
+            data.conclusiones_cie_10 = Object.values(valoresCie10 ?? {})
+              .filter(value => value != null && value !== '')
+              .map(String)
+              .sort((a, b) => a.localeCompare(b, 'es'))
+              .join('\n');
+          } catch {
+            data.conclusiones_cie_10 = '';
+          }
           data.antecedentesPersonales2 = "NINGUNO";
 
           // Antecedentes Familiares (solo al obtener/crear un nuevo registro, concatenados en un solo campo)
@@ -378,7 +412,7 @@ export const GetInfoServicio = (
           data.otros = res.otrosAnexo7c_chkotros ?? false;
 
           if (res.interpretacionFuncionRespiratoria_interpretacion != null) {
-            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + " " + (valoresCie10.espirometriaInterpretacionCie10 ? "\n" + valoresCie10.espirometriaInterpretacionCie10 : "") + "\n";
           }
 
           const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
@@ -390,6 +424,7 @@ export const GetInfoServicio = (
               (rayosXConclusion ?? "") +
               (rayosXConclusion && rayosXObservaciones ? " - " : "") +
               (rayosXObservaciones ?? "") +
+              (valoresCie10.rayosxConclusionesCie10 ? "\n" + valoresCie10.rayosxConclusionesCie10 : "") +
               ".\n";
           }
 
@@ -406,14 +441,14 @@ export const GetInfoServicio = (
           }
 
           const musculoEsqueleticoAnexo = res.musculoEsqueleticoAnexo ?? {};
-          const musculoDiagnostico = musculoEsqueleticoAnexo.musculoesqueleticoDiagnostico;
-          const musculoConclusiones = musculoEsqueleticoAnexo.musculoEsqueleticoBorooConclusiones;
+          const musculoDiagnostico = res.musculoesqueletico_diagnostico;
+          const musculoConclusiones = res.musculoesqueletico_boroo_conclusiones;
           const mostrarMusculoesqueletico = musculoDiagnostico != null
             ? musculoDiagnostico !== "NORMAL"
             : (musculoConclusiones != null && musculoConclusiones !== "NORMAL");
-
+          console.log("mostrar", mostrarMusculoesqueletico)
           if (mostrarMusculoesqueletico) {
-            data.observacionesGenerales += `MUSCULOESQUELETICA: ${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""}\n`;
+            data.observacionesGenerales += ` MUSCULOESQUELETICA: ${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""}${valoresCie10.musculoEsqueleticoDiagnosticoCie10 ? "\n" + valoresCie10.musculoEsqueleticoDiagnosticoCie10 : ""}\n`;
           }
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
@@ -424,9 +459,9 @@ export const GetInfoServicio = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
           }
 
+          data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""} ${valoresCie10.ekgHallazgosCie10 ? "\n" + valoresCie10.ekgHallazgosCie10 : ""} ${valoresCie10.ekgConclusionesCie10 ? "\n" + valoresCie10.ekgConclusionesCie10 : ""}\n`;
           // if (res.observacionFichaConduccion != null) {
           //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
           // }
@@ -440,7 +475,8 @@ export const GetInfoServicio = (
             "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales +=
               ". INFORME RADIOGRAFICO : " +
-              res.infoGeneralRadiografia_info_general +
+              res.infoGeneralRadiografia_info_general + " " +
+              (valoresCie10.rayoscolumnaConclusionCie10 ? "\n" + valoresCie10.rayoscolumnaConclusionCie10 : "") +
               "\n";
           }
           // if (res.conclusionRadiografia_conclu != null) {
@@ -565,7 +601,7 @@ export const GetInfoServicio = (
             data.contador + ". " + (
               res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
                 res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
-                ? res.observacionesLaboratorioClinico_txtobservacioneslb
+                ? "LABORATORIO: " + res.observacionesLaboratorioClinico_txtobservacioneslb + " " + (valoresCie10.hematologiaObservacionesCie10 ? "\n" + valoresCie10.hematologiaObservacionesCie10 : "")
                 : "LABORATORIO: SIN OBSERVACIONES"
             ) + "\n";
 
@@ -840,7 +876,7 @@ export const GetInfoServicio = (
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
             data.observacionesGenerales +=
-              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + " " + (valoresCie10.oftalmologiaEnfOcularesCie10 ? "\n" + valoresCie10.oftalmologiaEnfOcularesCie10 : "") + (valoresCie10.oftalmologiaPresenciaPterigionCie10 ? "\n" + valoresCie10.oftalmologiaPresenciaPterigionCie10 : "") + "\n";
             data.contador++;
           }
 
@@ -880,6 +916,7 @@ export const GetInfoServicio = (
           data.oi8000 = res.oidoIzquierdo8000Audiometria_o_i_8000 ?? "";
 
           // Diagnóstico audiométrico
+          //ESTO ESTA EN OTRO INPUT; NO EN OBSERVACIONES GENERALES
           const diagnosticoAudiometrico =
             res.diagnosticoAudiometricoCompleto_diagnostico ?? "";
           if (
@@ -889,7 +926,7 @@ export const GetInfoServicio = (
             diagnosticoAudiometrico !== ""
           ) {
             data.observacionesAudio =
-              "AUDIOMETRIA " + diagnosticoAudiometrico + ".EVALUACION ANUAL ";
+              "AUDIOMETRIA " + diagnosticoAudiometrico + ".EVALUACION ANUAL " + (valoresCie10.audiometriaDiagnosticoCie10 ? "\n" + valoresCie10.audiometriaDiagnosticoCie10 : "");
           } else if (data.od500 === "N/A" || data.od500 === "") {
             data.observacionesAudio = "NO PASO EXAMEN AUDIOMETRIA.\n";
           }
@@ -1006,7 +1043,8 @@ export const GetInfoServicio = (
             data.observacionesGenerales +=
               data.contador +
               ". ODONTOGRAMA : " +
-              res.observacionesOdontograma_txtobservaciones +
+              res.observacionesOdontograma_txtobservaciones + " " +
+              (valoresCie10.odontologiaObservacionesCie10 ? "\n" + valoresCie10.odontologiaObservacionesCie10 : "") +
               "\n";
             data.dentaduraObservaciones =
               res.observacionesOdontograma_txtobservaciones;
@@ -1163,6 +1201,7 @@ export const GetInfoServicio = (
               `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgo_coronario_valor}. CONTROL ANUAL\n`
             );
           }
+          data.conclusiones_cie_10 = limpiarObservaciones(data.conclusiones_cie_10);
 
 
 
@@ -1172,6 +1211,7 @@ export const GetInfoServicio = (
             ...prev,
             ...res,
             ...data,
+            conclusionesCie10: data.conclusiones_cie_10,
             // antecedentesPersonales: `${res.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? ""}\n${res.alergia_medicamentos_an ?? ""}\n${prev.antecedentesPersonales ?? ""}`,
             antecedentesPersonales: [
               res.antecedentesPersonalesAnexo7c_txtantecedentespersonales,
