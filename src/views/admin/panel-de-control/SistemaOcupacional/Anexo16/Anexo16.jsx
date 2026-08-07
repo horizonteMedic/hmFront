@@ -44,7 +44,7 @@ export default function Anexo16({ SinReestricciones = false }) {
     handleClearnotO,
     handleBlur
   } = useForm(initialFormState, { storageKey: "anexo_16" });
-  console.log(form.registrado_sin_restriccion)
+
   const [visualerOpen, setVisualerOpen] = useState(null)
   const [activeTab, setActiveTab] = useState(0);
   const [modalCIE10, setModalCIE10] = useState(false)
@@ -172,6 +172,8 @@ export default function Anexo16({ SinReestricciones = false }) {
             handleChange={handleChange}
             setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
             abrirCargaMasiva={() => setModalCargaMasiva(true)}
+            setForm={setForm}
+            token={token}
           />
         </div>
         {visualerOpen && (
