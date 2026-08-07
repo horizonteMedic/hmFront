@@ -136,7 +136,8 @@ const construirBody = (form, user, esActualizacion) =>
         user,
         esActualizacion,
         userRegistro: form.userRegistro,
-        fechaRegistro: form.fechaRegistro,
+        fechaRegistro: form.fechaRegistro, 
+        campoUserRegistro: "usuarioRegistro",
     });
 
 
