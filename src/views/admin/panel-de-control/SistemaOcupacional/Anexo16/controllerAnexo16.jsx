@@ -1779,6 +1779,33 @@ export const GetInfoServicioEditar = (
             otrosExamenes: "",
             conclusionesCie10: res.conclusiones_cie_10
           };
+
+          data.conclusiones_cie_10 = res.conclusiones_cie_10 ?? "";
+          data.observacionesGenerales2Cie10 = "";
+          const valoresCie10 = {
+            ekgConclusionesCie10: res.ekg_conclusiones_cie_10,
+            ekgHallazgosCie10: res.ekg_hallazgos_cie_10,
+            audiometriaDiagnosticoCie10: res.audiometriapo_diagnostico_cie_10,
+            oftalmologiaVisionColoresCie10: res.oftalmologia_vision_colores_cie_10,
+            oftalmologiaEnfOcularesCie10: res.oftalmologia_enf_oculares_cie_10,
+            oftalmologiaPresenciaPterigionCie10: res.oftalmologia_presencia_pterigion_cie_10,
+            espirometriaInterpretacionCie10: res.espirometria_interpretacion_cie_10,
+            rayosxConclusionesCie10: res.rayosx_conclusiones_cie_10,
+            musculoEsqueleticoDiagnosticoCie10: res.musculoesq_diagnostico_cie_10,
+            rayoscolumnaConclusionCie10: res.rayoscolumna_conclusion_cie_10,
+            odontologiaObservacionesCie10: res.odontologia_observaciones_cie_10,
+            hematologiaObservacionesCie10: res.hematologia_observaciones_cie_10
+          };
+          try {
+            data.observacionesGenerales2Cie10 = Object.values(valoresCie10 ?? {})
+              .filter(value => value != null && value !== '')
+              .map(String)
+              .sort((a, b) => a.localeCompare(b, 'es'))
+              .join('\n');
+          } catch {
+            data.observacionesGenerales2Cie10 = '';
+          }
+
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
 
@@ -2119,7 +2146,7 @@ export const GetInfoServicioEditar = (
           data.resultadoGonadotropina = res.resultadoGonadotropina
 
           if (resSimple.interpretacionFuncionRespiratoria_interpretacion != null) {
-            data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+            data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + " " + (valoresCie10.espirometriaInterpretacionCie10 ? "\n" + valoresCie10.espirometriaInterpretacionCie10 : "") + "\n";
           }
 
           const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
@@ -2131,6 +2158,7 @@ export const GetInfoServicioEditar = (
               (rayosXConclusion ?? "") +
               (rayosXConclusion && rayosXObservaciones ? " - " : "") +
               (rayosXObservaciones ?? "") +
+              (valoresCie10.rayosxConclusionesCie10 ? "\n" + valoresCie10.rayosxConclusionesCie10 : "") +
               ".\n";
           }
 
@@ -2154,7 +2182,7 @@ export const GetInfoServicioEditar = (
             : (musculoConclusiones2 != null && musculoConclusiones2 !== "NORMAL");
 
           if (mostrarMusculoesqueletico2) {
-            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""}\n`;
+            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""} ${valoresCie10.musculoEsqueleticoDiagnosticoCie10 ? "\n" + valoresCie10.musculoEsqueleticoDiagnosticoCie10 : ""}\n`;
           }
 
           // if (res.observacionFichaConduccion != null) {
@@ -2169,7 +2197,7 @@ export const GetInfoServicioEditar = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""} ${valoresCie10.ekgHallazgosCie10 ? "\n" + valoresCie10.ekgHallazgosCie10 : ""} ${valoresCie10.ekgConclusionesCie10 ? "\n" + valoresCie10.ekgConclusionesCie10 : ""}\n`;
           }
 
           // Información radiográfica
@@ -2181,7 +2209,8 @@ export const GetInfoServicioEditar = (
             "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales2 +=
               "-INFORME RADIOGRAFICO : " +
-              resSimple.infoGeneralRadiografia_info_general +
+              resSimple.infoGeneralRadiografia_info_general + " " +
+              (valoresCie10.rayoscolumnaConclusionCie10 ? "\n" + valoresCie10.rayoscolumnaConclusionCie10 : "") +
               "\n";
           }
           // if (resSimple.conclusionRadiografia_conclu != null) {
@@ -2307,7 +2336,7 @@ export const GetInfoServicioEditar = (
             (
               resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
                 resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
-                ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
+                ? "LABORATORIO: " + resSimple.observacionesLaboratorioClinico_txtobservacioneslb + " " + (valoresCie10.hematologiaObservacionesCie10 ? "\n" + valoresCie10.hematologiaObservacionesCie10 : "")
                 : "LABORATORIO: SIN OBSERVACIONES"
             ) +
             "\n";
@@ -2434,7 +2463,7 @@ export const GetInfoServicioEditar = (
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
             data.observacionesGenerales2 +=
-              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + " " + (valoresCie10.oftalmologiaEnfOcularesCie10 ? "\n" + valoresCie10.oftalmologiaEnfOcularesCie10 : "") + (valoresCie10.oftalmologiaPresenciaPterigionCie10 ? "\n" + valoresCie10.oftalmologiaPresenciaPterigionCie10 : "") + "\n";
             data.contador++;
           }
 
@@ -2464,7 +2493,8 @@ export const GetInfoServicioEditar = (
             data.observacionesGenerales2 +=
               data.contador +
               ".ODONTOGRAMA : " +
-              resSimple.observacionesOdontograma_txtobservaciones +
+              resSimple.observacionesOdontograma_txtobservaciones + " " +
+              (valoresCie10.odontologiaObservacionesCie10 ? "\n" + valoresCie10.odontologiaObservacionesCie10 : "") +
               "\n";
             data.dentaduraObservaciones =
               resSimple.observacionesOdontograma_txtobservaciones;
@@ -2632,6 +2662,8 @@ export const GetInfoServicioEditar = (
           }
 
           data = MapearDatosAdicionales(res, data, 1, true);
+          data.observacionesGenerales2Cie10 = limpiarObservaciones(data.observacionesGenerales2Cie10);
+
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...res, ...data, visionColores: resSimple.vc_vc ?? "", reflejosPupilares: resSimple.rp_rp ?? "", }));
         }
