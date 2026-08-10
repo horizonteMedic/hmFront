@@ -66,6 +66,47 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
         setResultadosFinales([]);
         setData((prev) => prev.map((row) => ({ ...row, estado: "procesando", mensaje: "" })));
 
+        const total = data.length;
+        let procesados = 0;
+
+        Swal.fire({
+            title: "Procesando Carga Masiva",
+            html: `
+                <div class="mb-4">
+                    <p class="text-gray-700 mb-2">Verificando y registrando N° de Orden...</p>
+                    <div class="w-full bg-gray-200 rounded-full h-6 mb-2">
+                        <div id="cm-progress-bar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-white text-sm font-semibold" style="width: 0%">
+                            0%
+                        </div>
+                    </div>
+                    <p id="cm-current" class="text-sm text-gray-600">Iniciando...</p>
+                    <p id="cm-count" class="text-xs text-gray-500 mt-1">0 de ${total} registros procesados</p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        const actualizarBarraYFila = (resultado) => {
+            procesados += 1;
+            const pct = Math.round((procesados / total) * 100);
+
+            const bar = document.getElementById("cm-progress-bar");
+            const current = document.getElementById("cm-current");
+            const count = document.getElementById("cm-count");
+
+            if (bar) { bar.style.width = `${pct}%`; bar.textContent = `${pct}%`; }
+            if (current) {
+                const estado = resultado.omitido ? "Omitido" : resultado.ok ? "Guardado" : "Error";
+                current.textContent = `N° Orden ${resultado.norden}: ${estado}`;
+            }
+            if (count) count.textContent = `${procesados} de ${total} registros procesados`;
+
+            actualizarFila(resultado);
+        };
+
         const resultados = await guardarCargaMasivaFA16(
             data,
             {
@@ -77,9 +118,10 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                 medicoUsername: medico.user_medicoFirma,
                 sede,
             },
-            actualizarFila
+            actualizarBarraYFila
         );
 
+        Swal.close();
         setProcesando(false);
         setResultadosFinales(resultados);
 

@@ -83,11 +83,14 @@ export default function PanelObservaciones({
         </div>
         <div className="bg-green-200 p-3 rounded-xl col-span-3">
           <CIE10List
-            value={form.conclusionesCie10AUTO}
-            fieldName="conclusionesCie10AUTO"
+            value={form.observacionesGenerales2Cie10}
+            fieldName="observacionesGenerales2Cie10"
             label="Observaciones Generales AUTO CIE10"
             token={token}
             setForm={setForm}
+            setAdditionalForm={setForm}
+            additionalFieldName="observacionesGenerales2"
+            additionalDelimiter={"\n"}
           />
         </div>
         {/* Observaciones */}

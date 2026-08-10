@@ -29,6 +29,7 @@ const MATRICES_MAP = {
   "Matriz-18": { url: "/api/v01/st/registros/colinesterasa", method: "POST", name: "MATRIZ COLINESTERASA" },
   "Matriz-19": { url: "/api/v01/st/registros/matrizOhlaGeneral", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
   "Matriz-20": { urlH: "/api/headers/hidrandina", methodH: "GET", urlB: "/api/v01/st/registros/matrizHidrandina", methodB: "POST", name: "MATRIZ HIDRANDINA" },
+  "Matriz-21": { urlH: "/api/headers/hidrandina", methodH: "GET", urlB: "/api/v01/st/registros/matrizConsorcioCoptos", methodB: "POST", name: "MATRIZ CONSORCIO COPTOS" },
 };
 
 const MatrizPostulante = () => {
@@ -780,6 +781,8 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Colinesterasa") && <option value="Matriz-18">MATRIZ COLINESTERASA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Ohla-General") && <option value="Matriz-19">MATRIZ ADMINISTRATIVA GENERAL</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Hidrandina") && <option value="Matriz-20">MATRIZ HIDRANDINA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Consorcio Coptos") && <option value="Matriz-21">MATRIZ CONSORCIO COPTOS</option>}
+
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

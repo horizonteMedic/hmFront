@@ -4,7 +4,7 @@ export const getAnexo16InitialFormState = ({ today, userlogued, userName, SinRee
   fechaExam: today,
   codigoAnexo: null,
   conclusionesCie10: "",
-  conclusionesCie10AUTO: "",
+  observacionesGenerales2Cie10: "",
   //Info personal
   dni: "",
   nombres: "",
