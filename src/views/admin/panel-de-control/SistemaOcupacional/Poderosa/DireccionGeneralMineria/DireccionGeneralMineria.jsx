@@ -3,24 +3,93 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import RadioTable from "../../../../../components/reusableComponents/RadioTable";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
-import BotonesAccion from "../../../../../components/templates/BotonesAccion"
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
-import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
 
 const tabla = "ministerio_energia_minas";
+const today = getToday();
 
-export default function DirecionGeneralMineria() {
-    const today = getToday();
+const FACTORES_HEREDITARIOS_1 = [
+    { name: "asma", label: "1.- Asma" },
+    { name: "alergias", label: "2.- Alergias" },
+    { name: "bronquitis", label: "3.- Bronquitis" },
+    { name: "pleuresia", label: "4.- Pleuresia" },
+    { name: "neumonia", label: "5.- Neumonia" },
+    { name: "respiracion", label: "6.- Respiracion" },
+    { name: "sangreSaliva", label: "7.- Sangre en la Saliva" },
+    { name: "respiracionBreve", label: "8.- Respiracion Breve" },
+    { name: "problemasNasales", label: "9.- Problemas Nasales" },
+    { name: "tbc", label: "10.- T.B.C." },
+    { name: "fuma", label: "Fuma" },
+];
+
+const FACTORES_HEREDITARIOS_2 = [
+    { name: "palpitaciones", label: "11.- Palpitaciones" },
+    { name: "ritmoCardiacoIrregular", label: "12.- Ritmo Cardiaco Irregular" },
+    { name: "fallasCardiacas", label: "13.- Fallas Cardiacas" },
+    { name: "desmayos", label: "14.- Desmayos" },
+    { name: "tobillosHinchados", label: "15.- Tobillos Hinchados" },
+    { name: "moretonesAnormales", label: "16.- Moretones Anormales" },
+    { name: "presionAlta", label: "17.- Presion Alta" },
+    { name: "heridasPecho", label: "18.- Heridas del Pecho" },
+    { name: "otrasEnfermedades", label: "19.- Otras Enfermedades" },
+    { name: "tomaMedicina", label: "Toma alguna medicina" },
+];
+
+const OPCIONES_SI_NO = [
+    { label: "SI", value: true },
+    { label: "NO", value: false },
+];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "colorPiel",
+    "colorOjos",
+    "cabello",
+    ...FACTORES_HEREDITARIOS_1.map((i) => i.name),
+    ...FACTORES_HEREDITARIOS_2.map((i) => i.name),
+    "pulsoReposo",
+    "pulsoReposoBp",
+    "pulso30flexiones",
+    "respiracionReposo",
+    "respiracion30flexiones",
+    "obstruccionNasal",
+    "formaPecho",
+    "expansionPecho",
+    "enfermedadesCronicas",
+    "enForma",
+    "pechoNormal",
+    "tbcRayosX",
+    "pneumoconiosis",
+    "clasificacionOit",
+    "corazonRayosX",
+    "otrosCambios",
+    "hallazgosAnormales",
+    "opinionClinica",
+    "user_medicoFirma",
+    "nombre_medico",
+];
+
+const DireccionGeneralMineria = () => {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+
     const initialFormState = {
         // Header
         norden: "",
         fechaExamen: today,
         tipoExamen: "",
+
         // Datos personales
         dni: "",
         nombres: "",
@@ -37,7 +106,7 @@ export default function DirecionGeneralMineria() {
         ocupacion: "",
         cargoDesempenar: "",
 
-        //EXAMEN MEDICO
+        // Exámen médico (datos básicos, de Triaje)
         fechaNacimientoPaciente: "",
         peso: "",
         talla: "",
@@ -45,8 +114,7 @@ export default function DirecionGeneralMineria() {
         colorOjos: "",
         cabello: "",
 
-        //FACTORES HEREDITARIOS
-        //1
+        // Factores hereditarios (1)
         asma: false,
         alergias: false,
         bronquitis: false,
@@ -58,7 +126,8 @@ export default function DirecionGeneralMineria() {
         problemasNasales: false,
         tbc: false,
         fuma: false,
-        //2
+
+        // Factores hereditarios (2) / Cáncer pulmonar
         palpitaciones: false,
         ritmoCardiacoIrregular: false,
         fallasCardiacas: false,
@@ -70,8 +139,7 @@ export default function DirecionGeneralMineria() {
         otrasEnfermedades: false,
         tomaMedicina: false,
 
-        //DETALLES
-        //EXAMNE MEDICO
+        // Detalles - Exámen médico
         pulsoReposo: "",
         pulsoReposoBp: "",
         pulso30flexiones: "",
@@ -89,7 +157,7 @@ export default function DirecionGeneralMineria() {
         otros: "",
         enForma: "",
 
-        //RAYOS X
+        // Detalles - Rayos X
         fechaPlaca: "",
         pechoNormal: "",
         tbcRayosX: "",
@@ -99,13 +167,23 @@ export default function DirecionGeneralMineria() {
         corazonRayosX: "",
         otrosCambios: "",
         examenSaliva: "",
-        //OPINOINES
+
+        // Opiniones
         hallazgosAnormales: "",
         opinionClinica: "",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -119,35 +197,99 @@ export default function DirecionGeneralMineria() {
         handleChangeSimple,
         handleClearnotO,
         handlePrintDefault,
+        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "DireccionGeneralMineria" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
+    const handleSearch = (e) => {
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
-    const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-        }
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
-    const handlePrint = () => {
-        handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
-        });
-    };
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+            {hayRegistroCargado && (
+                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
+                </div>
+            )}
+
+            {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+                <div className="w-full flex gap-x-3">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="flex-1"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
+                    label="Tipo de Examen"
+                    name="tipoExamen"
+                    disabled
+                    value={form.tipoExamen}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -156,20 +298,21 @@ export default function DirecionGeneralMineria() {
                     type="date"
                     value={form.fechaExamen}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("fechaExamen")}
+                    onRevert={() => revertField("fechaExamen")}
                 />
-
             </SectionFieldset>
 
             {/* ===== SECCIÓN: DATOS LABORALES ===== */}
             <DatosPersonalesLaborales form={form} />
 
-            {/* ===== SECCIÓN: EXAMEN MEDICOS =====*/}
-            <SectionFieldset legend="EXÁMEN MEDICO (Debe ser llenado por el médico que hace la evaluación fisica)" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            {/* ===== SECCIÓN: EXÁMEN MÉDICO ===== */}
+            <SectionFieldset legend="Exámen Médico (Debe ser llenado por el médico que hace la evaluación física)" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="Fecha de Nacimiento"
                     name="fechaNacimientoPaciente"
-                    type="text"
                     value={form.fechaNacimientoPaciente}
                     disabled
                     labelWidth="120px"
@@ -194,7 +337,10 @@ export default function DirecionGeneralMineria() {
                     value={form.colorPiel}
                     onChange={handleChange}
                     onKeyUp={handleFocusNext}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("colorPiel")}
+                    onRevert={() => revertField("colorPiel")}
                 />
                 <InputTextOneLine
                     label="Color de Ojos"
@@ -202,77 +348,53 @@ export default function DirecionGeneralMineria() {
                     value={form.colorOjos}
                     onChange={handleChange}
                     onKeyUp={handleFocusNext}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("colorOjos")}
+                    onRevert={() => revertField("colorOjos")}
                 />
                 <InputTextOneLine
                     label="Cabello"
                     name="cabello"
                     value={form.cabello}
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("cabello")}
+                    onRevert={() => revertField("cabello")}
                 />
-
             </SectionFieldset>
 
             <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
-                <SectionFieldset legend="FACTORES HEREDITARIOS">
+                <SectionFieldset legend="Factores Hereditarios">
                     <RadioTable
-                        items={[
-                            { name: "asma", label: "1.- Asma" },
-                            { name: "alergias", label: "2.- Alergias" },
-                            { name: "bronquitis", label: "3.- Bronquitis" },
-                            { name: "pleuresia", label: "4.- Pleuresia" },
-                            { name: "neumonia", label: "5.- Neumonia" },
-                            { name: "respiracion", label: "6.- Respiracion" },
-                            { name: "sangreSaliva", label: "7.- Sangre en la Saliva" },
-                            { name: "respiracionBreve", label: "8.- Respiracion Breve" },
-                            { name: "problemasNasales", label: "9.- Problemas Nasales" },
-                            { name: "tbc", label: "10.- T.B.C." },
-                            { name: "fuma", label: "Fuma" },
-                        ]}
-                        options={[
-                            { label: "SI", value: true },
-                            { label: "NO", value: false },
-                        ]}
+                        items={FACTORES_HEREDITARIOS_1}
+                        options={OPCIONES_SI_NO}
                         form={form}
                         groupLabel="T.B.C."
                         handleRadioButton={handleRadioButtonBoolean}
+                        disabled={camposDeshabilitados}
                     />
                 </SectionFieldset>
-                <SectionFieldset legend="CANCER PULMONAR">
+                <SectionFieldset legend="Cáncer Pulmonar">
                     <RadioTable
-                        items={[
-                            { name: "palpitaciones", label: "11.- Palpitaciones" },
-                            { name: "ritmoCardiacoIrregular", label: "12.- Ritmo Cardiaco Irregular" },
-                            { name: "fallasCardiacas", label: "13.- Fallas Cardiacas" },
-                            { name: "desmayos", label: "14.- Desmayos" },
-                            { name: "tobillosHinchados", label: "15.- Tobillos Hinchados" },
-                            { name: "moretonesAnormales", label: "16.- Moretones Anormales" },
-                            { name: "presionAlta", label: "17.- Presion Alta" },
-                            { name: "heridasPecho", label: "18.- Heridas del Pecho" },
-                            { name: "otrasEnfermedades", label: "19.- Otras Enfermedades" },
-                            { name: "tomaMedicina", label: "Toma alguna medicina" },
-                        ]}
-                        options={[
-                            { label: "SI", value: true },
-                            { label: "NO", value: false },
-                        ]}
+                        items={FACTORES_HEREDITARIOS_2}
+                        options={OPCIONES_SI_NO}
                         form={form}
                         groupLabel="CANCER PULMONAR"
                         handleRadioButton={handleRadioButtonBoolean}
+                        disabled={camposDeshabilitados}
                     />
                 </SectionFieldset>
             </div>
 
-
-            {/* ===== SECCIÓN: DETALLES =====*/}
-            <SectionFieldset legend="DETALLES" className="grid grid-cols-1  gap-x-4 gap-y-3">
-                <SectionFieldset legend="Examen Medico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+            {/* ===== SECCIÓN: DETALLES ===== */}
+            <SectionFieldset legend="Detalles" className="grid grid-cols-1 gap-x-4 gap-y-3">
+                <SectionFieldset legend="Exámen Médico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Fecha"
-                            name="fechaExamen"
-                            type="text"
+                            name="fechaExamenDetalle"
                             value={form.fechaExamen}
                             disabled
                             labelWidth="120px"
@@ -282,7 +404,10 @@ export default function DirecionGeneralMineria() {
                             name="pulsoReposo"
                             value={form.pulsoReposo}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("pulsoReposo")}
+                            onRevert={() => revertField("pulsoReposo")}
                         />
                         <InputTextOneLine
                             label="B.P."
@@ -290,7 +415,10 @@ export default function DirecionGeneralMineria() {
                             value={form.pulsoReposoBp}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("pulsoReposoBp")}
+                            onRevert={() => revertField("pulsoReposoBp")}
                         />
                         <InputTextOneLine
                             label="Despues de 30 flexiones en 60 seg"
@@ -298,31 +426,43 @@ export default function DirecionGeneralMineria() {
                             value={form.pulso30flexiones}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("pulso30flexiones")}
+                            onRevert={() => revertField("pulso30flexiones")}
                         />
                         <InputTextOneLine
                             label="Respiracion en reposo"
                             name="respiracionReposo"
                             value={form.respiracionReposo}
-                            onChange={handleChange} 
+                            onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("respiracionReposo")}
+                            onRevert={() => revertField("respiracionReposo")}
                         />
                         <InputTextOneLine
                             label="Despues de 30 flexiones en 60 seg"
                             name="respiracion30flexiones"
                             value={form.respiracion30flexiones}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("respiracion30flexiones")}
+                            onRevert={() => revertField("respiracion30flexiones")}
                         />
                         <InputsBooleanRadioGroup
                             label="Obstruccion Nasal"
                             name="obstruccionNasal"
                             labelWidth="120px"
-                            value={form?.obstruccionNasal}
+                            value={form.obstruccionNasal}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             trueLabel="Si"
                             falseLabel="No"
+                            edited={isFieldEdited("obstruccionNasal")}
+                            onRevert={() => revertField("obstruccionNasal")}
                         />
                         <InputTextOneLine
                             label="Forma del pecho"
@@ -330,25 +470,28 @@ export default function DirecionGeneralMineria() {
                             value={form.formaPecho}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("formaPecho")}
+                            onRevert={() => revertField("formaPecho")}
                         />
                         <InputTextOneLine
                             label="Expansión del pecho Normal"
                             name="expansionPecho"
                             value={form.expansionPecho}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("expansionPecho")}
+                            onRevert={() => revertField("expansionPecho")}
                         />
-
                     </div>
                     <div className="grid grid-cols-1 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Pulmones"
                             name="pulmones"
-                            type="text"
                             value={form.pulmones}
-                            onChange={handleChange}
-                            onKeyUp={handleFocusNext}
+                            disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -363,7 +506,10 @@ export default function DirecionGeneralMineria() {
                             name="enfermedadesCronicas"
                             value={form.enfermedadesCronicas}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("enfermedadesCronicas")}
+                            onRevert={() => revertField("enfermedadesCronicas")}
                         />
                         <div className="grid lg:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
@@ -381,9 +527,7 @@ export default function DirecionGeneralMineria() {
                                 labelWidth="120px"
                             />
                         </div>
-
                         <div className="grid lg:grid-cols-2 gap-x-4 gap-y-3">
-
                             <InputTextOneLine
                                 label="FEVL"
                                 name="fevl"
@@ -404,13 +548,15 @@ export default function DirecionGeneralMineria() {
                                 label="En Forma"
                                 name="enForma"
                                 labelWidth="120px"
-                                value={form?.enForma}
+                                value={form.enForma}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={camposDeshabilitados}
                                 trueLabel="Si"
                                 falseLabel="No"
+                                edited={isFieldEdited("enForma")}
+                                onRevert={() => revertField("enForma")}
                             />
                         </div>
-
                     </div>
                 </SectionFieldset>
 
@@ -419,19 +565,20 @@ export default function DirecionGeneralMineria() {
                         <InputTextOneLine
                             label="Fecha"
                             name="fechaPlaca"
-                            type="text"
                             value={form.fechaPlaca}
                             disabled
                             labelWidth="120px"
                         />
-
                         <InputTextOneLine
                             label="Pecho Normal"
                             name="pechoNormal"
                             value={form.pechoNormal}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("pechoNormal")}
+                            onRevert={() => revertField("pechoNormal")}
                         />
                         <InputTextOneLine
                             label="T.B.C."
@@ -439,7 +586,10 @@ export default function DirecionGeneralMineria() {
                             value={form.tbcRayosX}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("tbcRayosX")}
+                            onRevert={() => revertField("tbcRayosX")}
                         />
                         <InputTextOneLine
                             label="Pneumoconiosis"
@@ -447,16 +597,21 @@ export default function DirecionGeneralMineria() {
                             value={form.pneumoconiosis}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("pneumoconiosis")}
+                            onRevert={() => revertField("pneumoconiosis")}
                         />
                         <InputTextOneLine
                             label="Clasificacion de la OIT (1980)"
                             name="clasificacionOit"
                             value={form.clasificacionOit}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("clasificacionOit")}
+                            onRevert={() => revertField("clasificacionOit")}
                         />
-
                     </div>
                     <div className="grid grid-cols-1 gap-x-4 gap-y-3">
                         <InputTextOneLine
@@ -469,31 +624,37 @@ export default function DirecionGeneralMineria() {
                         <InputTextOneLine
                             label="Corazon"
                             name="corazonRayosX"
-                            type="text"
                             value={form.corazonRayosX}
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("corazonRayosX")}
+                            onRevert={() => revertField("corazonRayosX")}
                         />
                         <InputTextOneLine
                             label="Otros Cambios"
                             name="otrosCambios"
                             value={form.otrosCambios}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
+                            edited={isFieldEdited("otrosCambios")}
+                            onRevert={() => revertField("otrosCambios")}
                         />
                         <InputTextOneLine
                             label="Examen de Saliva"
                             name="examenSaliva"
-                            disabled
                             value={form.examenSaliva}
+                            disabled
                             labelWidth="120px"
                         />
                     </div>
                 </SectionFieldset>
             </SectionFieldset>
 
-            <SectionFieldset legend="Opiniones" className="grid grid-cols-1  gap-x-4 gap-y-3">
+            {/* ===== SECCIÓN: OPINIONES ===== */}
+            <SectionFieldset legend="Opiniones" className="grid grid-cols-1 gap-x-4 gap-y-3">
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Pecho Normal"
@@ -506,17 +667,23 @@ export default function DirecionGeneralMineria() {
                         label="Hallazgos Anormales"
                         name="hallazgosAnormales"
                         value={form.hallazgosAnormales}
-                        onKeyUp={handleFocusNext}
-                        labelWidth="120px"
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        labelWidth="120px"
+                        edited={isFieldEdited("hallazgosAnormales")}
+                        onRevert={() => revertField("hallazgosAnormales")}
                     />
                     <InputTextOneLine
                         label="Clasificacion de la OIT (1980)"
                         name="clasificacionOit"
+                        value={form.clasificacionOit}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
-                        value={form.clasificacionOit}
+                        disabled={camposDeshabilitados}
                         labelWidth="120px"
+                        edited={isFieldEdited("clasificacionOit")}
+                        onRevert={() => revertField("clasificacionOit")}
                     />
                 </div>
 
@@ -526,28 +693,52 @@ export default function DirecionGeneralMineria() {
                     rows={2}
                     onChange={handleChange}
                     value={form.opinionClinica}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("opinionClinica")}
+                    onRevert={() => revertField("opinionClinica")}
                 />
-
-
             </SectionFieldset>
 
+            {/* ===== SECCIÓN: ASIGNACIÓN DE MÉDICO ===== */}
             <SectionFieldset legend="Asignación de Médico" className="w-full">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
-            {/* BOTONES DE ACCIÓN */}
-            <BotonesAccion
+
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     )
 }
 
+export default DireccionGeneralMineria

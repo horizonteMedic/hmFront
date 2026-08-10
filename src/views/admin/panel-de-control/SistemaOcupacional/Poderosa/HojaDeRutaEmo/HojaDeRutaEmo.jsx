@@ -2,100 +2,49 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
-import useRealTime from "../../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
-import { PrintHojaR, PrintHojaRData, SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerHojaRutaEmo";
 
 const tabla = "hoja_ruta_emo";
+const today = getToday();
 
-const dataReportePrueba = { 
-    "dniPaciente": 76574022, 
-    "nombreCompletoPaciente": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "nombresPaciente": "JOSUE SPENCER", 
-    "apellidosPaciente": "ROJAS SIGUENZA", 
-    "sexoPaciente": "M", 
-    "fechaNacimientoPaciente": "1995-07-19", 
-    "edadPaciente": "30", 
-    "nivelEstudioPaciente": "UNIVERSITARIO", 
-    "estadoCivilPaciente": "SOLTERO", 
-    "lugarNacimientoPaciente": "TRUJILLO", 
-    "ocupacionPaciente": "INGENIERO DE SISTEMAS", 
-    "observacionesGenerales": "DANI CONCLUSIONES SDAFAFDSF SDFSD FDSFSDF23FEFSDFSD FSDFSADFSDFSD FWEFDEWFDSFSD FWEFWEFWE FEFWER3EEREW RESR23423DSF SDFSDF23432 2 3 23423 DSFSD FW", 
-    "horaSalida": "11:21:44", 
-    "horaEntrada": "09:47:29", 
-    "peso": "67", 
-    "talla": "1.40", 
-    "pa": "90/90", 
-    "sat02": "100", 
-    "cintura": "100", 
-    "cadera": "100", 
-    "fc": "90", 
-    "fr": "40", 
-    "cuello": "40", 
-    "usuarioEvaluacionMedica": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionesEvaluacionMedica": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
-    "usuarioInformeBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionInformeBrigadista": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
-    "usuarioEvaluacionOftalmologica": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "usuarioAgudezaVisual": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionesEvaluacionVisual": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
-    "usuarioAudiometria": "JOSUE SPENCER ROJAS SIGUENZA SDFSDF DSFDS FSDFDSF23", 
-    "observacionAudiometria": "DANI OBSERVACION 4", 
-    "usuarioEspirometria": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionEspirometria": "DANI OBSERVACION 4", 
-    "usuarioToraxConvencional": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "usuarioToraxOit": " ", 
-    "observacionRadiografiaTorax": "DANI OBSERVACION 6", 
-    "usuarioElectrocardiograma": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionesElectrocardiograma": "DANI OBSERVACION 7", 
-    "usuarioExamenLaboratorio": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionesExamenLaboratorio": "DANI OBSERVACION 8", 
-    "usuarioExamenMedicoBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "usuarioCertificadoAptitudBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "usuarioConsultaExterna": "JOSUE SPENCER ROJAS SIGUENZA", 
-    "observacionBrigadista": "DANI OBSERVACION 9", 
-    "tipoExamen": "PRE-OCUPACIONAL", 
-    "empresa": "CONSORCIO COPTOS ", 
-    "contrata": "CENTRO MEDICO HORIZONTE MEDIC", 
-    "cargoPaciente": "ADMINISTRADOR", 
-    "areaPaciente": "ADMINISTRACION", 
-    "fechaApertura": "2025-06-26", 
-    "fechaExamen": "2026-03-06", 
-    "usuarioFirma": "developer", 
-    "doctorAsignado": null, 
-    "userRegistro": null, 
-    "nombreSede": "Trujillo-Pierola", 
-    "sede": "TRUJILLO-NICOLAS DE PIEROLA", 
-    "color": 1, 
-    "textoColor": "A", 
-    "codigoColor": "#00FFFF", 
-    "nameJasper": null, 
-    "codigoClinica": "4353-H", 
-    "digitalizacion": [ 
-        { 
-            "nombreDigitalizacion": "SELLOFIRMA", 
-            "url": "https://almacenamientotesthm.blob.core.windows.net/files1/EMPLEADO-DNI-76574021/Firma_ClaudiaChavezz.png?nocache=1773434998162" 
-        }, 
-        { 
-            "nombreDigitalizacion": "SELLOFIRMADOCASIG", 
-            "url": "https://almacenamientotesthm.blob.core.windows.net/files1/EMPLEADO-DNI-76574021/Firma_ClaudiaChavezz.png?nocache=1773434998181" 
-        } 
-    ], 
-    "norden": 148055 
-};
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "observacionesEvaluacionMedica",
+    "observacionInformeBrigadista",
+    "observacionesEvaluacionVisual",
+    "observacionAudiometria",
+    "observacionEspirometria",
+    "observacionRadiografiaTorax",
+    "observacionesElectrocardiograma",
+    "observacionesExamenLaboratorio",
+    "observacionBrigadista",
+    "observacionesGenerales",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 const HojaDeRutaEmo = () => {
-    const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
+
     const initialFormState = {
         // Header
         norden: "",
-        fechaExamen: today,
         tipoExamen: "",
+        fechaExamen: today,
+        horaEntrada: "",
+        horaSalida: "",
+
         // Datos personales
         dni: "",
         nombres: "",
@@ -112,85 +61,164 @@ const HojaDeRutaEmo = () => {
         ocupacion: "",
         cargoDesempenar: "",
 
-        //EXAMENES
+        // Vitales (Triaje)
+        peso: "",
+        talla: "",
+        pa: "",
+        sat02: "",
+        cintura: "",
+        cadera: "",
+        fc: "",
+        fr: "",
+        cuello: "",
 
+        // Medicina
         usuarioEvaluacionMedica: "",
         observacionesEvaluacionMedica: "",
-        //psicologica
+        // Psicología (Informe Brigadista)
         usuarioInformeBrigadista: "",
         observacionInformeBrigadista: "",
-        //Visual
+        // Visual
         usuarioEvaluacionOftalmologica: "",
         observacionesEvaluacionVisual: "",
-        //Audiometria
+        // Audiometría
         usuarioAudiometria: "",
         observacionAudiometria: "",
-        //Espirometria
+        // Espirometría
         usuarioEspirometria: "",
         observacionEspirometria: "",
-        //Radiografia de torax
+        // Radiografía de Tórax
         usuarioToraxConvencional: "",
         observacionRadiografiaTorax: "",
-        //Cardiologia
+        // Cardiología
         usuarioElectrocardiograma: "",
         observacionesElectrocardiograma: "",
-        //Laboratorio
+        // Laboratorio
         usuarioExamenLaboratorio: "",
         observacionesExamenLaboratorio: "",
-        //Brigadista
+        // Brigadista
         usuarioCertificadoAptitudBrigadista: "",
         observacionBrigadista: "",
-        //horas
+
+        // Conclusiones
         observacionesGenerales: "",
-        horaEntrada: "",
-        horaSalida: useRealTime(),
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
         form,
         setForm,
-        handleChange,
         handleChangeNumber,
-        handleRadioButton,
-        handleRadioButtonBoolean,
-        handleClear,
         handleChangeSimple,
+        handleChange,
         handleClearnotO,
+        handleClear,
         handlePrintDefault,
         handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "HojaRutaEMO" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
+    const handleSearch = (e) => {
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
-    const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-        }
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
-    const handlePrint = () => {
-        handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
-        });
-    };
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            {hayRegistroCargado && (
+                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
+                </div>
+            )}
+
+            {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">
+                <div className="w-full flex gap-x-3">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="flex-1"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
+                    label="Tipo de Examen"
+                    name="tipoExamen"
+                    disabled
+                    value={form.tipoExamen}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -199,338 +227,218 @@ const HojaDeRutaEmo = () => {
                     type="date"
                     value={form.fechaExamen}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("fechaExamen")}
+                    onRevert={() => revertField("fechaExamen")}
                 />
-
-
+                <InputTextOneLine
+                    label="Hora"
+                    name="horaSalida"
+                    labelWidth="120px"
+                    disabled
+                    value={form.tieneRegistro ? form.horaSalida : hora}
+                />
             </SectionFieldset>
 
             {/* ===== SECCIÓN: DATOS LABORALES ===== */}
             <DatosPersonalesLaborales form={form} />
 
-            <SectionFieldset legend="EXAMENES" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
-                <label className="text-center text-lg" htmlFor="">EXÁMENES</label>
-                <label className="text-center text-lg" htmlFor="">PRUEBAS REALIZADAS POR</label>
-                <label className="text-center text-lg" htmlFor="">OBSERVACIONES</label>
+            {/* ===== SECCIÓN: EXÁMENES ===== */}
+            <SectionFieldset legend="Exámenes" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+                <label className="text-center text-lg font-semibold" htmlFor="">EXÁMENES</label>
+                <label className="text-center text-lg font-semibold" htmlFor="">PRUEBAS REALIZADAS POR</label>
+                <label className="text-center text-lg font-semibold" htmlFor="">OBSERVACIONES</label>
 
+                {/* Vitales (Triaje) */}
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="PESO"
-                        name="peso"
-                        type="text"
-                        value={form.peso}
-                        labelWidth="34px"
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="TALLA"
-                        name="talla"
-                        type="text"
-                        value={form.talla}
-                        disabled
-                        labelWidth="36px"
-                    />
-                    <InputTextOneLine
-                        label="P/A"
-                        name="pa"
-                        type="text"
-                        value={form.pa}
-                        disabled
-                        labelWidth="35px"
-                    />
+                    <InputTextOneLine label="PESO" name="peso" value={form.peso} labelWidth="34px" disabled />
+                    <InputTextOneLine label="TALLA" name="talla" value={form.talla} labelWidth="36px" disabled />
+                    <InputTextOneLine label="P/A" name="pa" value={form.pa} labelWidth="35px" disabled />
                 </div>
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="SAT02"
-                        name="sat02"
-                        type="text"
-                        value={form.sat02}
-                        disabled
-                        labelWidth="38px"
-                    />
-                    <InputTextOneLine
-                        label="CINTURA"
-                        name="cintura"
-                        type="text"
-                        value={form.cintura}
-                        disabled
-                        labelWidth="55px"
-                    />
-                    <InputTextOneLine
-                        label="CADERA"
-                        name="cadera"
-                        type="text"
-                        value={form.cadera}
-                        disabled
-                        labelWidth="55px"
-                    />
+                    <InputTextOneLine label="SAT02" name="sat02" value={form.sat02} labelWidth="38px" disabled />
+                    <InputTextOneLine label="CINTURA" name="cintura" value={form.cintura} labelWidth="55px" disabled />
+                    <InputTextOneLine label="CADERA" name="cadera" value={form.cadera} labelWidth="55px" disabled />
                 </div>
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="FC"
-                        name="fc"
-                        type="text"
-                        value={form.fc}
-                        disabled
-                        labelWidth="34px"
-                    />
-                    <InputTextOneLine
-                        label="FR"
-                        name="fr"
-                        type="text"
-                        value={form.fr}
-                        disabled
-                        labelWidth="36px"
-                    />
-                    <InputTextOneLine
-                        label="CUELLO"
-                        name="cuello"
-                        type="text"
-                        value={form.cuello}
-                        disabled
-                        labelWidth="45px"
-                    />
+                    <InputTextOneLine label="FC" name="fc" value={form.fc} labelWidth="34px" disabled />
+                    <InputTextOneLine label="FR" name="fr" value={form.fr} labelWidth="36px" disabled />
+                    <InputTextOneLine label="CUELLO" name="cuello" value={form.cuello} labelWidth="45px" disabled />
                 </div>
 
-                {/*MEDICINA */}
-                <h1 className="font-bold text-lg text-center">MEDICINA
-                    *Evaluación médica
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    value={form.usuarioEvaluacionMedica}
-                    form={form}
-                    onChange={handleChangeSimple}
-                    disabled
-                />
+                {/* MEDICINA */}
+                <h1 className="font-bold text-lg text-center self-center">MEDICINA<br />*Evaluación médica</h1>
+                <InputTextOneLine name="usuarioEvaluacionMedica" value={form.usuarioEvaluacionMedica} disabled />
                 <InputTextOneLine
                     name="observacionesEvaluacionMedica"
-                    type="text"
                     value={form.observacionesEvaluacionMedica}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionesEvaluacionMedica")}
+                    onRevert={() => revertField("observacionesEvaluacionMedica")}
                 />
 
-                {/*PSICOLOGICA */}
-                <h1 className="font-bold text-lg text-center">EVALUACIÓN PSICOLÓGIA
-                    <br />
-                    *Informe Psicologico Brigadista
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    disabled
-                    value={form.usuarioInformeBrigadista}
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
+                {/* PSICOLÓGICA */}
+                <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN PSICOLÓGICA<br />*Informe Psicológico Brigadista</h1>
+                <InputTextOneLine name="usuarioInformeBrigadista" value={form.usuarioInformeBrigadista} disabled />
                 <InputTextOneLine
                     name="observacionInformeBrigadista"
-                    type="text"
                     value={form.observacionInformeBrigadista}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionInformeBrigadista")}
+                    onRevert={() => revertField("observacionInformeBrigadista")}
                 />
 
-                {/*EVALUACION VISUAL */}
-                <h1 className="font-bold text-lg text-center">EVALUACIÓN VISUAL
-                    <br />
-                    *Evaluación Oftalmológica
-                    *Agudeza visual
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    disabled
-                    value={form.usuarioEvaluacionOftalmologica}
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
+                {/* EVALUACIÓN VISUAL */}
+                <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN VISUAL<br />*Evaluación Oftalmológica *Agudeza visual</h1>
+                <InputTextOneLine name="usuarioEvaluacionOftalmologica" value={form.usuarioEvaluacionOftalmologica} disabled />
                 <InputTextOneLine
                     name="observacionesEvaluacionVisual"
-                    type="text"
                     value={form.observacionesEvaluacionVisual}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionesEvaluacionVisual")}
+                    onRevert={() => revertField("observacionesEvaluacionVisual")}
                 />
 
-                {/*EVALUACION AUDIOMETRIA */}
-                <h1 className="font-bold text-lg text-center">EVALUACIÓN AUDIOMETRIA
-                    <br />
-                    *AUDIOMETRIA
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    value={form.usuarioAudiometria}
-                    form={form}
-                    onChange={handleChangeSimple}
-                    disabled
-                />
+                {/* AUDIOMETRÍA */}
+                <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN AUDIOMETRÍA<br />*Audiometría</h1>
+                <InputTextOneLine name="usuarioAudiometria" value={form.usuarioAudiometria} disabled />
                 <InputTextOneLine
                     name="observacionAudiometria"
-                    type="text"
                     value={form.observacionAudiometria}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionAudiometria")}
+                    onRevert={() => revertField("observacionAudiometria")}
                 />
 
-                {/*EVALUACION ESPIROMETRIA */}
-                <h1 className="font-bold text-lg text-center">EVALUACIÓN ESPIROMETRIA
-                    <br />
-                    *Cuestionario de Espirometria
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    value={form.usuarioEspirometria}
-                    form={form}
-                    onChange={handleChangeSimple}
-                    disabled
-                />
+                {/* ESPIROMETRÍA */}
+                <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN ESPIROMETRÍA<br />*Cuestionario de Espirometría</h1>
+                <InputTextOneLine name="usuarioEspirometria" value={form.usuarioEspirometria} disabled />
                 <InputTextOneLine
                     name="observacionEspirometria"
-                    type="text"
                     value={form.observacionEspirometria}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionEspirometria")}
+                    onRevert={() => revertField("observacionEspirometria")}
                 />
 
-                {/*EVALUACION RADIOGRAFICA DE TORAX */}
-                <h1 className="font-bold text-lg text-center">EVALUACIÓN RADIOGRAFIA DE TORAX
-                    <br />
-                    *Tórax Convencional *Tórax OIT
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    value={form.usuarioToraxConvencional}
-                    form={form}
-                    onChange={handleChangeSimple}
-                    disabled
-                />
+                {/* RADIOGRAFÍA DE TÓRAX */}
+                <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN RADIOGRAFÍA DE TÓRAX<br />*Tórax Convencional *Tórax OIT</h1>
+                <InputTextOneLine name="usuarioToraxConvencional" value={form.usuarioToraxConvencional} disabled />
                 <InputTextOneLine
                     name="observacionRadiografiaTorax"
-                    type="text"
                     value={form.observacionRadiografiaTorax}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionRadiografiaTorax")}
+                    onRevert={() => revertField("observacionRadiografiaTorax")}
                 />
 
-                {/*EVALUACION CARDIOLOGIA */}
-                <h1 className="font-bold text-lg text-center">CARDIOLOGIA
-                    <br />
-                    *Electrocardiograma
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    disabled
-                    value={form.usuarioElectrocardiograma}
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
+                {/* CARDIOLOGÍA */}
+                <h1 className="font-bold text-lg text-center self-center">CARDIOLOGÍA<br />*Electrocardiograma</h1>
+                <InputTextOneLine name="usuarioElectrocardiograma" value={form.usuarioElectrocardiograma} disabled />
                 <InputTextOneLine
                     name="observacionesElectrocardiograma"
-                    type="text"
                     value={form.observacionesElectrocardiograma}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionesElectrocardiograma")}
+                    onRevert={() => revertField("observacionesElectrocardiograma")}
                 />
 
-                {/* LABORATIOR*/}
-                <h1 className="font-bold text-lg text-center">EXÁMENES DE LABORATORIO
-
-                </h1>
-
-                <InputTextOneLine
-                    truelabel={false}
-                    value={form.usuarioExamenLaboratorio}
-                    form={form}
-                    onChange={handleChangeSimple}
-                    disabled
-                />
+                {/* LABORATORIO */}
+                <h1 className="font-bold text-lg text-center self-center">EXÁMENES DE LABORATORIO</h1>
+                <InputTextOneLine name="usuarioExamenLaboratorio" value={form.usuarioExamenLaboratorio} disabled />
                 <InputTextOneLine
                     name="observacionesExamenLaboratorio"
-                    type="text"
                     value={form.observacionesExamenLaboratorio}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionesExamenLaboratorio")}
+                    onRevert={() => revertField("observacionesExamenLaboratorio")}
                 />
 
-                {/*BRIGADISTA */}
-                <h1 className="font-bold text-lg text-center">BRIGADISTA
-                    <br />
-                    *Examen Medico Brigadista *Certificado de Aptitud Brigadista *Hoja de Consulta Externa - Brl
-                </h1>
-
-                <InputTextOneLine
-                    className="flex justify-center items-center"
-                    truelabel={false}
-                    disabled
-                    value={form.usuarioCertificadoAptitudBrigadista}
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
+                {/* BRIGADISTA */}
+                <h1 className="font-bold text-lg text-center self-center">BRIGADISTA<br />*Examen Médico Brigadista *Certificado de Aptitud Brigadista *Hoja de Consulta Externa - Brl</h1>
+                <InputTextOneLine name="usuarioCertificadoAptitudBrigadista" value={form.usuarioCertificadoAptitudBrigadista} disabled />
                 <InputTextOneLine
                     name="observacionBrigadista"
-                    type="text"
                     value={form.observacionBrigadista}
                     onChange={handleChange}
-                    labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionBrigadista")}
+                    onRevert={() => revertField("observacionBrigadista")}
                 />
-
             </SectionFieldset>
 
-            <SectionFieldset legend="Conclusiones" className="gap-x-4 gap-y-3">
+            {/* ===== SECCIÓN: CONCLUSIONES ===== */}
+            <SectionFieldset legend="Conclusiones" className="space-y-3">
                 <InputTextArea
                     label="Conclusiones"
                     name="observacionesGenerales"
-                    type="text"
                     rows={3}
                     value={form.observacionesGenerales}
                     onChange={handleChange}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observacionesGenerales")}
+                    onRevert={() => revertField("observacionesGenerales")}
                 />
                 <div className="w-full flex justify-between">
-                    {form.horaEntrada && <div className="flex gap-2 items-center justify-center">
-                        <label htmlFor="">HORA ENTRADA:</label>
-                        <h1 className="text-lg font-bold">{form.horaEntrada}</h1>
-                    </div>}
+                    {form.horaEntrada && (
+                        <div className="flex gap-2 items-center justify-center">
+                            <label>HORA ENTRADA:</label>
+                            <h1 className="text-lg font-bold">{form.horaEntrada}</h1>
+                        </div>
+                    )}
                     <div className="flex gap-2 items-center justify-center">
-                        <label htmlFor="">HORA SALIDA:</label>
-                        <h1 className="text-lg font-bold">{form.horaSalida}</h1>
+                        <label>HORA SALIDA:</label>
+                        <h1 className="text-lg font-bold">{form.tieneRegistro ? form.horaSalida : hora}</h1>
                     </div>
                 </div>
             </SectionFieldset>
 
-            <SectionFieldset legend="Asignación de Médico" className="w-full">
+            {/* ===== SECCIÓN: ASIGNACIÓN DE MÉDICO ===== */}
+            <SectionFieldset legend="Asignación de Médico">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
                     label="Doctor Asignado"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
 
-            {/* <div className="flex justify-end px-4">
-                <button
-                    type="button"
-                    onClick={() => PrintHojaRData(dataReportePrueba, datosFooter)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow-md flex items-center gap-2 transition-all"
-                >
-                    Imprimir Reporte (Data)
-                </button>
-            </div> */}
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
 
-            {/* BOTONES DE ACCIÓN */}
-            <BotonesAccion
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
-                handleSave={handleSave}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     )

@@ -4,7 +4,8 @@ export default function RadioTable({
   form,
   handleRadioButton,
   labelColumns = 2,
-  groupLabel
+  groupLabel,
+  disabled = false,
 }) {
   const styleButton = ` w-5 h-5
                         rounded-md
@@ -60,7 +61,8 @@ export default function RadioTable({
                 name={item.name}
                 value={option.value}
                 checked={form?.[item.name] === option.value}
-                onChange={(e) => handleRadioButton(e, option.value)}
+                onChange={(e) => (disabled ? null : handleRadioButton(e, option.value))}
+                disabled={disabled}
                 className={styleButton}
               />
             </div>

@@ -1,290 +1,329 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBroom,
-  faPrint,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  InputTextOneLine,
-  InputTextArea,
-  InputsRadioGroup,
-  SectionFieldset,
-} from "../../../../../components/reusableComponents/ResusableComponents";
-import { useForm } from "../../../../../hooks/useForm";
-import { getToday, getTodayPlusOneYear } from "../../../../../utils/helpers";
-import { useSessionData } from "../../../../../hooks/useSessionData";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCAHerramientasManuales";
+import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual, getTodayPlusOneYear } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerCAHerramientasManuales";
 
 const tabla = "certificado_aptitud_herramientas_manuales";
+const today = getToday();
 
-export default function CAHerramientasManuales() {
-  const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter, userName } =
-    useSessionData();
+const TITULOS_EXAMEN = [
+    "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
+    "CERTIFICADO DE ESPACIOS CONFINADOS",
+];
 
-  const initialFormState = {
-    // Header - Campos principales
-    norden: "",
-    tituloExamen: "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
-    idCertificado: null,
-    fechaExam: today,
-    fechahasta: getTodayPlusOneYear(),
-    nombreExamen: "",
-    aptitud: "",
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "fechaHasta",
+    "tituloExamen",
+    "aptitud",
+    "observacion",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
-    // Datos personales
-    nombres: "",
-    dni: "",
-    edad: "",
-    sexo: "",
-    empresa: "",
-    contrata: "",
-    explotacion: "",
-    cargo: "",
-    areaTrabajo: "",
+const CAHerramientasManuales = () => {
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
+    const initialFormState = {
+        // Header
+        norden: "",
+        idCertificado: null,
+        nombreExamen: "",
+        tituloExamen: TITULOS_EXAMEN[0],
+        fechaExamen: today,
+        fechaHasta: getTodayPlusOneYear(),
 
-    // observacion
-    observacion: "",
+        // Datos personales
+        dni: "",
+        nombres: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        edad: "",
+        sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-  };
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
+        explotacion: "",
 
-  const {
-    form,
-    setForm,
-    handleChange,
-    handleChangeNumber,
-    handleChangeSimple,
-    handleRadioButton,
-    handleClear,
-    handleClearnotO,
-    handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "CAHerramientasManuales" });
+        // Conclusiones finales
+        aptitud: "",
+        observacion: "",
 
-  const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-  };
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
-  };
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
 
-  const handlePrint = () => {
-    handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
+    };
+
+    const {
+        form,
+        setForm,
+        handleChangeNumber,
+        handleChangeSimple,
+        handleChange,
+        handleClearnotO,
+        handleClear,
+        handleRadioButton,
+        handlePrintDefault,
+        handleChangeNumberDecimals,
+    } = useForm(initialFormState, { storageKey: "CAHerramientasManuales" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    const validateForm = () => {
+        if (!form.aptitud) {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-clipboard-list"></i>Error',
+                html: "Por favor, seleccione la aptitud.",
+            });
+            return false;
+        }
+        return true;
+    };
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
+    const handleSearch = (e) => {
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
+
+    const handleSave = () => {
+        if (!validateForm()) return;
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        if (!validateForm()) return;
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
     });
-  };
 
+    return (
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            {hayRegistroCargado && (
+                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
+                </div>
+            )}
 
-  return (
-    <div className="mx-auto bg-white">
-      <div className="w-full ">
-        {/* Datos del trabajador */}
-        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form?.norden}
-            onChange={handleChangeNumber}
-            onKeyUp={handleSearch}
-          />
-          <InputTextOneLine
-            label="Nombre Examen"
-            name="nombreExamen"
-            value={form?.nombreExamen}
-            disabled
-          />
-          <div className="flex gap-4 items-center ">
-            <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
-            <select
-              name="tituloExamen"
-              value={form.tituloExamen}
-              onChange={handleChangeSimple}
-              className="border rounded px-2 py-1 text-base w-full"
-            >
-              <option value="CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES">
-                CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES
-              </option>
-              <option value="CERTIFICADO DE ESPACIOS CONFINADOS">
-                CERTIFICADO DE ESPACIOS CONFINADOS
-              </option>
-            </select>
-          </div>
-          <InputTextOneLine
-            label="Fecha Examen"
-            name="fechaExam"
-            type="date"
-            value={form?.fechaExam}
-            onChange={handleChangeSimple}
-          />
-          <InputTextOneLine
-            label="Fecha Hasta"
-            name="fechahasta"
-            type="date"
-            value={form?.fechahasta}
-            onChange={handleChangeSimple}
-          />
+            {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="w-full flex gap-x-3">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="flex-1"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
+                <InputTextOneLine
+                    label="Nombre Examen"
+                    name="nombreExamen"
+                    disabled
+                    value={form.nombreExamen}
+                    labelWidth="120px"
+                />
+                <div className="flex items-center gap-4 w-full md:col-span-2 lg:col-span-2">
+                    <label className="font-semibold min-w-[120px] max-w-[120px]">Título del Examen :</label>
+                    <select
+                        name="tituloExamen"
+                        value={form.tituloExamen}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        className={`border rounded px-2 py-1 text-base w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("tituloExamen") ? "border-orange-400 bg-orange-100" : ""}`}
+                    >
+                        {TITULOS_EXAMEN.map((titulo) => (
+                            <option key={titulo} value={titulo}>{titulo}</option>
+                        ))}
+                    </select>
+                </div>
+                    <InputTextOneLine
+                        label="Fecha"
+                        name="fechaExamen"
+                        type="date"
+                        value={form.fechaExamen}
+                        labelWidth="120px"
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fechaExamen")}
+                        onRevert={() => revertField("fechaExamen")}
+                    />
+                    <InputTextOneLine
+                        label="Fecha Venc."
+                        name="fechaHasta"
+                        type="date"
+                        labelWidth="120px"
+                        value={form.fechaHasta}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fechaHasta")}
+                        onRevert={() => revertField("fechaHasta")}
+                    />
+            </SectionFieldset>
 
-        </section>
+            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
+            <DatosPersonalesLaborales form={form} />
 
-        {/* Información del trabajador */}
-        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 gap-4">
-          <h3 className="font-bold mb-3">Datos del Paciente</h3>
-          {/* Fila 1: Nombres, DNI, Edad, Género */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <InputTextOneLine
-              label="Nombres y Apellidos"
-              name="nombres"
-              value={form?.nombres}
-              disabled
-              labelWidth="65px"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 ">
-              <InputTextOneLine
-                label="DNI"
-                name="dni"
-                value={form?.dni}
-                disabled
-                labelWidth="65px"
-              />
-              <InputTextOneLine
-                label="Sexo"
-                name="sexo"
-                value={form?.sexo}
-                disabled
-                labelWidth="65px"
-              />
-              <InputTextOneLine
-                label="Edad"
-                name="edad"
-                value={form?.edad}
-                disabled
-                labelWidth="65px"
-              />
+            <SectionFieldset legend="Datos Adicionales" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="Explotación"
+                    name="explotacion"
+                    disabled
+                    value={form.explotacion}
+                    labelWidth="120px"
+                />
+            </SectionFieldset>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3 items-start">
+                <SectionFieldset legend="Aptitud">
+                    <InputsRadioGroup
+                        vertical
+                        disabled={camposDeshabilitados}
+                        name="aptitud"
+                        value={form.aptitud}
+                        className="py-2"
+                        onChange={handleRadioButton}
+                        options={[
+                            { label: "APTO", value: "APTO" },
+                            { label: "APTO CON RESTRICCION", value: "APTO CON RESTRICCION" },
+                            { label: "APTO TEMPORAL", value: "APTO TEMPORAL" },
+                            { label: "NO APTO", value: "NO APTO" },
+                        ]}
+                        edited={isFieldEdited("aptitud")}
+                        onRevert={() => revertField("aptitud")}
+                    />
+                </SectionFieldset>
+
+                <SectionFieldset legend="Observación">
+                    <InputTextArea
+                        label="Observación"
+                        name="observacion"
+                        value={form.observacion}
+                        onChange={handleChange}
+                        rows={6}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("observacion")}
+                        onRevert={() => revertField("observacion")}
+                    />
+                </SectionFieldset>
             </div>
-            <InputTextOneLine
-              label="Área Trabajo"
-              name="areaTrabajo"
-              value={form?.areaTrabajo}
-              disabled
-              labelWidth="65px"
-            />
-            <InputTextOneLine
-              label="Cargo"
-              name="cargo"
-              value={form?.cargo}
-              disabled
-              labelWidth="65px"
-            />
-            <InputTextOneLine
-              label="Empresa"
-              name="empresa"
-              value={form?.empresa}
-              disabled
-              className="col-span-2"
-              labelWidth="65px"
-            />
-            <InputTextOneLine
-              label="Contrata"
-              name="contrata"
-              value={form?.contrata}
-              disabled
-              labelWidth="65px"
-            />
-            <InputTextOneLine
-              label="Explotación"
-              name="explotacion"
-              value={form?.explotacion}
-              disabled
-              labelWidth="65px"
-            />
-          </div>
-        </section>
 
-        {/* Conclusiones Finales */}
-        <fieldset className="bg-white border border-gray-200 rounded-lg p-4 mx-4 mt-4 space-y-3">
-          <legend className="font-bold mb-2 text-gray-800 text-[10px]">
-            Conclusiones Finales
-          </legend>
-          <div className="grid grid-cols-7">
-            <InputsRadioGroup
-              label="Aptitud"
-              labelOnTop
-              vertical
-              name="aptitud"
-              value={form.aptitud}
-              options={[
-                { label: "APTO", value: "APTO" },
-                { label: "APTO CON RESTRICCION", value: "APTO CON RESTRICCION" },
-                { label: "APTO TEMPORAL", value: "APTO TEMPORAL" },
-                { label: "NO APTO", value: "NO APTO" }
-              ]}
-              onChange={handleRadioButton}
-            />
-            <InputTextArea
-              label="Observacion"
-              name="observacion"
-              className="col-span-6"
-              value={form?.observacion}
-              onChange={handleChange}
-              rows={6}
-            />
-          </div>
-          {/* Médico */}
-          <SectionFieldset legend="Asignación de Médico">
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              label="Especialista"
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </SectionFieldset>
-        </fieldset>
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
+                />
+            </SectionFieldset>
 
-        <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
+        </div>
+    )
 }
+
+export default CAHerramientasManuales
