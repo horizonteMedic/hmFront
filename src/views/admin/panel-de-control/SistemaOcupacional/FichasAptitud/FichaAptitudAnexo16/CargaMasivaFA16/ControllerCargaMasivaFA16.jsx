@@ -1,11 +1,11 @@
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../../utils/helpers";
 import { GetInfoServicio } from "../controllerFichaAptitudAnexo16";
 import { getFA16InitialFormState } from "../FA16FormDefaults";
+import Swal from "sweetalert2";
 
 const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarMasivoFichaAnexo16";
 const tabla = "certificado_aptitud_medico_ocupacional";
@@ -251,9 +251,7 @@ export const guardarCargaMasivaFA16 = async (
     if (lote.length === 0) return resultados;
 
     // Fase 2: enviar todo el lote en una sola llamada
-    Swal.fire({ title: "Enviando lote al servidor...", didOpen: () => Swal.showLoading() });
     const res = await SubmitData(lote.map((l) => l.body), urlRegistroMasivo, token);
-    Swal.close();
 
     // Indexar errores por norden para lookup O(1)
     const erroresMap = new Map(
