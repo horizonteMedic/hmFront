@@ -13,7 +13,9 @@ import {
     InputTextOneLine,
     InputTextArea,
     InputsRadioGroup,
-    InputCheckbox
+    InputCheckbox,
+    CIE10List,
+    InputTextAreaUpper
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
@@ -41,6 +43,7 @@ export default function FichaCertificadoAltura() {
         fechaExam: today,
         tipoExamen: "",
         razonVisita: "PRIMERA ACTITUD",
+        conclusionesCie10: "",
         //datos personales
         nombres: "",
         dni: "",
@@ -148,7 +151,7 @@ export default function FichaCertificadoAltura() {
 
         nombre_doctorAsignado: userName,
         user_doctorAsignado: userlogued,
-        
+
         SubirDoc: false,
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA"
     };
@@ -444,13 +447,35 @@ export default function FichaCertificadoAltura() {
                                 </div>
                                 {/* Columna Central - Observaciones */}
                                 <div className="space-y-4 text-[11px]">
-                                    <InputTextArea
+                                    <InputTextAreaUpper
                                         label="Observaciones y Recomendaciones"
                                         name="observacionesRecomendaciones"
-                                        value={form?.observacionesRecomendaciones}
-                                        onChange={handleChange}
                                         rows={5}
+                                        value={form?.observacionesRecomendaciones}
+                                        onChange={(upper) => {
+                                            const cie10Lines = upper
+                                                .split("\n")
+                                                .filter(l => /^CIE 10:/i.test(l.trim()));
+                                            const nuevoCie10 = cie10Lines.join("\n");
+                                            setForm((d) => ({
+                                                ...d,
+                                                observacionesRecomendaciones: upper,
+                                                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                                            }));
+                                        }} 
                                     />
+                                    <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                                        <CIE10List
+                                            value={form.conclusionesCie10}
+                                            fieldName="conclusionesCie10"
+                                            label="Conclusiones CIE10"
+                                            token={token}
+                                            setForm={setForm}
+                                            setAdditionalForm={setForm}
+                                            additionalFieldName="observacionesRecomendaciones"
+                                            additionalDelimiter={"\n"}
+                                        />
+                                    </div>
                                     <EmpleadoComboBox
                                         value={form.nombre_medico}
                                         form={form}

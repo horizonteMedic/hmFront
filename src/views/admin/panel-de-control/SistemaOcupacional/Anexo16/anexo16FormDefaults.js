@@ -3,6 +3,8 @@ export const getAnexo16InitialFormState = ({ today, userlogued, userName, SinRee
   nomExamen: "",
   fechaExam: today,
   codigoAnexo: null,
+  conclusionesCie10: "",
+  observacionesGenerales2Cie10: "",
   //Info personal
   dni: "",
   nombres: "",

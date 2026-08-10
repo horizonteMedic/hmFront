@@ -3,7 +3,9 @@ import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
-    InputsBooleanRadioGroup
+    InputsBooleanRadioGroup,
+    CIE10List,
+    InputTextAreaUpper
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -27,6 +29,7 @@ export default function FichaSas() {
         fechaExam: today,
         tipoExamen: "",
         tipoLicencia: "",
+        conclusionesCie10: "",
         //datos personales
         nombres: "",
         dni: "",
@@ -1023,13 +1026,35 @@ export default function FichaSas() {
                         form={form}
                         onChange={handleChangeSimple}
                     />
-                    <InputTextArea
+                    <InputTextAreaUpper
                         label="Observaciones"
                         rows={6}
                         name="observaciones"
                         value={form?.observaciones}
-                        onChange={handleChange}
+                        onChange={(upper) => {
+                            const cie10Lines = upper
+                                .split("\n")
+                                .filter(l => /^CIE 10:/i.test(l.trim()));
+                            const nuevoCie10 = cie10Lines.join("\n");
+                            setForm((d) => ({
+                                ...d,
+                                observaciones: upper,
+                                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                            }));
+                        }}
                     />
+                    <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                        <CIE10List
+                            value={form.conclusionesCie10}
+                            fieldName="conclusionesCie10"
+                            label="Conclusiones CIE10"
+                            token={token}
+                            setForm={setForm}
+                            setAdditionalForm={setForm}
+                            additionalFieldName="observaciones"
+                            additionalDelimiter={"\n"}
+                        />
+                    </div>
                 </div>
 
                 <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
