@@ -33,7 +33,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden,
-            fechaExam: res.fechaRegistro,
+            fechaExam: res.fechaExamen,
             nombreExamen: res.tipoExamen ?? "",
             dni: res.dniPaciente ?? "",
 
