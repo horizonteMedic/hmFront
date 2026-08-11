@@ -58,6 +58,9 @@ export const GetInfoServicio = async (
 
 
             conclusiones: res.observacionesFichaMedica,
+            apto: res.apto ? "APTO" :
+                res.noApto ? "NO APTO" :
+                    res.evaluado ? "EVALUADO" : "APTO", //POR DEFECTO APTO EN CASO NO TRAIGA
 
             visionCercaOd: res.visioncercasincorregirodVCercaSOd,
             visionLejosOd: res.visionlejossincorregirodVLejosSOd,
@@ -101,7 +104,7 @@ export const GetInfoServicioEditar = async (
             ...prev,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            
+
             dni: res.dniPaciente,
             nombres: res.nombresPaciente + " " + res.apellidosPaciente,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),

@@ -325,7 +325,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     clasificacionNeumoconiosis: {
       clasificaciones: {
         "0/-": data.examenRadiografico1_ex_1 ?? false,
-        "1/1": data.examenRadiografico11_ex_11 ?? false,
+        "0/0": data.examenRadiografico0_ex_0 ?? false,
         "0/1": data.examenRadiografico01_ex_01 ?? false,
         "1/0": data.examenRadiografico10_ex_10 ?? false,
         "1/1": data.examenRadiografico11_ex_11 ?? false,
