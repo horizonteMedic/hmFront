@@ -143,7 +143,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                     form.nombres,
                     form.apellidos,
                     datosFooter,
-                    false,   // comprimidoz
+                    true,    // comprimidoz
                     "azure", // urlType
                     "",      // fechaPersonalizada
                     "",      // diasVencimientoPersonalizado
