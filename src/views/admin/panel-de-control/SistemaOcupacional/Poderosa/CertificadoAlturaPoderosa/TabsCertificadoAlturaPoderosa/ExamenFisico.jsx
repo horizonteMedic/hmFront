@@ -6,6 +6,7 @@ import {
 export default function ExamenFisico({
   form,
   handleChange,
+  disabled = false,
 }) {
   return (
     <div className="space-y-6">
@@ -114,6 +115,7 @@ export default function ExamenFisico({
               name="apreciacionGeneral"
               value={form?.apreciacionGeneral}
               onChange={handleChange}
+              disabled={disabled}
               rows={3}
             />
             <InputTextOneLine
@@ -121,18 +123,21 @@ export default function ExamenFisico({
               name="cabeza"
               value={form?.cabeza}
               onChange={handleChange}
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Piel"
               name="piel"
               value={form?.piel}
               onChange={handleChange}
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Movilidad Ocular"
               name="movilidadOcular"
               value={form?.movilidadOcular}
               onChange={handleChange}
+              disabled={disabled}
             />
             <div className="grid grid-cols-2 gap-4">
               <InputTextOneLine
@@ -140,12 +145,14 @@ export default function ExamenFisico({
                 name="otoscopiaOD"
                 value={form?.otoscopiaOD}
                 onChange={handleChange}
+                disabled={disabled}
               />
               <InputTextOneLine
                 label="Otoscopia O.I"
                 name="otoscopiaOI"
                 value={form?.otoscopiaOI}
                 onChange={handleChange}
+                disabled={disabled}
               />
             </div>
             <InputTextOneLine
@@ -153,12 +160,14 @@ export default function ExamenFisico({
               name="nariz"
               value={form?.nariz}
               onChange={handleChange}
+              disabled={disabled}
             />
             <InputTextArea
               label="Aparato Respiratorio"
               name="aparatoRespiratorio"
               value={form?.aparatoRespiratorio}
               onChange={handleChange}
+              disabled={disabled}
               rows={3}
             />
           </div>
@@ -168,6 +177,7 @@ export default function ExamenFisico({
               name="aparatoCardiovascular"
               value={form?.aparatoCardiovascular}
               onChange={handleChange}
+              disabled={disabled}
               labelWidth="120px"
             />
             <InputTextOneLine
@@ -175,6 +185,7 @@ export default function ExamenFisico({
               name="abdomen"
               value={form?.abdomen}
               onChange={handleChange}
+              disabled={disabled}
               labelWidth="120px"
             />
             <InputTextOneLine
@@ -182,6 +193,7 @@ export default function ExamenFisico({
               name="musculoEsqueletico"
               value={form?.musculoEsqueletico}
               onChange={handleChange}
+              disabled={disabled}
               labelWidth="120px"
             />
             <InputTextOneLine
@@ -189,6 +201,7 @@ export default function ExamenFisico({
               name="columna"
               value={form?.columna}
               onChange={handleChange}
+              disabled={disabled}
               labelWidth="120px"
             />
             <InputTextArea
@@ -196,6 +209,7 @@ export default function ExamenFisico({
               name="testEpworth"
               value={form?.testEpworth}
               onChange={handleChange}
+              disabled={disabled}
               rows={3}
             />
             <InputTextArea
@@ -203,6 +217,7 @@ export default function ExamenFisico({
               name="otrosExaLaboratorio"
               value={form?.otrosExaLaboratorio}
               onChange={handleChange}
+              disabled={disabled}
               rows={3}
             />
           </div>

@@ -9,6 +9,7 @@ export default function Antecedentes({
   setForm,
   handleChange,
   handleRadioButtonBoolean,
+  disabled = false,
 }) {
   return (
     <div className="space-y-6">
@@ -23,6 +24,7 @@ export default function Antecedentes({
             name="accidentesTrabajoEnfermedades"
             value={form?.accidentesTrabajoEnfermedades}
             onChange={handleChange}
+            disabled={disabled}
             rows={6}
           />
           <InputTextArea
@@ -30,6 +32,7 @@ export default function Antecedentes({
             name="antecedentesFamiliares"
             value={form?.antecedentesFamiliares}
             onChange={handleChange}
+            disabled={disabled}
             rows={6}
           />
         </div>
@@ -51,12 +54,13 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, tecModeradoGraveDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="tecModeradoGraveDescripcion"
               value={form?.tecModeradoGraveDescripcion}
               className="w-full my-auto"
-              disabled={!form?.tecModeradoGrave}
+              disabled={disabled || !form?.tecModeradoGrave}
               onChange={handleChange}
             />
           </div>
@@ -71,13 +75,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, convulsionesDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="convulsionesDescripcion"
               value={form?.convulsionesDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.convulsiones}
+              disabled={disabled || !form?.convulsiones}
             />
           </div>
 
@@ -92,13 +97,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, mareosModosidadAcatasiaDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="mareosModosidadAcatasiaDescripcion"
               value={form?.mareosModosidadAcatasiaDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.mareosModosidadAcatisia}
+              disabled={disabled || !form?.mareosModosidadAcatisia}
             />
           </div>
 
@@ -113,13 +119,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, problemasAudicionDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="problemasAudicionDescripcion"
               value={form?.problemasAudicionDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.problemasAudicion}
+              disabled={disabled || !form?.problemasAudicion}
             />
           </div>
 
@@ -134,13 +141,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, problemasEquilibrioDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="problemasEquilibrioDescripcion"
               value={form?.problemasEquilibrioDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.problemasEquilibrio}
+              disabled={disabled || !form?.problemasEquilibrio}
             />
           </div>
 
@@ -155,13 +163,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, acrofobiaDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="acrofobiaDescripcion"
               value={form?.acrofobiaDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.acrofobia}
+              disabled={disabled || !form?.acrofobia}
             />
           </div>
 
@@ -176,13 +185,14 @@ export default function Antecedentes({
                 setForm(prev => ({ ...prev, agarofobiaDescripcion: "" }))
               }}
               labelWidth="130px"
+              disabled={disabled}
             />
             <InputTextOneLine
               name="agarofobiaDescripcion"
               value={form?.agarofobiaDescripcion}
               onChange={handleChange}
               className="w-full my-auto"
-              disabled={!form?.agarofobia}
+              disabled={disabled || !form?.agarofobia}
             />
           </div>
         </div>
@@ -208,6 +218,7 @@ export default function Antecedentes({
                   name="tabaco"
                   value={form?.tabaco}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelWidth="60px"
                 />
               </td>
@@ -216,6 +227,7 @@ export default function Antecedentes({
                   name="tabacoFrecuencia"
                   value={form?.tabacoFrecuencia}
                   onChange={handleChange}
+                  disabled={disabled}
                 />
               </td>
             </tr>
@@ -226,6 +238,7 @@ export default function Antecedentes({
                   name="alcohol"
                   value={form?.alcohol}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelWidth="60px"
                 />
               </td>
@@ -234,6 +247,7 @@ export default function Antecedentes({
                   name="alcoholFrecuencia"
                   value={form?.alcoholFrecuencia}
                   onChange={handleChange}
+                  disabled={disabled}
                 />
               </td>
             </tr>
@@ -244,6 +258,7 @@ export default function Antecedentes({
                   name="drogas"
                   value={form?.drogas}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelWidth="60px"
                 />
               </td>
@@ -252,6 +267,7 @@ export default function Antecedentes({
                   name="drogasFrecuencia"
                   value={form?.drogasFrecuencia}
                   onChange={handleChange}
+                  disabled={disabled}
                 />
               </td>
             </tr>
@@ -262,6 +278,7 @@ export default function Antecedentes({
                   name="hojaCoca"
                   value={form?.hojaCoca}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelWidth="60px"
                 />
               </td>
@@ -270,6 +287,7 @@ export default function Antecedentes({
                   name="hojaCocaFrecuencia"
                   value={form?.hojaCocaFrecuencia}
                   onChange={handleChange}
+                  disabled={disabled}
                 />
               </td>
             </tr>
@@ -280,6 +298,7 @@ export default function Antecedentes({
                   name="cafe"
                   value={form?.cafe}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelWidth="60px"
                 />
               </td>
@@ -288,6 +307,7 @@ export default function Antecedentes({
                   name="cafeFrecuencia"
                   value={form?.cafeFrecuencia}
                   onChange={handleChange}
+                  disabled={disabled}
                 />
               </td>
             </tr>

@@ -8,6 +8,7 @@ export default function TestDeCage({
   form,
   handleRadioButtonBoolean,
   handleChange,
+  disabled = false,
 }) {
   const cageQuestions = [
     {
@@ -85,6 +86,7 @@ export default function TestDeCage({
                     value={form?.[question.name]}
                     onChange={handleRadioButtonBoolean}
                     labelWidth="200px"
+                    disabled={disabled}
                   />
                   <InputTextOneLine
                     label="Puntaje"
@@ -92,6 +94,7 @@ export default function TestDeCage({
                     value={form?.[question.namePuntaje]}
                     onChange={handleChange}
                     className="w-full"
+                    disabled={disabled}
                   />
                 </div>
               </div>
@@ -103,6 +106,7 @@ export default function TestDeCage({
           name="anamnesisTestDeCage"
           value={form?.anamnesisTestDeCage}
           onChange={handleChange}
+          disabled={disabled}
           rows={4}
         />
       </section>

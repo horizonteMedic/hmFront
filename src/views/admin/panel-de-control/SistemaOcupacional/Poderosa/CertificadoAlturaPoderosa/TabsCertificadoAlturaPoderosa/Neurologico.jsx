@@ -7,6 +7,7 @@ export default function Neurologico({
   form,
   handleChange,
   handleRadioButtonBoolean,
+  disabled = false,
 }) {
   // Configuración de pruebas neurológicas
   const leftColumnTests = [
@@ -37,6 +38,7 @@ export default function Neurologico({
           name="reflejos"
           value={form?.reflejos}
           onChange={handleChange}
+          disabled={disabled}
           labelWidth="100px"
         />
       </fieldset>
@@ -57,6 +59,7 @@ export default function Neurologico({
                 trueLabel="POSITIVO"
                 falseLabel="NEGATIVO"
                 labelWidth="150px"
+                disabled={disabled}
               />
             ))}
           </div>
@@ -73,6 +76,7 @@ export default function Neurologico({
                 trueLabel="POSITIVO"
                 falseLabel="NEGATIVO"
                 labelWidth="150px"
+                disabled={disabled}
               />
             ))}
           </div>
