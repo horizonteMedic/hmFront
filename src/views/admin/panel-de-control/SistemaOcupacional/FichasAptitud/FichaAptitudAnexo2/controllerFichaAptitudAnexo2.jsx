@@ -51,6 +51,10 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargoPaciente,
 
             conclusiones: res.observacionesFichaMedica,
+            apto: res.anexo2Apto ? "APTO" : (res.anexo2Aptorestriccion ? "APTO CON RESTRICCION" :
+                res.anexo2Noapto ? "NO APTO" :
+                    res.conObservacion ? "CON OBSERVACION" :
+                        res.anexo2Evaluado ? "EVALUADO" : ""),
         }));
     }
 };
