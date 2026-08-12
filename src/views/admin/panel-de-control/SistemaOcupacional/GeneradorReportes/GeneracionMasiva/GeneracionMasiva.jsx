@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
-import { getFetch } from "../../../../../utils/apiHelpers";
+import { deleteArchivoPorOrdenNomenclatura, getFetch } from "../../../../../utils/apiHelpers";
 import FolioJasper from "../../../../../jaspers/FolioJasper/FolioJasper";
 import {
     descargarPlantillaGeneracionMasiva,
@@ -23,6 +23,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
     const [data, setData] = useState([]);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
+    const [reemplazar, setReemplazar] = useState(false);
     const abortRef = useRef(null);
 
     const handleSubir = async () => {
@@ -67,7 +68,10 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
 
         const confirm = await Swal.fire({
             title: "¿Iniciar generación masiva?",
-            html: `Se generará y subirá el reporte <b>${examen.nombre}</b> para <b>${data.length}</b> N° de Orden.<br/>Solo se procesarán los que tengan el examen realizado.`,
+            html: `Se generará y subirá el reporte <b>${examen.nombre}</b> para <b>${data.length}</b> N° de Orden.<br/>${reemplazar
+                ? "Los que ya tengan un archivo subido serán <b>eliminados y reemplazados</b> por el nuevo."
+                : "Solo se procesarán los que tengan el examen realizado. Los que ya tengan archivo subido se omitirán."
+                }`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -85,6 +89,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
 
         let generados = 0;
         let subidos = 0;
+        let reemplazados = 0;
         let omitidos = 0;
         let errores = 0;
 
@@ -103,12 +108,16 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                 }
 
                 // 2. Verificar si ya tiene archivo subido
+                let archivoAReemplazar = false;
                 if (examen.nomenclaturaSubida) {
                     const archivoExistente = await getFetch(`${GetExamenExterno}/${norden}/${examen.nomenclaturaSubida}`, token);
                     if (archivoExistente?.id === 1) {
-                        actualizarFila(norden, "omitido", "Ya tiene archivo subido, se omitió");
-                        omitidos++;
-                        continue;
+                        if (!reemplazar) {
+                            actualizarFila(norden, "omitido", "Ya tiene archivo subido, se omitió");
+                            omitidos++;
+                            continue;
+                        }
+                        archivoAReemplazar = true;
                     }
                 }
 
@@ -134,7 +143,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                     form.nombres,
                     form.apellidos,
                     datosFooter,
-                    false,   // comprimidoz
+                    true,    // comprimidoz
                     "azure", // urlType
                     "",      // fechaPersonalizada
                     "",      // diasVencimientoPersonalizado
@@ -142,9 +151,16 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                 );
 
                 generados++;
+
+                // 5. Si se va a reemplazar, eliminar primero el archivo existente
+                if (archivoAReemplazar) {
+                    actualizarFila(norden, "procesando", "Eliminando archivo anterior...");
+                    await deleteArchivoPorOrdenNomenclatura(norden, examen.nomenclaturaSubida, token);
+                }
+
                 actualizarFila(norden, "procesando", "Subiendo archivo...");
 
-                // 5. Subir con nomenclatura
+                // 6. Subir con nomenclatura
                 const uploadRes = await subirPDFGenerado(
                     pdfResult,
                     form,
@@ -155,8 +171,13 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                 );
 
                 if (uploadRes?.ok) {
-                    subidos++;
-                    actualizarFila(norden, "success", "Generado y subido correctamente");
+                    if (archivoAReemplazar) {
+                        reemplazados++;
+                        actualizarFila(norden, "success", "Archivo reemplazado correctamente");
+                    } else {
+                        subidos++;
+                        actualizarFila(norden, "success", "Generado y subido correctamente");
+                    }
                 } else {
                     errores++;
                     actualizarFila(norden, "error", "PDF generado pero error al subir");
@@ -177,7 +198,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
         await Swal.fire({
             icon: errores > 0 ? "warning" : "success",
             title: cancelado ? "Proceso cancelado" : "Generación masiva finalizada",
-            html: `✅ Subidos: <b>${subidos}</b><br/>📄 Generados sin subir: <b>${generados - subidos}</b><br/>⊘ Omitidos: <b>${omitidos}</b><br/>⚠️ Errores: <b>${errores}</b>`,
+            html: `✅ Subidos: <b>${subidos}</b><br/>🔁 Reemplazados: <b>${reemplazados}</b><br/>📄 Generados sin subir: <b>${generados - subidos - reemplazados}</b><br/>⊘ Omitidos: <b>${omitidos}</b><br/>⚠️ Errores: <b>${errores}</b>`,
         });
     };
 
@@ -249,6 +270,21 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                     >
                         Descargar Plantilla <FontAwesomeIcon icon={faFileExcel} />
                     </button>
+                </div>
+
+                {/* Opciones */}
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="reemplazarExistentes"
+                        checked={reemplazar}
+                        onChange={(e) => setReemplazar(e.target.checked)}
+                        disabled={procesando}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                    />
+                    <label htmlFor="reemplazarExistentes" className="text-sm font-medium text-gray-700 cursor-pointer">
+                        Reemplazar archivos existentes (elimina el archivo ya subido y sube el nuevo)
+                    </label>
                 </div>
 
                 {/* Contadores */}

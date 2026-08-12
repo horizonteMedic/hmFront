@@ -58,6 +58,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2Camo",
         esJasper: true,
         nomenclaturaSubida: "CAMO ADM",
+        masivo: true,
     },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
@@ -75,6 +76,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16CamoAdministrativo",
         esJasper: true,
         nomenclaturaSubida: "CAMO ADM",
+        masivo: true,
     },
 
     CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE: {

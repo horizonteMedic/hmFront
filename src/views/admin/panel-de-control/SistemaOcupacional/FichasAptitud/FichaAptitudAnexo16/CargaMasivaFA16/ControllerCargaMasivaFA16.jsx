@@ -177,10 +177,10 @@ const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => (
 });
 
 // Fase 1: verifica existencia de cada norden.
-//   - id=1 → ya tiene registro, se omite.
+//   - id=1 → ya tiene registro, se procesa igual (el backend actualiza) — se marca editado=true.
 //   - id=2 → requisito previo no cumplido, se omite con el mensaje del backend.
 //   - id=0 → nuevo, obtiene datos del paciente y arma el body.
-// Fase 2: envía todos los nuevos en un único lote al endpoint urlRegistroMasivo.
+// Fase 2: envía todos en un único lote al endpoint urlRegistroMasivo.
 // Parsea la respuesta { exitosos, fallidos, errores:[{motivo, registro:{norden}}] }.
 export const guardarCargaMasivaFA16 = async (
     data,
@@ -212,19 +212,14 @@ export const guardarCargaMasivaFA16 = async (
 
             const idExistencia = existencia?.id ?? 0;
 
-            if (idExistencia === 1) {
-                const resultado = { norden, ok: false, omitido: true, mensaje: "Ya tiene registro, se omitió" };
-                resultados.push(resultado);
-                onProgress(resultado);
-                continue;
-            }
-
             if (idExistencia === 2) {
                 const resultado = { norden, ok: false, omitido: true, mensaje: existencia?.mensaje ?? "Requisito previo no cumplido" };
                 resultados.push(resultado);
                 onProgress(resultado);
                 continue;
             }
+
+            const editado = idExistencia === 1;
 
             const state = await obtenerDatosPacienteFA16(norden, {
                 token, userlogued, userName, fecha: fechaFila,
@@ -238,7 +233,7 @@ export const guardarCargaMasivaFA16 = async (
             }
 
             const body = construirBodyFA16(state, userlogued, medicoNombre, medicoUsername);
-            lote.push({ norden, body });
+            lote.push({ norden, body, editado });
 
         } catch (error) {
             console.error(`Error al procesar N° Orden ${norden}:`, error);
@@ -258,12 +253,13 @@ export const guardarCargaMasivaFA16 = async (
         (res?.errores ?? []).map((e) => [String(e.registro?.norden), e.motivo])
     );
 
-    for (const { norden } of lote) {
+    for (const { norden, editado } of lote) {
         const motivo = erroresMap.get(String(norden));
         const resultado = {
             norden,
             ok: !motivo,
-            mensaje: motivo ?? "Creado y guardado como apto",
+            editado: !motivo && editado,
+            mensaje: motivo ?? (editado ? "Registro actualizado correctamente" : "Creado y guardado como apto"),
         };
         resultados.push(resultado);
         onProgress(resultado);
