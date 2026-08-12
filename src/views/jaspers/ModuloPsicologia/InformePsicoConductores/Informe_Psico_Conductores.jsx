@@ -17,7 +17,7 @@ export default async function InformePsicoConductores(data = {}, docExistente = 
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
