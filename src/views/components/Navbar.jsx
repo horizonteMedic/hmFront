@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faHome, faNotesMedical, faSignOutAlt, faTrash, faWifi } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faClock, faFlask, faHome, faNotesMedical, faSignOutAlt, faTrash, faWifi } from '@fortawesome/free-solid-svg-icons';
 import { URLAzure } from '../config/config';
 import { clearLocalStorageExceptAuth } from '../utils/helpers';
 import Swal from 'sweetalert2';
 import CelebrationAnimation from './CelebrationAnimation';
 import { useSessionData } from '../hooks/useSessionData';
+import { useVersionUpdateStore } from '../../store/versionUpdate';
 
 const getNavigatorConnection = () =>
   navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -34,6 +35,13 @@ const Navbar = () => {
   const [networkTitle, setNetworkTitle] = useState("");
   const pingSamplesRef = useRef([]);
   const flapsRef = useRef([]);
+
+  const countdownActive = useVersionUpdateStore((state) => state.countdownActive);
+  const secondsLeft = useVersionUpdateStore((state) => state.secondsLeft);
+  const triggerImmediateUpdate = useVersionUpdateStore((state) => state.triggerImmediateUpdate);
+  const simulateNewVersion = useVersionUpdateStore((state) => state.simulateNewVersion);
+
+  const formattedCountdown = `${Math.floor(Math.max(secondsLeft, 0) / 60)}:${String(Math.max(secondsLeft, 0) % 60).padStart(2, '0')}`;
 
   // Función para calcular días hasta el próximo pago (5 de cada mes)
   const calcularDiasParaPago = () => {
@@ -354,6 +362,19 @@ const Navbar = () => {
         </Link>
       </div>
 
+      {countdownActive && (
+        <div className={`flex items-center px-3 py-1.5 rounded-full mr-4 ${secondsLeft <= 20 ? 'bg-red-600 animate-pulse' : 'bg-amber-500'}`}>
+          <FontAwesomeIcon icon={faClock} className="mr-2" />
+          <span className="font-bold mr-3 whitespace-nowrap">Actualización en {formattedCountdown}</span>
+          <button
+            onClick={triggerImmediateUpdate}
+            className="bg-white text-[#233245] font-bold px-3 py-1 rounded-full hover:scale-105 ease-in-out duration-300 whitespace-nowrap"
+          >
+            Actualizar ahora
+          </button>
+        </div>
+      )}
+
       <div className="hidden md:flex items-center">
         {URLAzure == "https://testbackendhm.azurewebsites.net" && (
           <>
@@ -371,6 +392,14 @@ const Navbar = () => {
                       `${diasParaPago} días para pago 📅`}
               </span>
             </div>
+            <button
+              className='bg-purple-500 text-white hover:scale-110 ease-in-out py-2 px-3 rounded-full flex items-center justify-center duration-300 mr-5'
+              title="Simular detección de nueva versión"
+              onClick={simulateNewVersion}
+            >
+              <FontAwesomeIcon icon={faFlask} className="mr-2" />
+              <span className='font-bold'>Probar actualización</span>
+            </button>
           </>
         )}
         {/* <button className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-6'
