@@ -17,7 +17,7 @@ export default async function InformePsicoAltoRiesgo(data = {}, docExistente = n
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? raw?.fechaExamen ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ""),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
