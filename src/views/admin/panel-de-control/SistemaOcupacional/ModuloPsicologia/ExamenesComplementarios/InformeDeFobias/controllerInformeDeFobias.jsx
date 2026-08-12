@@ -93,7 +93,7 @@ export const SubmitDataService = async (
         recomendaciones: form.recomendaciones,
         conclusionesApto: form.esApto,
         conclusionesNoApto: !form.esApto,
-        fechaRegistro: form.fecha,
+        fechaExamen: form.fecha,
         userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
     };

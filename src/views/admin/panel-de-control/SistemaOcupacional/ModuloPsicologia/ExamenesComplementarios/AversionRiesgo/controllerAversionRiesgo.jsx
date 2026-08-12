@@ -134,7 +134,7 @@ export const SubmitDataService = async (
     }
     const body = {
         numeroOrden: form.norden,
-        fechaRegistro: form.fechaExam,
+        fechaExamen: form.fechaExam,
 
         aspectoIntelectualPracticoFuncionalBajo: form.practicaFuncional == "BAJO",
         aspectoIntelectualPracticoFuncionalMedio: form.practicaFuncional == "MEDIO",

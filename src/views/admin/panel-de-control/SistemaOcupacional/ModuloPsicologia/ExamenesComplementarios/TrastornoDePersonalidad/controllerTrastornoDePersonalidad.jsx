@@ -82,7 +82,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaRegistro: form.fecha,
+        fechaExamen: form.fecha,
 
         paranoideBajo: form.paranoide == "BAJO",
         paranoideMedio: form.paranoide == "MEDIO",
