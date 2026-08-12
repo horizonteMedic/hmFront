@@ -24,7 +24,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaRegistro,
+            fecha: res.fechaExamen,
 
             cumpleConPerfil: res.perfilCumple ?? false,
 
@@ -82,7 +82,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaRegistro: form.fecha,
+        fechaExamen: form.fecha,
 
         paranoideBajo: form.paranoide == "BAJO",
         paranoideMedio: form.paranoide == "MEDIO",

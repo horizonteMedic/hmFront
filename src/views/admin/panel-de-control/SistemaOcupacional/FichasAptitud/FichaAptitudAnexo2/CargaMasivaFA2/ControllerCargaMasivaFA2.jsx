@@ -1,11 +1,11 @@
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../../utils/helpers";
 import { GetInfoServicio } from "../controllerFichaAptitudAnexo2";
 import { getFA2InitialFormState } from "../FA2FormDefaults";
+import Swal from "sweetalert2";
 
 const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarMasivoFichaAnexo2";
 const tabla = "aptitud_medico_ocupacional_agro";
@@ -173,10 +173,10 @@ const construirBodyFA2 = (state, userlogued, medicoNombre, medicoUsername) => ({
 });
 
 // Fase 1: verifica existencia de cada norden.
-//   - id=1 → ya tiene registro, se omite.
+//   - id=1 → ya tiene registro, se procesa igual (el backend actualiza) — se marca editado=true.
 //   - id=2 → requisito previo no cumplido, se omite con el mensaje del backend.
 //   - id=0 → nuevo, obtiene datos del paciente y arma el body.
-// Fase 2: envía todos los nuevos en un único lote al endpoint urlRegistroMasivo.
+// Fase 2: envía todos en un único lote al endpoint urlRegistroMasivo.
 // Parsea la respuesta { exitosos, fallidos, errores:[{motivo, registro:{norden}}] }.
 export const guardarCargaMasivaFA2 = async (
     data,
@@ -208,19 +208,14 @@ export const guardarCargaMasivaFA2 = async (
 
             const idExistencia = existencia?.id ?? 0;
 
-            if (idExistencia === 1) {
-                const resultado = { norden, ok: false, omitido: true, mensaje: "Ya tiene registro, se omitió" };
-                resultados.push(resultado);
-                onProgress(resultado);
-                continue;
-            }
-
             if (idExistencia === 2) {
                 const resultado = { norden, ok: false, omitido: true, mensaje: existencia?.mensaje ?? "Requisito previo no cumplido" };
                 resultados.push(resultado);
                 onProgress(resultado);
                 continue;
             }
+
+            const editado = idExistencia === 1;
 
             const state = await obtenerDatosPacienteFA2(norden, {
                 token, userlogued, userName, fecha: fechaFila,
@@ -234,7 +229,7 @@ export const guardarCargaMasivaFA2 = async (
             }
 
             const body = construirBodyFA2(state, userlogued, medicoNombre, medicoUsername);
-            lote.push({ norden, body });
+            lote.push({ norden, body, editado });
 
         } catch (error) {
             console.error(`Error al procesar N° Orden ${norden}:`, error);
@@ -247,21 +242,20 @@ export const guardarCargaMasivaFA2 = async (
     if (lote.length === 0) return resultados;
 
     // Fase 2: enviar todo el lote en una sola llamada
-    Swal.fire({ title: "Enviando lote al servidor...", didOpen: () => Swal.showLoading() });
     const res = await SubmitData(lote.map((l) => l.body), urlRegistroMasivo, token);
-    Swal.close();
 
     // Indexar errores por norden para lookup O(1)
     const erroresMap = new Map(
         (res?.errores ?? []).map((e) => [String(e.registro?.norden), e.motivo])
     );
 
-    for (const { norden } of lote) {
+    for (const { norden, editado } of lote) {
         const motivo = erroresMap.get(String(norden));
         const resultado = {
             norden,
             ok: !motivo,
-            mensaje: motivo ?? "Creado y guardado como apto",
+            editado: !motivo && editado,
+            mensaje: motivo ?? (editado ? "Registro actualizado correctamente" : "Creado y guardado como apto"),
         };
         resultados.push(resultado);
         onProgress(resultado);
@@ -282,7 +276,7 @@ export const exportarResultadosFA2 = async (resultados) => {
     });
 
     resultados.forEach((r) => {
-        const estado = r.omitido ? "OMITIDO" : r.ok ? "OK" : "ERROR";
+        const estado = r.omitido ? "OMITIDO" : r.ok ? (r.editado ? "ACTUALIZADO" : "CREADO") : "ERROR";
         sheet.addRow([r.norden, r.fecha || "", estado, r.mensaje || ""]);
     });
 
