@@ -31,23 +31,6 @@ export default function InputTextOneLine({
     ? "border-orange-400 bg-orange-100"
     : "";
 
-  const inputEl = (
-    <input
-      type={type}
-      className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
-        } ${stateClasses} ${inputClassName}`}
-      id={name}
-      name={name}
-      value={value ?? ""}
-      onKeyUp={onKeyUp}
-      onChange={onChange}
-      onBlur={onBlur}
-      disabled={disabled}
-      aria-invalid={hasError}
-      aria-describedby={hasError ? `${name}-error` : undefined}
-    />
-  );
-
   return (
     <div className={className}>
       <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"}`}>
@@ -61,14 +44,26 @@ export default function InputTextOneLine({
             {required && <span className="text-red-500 ml-0.5">*</span>} :
           </label>
         )}
-        {showRevert ? (
-          <div className="w-full flex items-center gap-1.5">
-            {inputEl}
-            <RevertButton onClick={onRevert} />
-          </div>
-        ) : (
-          inputEl
-        )}
+        {/* El contenedor y el <input> se renderizan siempre igual (nunca condicionalmente),
+            para que React no lo desmonte/remonte -y pierda el foco- cuando `showRevert`
+            cambia de valor mientras el usuario escribe. */}
+        <div className="w-full flex items-center gap-1.5">
+          <input
+            type={type}
+            className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
+              } ${stateClasses} ${inputClassName}`}
+            id={name}
+            name={name}
+            value={value ?? ""}
+            onKeyUp={onKeyUp}
+            onChange={onChange}
+            onBlur={onBlur}
+            disabled={disabled}
+            aria-invalid={hasError}
+            aria-describedby={hasError ? `${name}-error` : undefined}
+          />
+          {showRevert && <RevertButton onClick={onRevert} />}
+        </div>
       </div>
       {hasError && (
         <p

@@ -31,16 +31,15 @@ export default function InputTextArea({
 
   return (
     <div className={`w-full ${className}`}>
-      {(label || showRevert) && (
+      {/* La presencia de esta fila depende solo de `label` (fijo por uso), nunca de
+          `showRevert` (que cambia mientras se escribe) - así el <textarea> de abajo nunca
+          cambia de posición en el árbol y React no lo desmonta/remonta perdiendo el foco. */}
+      {label && (
         <div className="flex items-center justify-between mb-1">
-          {label ? (
-            <label className={`block font-semibold ${classNameLabel}`} htmlFor={name}>
-              {label}
-              {required && <span className="text-red-500 ml-0.5">*</span>} :
-            </label>
-          ) : (
-            <span />
-          )}
+          <label className={`block font-semibold ${classNameLabel}`} htmlFor={name}>
+            {label}
+            {required && <span className="text-red-500 ml-0.5">*</span>} :
+          </label>
           {showRevert && <RevertButton onClick={onRevert} />}
         </div>
       )}

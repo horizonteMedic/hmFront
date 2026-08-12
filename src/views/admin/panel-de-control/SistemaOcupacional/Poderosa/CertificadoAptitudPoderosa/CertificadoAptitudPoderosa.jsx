@@ -1,3 +1,4 @@
+import { useState } from "react";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
@@ -140,6 +141,21 @@ const CertificadoAptitudPoderosa = () => {
     const isMedicoEdited = isFieldEdited("user_medicoFirma");
     const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
+    const [errors, setErrors] = useState({});
+
+    // El error de Aptitud se muestra solo tras intentar guardar y mientras el campo
+    // siga sin seleccionar; se limpia solo apenas el usuario elige una opción.
+    const aptoError = errors.apto && !form.apto ? errors.apto : "";
+
+    const validateForm = () => {
+        const next = {};
+        if (!form.apto) {
+            next.apto = "Debe seleccionar la aptitud.";
+        }
+        setErrors(next);
+        return Object.keys(next).length === 0;
+    };
+
     // Selector rápido de conclusiones: agrega el texto elegido a Observaciones (no lo reemplaza).
     const handleRadioButtonConclusiones = (e) => {
         const { name, value } = e.target;
@@ -166,6 +182,7 @@ const CertificadoAptitudPoderosa = () => {
 
     // ===== Búsqueda con boton =====
     const executeSearch = () => {
+        setErrors({});
         handleClearnotO();
         VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     };
@@ -183,6 +200,7 @@ const CertificadoAptitudPoderosa = () => {
 
         const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
         if (hayDatosCargados && value !== form.norden) {
+            setErrors({});
             setForm({ ...initialFormState, norden: value });
         } else {
             setForm((f) => ({ ...f, norden: value }));
@@ -197,11 +215,18 @@ const CertificadoAptitudPoderosa = () => {
     };
 
     const handleSave = () => {
+        if (!validateForm()) return;
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleEdit = () => {
+        if (!validateForm()) return;
         UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleClearForm = () => {
+        setErrors({});
+        handleClear();
     };
 
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
@@ -213,7 +238,7 @@ const CertificadoAptitudPoderosa = () => {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-4 max-w-[90%]  mx-auto">
             {hayRegistroCargado && (
                 <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
                     <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
@@ -273,6 +298,7 @@ const CertificadoAptitudPoderosa = () => {
                                     ]}
                                     edited={isFieldEdited("apto")}
                                     onRevert={() => revertField("apto")}
+                                    error={aptoError}
                                 />
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <InputTextOneLine
@@ -341,7 +367,7 @@ const CertificadoAptitudPoderosa = () => {
                 </div>
 
                 {/* ===== BARRA LATERAL: AGUDEZA VISUAL Y LABORATORIO (solo lectura) ===== */}
-                <aside className="w-full lg:w-72 xl:w-80 shrink-0 space-y-3">
+                <aside className="w-full lg:w-80 xl:w-96 shrink-0 space-y-3">
                     <SectionFieldset legend="Agudeza Visual">
                         <div className="space-y-4">
                             <div>
@@ -413,7 +439,7 @@ const CertificadoAptitudPoderosa = () => {
                 handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
                 saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
                 handleEdit={habilitarEdicion}
-                handleClear={handleClear}
+                handleClear={handleClearForm}
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}

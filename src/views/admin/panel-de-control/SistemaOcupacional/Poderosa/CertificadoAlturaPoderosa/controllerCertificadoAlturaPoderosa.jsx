@@ -14,6 +14,8 @@ import {
     actualizarRegistro,
     validarSede,
 } from "../../../../../utils/registroOcupacionalUtils";
+import { convertirGenero } from "../../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 // ===== Configuración =====
 const obtenerReporteUrl = "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa";
@@ -133,10 +135,16 @@ export const GetInfoServicio = async (
             nombres: res.nombresPaciente ?? "",
             dni: res.dniPaciente ?? "",
             edad: `${res.edadPaciente ?? ""} AÑOS`,
-            sexo: res.sexoPaciente ?? "",
+            sexo: convertirGenero(res.sexoPaciente ?? ""),
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
-            cargo: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
             areaTrabajo: res.areaPaciente ?? "",
 
             // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
@@ -222,10 +230,17 @@ export const GetInfoServicioEditar = async (
             nombres: res.nombresPaciente ?? "",
             dni: res.dniPaciente ?? "",
             edad: `${res.edadPaciente ?? ""} AÑOS`,
-            sexo: res.sexoPaciente ?? "",
+
+            sexo: convertirGenero(res.sexoPaciente ?? ""),
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
-            cargo: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
             areaTrabajo: res.areaPaciente ?? "",
 
             // Datos extra
@@ -368,6 +383,7 @@ export const GetInfoServicioEditar = async (
             dixHallpike: res.dixPositivo_chkneuro_pos9 ?? false,
             marcha: res.marchaPositivo_chkneuro_pos10 ?? false,
             tituloExamen: res.tituloExamen ?? prev.tituloExamen,
+            SubirDoc: true,
             digitalizacion: res.digitalizacion,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
