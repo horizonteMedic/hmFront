@@ -18,7 +18,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
     const datosFinales = {
       // Mapeo de nombres - soporta tanto la estructura del controller como la del backend
       apellidosNombres: String(raw?.nombreCompleto ?? ((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim() ?? ''),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? raw?.fechaExamen ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''),
       sexo: convertirGenero(raw?.sexo ?? raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dni ?? raw?.dniPaciente ?? raw?.codPa ?? ''),
       edad: String(raw?.edad ?? raw?.edadPaciente ?? ''),
@@ -80,7 +80,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     // Ajustar posición de "Fecha de examen" según la cantidad de líneas de la sede
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
@@ -105,7 +105,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
@@ -171,20 +171,20 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
 
     const padding = 3;
     doc.setFont("helvetica", "normal").setFontSize(9);
-    
+
     // Dividir texto en líneas
     const lineas = doc.splitTextToSize(String(texto), anchoMaximo - 4);
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     const alturaFinal = Math.max(alturaMinima, alturaTexto);
-    
+
     // Dibujar borde
     doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
-    
+
     // Dibujar texto
     lineas.forEach((linea, idx) => {
       doc.text(linea, x + 2, y + padding + 2 + (idx * 3.5));
     });
-    
+
     return y + alturaFinal;
   };
 
@@ -332,7 +332,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
   dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
- 
+
 
   // Verificar si necesitamos nueva página
   if (yPos + 30 > pageHeight - 20) {
@@ -364,10 +364,10 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
     const anchoDisponibleValor = tablaAncho - colCriterio - 4;
     const lineasValor = doc.splitTextToSize(criterio.valor || "", anchoDisponibleValor);
     const alturaFila = Math.max(filaAltura, lineasValor.length * 3.5 + 2);
-    
+
     // Dibujar rectángulo completo de la fila
     doc.rect(tablaInicioX, yFilaActual, tablaAncho, alturaFila, 'S');
-    
+
     // Línea divisoria entre criterio y resultado
     doc.line(tablaInicioX + colCriterio, yFilaActual, tablaInicioX + colCriterio, yFilaActual + alturaFila);
 
@@ -388,7 +388,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
         doc.text(linea, tablaInicioX + colCriterio + 2, yInicioTexto + (lineIdx * 3.5));
       });
     }
-    
+
     // Actualizar posición para la siguiente fila
     yFilaActual += alturaFila;
   });
@@ -414,7 +414,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
   doc.setFont("helvetica", "normal").setFontSize(9);
   const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
   const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -434,7 +434,7 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
   const textoAmenazas = datosFinales.amenazasDebilidades || "-";
   const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
   const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -478,28 +478,28 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
   // Función para procesar recomendaciones (separar por líneas o guiones)
   const procesarRecomendaciones = (texto) => {
     if (!texto || texto.trim() === '') return [];
-    
+
     // Si tiene saltos de línea, dividir por ellos
     if (texto.includes('\n')) {
       return texto.split('\n').filter(item => item.trim() !== '');
     }
-    
+
     // Si tiene guiones al inicio, dividir por ellos
     if (texto.includes('-')) {
       const items = texto.split(/-/).filter(item => item.trim() !== '');
       return items.map(item => item.trim());
     }
-    
+
     // Si no, devolver como un solo item
     return [texto];
   };
 
   // Procesar recomendaciones
   const itemsRecomendaciones = procesarRecomendaciones(datosFinales.recomendaciones);
-  
+
   // Ancho disponible para recomendaciones (sin reservar espacio para firma)
   const anchoRecomendaciones = tablaAncho - 4;
-  
+
   // Calcular altura necesaria (con padding igual que OBSERVACIONES)
   const padding = 3;
   let alturaRecomendaciones = 20;
@@ -512,10 +512,10 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
     });
     alturaRecomendaciones = Math.max(20, alturaTotal + padding * 2); // padding arriba y abajo
   }
-  
+
   // Dibujar borde
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
-  
+
   // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(9);
   let yRecomendaciones = yPos + padding + 2; // Mismo padding que OBSERVACIONES (3 + 2 = 5)
@@ -592,13 +592,13 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-  
+
   if (docExistente) {
-    return doc;   
+    return doc;
   } else {
     imprimir(doc);
   }
-} 
+}
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
