@@ -3,17 +3,26 @@ import { faCheckCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputsBooleanRadioGroup,
-    InputsRadioGroup, SectionFieldset
+    InputsRadioGroup,
+    SectionFieldset,
+    SearchButton,
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday } from "../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaDatosPacientes";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
-import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerFichaDatosPacientes";
 
 const tabla = "ficha_datos_paciente";
 const today = getToday();
+
+// Campos que el usuario puede editar y que además muestran resaltado/revertido individual.
+// El resto de campos editables solo respeta el bloqueo general (camposDeshabilitados): con
+// ~80 campos en este formulario, resaltar cada uno sería ruido (mismo criterio que se usó
+// en CertificadoAlturaPoderosa).
+const CAMPOS_EDITABLES = ["fechaIngreso", "tipoTrabajador", "cargo"];
 
 export default function FichaDatosPacientes() {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -66,7 +75,7 @@ export default function FichaDatosPacientes() {
         // Composición Familiar
         idfamiliarPadre: null, familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
         idfamiliarMadre: null, familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
-        idfamiliarMadre: null, familiarConvivienteNombre: "-", familiarConvivienteVive: "-", familiarConvivienteFechaNac: "", familiarConvivienteEdad: "-", familiarConvivienteDni: "-", familiarConvivienteGrado: "-", familiarConvivienteAutogenerado: "-",
+        idfamiliarConviviente: null, familiarConvivienteNombre: "-", familiarConvivienteVive: "-", familiarConvivienteFechaNac: "", familiarConvivienteEdad: "-", familiarConvivienteDni: "-", familiarConvivienteGrado: "-", familiarConvivienteAutogenerado: "-",
         idfamiliarEsposa: null, familiarEsposaNombre: "-", familiarEsposaVive: "-", familiarEsposaFechaNac: "", familiarEsposaEdad: "-", familiarEsposaDni: "-", familiarEsposaGrado: "-", familiarEsposaAutogenerado: "-",
         idfamiliarHijo1: null, familiarHijo1Nombre: "-", familiarHijo1Vive: "-", familiarHijo1FechaNac: "", familiarHijo1Edad: "-", familiarHijo1Dni: "-", familiarHijo1Grado: "-", familiarHijo1Autogenerado: "-",
         idfamiliarHijo2: null, familiarHijo2Nombre: "-", familiarHijo2Vive: "-", familiarHijo2FechaNac: "", familiarHijo2Edad: "-", familiarHijo2Dni: "-", familiarHijo2Grado: "-", familiarHijo2Autogenerado: "-",
@@ -88,12 +97,6 @@ export default function FichaDatosPacientes() {
         idInstruccionSuperior: null, instruccionSuperiorCentro: "-", instruccionSuperiorInicio: "", instruccionSuperiorTermino: "", instruccionSuperiorGrado: "-",
         idInstruccionOtros: null, instruccionOtrosCentro: "-", instruccionOtrosInicio: "", instruccionOtrosTermino: "", instruccionOtrosGrado: "-",
 
-        // Capacitación (input temporal)
-        // capacitacionTitulo: "",
-        // capacitacionCentro: "",
-        // capacitacionFechaInicio: "",
-        // capacitacionFechaTermino: "",
-        // capacitacionGrado: "",
         // Experiencia Laboral (input temporal)
         experienciaNombre: "",
         experienciaTelefono: "",
@@ -122,7 +125,6 @@ export default function FichaDatosPacientes() {
         aptitudAltura18: undefined,
         aptitud: undefined,
 
-        // capacitaciones: [],
         experiencias: [],
         referencias: [],
 
@@ -134,6 +136,9 @@ export default function FichaDatosPacientes() {
         user_doctorAsignado: "",
         nombrePsicologo: "",
         nombreMedicoAnexo16: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
     };
 
     const {
@@ -150,20 +155,50 @@ export default function FichaDatosPacientes() {
         handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "fichaDatosPacientesPoderosa" });
 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter, selectedSede);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter, selectedSede);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
 
@@ -178,41 +213,9 @@ export default function FichaDatosPacientes() {
         { value: "OBRERO", label: "Obrero" },
     ];
 
-    // Funciones para Capacitación
-    const agregarCapacitacion = () => {
-        if (form.capacitacionTitulo) {
-            setForm({
-                ...form,
-                capacitaciones: [
-                    ...form.capacitaciones,
-                    {
-                        id: null,
-                        instruccion: form.capacitacionTitulo,
-                        centroEstudio: form.capacitacionCentro,
-                        fechaInicio: form.capacitacionFechaInicio,
-                        fechaTermino: form.capacitacionFechaTermino,
-                        gradoObtenido: form.capacitacionGrado,
-                    }
-                ],
-                capacitacionTitulo: "",
-                capacitacionCentro: "",
-                capacitacionFechaInicio: "",
-                capacitacionFechaTermino: "",
-                capacitacionGrado: "",
-            });
-        }
-    };
-
-
-    const eliminarCapacitacion = (index) => {
-        setForm({
-            ...form,
-            capacitaciones: form.capacitaciones.filter((_, i) => i !== index)
-        });
-    };
-
     // Funciones para Experiencia Laboral
     const agregarExperiencia = () => {
+        if (camposDeshabilitados) return;
         if (form.experienciaNombre) {
             setForm({
                 ...form,
@@ -239,15 +242,16 @@ export default function FichaDatosPacientes() {
     };
 
     const eliminarExperiencia = (index) => {
+        if (camposDeshabilitados) return;
         setForm({
             ...form,
             experiencias: form.experiencias.filter((_, i) => i !== index)
         });
     };
 
-
     // Funciones para Referencias Personales
     const agregarReferencia = () => {
+        if (camposDeshabilitados) return;
         if (form.referenciaNombres) {
             setForm({
                 ...form,
@@ -272,32 +276,49 @@ export default function FichaDatosPacientes() {
     };
 
     const eliminarReferencia = (index) => {
+        if (camposDeshabilitados) return;
         setForm({
             ...form,
             referencias: form.referencias.filter((_, i) => i !== index)
         });
     };
 
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            {hayRegistroCargado && (
+                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
+                </div>
+            )}
+
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha de Ingreso"
                     name="fechaIngreso"
                     type="date"
                     value={form.fechaIngreso}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("fechaIngreso")}
+                    onRevert={() => revertField("fechaIngreso")}
                 />
                 <InputsRadioGroup
                     label="Tipo de Trabajador"
@@ -307,6 +328,9 @@ export default function FichaDatosPacientes() {
                     onChange={handleRadioButton}
                     allowUncheck
                     options={tipoTrabajadorOptions}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("tipoTrabajador")}
+                    onRevert={() => revertField("tipoTrabajador")}
                 />
             </SectionFieldset>
 
@@ -324,7 +348,10 @@ export default function FichaDatosPacientes() {
                     name="cargo"
                     value={form.cargo}
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
+                    edited={isFieldEdited("cargo")}
+                    onRevert={() => revertField("cargo")}
                 />
             </SectionFieldset>
 
@@ -358,6 +385,7 @@ export default function FichaDatosPacientes() {
                             name="distritoNacimiento"
                             value={form.distritoNacimiento}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -365,6 +393,7 @@ export default function FichaDatosPacientes() {
                             name="provinciaNacimiento"
                             value={form.provinciaNacimiento}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -372,6 +401,7 @@ export default function FichaDatosPacientes() {
                             name="departamentoNacimiento"
                             value={form.departamentoNacimiento}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                     </div>
@@ -388,6 +418,7 @@ export default function FichaDatosPacientes() {
                             name="lmNo"
                             value={form.lmNo}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -395,6 +426,7 @@ export default function FichaDatosPacientes() {
                             name="autogenerado"
                             value={form.autogenerado}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -410,6 +442,7 @@ export default function FichaDatosPacientes() {
                                 name="afpSnp"
                                 value={form.afpSnp}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
@@ -426,6 +459,7 @@ export default function FichaDatosPacientes() {
                                 name="licConducirNo"
                                 value={form.licConducirNo}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
@@ -433,6 +467,7 @@ export default function FichaDatosPacientes() {
                                 name="cusspNo"
                                 value={form.cusspNo}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                         </div>
@@ -481,6 +516,7 @@ export default function FichaDatosPacientes() {
                             name="referenciaDomiciliaria"
                             value={form.referenciaDomiciliaria}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                     </div>
@@ -490,6 +526,7 @@ export default function FichaDatosPacientes() {
                             name="telefono1"
                             value={form.telefono1}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -497,6 +534,7 @@ export default function FichaDatosPacientes() {
                             name="telefono2"
                             value={form.telefono2}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputsRadioGroup
@@ -505,6 +543,7 @@ export default function FichaDatosPacientes() {
                             value={form.tipoVivienda}
                             onChange={handleRadioButton}
                             options={tipoViviendaOptions}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -512,6 +551,7 @@ export default function FichaDatosPacientes() {
                             name="email"
                             value={form.email}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                             labelWidth="120px"
                         />
                         <div className="grid grid-cols-2 gap-x-4">
@@ -520,6 +560,7 @@ export default function FichaDatosPacientes() {
                                 name="radioFrec"
                                 value={form.radioFrec}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
@@ -527,6 +568,7 @@ export default function FichaDatosPacientes() {
                                 name="celular"
                                 value={form.celular}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                         </div>
@@ -536,6 +578,7 @@ export default function FichaDatosPacientes() {
                                 name="numeroCuentaAhorro"
                                 value={form.numeroCuentaAhorro}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
@@ -543,6 +586,7 @@ export default function FichaDatosPacientes() {
                                 name="banco"
                                 value={form.banco}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
                                 labelWidth="120px"
                             />
                         </div>
@@ -569,57 +613,57 @@ export default function FichaDatosPacientes() {
                         <tbody>
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1 font-semibold">Padre</td>
-                                <td><InputTextOneLine name="familiarPadreNombre" value={form.familiarPadreNombre ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarPadreVive" value={form.familiarPadreVive ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="familiarPadreFechaNac" value={form.familiarPadreFechaNac ?? "-"} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="familiarPadreEdad" value={form.familiarPadreEdad ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarPadreDni" value={form.familiarPadreDni ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarPadreGrado" value={form.familiarPadreGrado ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarPadreAutogenerado" value={form.familiarPadreAutogenerado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarPadreNombre" value={form.familiarPadreNombre ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarPadreVive" value={form.familiarPadreVive ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="familiarPadreFechaNac" value={form.familiarPadreFechaNac ?? "-"} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarPadreEdad" value={form.familiarPadreEdad ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarPadreDni" value={form.familiarPadreDni ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarPadreGrado" value={form.familiarPadreGrado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarPadreAutogenerado" value={form.familiarPadreAutogenerado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1 font-semibold">Madre</td>
-                                <td><InputTextOneLine name="familiarMadreNombre" value={form.familiarMadreNombre ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarMadreVive" value={form.familiarMadreVive ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="familiarMadreFechaNac" value={form.familiarMadreFechaNac ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="familiarMadreEdad" value={form.familiarMadreEdad ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarMadreDni" value={form.familiarMadreDni ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarMadreGrado" value={form.familiarMadreGrado ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarMadreAutogenerado" value={form.familiarMadreAutogenerado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarMadreNombre" value={form.familiarMadreNombre ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarMadreVive" value={form.familiarMadreVive ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="familiarMadreFechaNac" value={form.familiarMadreFechaNac ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarMadreEdad" value={form.familiarMadreEdad ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarMadreDni" value={form.familiarMadreDni ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarMadreGrado" value={form.familiarMadreGrado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarMadreAutogenerado" value={form.familiarMadreAutogenerado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1 font-semibold">Conviviente</td>
-                                <td><InputTextOneLine name="familiarConvivienteNombre" value={form.familiarConvivienteNombre ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarConvivienteVive" value={form.familiarConvivienteVive ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="familiarConvivienteFechaNac" value={form.familiarConvivienteFechaNac ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="familiarConvivienteEdad" value={form.familiarConvivienteEdad ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarConvivienteDni" value={form.familiarConvivienteDni ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarConvivienteGrado" value={form.familiarConvivienteGrado ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarConvivienteAutogenerado" value={form.familiarConvivienteAutogenerado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteNombre" value={form.familiarConvivienteNombre ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteVive" value={form.familiarConvivienteVive ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="familiarConvivienteFechaNac" value={form.familiarConvivienteFechaNac ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteEdad" value={form.familiarConvivienteEdad ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteDni" value={form.familiarConvivienteDni ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteGrado" value={form.familiarConvivienteGrado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteAutogenerado" value={form.familiarConvivienteAutogenerado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1 font-semibold">Esposa</td>
-                                <td><InputTextOneLine name="familiarEsposaNombre" value={form.familiarEsposaNombre ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarEsposaVive" value={form.familiarEsposaVive ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="familiarEsposaFechaNac" value={form.familiarEsposaFechaNac ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="familiarEsposaEdad" value={form.familiarEsposaEdad ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarEsposaDni" value={form.familiarEsposaDni ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarEsposaGrado" value={form.familiarEsposaGrado ?? "-"} onChange={handleChange} /></td>
-                                <td><InputTextOneLine name="familiarEsposaAutogenerado" value={form.familiarEsposaAutogenerado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarEsposaNombre" value={form.familiarEsposaNombre ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarEsposaVive" value={form.familiarEsposaVive ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="familiarEsposaFechaNac" value={form.familiarEsposaFechaNac ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarEsposaEdad" value={form.familiarEsposaEdad ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarEsposaDni" value={form.familiarEsposaDni ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarEsposaGrado" value={form.familiarEsposaGrado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="familiarEsposaAutogenerado" value={form.familiarEsposaAutogenerado ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             {[1, 2, 3, 4, 5].map((num) => (
                                 <tr key={num}>
                                     <td className="border border-gray-300 px-2 py-1 font-semibold">Hijo</td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Nombre`} value={form[`familiarHijo${num}Nombre`] ?? "-"} onChange={handleChange} /></td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Vive`} value={form[`familiarHijo${num}Vive`] ?? "-"} onChange={handleChange} /></td>
-                                    <td><InputTextOneLine type="date" name={`familiarHijo${num}FechaNac`} value={form[`familiarHijo${num}FechaNac`] ?? ""} onChange={handleChangeSimple} /></td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Edad`} value={form[`familiarHijo${num}Edad`] ?? "-"} onChange={handleChange} /></td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Dni`} value={form[`familiarHijo${num}Dni`] ?? "-"} onChange={handleChange} /></td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Grado`} value={form[`familiarHijo${num}Grado`] ?? "-"} onChange={handleChange} /></td>
-                                    <td><InputTextOneLine name={`familiarHijo${num}Autogenerado`} value={form[`familiarHijo${num}Autogenerado`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Nombre`} value={form[`familiarHijo${num}Nombre`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Vive`} value={form[`familiarHijo${num}Vive`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine type="date" name={`familiarHijo${num}FechaNac`} value={form[`familiarHijo${num}FechaNac`] ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Edad`} value={form[`familiarHijo${num}Edad`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Dni`} value={form[`familiarHijo${num}Dni`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Grado`} value={form[`familiarHijo${num}Grado`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Autogenerado`} value={form[`familiarHijo${num}Autogenerado`] ?? "-"} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -635,6 +679,7 @@ export default function FichaDatosPacientes() {
                         name="emergenciaNombres"
                         value={form.emergenciaNombres}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelWidth="150px"
                     />
                     <InputTextOneLine
@@ -642,6 +687,7 @@ export default function FichaDatosPacientes() {
                         name="emergenciaParentesco"
                         value={form.emergenciaParentesco}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelWidth="150px"
                     />
                     <InputTextOneLine
@@ -649,6 +695,7 @@ export default function FichaDatosPacientes() {
                         name="emergenciaDomicilio"
                         value={form.emergenciaDomicilio}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelWidth="150px"
                     />
                 </div>
@@ -658,6 +705,7 @@ export default function FichaDatosPacientes() {
                         name="emergenciaTelefono"
                         value={form.emergenciaTelefono}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelWidth="150px"
                     />
                     <InputTextOneLine
@@ -665,6 +713,7 @@ export default function FichaDatosPacientes() {
                         name="emergenciaOtraReferencia"
                         value={form.emergenciaOtraReferencia}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelWidth="150px"
                     />
                 </div>
@@ -686,42 +735,42 @@ export default function FichaDatosPacientes() {
                         <tbody>
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Primaria</td>
-                                <td><InputTextOneLine name="instruccionPrimariaCentro" value={form.instruccionPrimariaCentro ?? ""} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionPrimariaInicio" value={form.instruccionPrimariaInicio ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionPrimariaTermino" value={form.instruccionPrimariaTermino ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="instruccionPrimariaGrado" value={form.instruccionPrimariaGrado ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="instruccionPrimariaCentro" value={form.instruccionPrimariaCentro ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaInicio" value={form.instruccionPrimariaInicio ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaTermino" value={form.instruccionPrimariaTermino ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="instruccionPrimariaGrado" value={form.instruccionPrimariaGrado ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Secundaria</td>
-                                <td><InputTextOneLine name="instruccionSecundariaCentro" value={form.instruccionSecundariaCentro ?? ""} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionSecundariaInicio" value={form.instruccionSecundariaInicio ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionSecundariaTermino" value={form.instruccionSecundariaTermino ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="instruccionSecundariaGrado" value={form.instruccionSecundariaGrado ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="instruccionSecundariaCentro" value={form.instruccionSecundariaCentro ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaInicio" value={form.instruccionSecundariaInicio ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaTermino" value={form.instruccionSecundariaTermino ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="instruccionSecundariaGrado" value={form.instruccionSecundariaGrado ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Técnica</td>
-                                <td><InputTextOneLine name="instruccionTecnicaCentro" value={form.instruccionTecnicaCentro ?? ""} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionTecnicaInicio" value={form.instruccionTecnicaInicio ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionTecnicaTermino" value={form.instruccionTecnicaTermino ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="instruccionTecnicaGrado" value={form.instruccionTecnicaGrado ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="instruccionTecnicaCentro" value={form.instruccionTecnicaCentro ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaInicio" value={form.instruccionTecnicaInicio ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaTermino" value={form.instruccionTecnicaTermino ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="instruccionTecnicaGrado" value={form.instruccionTecnicaGrado ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Superior</td>
-                                <td><InputTextOneLine name="instruccionSuperiorCentro" value={form.instruccionSuperiorCentro ?? ""} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionSuperiorInicio" value={form.instruccionSuperiorInicio ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionSuperiorTermino" value={form.instruccionSuperiorTermino ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="instruccionSuperiorGrado" value={form.instruccionSuperiorGrado ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="instruccionSuperiorCentro" value={form.instruccionSuperiorCentro ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorInicio" value={form.instruccionSuperiorInicio ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorTermino" value={form.instruccionSuperiorTermino ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="instruccionSuperiorGrado" value={form.instruccionSuperiorGrado ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Otros</td>
-                                <td><InputTextOneLine name="instruccionOtrosCentro" value={form.instruccionOtrosCentro ?? ""} onChange={handleChange} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionOtrosInicio" value={form.instruccionOtrosInicio ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine type="date" name="instruccionOtrosTermino" value={form.instruccionOtrosTermino ?? ""} onChange={handleChangeSimple} /></td>
-                                <td><InputTextOneLine name="instruccionOtrosGrado" value={form.instruccionOtrosGrado ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="instruccionOtrosCentro" value={form.instruccionOtrosCentro ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosInicio" value={form.instruccionOtrosInicio ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosTermino" value={form.instruccionOtrosTermino ?? ""} onChange={handleChangeSimple} disabled={camposDeshabilitados} /></td>
+                                <td><InputTextOneLine name="instruccionOtrosGrado" value={form.instruccionOtrosGrado ?? ""} onChange={handleChange} disabled={camposDeshabilitados} /></td>
                             </tr>
 
                         </tbody>
@@ -737,6 +786,7 @@ export default function FichaDatosPacientes() {
                         name="experienciaNombre"
                         value={form.experienciaNombre}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -744,6 +794,7 @@ export default function FichaDatosPacientes() {
                         name="experienciaTelefono"
                         value={form.experienciaTelefono}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -751,6 +802,7 @@ export default function FichaDatosPacientes() {
                         name="experienciaCargo"
                         value={form.experienciaCargo}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -759,6 +811,7 @@ export default function FichaDatosPacientes() {
                         type="date"
                         value={form.experienciaFechaInicio}
                         onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -767,6 +820,7 @@ export default function FichaDatosPacientes() {
                         type="date"
                         value={form.experienciaFechaTermino}
                         onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <div className="flex flex-col gap-2">
@@ -776,12 +830,14 @@ export default function FichaDatosPacientes() {
                                 name="experienciaMotivo"
                                 value={form.experienciaMotivo ?? ""}
                                 onChange={handleChange}
-                                className="border rounded px-2 py-1 w-full"
+                                disabled={camposDeshabilitados}
+                                className="border rounded px-2 py-1 w-full disabled:bg-gray-300"
                             />
                             <button
                                 type="button"
                                 onClick={agregarExperiencia}
-                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
+                                disabled={camposDeshabilitados}
+                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Agregar experiencia"
                             >
                                 <FontAwesomeIcon icon={faCheckCircle} />
@@ -817,7 +873,8 @@ export default function FichaDatosPacientes() {
                                             <button
                                                 type="button"
                                                 onClick={() => eliminarExperiencia(index)}
-                                                className="text-red-500 hover:text-red-700"
+                                                disabled={camposDeshabilitados}
+                                                className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </button>
@@ -838,6 +895,7 @@ export default function FichaDatosPacientes() {
                         name="referenciaNombres"
                         value={form.referenciaNombres}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -845,6 +903,7 @@ export default function FichaDatosPacientes() {
                         name="referenciaCentro"
                         value={form.referenciaCentro}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -852,6 +911,7 @@ export default function FichaDatosPacientes() {
                         name="referenciaCargo"
                         value={form.referenciaCargo}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -859,6 +919,7 @@ export default function FichaDatosPacientes() {
                         name="referenciaTelefono"
                         value={form.referenciaTelefono}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
                         labelOnTop
                     />
                     <div className="flex flex-col gap-2">
@@ -868,12 +929,14 @@ export default function FichaDatosPacientes() {
                                 name="referenciaDireccion"
                                 value={form.referenciaDireccion ?? ""}
                                 onChange={handleChange}
-                                className="border rounded px-2 py-1 w-full"
+                                disabled={camposDeshabilitados}
+                                className="border rounded px-2 py-1 w-full disabled:bg-gray-300"
                             />
                             <button
                                 type="button"
                                 onClick={agregarReferencia}
-                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
+                                disabled={camposDeshabilitados}
+                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Agregar referencia"
                             >
                                 <FontAwesomeIcon icon={faCheckCircle} />
@@ -907,7 +970,8 @@ export default function FichaDatosPacientes() {
                                             <button
                                                 type="button"
                                                 onClick={() => eliminarReferencia(index)}
-                                                className="text-red-500 hover:text-red-700"
+                                                disabled={camposDeshabilitados}
+                                                className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </button>
@@ -929,6 +993,7 @@ export default function FichaDatosPacientes() {
                             name="sueldoJornal"
                             onChange={handleChangeNumber}
                             value={form.sueldoJornal}
+                            disabled={camposDeshabilitados}
                             labelWidth="100px"
                         />
                         <InputTextOneLine
@@ -936,6 +1001,7 @@ export default function FichaDatosPacientes() {
                             name="sistemaTrabajo"
                             onChange={handleChangeSimple}
                             value={form.sistemaTrabajo}
+                            disabled={camposDeshabilitados}
                             labelWidth="100px"
                         />
 
@@ -948,6 +1014,7 @@ export default function FichaDatosPacientes() {
                             labelWidth="100px"
                             onChange={handleRadioButtonBoolean}
                             options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
+                            disabled={camposDeshabilitados}
                         />
                         <InputsRadioGroup
                             label="Transporte Aéreo"
@@ -956,6 +1023,7 @@ export default function FichaDatosPacientes() {
                             onChange={handleRadioButtonBoolean}
                             options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                             labelWidth="100px"
+                            disabled={camposDeshabilitados}
                         />
                     </div>
                     <div className="space-y-3">
@@ -967,11 +1035,13 @@ export default function FichaDatosPacientes() {
                                 onChange={handleRadioButtonBoolean}
                                 labelWidth="100px"
                                 options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
+                                disabled={camposDeshabilitados}
                             />
                             <InputTextOneLine
                                 name="viaticosValor"
                                 onChange={handleChange}
                                 value={form.viaticosValor ?? ""}
+                                disabled={camposDeshabilitados}
                                 className="w-full"
                             />
                         </div>
@@ -980,6 +1050,7 @@ export default function FichaDatosPacientes() {
                             name="alimentacionContrata"
                             onChange={handleChange}
                             value={form.alimentacionContrata}
+                            disabled={camposDeshabilitados}
                             labelWidth="100px"
                         />
                     </div>
@@ -1039,13 +1110,18 @@ export default function FichaDatosPacientes() {
 
             </SectionFieldset>
 
-            {/* BOTONES DE ACCIÓN */}
-            <BotonesAccion
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

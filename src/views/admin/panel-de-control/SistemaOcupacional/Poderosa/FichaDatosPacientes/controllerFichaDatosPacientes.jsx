@@ -1,134 +1,25 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoServicioDefault,
+    existeRegistro,
     GetInfoServicioDefaultManejo,
     LoadingDefault,
-    PrintHojaRDefault,
-    PrintHojaRJsReportDefault,
-    SubmitDataServiceDefault,
     SubmitDataServiceDefaultManejo,
     VerifyTRPerzonalizadoDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
-import Informe_Ocu_DatosPacientes from "../../../../../jaspers/FichaDatosPersonales/Informe_Ocu_DatosPacientes";
-const obtenerReporteUrl =
-    "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales";
-const obtenerReporteJsReportUrl = "/api/v01/ct/fichaDatosPersonales/descargarReporteFichaDatosPaciente";
+import { validarSede } from "../../../../../utils/registroOcupacionalUtils";
 
-const registrarUrl =
-    "/api/v01/ct/fichaDatosPersonales/registrarActualizarFichaDatosPersonales";
+// ===== Configuración =====
+const obtenerReporteUrl = "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales";
+const registrarUrl = "/api/v01/ct/fichaDatosPersonales/registrarActualizarFichaDatosPersonales";
 
-export const GetInfoServicio = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefaultManejo(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            norden: res.norden ?? "",
-            id: res.id,
-            fechaIngreso: res.fechaIngreso ?? prev.fechaIngreso,
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por
+// eso se declara aquí (en el controller) y no dentro del util de impresión.
+const jasperModules = import.meta.glob("../../../../../jaspers/FichaDatosPersonales/*.jsx");
+const rutaReporte = "../../../../../jaspers/FichaDatosPersonales/Informe_Ocu_DatosPacientes.jsx";
 
-            tipoTrabajador: res.empleado
-                ? "EMPLEADO"
-                : res.obrero
-                    ? "OBRERO"
-                    : prev.tipoTrabajador,
-
-            // ===== DATOS LABORALES =====
-            empresa: res.contrata ?? "",
-            cargo: res.cargoPaciente ?? "",
-
-            // ===== DATOS PERSONALES =====
-            nombres: res.nombresPaciente ?? "",
-            apellidos: res.apellidosPaciente ?? "",
-            apellidoPaterno: res.apellidoPaterno ?? "",
-            apellidoMaterno: res.apellidoMaterno ?? "",
-
-            dni: res.dniPaciente ?? "",
-            lmNo: res.lm ?? "",
-            autogenerado: res.autogenerado ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            afpSnp: res.afp ?? "",
-            estatura: res.talla ?? "",
-            licConducirNo: res.lincenciaConducir ?? "",
-            cusspNo: res.cussp ?? "",
-            peso: res.peso ?? "",
-
-            // ===== NACIMIENTO =====
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            distritoNacimiento: res.distritoForm ?? "",
-            provinciaNacimiento: res.provinciaForm ?? "",
-            departamentoNacimiento: res.departamentoForm ?? "",
-
-            // ===== DOMICILIO =====
-            direccionDomicilio: res.direccionPaciente ?? "",
-            distritoDomicilio: res.distritoAdmisionPaciente ?? "",
-            provinciaDomicilio: res.provinciaAdmisionPaciente ?? "",
-            departamentoDomicilio: res.departamentoAdmisionPaciente ?? "",
-            referenciaDomiciliaria: res.referenciaDomicilio ?? "",
-
-            // ===== CONTACTO =====
-            telefono1: res.telefonoPaciente ?? "",
-            telefono2: "",
-            tipoVivienda: res.viviendaPropia
-                ? "PROPIA"
-                : res.viviendaAlquilada
-                    ? "ALQUILADA"
-                    : "OTROS",
-            email: "",
-            radioFrec: res.radioFrecuencia ?? "",
-            celular: res.celularPaciente ?? "",
-            numeroCuentaAhorro: res.numeroCuenta ?? "",
-            banco: res.banco ?? "",
-
-            // Composición Familiar
-            ...mapFamilia(res.composicionFamiliar ?? []),
-
-            // Emergencia
-            emergenciaNombres: res.nombreEmergencia ?? "",
-            emergenciaParentesco: res.parentescoEmergencia ?? "",
-            emergenciaTelefono: res.telefonoEmergencia ?? "",
-            emergenciaDomicilio: res.domicilioEmergencia ?? "",
-            emergenciaOtraReferencia: res.otraReferenciaEmergencia ?? "",
-
-            // Instrucción Adquirida
-            ...mapInstruccion(res.instruccionAdquirida ?? []),
-
-            // Condiciones Laborales
-            sueldoJornal: res.sueldo ?? "",
-            sistemaTrabajo: res.sistemaTrabajo ?? "",
-            transporteTerrestre: res.transporteTerrestreSi ? "SI" : "NO",
-            transporteAereo: res.transporteAereoSi ? "SI" : "NO",
-            viaticos: res.viaticosSi ? "SI" : "NO",
-            viaticosValor: res.viaticosDescripcion ?? "",
-            alimentacionContrata: res.alimentacionContrata ?? "",
-
-            //Pre-Evaluación
-            grupoSanguineo: res.grupoSanguineo ?? "",
-
-            // capacitaciones: [],
-            experiencias: res.experienciaLaboral ?? [],
-            referencias: res.referenciasPersonales ?? [],
-            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
-            aptitud: res.faApto === true ? "APTO" : res.faAptoConRestriccion === true ? "APTO RESTRICCION" : res.faNoApto === true ? "NO APTO" : false,
-            nombrePsicologo: res.nombrePsicologo ?? "",
-            nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
-        }));
-        Swal.close();
-    }
-};
+// ===== Mapeo Composición Familiar =====
 const parentescoConfig = {
     PADRE: "Padre",
     MADRE: "Madre",
@@ -141,9 +32,8 @@ const parentescoConfig = {
     HIJO5: "Hijo5",
 };
 
-const createBase = () => {
+const createBaseFamilia = () => {
     const base = {};
-
     Object.values(parentescoConfig).forEach((key) => {
         base[`idfamiliar${key}`] = null;
         base[`familiar${key}Nombre`] = "-";
@@ -154,20 +44,18 @@ const createBase = () => {
         base[`familiar${key}Grado`] = "-";
         base[`familiar${key}Autogenerado`] = "-";
     });
-
     return base;
 };
 
-export const mapFamilia = (familia = []) => {
-    const base = createBase();
+const mapFamilia = (familia = []) => {
+    const base = createBaseFamilia();
     let hijo = 0;
     familia.forEach((f) => {
         if (f.parentesco.toUpperCase() === "HIJO") {
             hijo++;
         }
         const concatenacion =
-            f.parentesco.toUpperCase() != "HIJO" ?
-                f.parentesco.toUpperCase() : `HIJO${hijo}`;
+            f.parentesco.toUpperCase() != "HIJO" ? f.parentesco.toUpperCase() : `HIJO${hijo}`;
         const key = parentescoConfig[concatenacion];
         if (!key) return;
 
@@ -180,11 +68,11 @@ export const mapFamilia = (familia = []) => {
         base[`familiar${key}Grado`] = f.gradoInstruccion ?? "-";
         base[`familiar${key}Autogenerado`] = f.autogenerado ?? "-";
     });
-
     return base;
 };
 
-const mapInstruccion = (lista) => {
+// ===== Mapeo Instrucción Adquirida =====
+const mapInstruccion = (lista = []) => {
     const base = {
         instruccionPrimariaCentro: "-",
         instruccionPrimariaInicio: "",
@@ -226,144 +114,150 @@ const mapInstruccion = (lista) => {
             base.instruccionSecundariaTermino = i.fechaTermino ?? "";
             base.instruccionSecundariaGrado = i.gradoObtenido ?? "-";
         }
+        if (key === "tecnica") {
+            base.instruccionTecnicaCentro = i.centroEstudio ?? "-";
+            base.instruccionTecnicaInicio = i.fechaInicio ?? "";
+            base.instruccionTecnicaTermino = i.fechaTermino ?? "";
+            base.instruccionTecnicaGrado = i.gradoObtenido ?? "-";
+        }
+        if (key === "superior") {
+            base.instruccionSuperiorCentro = i.centroEstudio ?? "-";
+            base.instruccionSuperiorInicio = i.fechaInicio ?? "";
+            base.instruccionSuperiorTermino = i.fechaTermino ?? "";
+            base.instruccionSuperiorGrado = i.gradoObtenido ?? "-";
+        }
+        if (key === "otros") {
+            base.instruccionOtrosCentro = i.centroEstudio ?? "-";
+            base.instruccionOtrosInicio = i.fechaInicio ?? "";
+            base.instruccionOtrosTermino = i.fechaTermino ?? "";
+            base.instruccionOtrosGrado = i.gradoObtenido ?? "-";
+        }
     });
 
     return base;
 };
 
+// ===== Mapeo compartido del reporte =====
+// obtenerReporte agrega en vivo los datos del paciente exista o no fila propia en
+// ficha_datos_paciente (igual que HojaDeRutaEmo): un único mapeo reutilizado por
+// GetInfoServicio/GetInfoServicioEditar, que solo difieren en lo que se setea al final.
+const mapReporte = (res, prev) => ({
+    norden: res.norden ?? "",
+    id: res.id,
+    fechaIngreso: res.fechaIngreso ?? prev.fechaIngreso,
 
-export const GetInfoServicioEditar = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefaultManejo(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            norden: res.norden ?? "",
-            id: res.id,
-            fechaIngreso: res.fechaIngreso,
+    tipoTrabajador: res.empleado ? "EMPLEADO" : res.obrero ? "OBRERO" : prev.tipoTrabajador,
 
-            tipoTrabajador: res.empleado
-                ? "EMPLEADO"
-                : res.obrero
-                    ? "OBRERO"
-                    : "",
+    // ===== DATOS LABORALES =====
+    empresa: res.contrata ?? "",
+    cargo: res.cargoPaciente ?? "",
 
-            // ===== DATOS LABORALES =====
-            empresa: res.contrata ?? "",
-            cargo: res.cargoPaciente ?? "",
+    // ===== DATOS PERSONALES =====
+    nombres: res.nombresPaciente ?? "",
+    apellidos: res.apellidosPaciente ?? "",
+    apellidoPaterno: res.apellidoPaterno ?? "",
+    apellidoMaterno: res.apellidoMaterno ?? "",
 
-            // ===== DATOS PERSONALES =====
-            nombres: res.nombresPaciente ?? "",
-            apellidos: res.apellidosPaciente ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+    dni: res.dniPaciente ?? "",
+    lmNo: res.lm ?? "",
+    autogenerado: res.autogenerado ?? "",
+    estadoCivil: res.estadoCivilPaciente ?? "",
+    afpSnp: res.afp ?? "",
+    estatura: res.talla ?? "",
+    licConducirNo: res.lincenciaConducir ?? "",
+    cusspNo: res.cussp ?? "",
+    peso: res.peso ?? "",
 
-            apellidoPaterno: res.apellidoPaterno ?? "",
-            apellidoMaterno: res.apellidoMaterno ?? "",
+    // ===== NACIMIENTO =====
+    fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+    distritoNacimiento: res.distritoForm ?? "",
+    provinciaNacimiento: res.provinciaForm ?? "",
+    departamentoNacimiento: res.departamentoForm ?? "",
 
-            dni: res.dniPaciente ?? "",
-            lmNo: res.lm ?? "",
-            autogenerado: res.autogenerado ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            afpSnp: res.afp ?? "",
-            estatura: res.talla ?? "",
-            licConducirNo: res.lincenciaConducir ?? "",
-            cusspNo: res.cussp ?? "",
-            peso: res.peso ?? "",
+    // ===== DOMICILIO =====
+    direccionDomicilio: res.direccionPaciente ?? "",
+    distritoDomicilio: res.distritoAdmisionPaciente ?? "",
+    provinciaDomicilio: res.provinciaAdmisionPaciente ?? "",
+    departamentoDomicilio: res.departamentoAdmisionPaciente ?? "",
+    referenciaDomiciliaria: res.referenciaDomicilio ?? "",
 
-            // ===== NACIMIENTO =====
-            distritoNacimiento: res.distritoForm ?? "",
-            provinciaNacimiento: res.provinciaForm ?? "",
-            departamentoNacimiento: res.departamentoForm ?? "",
+    // ===== CONTACTO =====
+    telefono1: res.telefonoPaciente ?? "",
+    telefono2: "",
+    tipoVivienda: res.viviendaPropia ? "PROPIA" : res.viviendaAlquilada ? "ALQUILADA" : "OTROS",
+    email: "",
+    radioFrec: res.radioFrecuencia ?? "",
+    celular: res.celularPaciente ?? "",
+    numeroCuentaAhorro: res.numeroCuenta ?? "",
+    banco: res.banco ?? "",
 
-            // ===== DOMICILIO =====
-            direccionDomicilio: res.direccionPaciente ?? "",
-            distritoDomicilio: res.distritoAdmisionPaciente ?? "",
-            provinciaDomicilio: res.provinciaAdmisionPaciente ?? "",
-            departamentoDomicilio: res.departamentoAdmisionPaciente ?? "",
-            referenciaDomiciliaria: res.referenciaDomicilio ?? "",
+    // Composición Familiar
+    ...mapFamilia(res.composicionFamiliar ?? []),
 
-            // ===== CONTACTO =====
-            telefono1: res.telefonoPaciente ?? "",
-            telefono2: "",
-            tipoVivienda: res.viviendaPropia
-                ? "PROPIA"
-                : res.viviendaAlquilada
-                    ? "ALQUILADA"
-                    : "OTROS",
-            email: "",
-            radioFrec: res.radioFrecuencia ?? "",
-            celular: res.celularPaciente ?? "",
-            numeroCuentaAhorro: res.numeroCuenta ?? "",
-            banco: res.banco ?? "",
+    // Emergencia
+    emergenciaNombres: res.nombreEmergencia ?? "",
+    emergenciaParentesco: res.parentescoEmergencia ?? "",
+    emergenciaTelefono: res.telefonoEmergencia ?? "",
+    emergenciaDomicilio: res.domicilioEmergencia ?? "",
+    emergenciaOtraReferencia: res.otraReferenciaEmergencia ?? "",
 
-            // Composición Familiar
-            ...mapFamilia(res.composicionFamiliar ?? []),
+    // Instrucción Adquirida
+    ...mapInstruccion(res.instruccionAdquirida ?? []),
 
-            // Emergencia
-            emergenciaNombres: res.nombreEmergencia ?? "",
-            emergenciaParentesco: res.parentescoEmergencia ?? "",
-            emergenciaTelefono: res.telefonoEmergencia ?? "",
-            emergenciaDomicilio: res.domicilioEmergencia ?? "",
-            emergenciaOtraReferencia: res.otraReferenciaEmergencia ?? "",
+    // Condiciones Laborales
+    sueldoJornal: res.sueldo ?? "",
+    sistemaTrabajo: res.sistemaTrabajo ?? "",
+    transporteTerrestre: res.transporteTerrestreSi ? "SI" : "NO",
+    transporteAereo: res.transporteAereoSi ? "SI" : "NO",
+    viaticos: res.viaticosSi ? "SI" : "NO",
+    viaticosValor: res.viaticosDescripcion ?? "",
+    alimentacionContrata: res.alimentacionContrata ?? "",
 
-            // Instrucción Adquirida
-            ...mapInstruccion(res.instruccionAdquirida ?? []),
+    // Pre-Evaluación
+    grupoSanguineo: res.grupoSanguineo ?? "",
 
-            // Condiciones Laborales
-            sueldoJornal: res.sueldo ?? "",
-            sistemaTrabajo: res.sistemaTrabajo ?? "",
-            transporteTerrestre: res.transporteTerrestreSi ? "SI" : "NO",
-            transporteAereo: res.transporteAereoSi ? "SI" : "NO",
-            viaticos: res.viaticosSi ? "SI" : "NO",
-            viaticosValor: res.viaticosDescripcion ?? "",
-            alimentacionContrata: res.alimentacionContrata ?? "",
+    experiencias: res.experienciaLaboral ?? [],
+    referencias: res.referenciasPersonales ?? [],
+    aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
+    aptitud:
+        res.faApto === true
+            ? "APTO"
+            : res.faAptoConRestriccion === true
+                ? "APTO RESTRICCION"
+                : res.faNoApto === true
+                    ? "NO APTO"
+                    : false,
 
-            //Pre-Evaluación
-            grupoSanguineo: res.grupoSanguineo ?? "",
+    nombrePsicologo: res.nombrePsicologo ?? "",
+    nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
+});
 
-            // capacitaciones: [],
-            experiencias: res.experienciaLaboral ?? [],
-            referencias: res.referenciasPersonales ?? [],
-            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
-            aptitud: res.faApto === true ? "APTO" : res.faAptoConRestriccion === true ? "APTO RESTRICCION" : res.faNoApto === true ? "NO APTO" : false,
-
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
-            nombrePsicologo: res.nombrePsicologo ?? "",
-            nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
-        }));
-        Swal.fire(
-            "Alerta",
-            "Este paciente ya cuenta con registros de Ficha Datos Personales.",
-            "warning"
-        );
-    }
+// ===== Mapeo Registro nuevo =====
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+    const res = await GetInfoServicioDefaultManejo(nro, tabla, token, obtenerReporteUrl, onFinish);
+    if (!res) return;
+    set((prev) => ({
+        ...prev,
+        ...mapReporte(res, prev),
+        tieneRegistro: false,
+    }));
 };
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
+// ===== Mapeo Edición =====
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
+    const res = await GetInfoServicioDefaultManejo(nro, tabla, token, obtenerReporteUrl, onFinish);
+    if (!res) return;
+    set((prev) => ({
+        ...prev,
+        ...mapReporte(res, prev),
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+        user_doctorAsignado: res.doctorAsignado,
+        tieneRegistro: true,
+    }));
+};
 
+// ===== Mapeo: Body de registro/actualización =====
+const construirBody = (form, user) => {
     const familiaresConfig = [
         { key: "Padre", parentesco: "PADRE" },
         { key: "Madre", parentesco: "MADRE" },
@@ -373,10 +267,10 @@ export const SubmitDataService = async (
         { key: "Hijo2", parentesco: "HIJO" },
         { key: "Hijo3", parentesco: "HIJO" },
         { key: "Hijo4", parentesco: "HIJO" },
-        { key: "Hijo5", parentesco: "HIJO" }
+        { key: "Hijo5", parentesco: "HIJO" },
     ];
 
-    const composicionFamiliar = familiaresConfig.map(f => ({
+    const composicionFamiliar = familiaresConfig.map((f) => ({
         id: form[`idfamiliar${f.key}`],
         idFichaDatosPersonales: form.norden,
         parentesco: f.parentesco,
@@ -386,7 +280,7 @@ export const SubmitDataService = async (
         edad: form[`familiar${f.key}Edad`],
         dni: form[`familiar${f.key}Dni`],
         gradoInstruccion: form[`familiar${f.key}Grado`],
-        autogenerado: form[`familiar${f.key}Autogenerado`]
+        autogenerado: form[`familiar${f.key}Autogenerado`],
     }));
 
     const instruccionConfig = [
@@ -397,26 +291,23 @@ export const SubmitDataService = async (
         { key: "Otros", label: "OTROS" },
     ];
 
-    const buildInstruccionAdquirida =
-        instruccionConfig
-            .map(i => ({
-                id: form[`idInstruccion${i.key}`],
-                idFichaDatosPersonales: form.norden,
-                instruccion: i.label,
-                centroEstudio: form[`instruccion${i.key}Centro`],
-                fechaInicio: form[`instruccion${i.key}Inicio`],
-                fechaTermino: form[`instruccion${i.key}Termino`],
-                gradoObtenido: form[`instruccion${i.key}Grado`],
-                cap: null,
-            }));
+    const instruccionAdquirida = instruccionConfig.map((i) => ({
+        id: form[`idInstruccion${i.key}`],
+        idFichaDatosPersonales: form.norden,
+        instruccion: i.label,
+        centroEstudio: form[`instruccion${i.key}Centro`],
+        fechaInicio: form[`instruccion${i.key}Inicio`],
+        fechaTermino: form[`instruccion${i.key}Termino`],
+        gradoObtenido: form[`instruccion${i.key}Grado`],
+        cap: null,
+    }));
 
-
-    const body = {
+    return {
         norden: form.norden,
         id: form.id,
         fechaIngreso: form.fechaIngreso,
-        empleado: form.tipoTrabajador == "EMPLEADO",
-        obrero: form.tipoTrabajador == "OBRERO",
+        empleado: form.tipoTrabajador === "EMPLEADO",
+        obrero: form.tipoTrabajador === "OBRERO",
         codigoActividad: "",
         codigoDepartamento: "",
         zona: "",
@@ -430,8 +321,8 @@ export const SubmitDataService = async (
         autogenerado: form.autogenerado,
         referenciaDomicilio: form.referenciaDomiciliaria,
 
-        viviendaPropia: form.tipoVivienda == "PROPIA",
-        viviendaAlquilada: form.tipoVivienda == "ALQUILADA",
+        viviendaPropia: form.tipoVivienda === "PROPIA",
+        viviendaAlquilada: form.tipoVivienda === "ALQUILADA",
         radioFrecuencia: form.radioFrec,
         numeroCuenta: form.numeroCuentaAhorro,
         banco: form.banco,
@@ -444,12 +335,12 @@ export const SubmitDataService = async (
 
         sueldo: form.sueldoJornal,
         sistemaTrabajo: form.sistemaTrabajo,
-        transporteTerrestreSi: form.transporteTerrestre == "SI",
-        transporteTerrestreNo: form.transporteTerrestre == "NO",
-        transporteAereoSi: form.transporteAereo == "SI",
-        transporteAereoNo: form.transporteAereo == "NO",
-        viaticosSi: form.viaticos == "SI",
-        viaticosNo: form.viaticos == "NO",
+        transporteTerrestreSi: form.transporteTerrestre === "SI",
+        transporteTerrestreNo: form.transporteTerrestre === "NO",
+        transporteAereoSi: form.transporteAereo === "SI",
+        transporteAereoNo: form.transporteAereo === "NO",
+        viaticosSi: form.viaticos === "SI",
+        viaticosNo: form.viaticos === "NO",
         viaticosDescripcion: form.viaticosValor,
         alimentacionContrata: form.alimentacionContrata,
 
@@ -458,58 +349,158 @@ export const SubmitDataService = async (
 
         usuarioRegistro: user,
 
-        composicionFamiliar: composicionFamiliar,
+        composicionFamiliar,
+        experienciaLaboral: form.experiencias.map((item) => ({ ...item, idFichaDatosPersonales: form.norden })),
+        instruccionAdquirida,
+        referenciasPersonales: form.referencias.map((item) => ({ ...item, idFichaDatosPersonales: form.norden })),
 
-        experienciaLaboral: form.experiencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
-        // capacitaciones: form.capacitaciones.map(item => ({ ...item, idFichaDatosPersonales: form.norden, cap: null })),
-        instruccionAdquirida: buildInstruccionAdquirida,
-        referenciasPersonales: form.referencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
-        apto: form.aptitud === "APTO" ? true : false,
-        aptoRestriccion: form.aptitud === "APTO RESTRICCION" ? true : false,
-        noApto: form.aptitud === "NO APTO" ? true : false,
+        apto: form.aptitud === "APTO",
+        aptoRestriccion: form.aptitud === "APTO RESTRICCION",
+        noApto: form.aptitud === "NO APTO",
 
         usuarioFirma: "",
         doctorAsignado: "",
     };
+};
 
+// ===== Guardar / Editar =====
+// El endpoint de fichaDatosPersonales responde envuelto en { codigo, resultado }, por eso se
+// usan las variantes "Manejo" de functionUtils en vez de los helpers genéricos de
+// registroOcupacionalUtils (pensados para respuestas planas).
+const enviarRegistro = async ({ form, token, user, tabla, limpiar, datosFooter, sede, esActualizacion }) => {
+    if (!form.norden) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-clipboard-list"></i>Error',
+            html: "Datos Incompletos",
+        });
+        return;
+    }
+
+    LoadingDefault("Validando datos");
+    const yaExiste = await existeRegistro(form.norden, tabla, token);
+
+    if (esActualizacion && !yaExiste) {
+        await Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-floppy-disk"></i>Alerta',
+            html: "No existe un registro para esta Orden. Use el botón Guardar para registrarlo.",
+        });
+        return;
+    }
+    if (!esActualizacion && yaExiste) {
+        await Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-pen-to-square"></i>Alerta',
+            html: "Ya existe un registro para esta Orden. Use el botón Editar para actualizarlo.",
+        });
+        return;
+    }
+
+    const body = construirBody(form, user);
     await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla, datosFooter, sede);
     });
 };
 
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter, sede) =>
+    enviarRegistro({ form, token, user, tabla, limpiar, datosFooter, sede, esActualizacion: false });
 
-/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    PrintHojaRJsReportDefault(
-        nro,
-        token,
-        tabla,
-        obtenerReporteJsReportUrl
-    );
-};*/
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter, sede) =>
+    enviarRegistro({ form, token, user, tabla, limpiar, datosFooter, sede, esActualizacion: true });
 
-export const PrintHojaR = (nro, token, tabla) => {
-    Loading('Cargando Formato a Imprimir')
-    getFetch(`/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+// ===== Impresión =====
+export const PrintHojaR = (nro, token, tabla, datosFooter, sede) => {
+    LoadingDefault("Cargando Formato a Imprimir");
+
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
         .then(async (res) => {
-            if (res.resultado.norden) {
-                const nombre = "Informe_Ocu_DatosPacientes";
-                console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../jaspers/FichaDatosPersonales/*.jsx');
-                const modulo = await jasperModules[`../../../../../jaspers/FichaDatosPersonales/${nombre}.jsx`]();
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === 'function') {
-                    modulo.default(res.resultado);
-                } else {
-                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+            if (sede) {
+                const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
+                if (estadoSede === "otraSede") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                        html: `El N° Orden ${nro} pertenece a otra sede${descripcionSede ? ` (${descripcionSede})` : ""}.`,
+                    });
+                    return;
                 }
-                Swal.close()
+                if (estadoSede === "error") {
+                    Swal.fire({
+                        icon: "error",
+                        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+                    });
+                    return;
+                }
+            }
+
+            const resultado = res?.resultado;
+            if (!res || res.error || !resultado?.norden) {
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+                    html: `No se encontraron registros para el N° Orden ${nro}.`,
+                });
+                return;
+            }
+
+            const modulo = await jasperModules[rutaReporte]();
+            if (typeof modulo.default === "function") {
+                modulo.default({ ...resultado, ...datosFooter });
+                Swal.close();
             } else {
-                Swal.close()
+                console.error(`El módulo ${rutaReporte} no exporta una función por defecto`);
+                Swal.fire({
+                    icon: "error",
+                    title: '<i class="fa-solid fa-print"></i>Error',
+                    html: "No se pudo cargar el formato de impresión.",
+                });
             }
         })
-}
+        .catch((error) => {
+            console.error("Error al generar el reporte:", error);
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-print"></i>Error',
+                html: "Ocurrió un error al generar el reporte.",
+            });
+        });
+};
 
+// ===== Búsqueda / verificación por N° Orden (3 estados: nuevo / existente / necesita examen previo) =====
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    LoadingDefault("Validando datos");
+
+    if (sede) {
+        const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
+        if (estadoSede === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a otra sede${descripcionSede ? ` (${descripcionSede})` : ""}.`,
+            });
+            return;
+        }
+        if (estadoSede === "error") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
     VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
@@ -517,144 +508,26 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         set,
         sede,
         () => {
-            //NO Tiene registro
+            // No tiene registro -> se cargan los datos del paciente.
             GetInfoServicio(nro, tabla, set, token, () => { });
         },
         () => {
-            //Tiene registro
-            GetInfoServicioEditar(nro, tabla, set, token, () => { });
+            // Ya tiene registro -> se carga para edición.
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de Ficha Datos Personales.",
+                });
+            });
         },
         () => {
-            //Necesita
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Laboratorio Clínico.",
-                "warning"
-            );
+            // Necesita pasar por Laboratorio Clínico antes de registrar esta ficha.
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-vial"></i>Alerta',
+                html: "El paciente necesita pasar por Laboratorio Clínico.",
+            });
         }
     );
-};
-export const Loading = (mensaje) => {
-    LoadingDefault(mensaje);
-};
-
-export const PrintHojaRPropio = (nro, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
-
-    LoadingDefault("Cargando Formato a Imprimir");
-
-    getFetch(
-        `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
-        token
-    )
-        .then(async (res) => {
-            console.log('asdas', res)
-            // Manejar errores de la respuesta
-            if (res.codigo !== 200) {
-                console.error("Error en la respuesta del servidor:", res);
-                Swal.fire(
-                    "Error",
-                    `No se pudo obtener el reporte. ${res.status === 404 ? 'El endpoint no existe o no hay datos.' : `Error ${res.status}: ${res.statusText || res.message || 'Error desconocido'}`}`,
-                    "error"
-                );
-                Swal.close();
-                return;
-            }
-            res = res.resultado
-            if (res.norden || res.norden_n_orden || res.n_orden) {
-                if (!(res.dataPrincipal ?? true)) {
-                    Swal.fire(
-                        "Error",
-                        "No existe registro",
-                        "error"
-                    );
-                    return;
-                }
-                const nombre = res.nameJasper || res.namejasper;
-                console.log("Nombre Jasper recibido:", nombre);
-                console.log("Nombre Carpeta:", nombreCarpeta);
-
-                if (!nombre || !nombreCarpeta) {
-                    console.error("Faltan datos necesarios:", { nombre, nombreCarpeta });
-                    Swal.fire("Error", "Error al obtener el formato de impresión", "error");
-                    Swal.close();
-                    return;
-                }
-
-                // Construir la ruta completa
-                const rutaCompleta = `${nombreCarpeta}/${nombre}.jsx`;
-                console.log("Ruta completa construida:", rutaCompleta);
-
-                // Verificar las claves disponibles
-                const clavesDisponibles = Object.keys(jasperModules);
-                console.log("Claves disponibles en jasperModules:", clavesDisponibles);
-
-                // Intentar encontrar el módulo
-                let moduloFunc = jasperModules[rutaCompleta];
-
-                // Si no se encuentra la ruta exacta, buscar por nombre del archivo
-                if (!moduloFunc) {
-                    console.warn(`No se encontró la ruta exacta: ${rutaCompleta}`);
-                    // Buscar cualquier clave que contenga el nombre (sin extensión)
-                    const nombreSinExtension = nombre.replace(/\.jsx?$/, '');
-                    // Extraer palabras clave del nombre (ej: "Informe_Lab_panel4D" -> ["panel", "4d"])
-                    const palabrasClave = nombreSinExtension.toLowerCase()
-                        .replace(/informe|lab|_/g, ' ')
-                        .split(/\s+/)
-                        .filter(p => p.length > 0);
-
-                    const claveEncontrada = clavesDisponibles.find(key => {
-                        const nombreArchivo = key.split('/').pop().replace(/\.jsx?$/, '').toLowerCase();
-                        // Buscar coincidencia exacta
-                        if (nombreArchivo === nombreSinExtension.toLowerCase()) {
-                            return true;
-                        }
-                        // Buscar si contiene todas las palabras clave
-                        if (palabrasClave.length > 0) {
-                            return palabrasClave.every(palabra => nombreArchivo.includes(palabra));
-                        }
-                        // Buscar si el nombre del archivo contiene el nombre buscado o viceversa
-                        return nombreArchivo.includes(nombreSinExtension.toLowerCase()) ||
-                            nombreSinExtension.toLowerCase().includes(nombreArchivo);
-                    });
-
-                    if (claveEncontrada) {
-                        console.log(`Se encontró una clave similar: ${claveEncontrada}`);
-                        moduloFunc = jasperModules[claveEncontrada];
-                    } else {
-                        // Si hay solo un archivo en la carpeta, usarlo
-                        if (clavesDisponibles.length === 1) {
-                            console.log(`Usando el único archivo disponible: ${clavesDisponibles[0]}`);
-                            moduloFunc = jasperModules[clavesDisponibles[0]];
-                        } else {
-                            console.error("No se pudo encontrar el módulo jasper");
-                            Swal.fire("Error", `No se encontró el formato de impresión: ${nombre}.jsx`, "error");
-                            Swal.close();
-                            return;
-                        }
-                    }
-                }
-
-                if (!moduloFunc || typeof moduloFunc !== 'function') {
-                    console.error("El módulo encontrado no es una función:", moduloFunc);
-                    Swal.fire("Error", `Error al cargar el formato de impresión: ${nombre}.jsx`, "error");
-                    Swal.close();
-                    return;
-                }
-
-                const modulo = await moduloFunc();
-                console.log("Módulo cargado:", modulo);
-
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === "function") {
-                    modulo.default({ ...res, ...datosFooter }, null);
-                } else {
-                    console.error(`El módulo no exporta una función por defecto`);
-                    Swal.fire("Error", `El formato de impresión ${nombre}.jsx no es válido`, "error");
-                }
-            }
-            Swal.close();
-        })
-    // .finally(() => {
-
-    // });
 };
