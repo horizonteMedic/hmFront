@@ -52,6 +52,7 @@ import Ficha from "./views/jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx";
 import useAppVersionChecker from "./views/hooks/useAppVersionChecker.jsx";
 import Valorizacion from "./views/admin/panel-de-control/Valorizacion/Valorizacion.jsx";
 import ModuloAsistencial from "./views/admin/panel-de-control/ModuloAsistencial/ModuloAsistencial.jsx";
+import ModuloSalud from "./views/admin/panel-de-control/ModuloSalud/ModuloSalud.jsx";
 // import * as pdfjsLib from "pdfjs-dist";
 
 // pdfjsLib.disableWorker = true;
@@ -156,6 +157,7 @@ const AppContent = () => {
           <Route path="/protocolos" element={<Protocolos />} />
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
           <Route path="/ModuloAsistencial" element={<ModuloAsistencial />} />
+          <Route path="/ModuloSalud" element={<ModuloSalud />} />
           {/* <Route path="/odontologia" element={<Odontologia />} />
           <Route
             path="/SistemaOcupacional/odontologia"
