@@ -509,7 +509,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             // No tiene registro -> se cargan los datos del paciente.
-            GetInfoServicio(nro, tabla, set, token, () => { });
+            GetInfoServicio(nro, tabla, set, token, () => {Swal.close()});
         },
         () => {
             // Ya tiene registro -> se carga para edición.
