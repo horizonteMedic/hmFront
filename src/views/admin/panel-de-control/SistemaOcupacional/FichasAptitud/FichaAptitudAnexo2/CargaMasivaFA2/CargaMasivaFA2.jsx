@@ -15,6 +15,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
     const [data, setData] = useState([]);
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
+    const [reemplazar, setReemplazar] = useState(false);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
 
@@ -54,7 +55,10 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
 
         const confirm = await Swal.fire({
             title: "¿Procesar y guardar los registros?",
-            html: `Los N° de Orden nuevos serán <b>creados</b>. Los que ya tengan registro serán <b>actualizados</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha por defecto: <b>${fecha}</b>`,
+            html: `${reemplazar
+                    ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
+                    : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
+                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha por defecto: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -68,47 +72,6 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
             row.estado === "error" ? row : { ...row, estado: "procesando", mensaje: "" }
         ));
 
-        const total = data.length;
-        let procesados = 0;
-
-        Swal.fire({
-            title: "Procesando Carga Masiva",
-            html: `
-                <div class="mb-4">
-                    <p class="text-gray-700 mb-2">Verificando y registrando N° de Orden...</p>
-                    <div class="w-full bg-gray-200 rounded-full h-6 mb-2">
-                        <div id="cm-progress-bar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-white text-sm font-semibold" style="width: 0%">
-                            0%
-                        </div>
-                    </div>
-                    <p id="cm-current" class="text-sm text-gray-600">Iniciando...</p>
-                    <p id="cm-count" class="text-xs text-gray-500 mt-1">0 de ${total} registros procesados</p>
-                </div>
-            `,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            didOpen: () => Swal.showLoading(),
-        });
-
-        const actualizarBarraYFila = (resultado) => {
-            procesados += 1;
-            const pct = Math.round((procesados / total) * 100);
-
-            const bar = document.getElementById("cm-progress-bar");
-            const current = document.getElementById("cm-current");
-            const count = document.getElementById("cm-count");
-
-            if (bar) { bar.style.width = `${pct}%`; bar.textContent = `${pct}%`; }
-            if (current) {
-                const estado = resultado.omitido ? "Omitido" : resultado.ok ? (resultado.editado ? "Actualizado" : "Guardado") : "Error";
-                current.textContent = `N° Orden ${resultado.norden}: ${estado}`;
-            }
-            if (count) count.textContent = `${procesados} de ${total} registros procesados`;
-
-            actualizarFila(resultado);
-        };
-
         const resultados = await guardarCargaMasivaFA2(
             data,
             {
@@ -119,11 +82,11 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                 medicoNombre: medico.nombre_medico,
                 medicoUsername: medico.user_medicoFirma,
                 sede,
+                reemplazar,
             },
-            actualizarBarraYFila
+            actualizarFila
         );
 
-        Swal.close();
         setProcesando(false);
         setResultadosFinales(resultados);
 
@@ -135,7 +98,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados: <b>${creadosCount}</b><br/>✏️ Actualizados: <b>${editadosCount}</b><br/>⊘ Omitidos (falta examen previo): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Creados: <b>${creadosCount}</b><br/>✏️ Actualizados: <b>${editadosCount}</b><br/>⊘ Omitidos: <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
@@ -180,7 +143,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                     />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 border border-gray-200 rounded p-3">
+                <div className="grid md:grid-cols-3 gap-4 border border-gray-200 rounded p-3 items-end">
                     <EmpleadoComboBox
                         value={medico.nombre_medico}
                         form={medico}
@@ -198,6 +161,15 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                             className="border rounded px-2 py-1 w-full"
                         />
                     </div>
+                    <label className="flex items-center gap-2 font-semibold">
+                        <input
+                            type="checkbox"
+                            checked={reemplazar}
+                            disabled={procesando}
+                            onChange={(e) => setReemplazar(e.target.checked)}
+                        />
+                        Reemplazar los que ya tengan registro
+                    </label>
                 </div>
                 <p className="text-xs text-gray-500 -mt-2">
                     La plantilla incluye columna "FECHA (DD/MM/AAAA)" para asignar fecha distinta a cada N° de Orden.
