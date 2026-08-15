@@ -932,7 +932,7 @@ export default function FichaSas() {
                                             name="criterio_d_imc"
                                             value={form?.criterio_d_imc}
                                             onChange={handleRadioButtonBoolean}
-                                            disabled={!form?.criterio_d}
+                                            // disabled={!form?.criterio_d}
                                         />
                                     </div>
                                     <div className="flex justify-between items-center">

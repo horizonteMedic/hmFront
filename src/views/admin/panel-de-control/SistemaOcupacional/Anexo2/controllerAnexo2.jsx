@@ -1093,7 +1093,16 @@ export const GetInfoServicio = (
 
 
           console.log("DATAAA", data);
-          set((prev) => ({ ...prev, ...data }));
+          set((prev) => ({
+            ...prev,
+            ...data,
+            otrosAntecedentesDescripcion: [
+              res.antecedentesPatologicosQuirurjicosAnexo2,
+              prev.otrosAntecedentesDescripcion
+            ]
+              .filter(texto => texto?.trim())
+              .join("\n"),
+          }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
