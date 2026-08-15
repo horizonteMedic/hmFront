@@ -12,6 +12,7 @@ export default function InputTextOneLine({
   className = "",
   labelClassName = "",
   inputClassName = "",
+  autocomplete = "on",
 }) {
   return (
     <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>
@@ -35,6 +36,7 @@ export default function InputTextOneLine({
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
+        autoComplete={autocomplete}
       />
     </div>
   );

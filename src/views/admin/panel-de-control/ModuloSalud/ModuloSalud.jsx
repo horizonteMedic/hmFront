@@ -10,12 +10,12 @@ import RegistroEspecialidades from "./RegistroEspecialidades/RegistroEspecialida
 
 const sections = [
     { tab: 1, vista: "Admision Salud", label: "Admisión", icon: faUserCheck, component: AdmisionTabSelector },
-    { tab: 2, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
-    { tab: 3, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
+    { tab: 2, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
+    { tab: 3, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
 ];
 
 const ModuloSalud = () => {
-    const [activeTab, setActiveTab] = useState(null); 
+    const [activeTab, setActiveTab] = useState(null);
     const navigate = useNavigate();
     const Vista = useAuthStore((state) => state.listView);
 
