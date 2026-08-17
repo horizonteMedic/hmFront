@@ -341,7 +341,7 @@ export default function DatosPersonales({
                 />
                 <InputTextOneLine
                   name="cirugiasDescripcion"
-                  value={form.cirugiasDescripcion}
+                  value={form.cirugiasDescripcion || ""}
                   onChange={handleChange}
                   disabled={!form.cirugias}
                 />
