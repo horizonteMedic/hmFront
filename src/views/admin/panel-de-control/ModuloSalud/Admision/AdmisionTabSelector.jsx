@@ -25,7 +25,7 @@ export default function AdmisionTabSelector({ tieneVista }) {
             permission: "Registro Visita Salud",
             label: "Registro Visita",
             component: RegistroVisita,
-            props: { pacienteActivo },
+            props: { pacienteActivo, onAutoRegistrado: () => setPacienteActivo(null) },
         },
     ];
 

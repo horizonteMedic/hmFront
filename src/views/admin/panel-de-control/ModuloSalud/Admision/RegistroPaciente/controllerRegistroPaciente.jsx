@@ -42,9 +42,9 @@ export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
     const fechaFormateada = `${yyyy}-${mm}-${dd}`;
     const body = {
         tipoDocumento: {
-            id: form.TipoDoc === "0" ? 0 : form.TipoDoc
+            id: form.TipoDoc === "4" ? 4 : form.TipoDoc
         },
-        numeroDocumento: form.TipoDoc === "0" ? "0" : form.dni,
+        numeroDocumento: form.TipoDoc === "4" ? null : form.dni,
         nombres: form.nombres,
         apellidos: form.apellidos,
         fechaNacimiento: fechaFormateada,

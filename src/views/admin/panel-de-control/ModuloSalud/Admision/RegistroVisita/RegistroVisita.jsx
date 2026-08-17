@@ -5,35 +5,53 @@ import { useForm } from "../../../../../hooks/useForm";
 import Swal from "sweetalert2";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { useEffect, useRef, useState } from "react";
-import { getEspecialidades, getInfoTabla, SubmitRegistro } from "./controllerRegistroVisita";
+import { getEspecialidades, getInfoTabla, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faCheck } from "@fortawesome/free-solid-svg-icons";
 
-const initialFormState = {
-  pacienteId: "",
-  TipoDoc: "1",
-  origen: "",
-  dni: "",
-  nombres: "",
-  Seleccionespecialidades: []
-};
 
-export default function RegistroVisita({ pacienteActivo }) {
+
+export default function RegistroVisita({ pacienteActivo, onAutoRegistrado }) {
+  const initialFormState = {
+    pacienteId: "",
+    TipoDoc: "1",
+    origen: "",
+    dni: "",
+    nombres: "",
+    Seleccionespecialidades: [],
+  };
   const [dataTabla, setDataTabla] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
+  const [disabled, setDisabled] = useState(false);
+  const [refresh, setRefresh] = useState(false)
+
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const autoSubmitRef = useRef(null);
 
-  const { form, setForm, handleChange, handleChangeSimple, handleRadioButton, handleClear } = useForm(initialFormState);
+  const { form, setForm, handleChange, handleChangeSimple, handleChangeNumberDecimals, handleClear } = useForm(initialFormState);
 
+  // Auto-registro cuando viene desde RegistroPaciente
   useEffect(() => {
-    if (!pacienteActivo) return;
-    setForm((f) => ({
-      ...f,
+    if (!pacienteActivo || especialidades.length === 0) return;
+    if (autoSubmitRef.current === pacienteActivo.pacienteId) return;
+    autoSubmitRef.current = pacienteActivo.pacienteId;
+
+    const seleccionadas = especialidades
+      .filter((e) => e.activo)
+      .map((e) => ({ id: e.id, nombre: e.nombre }));
+
+    const formData = {
+      ...initialFormState,
       pacienteId: pacienteActivo.pacienteId,
       dni: pacienteActivo.dni,
       nombres: pacienteActivo.nombres,
-    }));
-  }, [pacienteActivo]);
+      Seleccionespecialidades: seleccionadas,
+    };
+
+    setForm(formData);
+    SubmitRegistro(formData, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) });
+    onAutoRegistrado?.();
+  }, [pacienteActivo, especialidades]);
 
   const obtenerInfoTabla = () => {
     getInfoTabla(setDataTabla, token);
@@ -45,15 +63,41 @@ export default function RegistroVisita({ pacienteActivo }) {
 
   useEffect(() => {
     obtenerInfoTabla();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     obtenerEspecialidades();
   }, []);
 
+  useEffect(() => {
+    if (especialidades.length === 0) return;
+    setForm((f) => ({
+      ...f,
+      Seleccionespecialidades: especialidades
+        .filter((e) => e.activo)
+        .map((e) => ({ id: e.id, nombre: e.nombre })),
+    }));
+  }, [especialidades]);
+
+  const handleLimpiar = () => {
+    setDisabled(true);
+    setForm((f) => ({
+      ...initialFormState,
+      Seleccionespecialidades: f.Seleccionespecialidades,
+    }));
+  };
+
   const handleSubmit = () => {
-    SubmitRegistro(form, token, userlogued, handleClear)
+    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) })
   }
+
+  // ── Búsqueda ──────────────────────────────────────────────────────────────
+  const handleSearch = async (e, tipoBusqueda) => {
+    if (e.key === "Enter") {
+      setDisabled(true)
+      SearchPaciente(form, token, handleLimpiar, setForm, tipoBusqueda);
+    }
+  };
 
   return (
     <div className="px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6">
@@ -65,16 +109,20 @@ export default function RegistroVisita({ pacienteActivo }) {
               label="DNI"
               name="dni"
               value={form.dni}
+              onKeyUp={(e) => { handleSearch(e, "DNI") }}
+              onChange={handleChangeNumberDecimals}
               className="flex-[1] min-w-0"
-              disabled
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Nombres y Apellidos"
               name="nombres"
               value={form.nombres}
+              onKeyUp={(e) => { handleSearch(e, "NOMBRES") }}
+              onChange={handleChange}
               labelWidth="155px"
               className="flex-[2] min-w-0"
-              disabled
+              disabled={disabled}
             />
           </div>
 
@@ -85,12 +133,6 @@ export default function RegistroVisita({ pacienteActivo }) {
             disabled
           //onChange={handleChangeNumberDecimals}
           //onKeyUp={handleSearch}
-          />
-          <SelectorEspecialidades
-            especialidades={especialidades}
-            seleccionadas={form.Seleccionespecialidades}
-            onChange={(nuevas) => setForm((f) => ({ ...f, Seleccionespecialidades: nuevas }))}
-            className="col-span-full"
           />
           <div className="flex flex-wrap justify-center gap-4">
             <div className="flex flex-col items-center gap-1">
@@ -106,7 +148,7 @@ export default function RegistroVisita({ pacienteActivo }) {
             <div className="flex flex-col items-center gap-1">
               <button
                 type="button"
-                onClick={() => handleClear()}
+                onClick={() => handleLimpiar()}
                 className="px-6 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -120,7 +162,7 @@ export default function RegistroVisita({ pacienteActivo }) {
       {/* Columna derecha: Panel de historial/búsqueda */}
       <div className="space-y-3">
         <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+          {/*<div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
             <InputTextOneLine
               label="Nombre"
               labelOnTop
@@ -145,12 +187,12 @@ export default function RegistroVisita({ pacienteActivo }) {
               }}
               onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
             />
-          </div>
+          </div>*/}
           <Table
             data={dataTabla}
             set={setForm}
             token={token}
-            clean={handleClear}
+            clean={handleLimpiar}
             datosFooter={datosFooter}
           />
         </SectionFieldset>
@@ -160,90 +202,13 @@ export default function RegistroVisita({ pacienteActivo }) {
   );
 }
 
-function SelectorEspecialidades({ especialidades = [], seleccionadas = [], onChange, className = "" }) {
-  const [busqueda, setBusqueda] = useState("");
-  const [abierto, setAbierto] = useState(false);
-  const ref = useRef(null);
-
-  const opciones = especialidades.filter(
-    (e) => e.activo &&
-      e.nombre.toLowerCase().includes(busqueda.toLowerCase()) &&
-      !seleccionadas.some((s) => s.id === e.id)
-  );
-
-  const agregar = (esp) => {
-    onChange([...seleccionadas, { id: esp.id, nombre: esp.nombre }]);
-    setBusqueda("");
-  };
-
-  const quitar = (id) => onChange(seleccionadas.filter((s) => s.id !== id));
-
-  useEffect(() => {
-    const cerrar = (e) => { if (ref.current && !ref.current.contains(e.target)) setAbierto(false); };
-    document.addEventListener("mousedown", cerrar);
-    return () => document.removeEventListener("mousedown", cerrar);
-  }, []);
-
-  return (
-    <div className={`flex items-start gap-4 ${className}`} ref={ref}>
-      <label className="font-semibold whitespace-nowrap pt-1" style={{ minWidth: "80px", maxWidth: "80px" }}>
-        Especialidad :
-      </label>
-      <div className="flex-1 min-w-0">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Buscar especialidad..."
-            value={busqueda}
-            onChange={(e) => { setBusqueda(e.target.value); setAbierto(true); }}
-            onFocus={() => setAbierto(true)}
-            className="border rounded px-2 py-1 w-full"
-          />
-          {abierto && opciones.length > 0 && (
-            <ul className="absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto">
-              {opciones.map((esp) => (
-                <li
-                  key={esp.id}
-                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm"
-                  onMouseDown={(e) => { e.preventDefault(); agregar(esp); setAbierto(false); }}
-                >
-                  {esp.nombre}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {seleccionadas.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {seleccionadas.map((esp) => (
-              <span
-                key={esp.id}
-                className="flex items-center gap-1 bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-full"
-              >
-                {esp.nombre}
-                <button
-                  type="button"
-                  onClick={() => quitar(esp.id)}
-                  className="ml-1 text-blue-500 hover:text-red-600 font-bold leading-none"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function Table({ data, tabla, set, token, clean, datosFooter }) {
   // confirmación antes de imprimir
 
   function clicktable(nro) {
-    clean();
-    Loading("Importando Datos");
+    //clean();
+    //Loading("Importando Datos");
     //GetInfoServicio(nro, tabla, set, token, () => {
     //Swal.close();
     //});
@@ -280,7 +245,13 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
     {
       label: "Especialidades",
       accessor: "especialidades",
-      render: (row) => row.especialidades.map((option) => (<span className="">{option.nombre}</span>)),
+      render: (row) => (
+        <ul className="list-disc list-inside space-y-0.5">
+          {row.especialidades.map((option) => (
+            <li key={option.id ?? option.nombre} className="text-sm">{option.nombre}</li>
+          ))}
+        </ul>
+      ),
     },
   ];
 
