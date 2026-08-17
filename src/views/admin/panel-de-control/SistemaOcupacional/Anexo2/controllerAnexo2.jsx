@@ -1074,6 +1074,9 @@ export const GetInfoServicio = (
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
           data.resultadoAcidoUrico = res.resultadoAcidoUrico
 
+          data.cirugiasDescripcion = res.antecedentesPatologicosQuirurjicosAnexo2 ?? "";
+          data.cirugias = !!data.cirugiasDescripcion?.trim();
+
           //
           if (
             (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
@@ -1096,12 +1099,6 @@ export const GetInfoServicio = (
           set((prev) => ({
             ...prev,
             ...data,
-            otrosAntecedentesDescripcion: [
-              res.antecedentesPatologicosQuirurjicosAnexo2,
-              prev.otrosAntecedentesDescripcion
-            ]
-              .filter(texto => texto?.trim())
-              .join("\n"),
           }));
         }
       } else {
