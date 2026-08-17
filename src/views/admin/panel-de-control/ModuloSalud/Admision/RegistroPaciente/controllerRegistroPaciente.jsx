@@ -1,0 +1,63 @@
+import Swal from "sweetalert2";
+import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
+import { LoadingDefault, SubmitDataServiceDefault } from "../../../../../utils/functionUtils";
+
+const SearchURL = "/api/pacientes/buscar"
+const SubmitURL = "/api/pacientes"
+
+export const SearchPacienteDNI = async (dni, TipoDoc, token, handleLimpiar, set) => {
+    LoadingDefault("Buscando...")
+    const res = await getFetch(`${SearchURL}?tipoDocumentoId=${TipoDoc}&numeroDocumento=${dni}`, token);
+    /*if (!res.codPa) {
+        await Swal.fire({
+            toast: true, position: "top-end", icon: "info",
+            title: '<span style="font-size:1rem">Paciente no encontrado</span>',
+            width: 360, showConfirmButton: false, timer: 1200,
+        });
+        handleLimpiar(true);
+        return;
+    }*/
+    if (res) {
+        set((prev) => ({
+            ...prev,
+            origen: res.origen,
+            dni: prev.dni,
+            nombres: res.nombres,
+            apellidos: res.apellidos,
+            fechaNacimiento: res.fechaNacimiento,
+            sexo: res.sexo === "M" ? "M" : res.sexo === "F" ? "F" : "",
+            caserio: res.caserio,
+        }));
+        Swal.close()
+    }
+}
+
+export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
+    LoadingDefault("Registrando...")
+    const body = {
+        tipoDocumento: {
+            id: form.TipoDoc === "0" ? 0 : form.TipoDoc
+        },
+        numeroDocumento: form.TipoDoc === "0" ? "0" : form.dni,
+        nombres: form.nombres,
+        apellidos: form.apellidos,
+        fechaNacimiento: form.fechaNacimiento,
+        sexo: form.sexo,
+        caserio: form.caserio
+
+    };
+
+    SubmitData(body, SubmitURL + `?usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`, token)
+        .then((res) => {
+            if (res.id) {
+                Swal.fire({
+                    title: "Éxito",
+                    text: "Se registró o actualizó con éxito",
+                    icon: "success",
+                    confirmButtonColor: "#3085d6",
+                });
+            }
+        })
+
+
+}

@@ -361,12 +361,13 @@ export default function DatosPersonales({
                       }));
                   }}
                 />
-                <InputTextOneLine
+                <InputTextArea
                   name="otrosAntecedentesDescripcion"
                   value={form.otrosAntecedentesDescripcion}
                   onChange={handleChange}
                   disabled={!form.otrosAntecedentes}
                   className="col-span-3 -ml-0.5"
+                  rows={4}
                 />
               </div>
             </div>

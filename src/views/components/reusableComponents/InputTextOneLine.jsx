@@ -20,6 +20,7 @@ export default function InputTextOneLine({
   onRevert,
   required = false,
   error = "",
+  autocomplete = "on",
 }) {
   const showRevert = edited && typeof onRevert === "function";
   const hasError = Boolean(error);
@@ -74,6 +75,19 @@ export default function InputTextOneLine({
           <span>{error}</span>
         </p>
       )}
+      <input
+        type={type}
+        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
+          } ${inputClassName}`}
+        id={name}
+        name={name}
+        value={value ?? ""}
+        onKeyUp={onKeyUp}
+        onChange={onChange}
+        onBlur={onBlur}
+        disabled={disabled}
+        autoComplete={autocomplete}
+      />
     </div>
   );
 }

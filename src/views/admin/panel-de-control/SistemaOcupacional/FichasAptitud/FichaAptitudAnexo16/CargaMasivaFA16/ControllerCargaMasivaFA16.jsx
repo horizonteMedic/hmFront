@@ -7,8 +7,11 @@ import { GetInfoServicio } from "../controllerFichaAptitudAnexo16";
 import { getFA16InitialFormState } from "../FA16FormDefaults";
 import Swal from "sweetalert2";
 
-const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarMasivoFichaAnexo16";
+const urlRegistroIndividual = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarFichaAnexo16";
 const tabla = "certificado_aptitud_medico_ocupacional";
+
+const urlReporteEditarAnexo16 = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
+const tablaAnexo16 = "anexo7c";
 
 const formatearFechaDDMMYYYY = (date) => {
     const d = String(date.getDate()).padStart(2, "0");
@@ -156,6 +159,23 @@ const obtenerDatosPacienteFA16 = async (norden, { token, userlogued, userName, f
     return state;
 };
 
+// Traduce la aptitud registrada en el Anexo 16 (examen origen, tabla anexo7c) al
+// valor de "apto" que usa la Ficha Aptitud. Se usa solo al actualizar un registro
+// ya existente, para que la Ficha Aptitud refleje la aptitud vigente del Anexo 16
+// en vez de la que traía por defecto. Devuelve null si el Anexo 16 está en
+// REEVALUACION (o no trae aptitud registrada), caso en el que no corresponde
+// certificar y la fila debe omitirse.
+const obtenerAptitudAnexo16 = async (norden, token) => {
+    const res = await getFetch(
+        `${urlReporteEditarAnexo16}?nOrden=${norden}&nameService=${tablaAnexo16}`,
+        token
+    );
+    if (res?.examenRadiograficoAptoSi_apto_si) return "APTO";
+    if (res?.examenRadiograficoAptoNo_apto_no) return "NO APTO";
+    if (res?.evaluado) return "EVALUADO";
+    return null;
+};
+
 // Arma el body de FA16 a partir del state, igual que SubmitDataService de controllerFichaAptitudAnexo16.
 const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => ({
     norden: state.norden,
@@ -176,21 +196,19 @@ const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => (
     usuarioFirma: medicoUsername,
 });
 
-// Fase 1: verifica existencia de cada norden.
-//   - id=1 → ya tiene registro, se procesa igual (el backend actualiza) — se marca editado=true.
+// Procesa cada N° de Orden uno por uno (sin endpoint masivo):
 //   - id=2 → requisito previo no cumplido, se omite con el mensaje del backend.
-//   - id=0 → nuevo, obtiene datos del paciente y arma el body.
-// Fase 2: envía todos en un único lote al endpoint urlRegistroMasivo.
-// Parsea la respuesta { exitosos, fallidos, errores:[{motivo, registro:{norden}}] }.
+//   - id=1 → ya tiene registro: se omite si no se pidió reemplazar; si se pidió,
+//     se procesa igual y el backend actualiza (se marca editado=true).
+//   - id=0 → nuevo, se obtienen los datos del paciente y se registra.
+// Cada fila se envía individualmente al endpoint urlRegistroIndividual.
 export const guardarCargaMasivaFA16 = async (
     data,
-    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, sede },
+    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, sede, reemplazar },
     onProgress = () => { }
 ) => {
     const resultados = [];
-    const lote = []; // { norden, body }
 
-    // Fase 1: verificar existencia y preparar cuerpos
     for (const row of data) {
         const norden = row.norden;
 
@@ -219,7 +237,14 @@ export const guardarCargaMasivaFA16 = async (
                 continue;
             }
 
-            const editado = idExistencia === 1;
+            const yaTeniaRegistro = idExistencia === 1;
+
+            if (yaTeniaRegistro && !reemplazar) {
+                const resultado = { norden, ok: false, omitido: true, mensaje: "Ya tiene registro, se omitió" };
+                resultados.push(resultado);
+                onProgress(resultado);
+                continue;
+            }
 
             const state = await obtenerDatosPacienteFA16(norden, {
                 token, userlogued, userName, fecha: fechaFila,
@@ -232,8 +257,38 @@ export const guardarCargaMasivaFA16 = async (
                 continue;
             }
 
+            // Al actualizar un registro existente, la aptitud se toma del Anexo 16
+            // (examen origen) en lugar de la que trae por defecto obtenerDatosPacienteFA16.
+            if (yaTeniaRegistro) {
+                const aptitudAnexo16 = await obtenerAptitudAnexo16(norden, token);
+                if (!aptitudAnexo16) {
+                    const resultado = {
+                        norden,
+                        ok: false,
+                        omitido: true,
+                        mensaje: "El Anexo 16 está en reevaluación; no se actualizó la Ficha Aptitud",
+                    };
+                    resultados.push(resultado);
+                    onProgress(resultado);
+                    continue;
+                }
+                state.apto = aptitudAnexo16;
+            }
+
             const body = construirBodyFA16(state, userlogued, medicoNombre, medicoUsername);
-            lote.push({ norden, body, editado });
+            const res = await SubmitData(body, urlRegistroIndividual, token);
+
+            const ok = res?.id === 1 || !!res?.nOrden || res?.codigo == "201";
+            const resultado = {
+                norden,
+                ok,
+                editado: ok && yaTeniaRegistro,
+                mensaje: ok
+                    ? (res?.mensaje || (yaTeniaRegistro ? "Registro actualizado correctamente" : "Creado y guardado como apto"))
+                    : (res?.mensaje || "Error al registrar"),
+            };
+            resultados.push(resultado);
+            onProgress(resultado);
 
         } catch (error) {
             console.error(`Error al procesar N° Orden ${norden}:`, error);
@@ -241,28 +296,6 @@ export const guardarCargaMasivaFA16 = async (
             resultados.push(resultado);
             onProgress(resultado);
         }
-    }
-
-    if (lote.length === 0) return resultados;
-
-    // Fase 2: enviar todo el lote en una sola llamada
-    const res = await SubmitData(lote.map((l) => l.body), urlRegistroMasivo, token);
-
-    // Indexar errores por norden para lookup O(1)
-    const erroresMap = new Map(
-        (res?.errores ?? []).map((e) => [String(e.registro?.norden), e.motivo])
-    );
-
-    for (const { norden, editado } of lote) {
-        const motivo = erroresMap.get(String(norden));
-        const resultado = {
-            norden,
-            ok: !motivo,
-            editado: !motivo && editado,
-            mensaje: motivo ?? (editado ? "Registro actualizado correctamente" : "Creado y guardado como apto"),
-        };
-        resultados.push(resultado);
-        onProgress(resultado);
     }
 
     return resultados;
