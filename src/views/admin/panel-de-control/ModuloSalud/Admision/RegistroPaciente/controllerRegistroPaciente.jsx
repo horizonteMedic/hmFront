@@ -18,6 +18,10 @@ export const SearchPacienteDNI = async (dni, TipoDoc, token, handleLimpiar, set)
         return;
     }*/
     if (res) {
+        if (res.fechaNacimiento) {
+            const [yyyy, mm, dd] = res.fechaNacimiento.split('-');
+            res.fechaNacimiento = `${dd}-${mm}-${yyyy}`;
+        }
         set((prev) => ({
             ...prev,
             origen: res.origen,
@@ -34,6 +38,8 @@ export const SearchPacienteDNI = async (dni, TipoDoc, token, handleLimpiar, set)
 
 export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
     LoadingDefault("Registrando...")
+    const [dd, mm, yyyy] = form.fechaNacimiento.split('-');
+    const fechaFormateada = `${yyyy}-${mm}-${dd}`;
     const body = {
         tipoDocumento: {
             id: form.TipoDoc === "0" ? 0 : form.TipoDoc
@@ -41,23 +47,11 @@ export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
         numeroDocumento: form.TipoDoc === "0" ? "0" : form.dni,
         nombres: form.nombres,
         apellidos: form.apellidos,
-        fechaNacimiento: form.fechaNacimiento,
+        fechaNacimiento: fechaFormateada,
         sexo: form.sexo,
         caserio: form.caserio
 
     };
-
-    SubmitData(body, SubmitURL + `?usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`, token)
-        .then((res) => {
-            if (res.id) {
-                Swal.fire({
-                    title: "Éxito",
-                    text: "Se registró o actualizó con éxito",
-                    icon: "success",
-                    confirmButtonColor: "#3085d6",
-                });
-            }
-        })
-
+    return await SubmitData(body, SubmitURL + `?usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`, token)
 
 }
