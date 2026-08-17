@@ -151,11 +151,12 @@ const CuadradorVigia = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {hayRegistroCargado && (
-                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
-                </div>
-            )}
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+            </div>
 
             {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-3">

@@ -239,11 +239,12 @@ const CertificadoAptitudPoderosa = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%]  mx-auto">
-            {hayRegistroCargado && (
-                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
-                </div>
-            )}
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+            </div>
 
             <div className="flex flex-col lg:flex-row gap-3 items-start">
                 {/* ===== COLUMNA PRINCIPAL ===== */}

@@ -6,6 +6,7 @@ import {
     faStethoscope,
     faBrain,
     faDownload,
+    faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
@@ -363,11 +364,21 @@ export default function CertificadoAlturaPoderosa() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] mx-auto">
-            {hayRegistroCargado && (
-                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
-                </div>
-            )}
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
+            </div>
 
             <div className="flex flex-col lg:flex-row gap-3 items-start">
                 {/* ===== COLUMNA PRINCIPAL ===== */}
@@ -465,12 +476,12 @@ export default function CertificadoAlturaPoderosa() {
                     </SectionFieldset>
 
                     {/* ===== SECCIÓN: SUBIDA MASIVA DE DOCUMENTOS ===== */}
-                    <SectionFieldset legend="Documento Psicosensométrico"> 
+                    <SectionFieldset legend="Documento Psicosensométrico">
                         <ButtonsPDF
-                                {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-                                {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-                                handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-                            />
+                            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                        />
                     </SectionFieldset>
 
                     {/* ===== PESTAÑAS: ANTECEDENTES / TEST DE CAGE / EXAMEN FÍSICO / NEUROLÓGICO ===== */}

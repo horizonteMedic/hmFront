@@ -9,6 +9,7 @@ import {
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { validarSede } from "../../../../../utils/registroOcupacionalUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
 
 // ===== Configuración =====
 const obtenerReporteUrl = "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales";
@@ -183,9 +184,9 @@ const mapReporte = (res, prev) => ({
 
     // ===== CONTACTO =====
     telefono1: res.telefonoPaciente ?? "",
-    telefono2: "",
+    telefono2: res.telefono2 ?? "",
     tipoVivienda: res.viviendaPropia ? "PROPIA" : res.viviendaAlquilada ? "ALQUILADA" : "OTROS",
-    email: "",
+    email: res.correoPaciente,
     radioFrec: res.radioFrecuencia ?? "",
     celular: res.celularPaciente ?? "",
     numeroCuentaAhorro: res.numeroCuenta ?? "",
@@ -230,6 +231,16 @@ const mapReporte = (res, prev) => ({
 
     nombrePsicologo: res.nombrePsicologo ?? "",
     nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
+
+    // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+    // La creación se conserva para reenviarla al editar y que el backend no la borre.
+    // Nota: este endpoint (fichaDatosPersonales) solo devuelve usuarioRegistro; fechaRegistro/
+    // fechaActualizacion/usuarioActualizacion no están en su schema (ver obtener.json) y
+    // quedarán en blanco hasta que el backend los exponga.
+    fechaRegistro: res.fechaRegistro ?? "",
+    userRegistro: res.usuarioRegistro ?? "",
+    fechaActualizacion: res.fechaActualizacion ?? "",
+    usuarioActualizacion: res.usuarioActualizacion ?? "",
 });
 
 // ===== Mapeo Registro nuevo =====
@@ -257,7 +268,7 @@ export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = (
 };
 
 // ===== Mapeo: Body de registro/actualización =====
-const construirBody = (form, user) => {
+const construirBody = (form, user, esActualizacion) => {
     const familiaresConfig = [
         { key: "Padre", parentesco: "PADRE" },
         { key: "Madre", parentesco: "MADRE" },
@@ -302,10 +313,11 @@ const construirBody = (form, user) => {
         cap: null,
     }));
 
-    return {
+    const base = {
         norden: form.norden,
         id: form.id,
         fechaIngreso: form.fechaIngreso,
+        email: form.email,
         empleado: form.tipoTrabajador === "EMPLEADO",
         obrero: form.tipoTrabajador === "OBRERO",
         codigoActividad: "",
@@ -347,8 +359,6 @@ const construirBody = (form, user) => {
         apellidoPaterno: form.apellidoPaterno,
         apellidoMaterno: form.apellidoMaterno,
 
-        usuarioRegistro: user,
-
         composicionFamiliar,
         experienciaLaboral: form.experiencias.map((item) => ({ ...item, idFichaDatosPersonales: form.norden })),
         instruccionAdquirida,
@@ -361,6 +371,14 @@ const construirBody = (form, user) => {
         usuarioFirma: "",
         doctorAsignado: "",
     };
+
+    return sellarAuditoria(base, {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
+        // campoUserRegistro: "usuarioRegistro",
+    });
 };
 
 // ===== Guardar / Editar =====
@@ -397,7 +415,7 @@ const enviarRegistro = async ({ form, token, user, tabla, limpiar, datosFooter, 
         return;
     }
 
-    const body = construirBody(form, user);
+    const body = construirBody(form, user, esActualizacion);
     await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter, sede);
     });

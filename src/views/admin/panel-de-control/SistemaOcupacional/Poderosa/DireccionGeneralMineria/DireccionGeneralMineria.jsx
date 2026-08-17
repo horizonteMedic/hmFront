@@ -15,6 +15,8 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const tabla = "ministerio_energia_minas";
 const today = getToday();
@@ -264,11 +266,21 @@ const DireccionGeneralMineria = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {hayRegistroCargado && (
-                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
-                </div>
-            )}
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
+            </div>
 
             {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
