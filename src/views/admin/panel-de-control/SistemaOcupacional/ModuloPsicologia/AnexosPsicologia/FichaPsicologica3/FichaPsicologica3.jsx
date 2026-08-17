@@ -1,9 +1,9 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBroom, faPrint, faSave } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerFichaPsicologica3';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerFichaPsicologica3';
 import {
   InputsRadioGroup,
   InputTextArea,
@@ -13,6 +13,10 @@ import {
   RadioTable,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import RegistroEstadoPill from '../../../../../../components/reusableComponents/RegistroEstadoPill';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = "ficha_psicologica_anexo03";
@@ -28,32 +32,48 @@ const orientacionOptions = [
   { value: 'ORIENTADO', label: 'Orientado' },
 ];
 
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fechaExamen", "esApto", "areaCognitiva", "areaEmocional", "user_medicoFirma", "nombre_medico"];
+
 function DatosPersonales({
   form,
   handleChange,
   handleChangeNumber,
   handleChangeSimple,
   handleSearch,
-  handleRadioButtonBoolean
+  executeSearch,
+  handleRadioButtonBoolean,
+  disabled,
+  isFieldEdited,
+  revertField,
+  hayRegistroCargado,
 }) {
   return (
     <div className="space-y-3">
       <SectionFieldset legend="Información del Examen">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onKeyUp={handleSearch}
-            onChange={handleChangeNumber}
-            labelWidth="120px"
-          />
+          <div className="flex gap-x-3 w-full">
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
+              onKeyUp={handleSearch}
+              onChange={handleChangeNumber}
+              disabled={hayRegistroCargado}
+              labelWidth="120px"
+              className="w-full"
+            />
+            <SearchButton onClick={executeSearch} className="lg:hidden" />
+          </div>
           <InputTextOneLine
             label="Fecha Examen"
             name="fechaExamen"
             type="date"
             value={form.fechaExamen}
             onChange={handleChangeSimple}
+            disabled={disabled}
+            edited={isFieldEdited("fechaExamen")}
+            onRevert={() => revertField("fechaExamen")}
             labelWidth="120px"
           />
           <InputTextOneLine
@@ -72,6 +92,9 @@ function DatosPersonales({
             trueLabel="APTO"
             falseLabel="NO APTO"
             onChange={handleRadioButtonBoolean}
+            disabled={disabled}
+            edited={isFieldEdited("esApto")}
+            onRevert={() => revertField("esApto")}
           />
         </div>
       </SectionFieldset>
@@ -223,6 +246,7 @@ function DatosPersonales({
           name="motivoEvaluacion"
           value={form.motivoEvaluacion}
           onChange={handleChange}
+          disabled={disabled}
         />
         <InputTextArea
           rows={5}
@@ -230,6 +254,7 @@ function DatosPersonales({
           name="principalesRiesgos"
           value={form.principalesRiesgos}
           onChange={handleChange}
+          disabled={disabled}
         />
         <InputTextArea
           rows={5}
@@ -237,6 +262,7 @@ function DatosPersonales({
           name="medidasSeguridad"
           value={form.medidasSeguridad}
           onChange={handleChange}
+          disabled={disabled}
         />
       </SectionFieldset>
 
@@ -248,6 +274,7 @@ function DatosPersonales({
             name="historiaFamiliar"
             value={form.historiaFamiliar}
             onChange={handleChange}
+            disabled={disabled}
           />
           <InputTextArea
             rows={5}
@@ -255,6 +282,7 @@ function DatosPersonales({
             name="habitos"
             value={form.habitos}
             onChange={handleChange}
+            disabled={disabled}
           />
           <InputTextArea
             rows={5}
@@ -262,6 +290,7 @@ function DatosPersonales({
             name="otrasObservaciones"
             value={form.otrasObservaciones}
             onChange={handleChange}
+            disabled={disabled}
           />
         </div>
       </SectionFieldset>
@@ -314,9 +343,11 @@ function ExamenMental({
   handleRadioButton,
   handleChangeSimple,
   handleCheckBoxChange,
-  handleSave,
-  handlePrint,
-  handleClear,
+  disabled,
+  isFieldEdited,
+  revertField,
+  isMedicoEdited,
+  revertMedico,
 }) {
   return (
     <div className=" space-y-3">
@@ -329,6 +360,7 @@ function ExamenMental({
                 value={form.presentacion}
                 onChange={handleRadioButton}
                 vertical
+                disabled={disabled}
                 options={[
                   { label: 'Adecuado', value: 'ADECUADO' },
                   { label: 'Inadecuado', value: 'INADECUADO' },
@@ -342,6 +374,7 @@ function ExamenMental({
                 value={form.postura}
                 onChange={handleRadioButton}
                 vertical
+                disabled={disabled}
                 options={[
                   { label: 'Erguida', value: 'ERGUIDA' },
                   { label: 'Encorvada', value: 'ENCORVADA' },
@@ -354,6 +387,7 @@ function ExamenMental({
                 value={form.ritmo}
                 onChange={handleRadioButton}
                 vertical
+                disabled={disabled}
                 options={[
                   { label: 'Lento', value: 'LENTO' },
                   { label: 'Rápido', value: 'RAPIDO' },
@@ -367,6 +401,7 @@ function ExamenMental({
                 value={form.tono}
                 onChange={handleRadioButton}
                 vertical
+                disabled={disabled}
                 options={[
                   { label: 'Bajo', value: 'BAJO' },
                   { label: 'Moderado', value: 'MODERADO' },
@@ -380,6 +415,7 @@ function ExamenMental({
                 value={form.articulacion}
                 onChange={handleRadioButton}
                 vertical
+                disabled={disabled}
                 options={[
                   { label: 'Con dificultad', value: 'CON_DIFICULTAD' },
                   { label: 'Sin dificultad', value: 'SIN_DIFICULTAD' },
@@ -393,6 +429,7 @@ function ExamenMental({
                 form={form}
                 handleRadioButton={handleRadioButton}
                 labelColumns={1}
+                disabled={disabled}
               />
             </SectionFieldset>
           </SectionFieldset>
@@ -404,6 +441,9 @@ function ExamenMental({
               onChange={handleChange}
               rows={6}
               className="w-full"
+              disabled={disabled}
+              edited={isFieldEdited("areaCognitiva")}
+              onRevert={() => revertField("areaCognitiva")}
             />
           </SectionFieldset>
         </div>
@@ -416,6 +456,7 @@ function ExamenMental({
               value={form.lucidoAtento}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Pensamiento"
@@ -423,6 +464,7 @@ function ExamenMental({
               value={form.pensamiento}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Percepción"
@@ -430,6 +472,7 @@ function ExamenMental({
               value={form.percepcion}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
           </SectionFieldset>
 
@@ -438,6 +481,7 @@ function ExamenMental({
               name="memoria"
               value={form.memoria}
               onChange={handleRadioButton}
+              disabled={disabled}
               options={[
                 { label: 'Corto Plazo', value: 'CORTO_PLAZO' },
                 { label: 'Mediano Plazo', value: 'MEDIANO_PLAZO' },
@@ -452,6 +496,7 @@ function ExamenMental({
               value={form.inteligencia}
               onChange={handleRadioButton}
               vertical
+              disabled={disabled}
               options={[
                 { label: 'Muy Superior', value: 'MUY_SUPERIOR' },
                 { label: 'Superior', value: 'SUPERIOR' },
@@ -465,6 +510,7 @@ function ExamenMental({
               value={form.inteligencia}
               onChange={handleRadioButton}
               vertical
+              disabled={disabled}
               options={[
                 { label: 'Fronterizo', value: 'FRONTERIZO' },
                 { label: 'RM Leve', value: 'RM_LEVE' },
@@ -482,6 +528,7 @@ function ExamenMental({
               value={form.apetito}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Sueño"
@@ -489,6 +536,7 @@ function ExamenMental({
               value={form.sueno}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Personalidad"
@@ -496,6 +544,7 @@ function ExamenMental({
               value={form.personalidad}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Afectividad"
@@ -503,6 +552,7 @@ function ExamenMental({
               value={form.afectividad}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
             <InputTextOneLine
               label="Conducta Sexual"
@@ -510,6 +560,7 @@ function ExamenMental({
               value={form.conductaSexual}
               onChange={handleChange}
               labelWidth="120px"
+              disabled={disabled}
             />
           </SectionFieldset>
         </div>
@@ -521,84 +572,98 @@ function ExamenMental({
               name="mips"
               checked={form.mips}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Escala de Motivaciones Psicosociales - MPS"
               name="mps"
               checked={form.mps}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Luria - DNA Diagnóstico neuropsicológico de Adultos"
               name="luria"
               checked={form.luria}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Escala de Apreciación del Estrés EAE"
               name="eae"
               checked={form.eae}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Inventario de Burnout de Maslach"
               name="maslach"
               checked={form.maslach}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Clima laboral"
               name="climaLaboral"
               checked={form.climaLaboral}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Batería de Conductores"
               name="conductores"
               checked={form.conductores}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="WAIS"
               name="wais"
               checked={form.wais}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Test BENTON"
               name="benton"
               checked={form.benton}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Test Bender"
               name="bender"
               checked={form.bender}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Inventario de la ansiedad ZUNG"
               name="zungAnsiedad"
               checked={form.zungAnsiedad}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Inventario de Depresión ZUNG"
               name="zungDepresion"
               checked={form.zungDepresion}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Escala de Memoria de Wechsler"
               name="wechsler"
               checked={form.wechsler}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
             <InputCheckbox
               label="Otras Pruebas"
               name="otrasPruebas"
               checked={form.otrasPruebas}
               onChange={handleCheckBoxChange}
+              disabled={disabled}
             />
           </SectionFieldset>
 
@@ -609,6 +674,9 @@ function ExamenMental({
               onChange={handleChange}
               rows={8}
               className="w-full"
+              disabled={disabled}
+              edited={isFieldEdited("areaEmocional")}
+              onRevert={() => revertField("areaEmocional")}
             />
           </SectionFieldset>
         </div>
@@ -620,44 +688,11 @@ function ExamenMental({
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={disabled}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
       </SectionFieldset>
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic text-base mb-1">Imprimir</span>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base w-24"
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -765,6 +800,14 @@ export default function FichaPsicologica3() {
     nombre_medico: userName,
     user_medicoFirma: userlogued,
 
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -775,38 +818,94 @@ export default function FichaPsicologica3() {
     handleChangeSimple,
     handleCheckBoxChange,
     handleChangeNumber,
+    handleChangeNumberDecimals,
     handleClearnotO,
     handlePrintDefault,
     handleClear,
     setForm,
   } = useForm(initialFormState, { storageKey: "fichaPsicologicaAnexo3" });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+  // el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.apellidos || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+        <RegistroEstadoPill
+          tieneRegistro={form.tieneRegistro}
+          className={hayRegistroCargado ? "" : "invisible"}
+        />
+      </div>
+
       <DatosPersonales
         form={form}
         handleChange={handleChange}
         handleChangeNumber={handleChangeNumber}
         handleChangeSimple={handleChangeSimple}
         handleSearch={handleSearch}
+        executeSearch={executeSearch}
         handleRadioButtonBoolean={handleRadioButtonBoolean}
+        disabled={camposDeshabilitados}
+        isFieldEdited={isFieldEdited}
+        revertField={revertField}
+        hayRegistroCargado={hayRegistroCargado}
       />
       <ExamenMental
         form={form}
@@ -814,11 +913,37 @@ export default function FichaPsicologica3() {
         handleRadioButton={handleRadioButton}
         handleChangeSimple={handleChangeSimple}
         handleCheckBoxChange={handleCheckBoxChange}
-        handleSave={handleSave}
-        handlePrint={handlePrint}
+        disabled={camposDeshabilitados}
+        isFieldEdited={isFieldEdited}
+        revertField={revertField}
+        isMedicoEdited={isMedicoEdited}
+        revertMedico={revertMedico}
+      />
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );
-};
-
+}

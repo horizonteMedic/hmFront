@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -8,11 +6,16 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 
 // Áreas de Evaluación: Inteligencia
@@ -44,6 +47,9 @@ const evalOptions = [
     { value: "I", label: "Inferior" },
 ];
 
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fechaExam", "aptitud", "recomendaciones", "user_medicoFirma", "nombre_medico"];
+
 export default function EvaluacionPsicologicaPoderosa() {
     const today = getToday();
     const [tabla, setTabla] = useState("evaluacion_psicologica_poderosa_normal");
@@ -57,7 +63,6 @@ export default function EvaluacionPsicologicaPoderosa() {
         codigoEvaluacionPsicologicaPoderosa: null,
         fechaExam: today,
         nombreExamen: "",
-        // tipoInforme: "NORMAL",
         aptitud: "",
 
         // Datos personales
@@ -104,6 +109,14 @@ export default function EvaluacionPsicologicaPoderosa() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -116,7 +129,22 @@ export default function EvaluacionPsicologicaPoderosa() {
         handleChangeSimple,
         handleClear,
         handleRadioButton,
+        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "EvaluacionPsicologicaPoderosa" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     const handleRadioButtonTipoInforme = (e, value) => {
         const { name } = e.target;
@@ -139,37 +167,81 @@ export default function EvaluacionPsicologicaPoderosa() {
         SubmitDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.apellidos || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+            </div>
+
             {/* Header */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha Examen"
                     name="fechaExam"
                     type="date"
                     value={form.fechaExam}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaExam")}
+                    onRevert={() => revertField("fechaExam")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -203,6 +275,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                         { label: "AP O.", value: "AP O." },
                     ]}
                     onChange={handleRadioButton}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("aptitud")}
+                    onRevert={() => revertField("aptitud")}
                 />
             </SectionFieldset>
             {/* Datos Necesarios */}
@@ -247,6 +322,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                         labelColumns={3}
                         form={form}
                         handleRadioButton={handleRadioButton}
+                        disabled={camposDeshabilitados}
                     />
                 </SectionFieldset>
                 {/* Áreas de Evaluación - Personalidad */}
@@ -256,7 +332,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                         options={evalOptions}
                         form={form}
                         labelColumns={3}
-                        handleRadioButton={handleRadioButton} />
+                        handleRadioButton={handleRadioButton}
+                        disabled={camposDeshabilitados}
+                    />
                 </SectionFieldset>
             </div>
             {/* Campos de texto libres */}
@@ -267,6 +345,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.fortalezasOportunidades}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
                 />
                 <InputTextArea
                     label="Amenazas y Debilidades"
@@ -274,6 +353,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.amenazasDebilidades}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
                 />
                 <InputTextArea
                     label="Observaciones"
@@ -281,6 +361,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.observaciones}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
                 />
                 <InputTextArea
                     label="Recomendaciones"
@@ -288,6 +369,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.recomendaciones}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("recomendaciones")}
+                    onRevert={() => revertField("recomendaciones")}
                 />
             </SectionFieldset>
 
@@ -297,45 +381,36 @@ export default function EvaluacionPsicologicaPoderosa() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
-            <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">Imprimir</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
 
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </fieldset>
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
         </div>
     );
 }

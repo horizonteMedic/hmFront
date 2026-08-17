@@ -3,298 +3,29 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    SubmitDataServiceDefault,
     VerifyTRPerzonalizadoDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    validarSede,
+    imprimirReporteJasper,
+} from "../../../../../../utils/registroOcupacionalUtils";
 
+// ===== Configuración =====
 const obtenerReporteUrl =
     "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03";
 const registrarUrl =
     "/api/v01/ct/psicologia/registrarActualizarFichaPsicologiaAnexo03";
 
-export const GetInfoServicio = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            // ===== TAB: DATOS PERSONALES =====
-            // Información General
-            norden: res.norden,
-            fechaExamen: res.fechaExamen_fecha,
-            esApto: res.apto_apto,
-            nombreExamen: res.nombreExamen,
-            codigoAnexo: res.codigoAnexo_cod_anexo03,
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build.
+const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/FichaAnexo3/*.jsx");
+const rutaReporte = "../../../../../../jaspers/ModuloPsicologia/FichaAnexo3/FichaPsicologicaOcupacional_Digitalizado.jsx";
 
-            // Datos Personales
-            nombres: res.nombresPaciente,
-            dni: res.dniPaciente,
-            sexo: res.sexoPaciente,
-            apellidos: res.apellidosPaciente,
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
-            lugarNacimiento: res.lugarNacimientoPaciente,
-            edad: res.edadPaciente,
-            estadoCivil: res.estadoCivilPaciente,
-            gradoInstruccion: res.nivelEstudioPaciente,
-
-            // Datos Laborales
-            empresa: res.empresa,
-            tiempoExperiencia: res.tiempoTrabajo_timpo_trab,
-            contrata: res.contrata,
-            puesto: res.cargoPaciente,
-            area: res.areaPaciente,
-            mineralExp: res.mineralExp ?? "", //revisar - no encontrado en JSON
-            explotacionEn: res.explotacionEn ?? "", //revisar - no encontrado en JSON
-            alturaLabor: res.alturaLabor ?? "", //revisar - no encontrado en JSON
-
-            // Evaluación y Riesgos
-            motivoEvaluacion: res.motivoEvaluacion_motivo_eval,
-            principalesRiesgos: res.principalRiesgo_princ_riesgo,
-            medidasSeguridad: res.medidasSeguridad_med_seguridad,
-
-            // Historia y Observaciones
-            historiaFamiliar: res.historialFamiliar_hist_familiar,
-            habitos: res.habitos_habitos,
-            otrasObservaciones: res.otrasObservaciones_otras_observ,
-
-            // ===== TAB: EXAMEN MENTAL =====
-            // Observación de Conductas - Presentación
-            presentacion: res.presentacionAdecuado_rb_adecuado ? "ADECUADO" : (res.presentacionIndecuado_rb_indecuado ? "INADECUADO" : ""),
-
-            // Observación de Conductas - Postura
-            postura: res.posturaErguida_rb_erguida ? "ERGUIDA" : (res.posturaEncorvada_rb_encorvada ? "ENCORVADA" : ""),
-
-            // Observación de Conductas - Discurso
-            ritmo: res.ritmoLento_rb_lento ? "LENTO" :
-                (res.ritmoRapido_rb_rapido ? "RAPIDO" :
-                    (res.ritmoFluido_rb_fluido ? "FLUIDO" : "")),
-            tono: res.tonoBajo_rb_bajo ? "BAJO" :
-                (res.tonoModerado_rb_moderado ? "MODERADO" :
-                    (res.tonoAlto_rb_alto ? "ALTO" : "")),
-            articulacion: res.articulacionConDificultad_rb_condificultad ? "CON_DIFICULTAD" :
-                (res.articulacionSinDificultad_rb_sindificultad ? "SIN_DIFICULTAD" : ""),
-
-            // Observación de Conductas - Orientación
-            orientacionTiempo: res.tiempoOrientado_rb_torientado ? "ORIENTADO" :
-                (res.tiempoDesorientado_rb_tdesorientado ? "DESORIENTADO" : ""),
-            orientacionEspacio: res.espacioOrientado_rb_eorientado ? "ORIENTADO" :
-                (res.espacioDesorientado_rb_edesorientado ? "DESORIENTADO" : ""),
-            orientacionPersona: res.personaOrientado_rb_porientado ? "ORIENTADO" :
-                (res.personaDesorientado_rb_pdesorientado ? "DESORIENTADO" : ""),
-
-            // Observación de Conductas - Área Cognitiva
-            areaCognitiva: res.areaCognitiva_area_cognitiva,
-
-            // Procesos Cognitivos
-            lucidoAtento: res.lucido_lucido,
-            pensamiento: res.pensamiento_pensamiento,
-            percepcion: res.percepcion_percepcion,
-            memoria: res.memoriaCortoPlazo_rb_cortoplazo ? "CORTO_PLAZO" :
-                (res.memoriaMedianoPlazo_rb_medianoplazo ? "MEDIANO_PLAZO" :
-                    (res.memoriaLargoPlazo_rb_largoplazo ? "LARGO_PLAZO" : "")),
-
-            inteligencia: res.inteligenciaMuySuperior_rb_muysuperior ? "MUY_SUPERIOR" :
-                (res.inteligenciaSuperior_rb_superior ? "SUPERIOR" :
-                    (res.inteligenciaNormal_rb_normal ? "NORMAL" :
-                        (res.inteligenciaPromedio_rb_promedio ? "PROMEDIO" :
-                            (res.inteligenciaTorpe_rb_torpe ? "TORPE" :
-                                (res.inteligenciaFronterizo_rb_fronterizo ? "FRONTERIZO" :
-                                    (res.inteligenciaRMLeve_rb_rleve ? "RM_LEVE" :
-                                        (res.inteligenciaRMModerado_rb_rmoderado ? "RM_MODERADO" :
-                                            (res.inteligenciaRMSevero_rb_rsevero ? "RM_SEVERO" :
-                                                (res.inteligenciaRMProfundo_rb_rprofundo ? "RM_PROFUNDO" : ""))))))))),
-            apetito: res.apetito_apetito,
-            sueno: res.sueno_sueno,
-            personalidad: res.personalidad_personalidad,
-            afectividad: res.afectividad_afectividad,
-            conductaSexual: res.conductaSexual_conducta_sexual,
-
-            empresasAnteriores: res.detalles ?? [],
-
-            // Pruebas Psicológicas - Ptje Nombre
-            mips: res.puntajeMips_puntaje1 == "X" ? true : false,
-            mps: res.puntajeMps_puntaje2 == "X" ? true : false,
-            luria: res.puntajeDna_puntaje3 == "X" ? true : false,
-            eae: res.puntajeEAE_puntaje4 == "X" ? true : false,
-            maslach: res.puntajeInventarioBormout_puntaje5 == "X" ? true : false,
-            climaLaboral: res.puntajeClimaLaboral_puntaje6 == "X" ? true : false,
-            conductores: res.puntajeBacteriaConductores_puntaje7 == "X" ? true : false,
-            wais: res.puntajeWais_puntaje8 == "X" ? true : false,
-            benton: res.puntajeBenton_puntaje9 == "X" ? true : false,
-            bender: res.puntajeBender_puntaje10 == "X" ? true : false,
-            zungAnsiedad: res.puntajeAnsiedadZung_puntaje11 == "X" ? true : false,
-            zungDepresion: res.puntajeDepresionZung_puntaje12 == "X" ? true : false,
-            wechsler: res.puntajeEscalaMemoriaWechsler_puntaje13 == "X" ? true : false,
-            otrasPruebas: res.puntajeOtrasPruebas_puntaje14 == "X" ? true : false,
-
-            // Pruebas Psicológicas - Área Emocional
-            areaEmocional: res.areaEmocional_area_emocional,
-
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-
-        }));
-    }
-};
-
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (form.esApto === undefined || form.esApto === "") {
-        Swal.fire({
-            icon: "Error",
-            title: "Datos Incompletos",
-            text: "Por favor, marque la aptitud.",
-        });
-        return;
-    }
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
-    const body = {
-        norden: form.norden,
-        codigoAnexo: form.codigoAnexo,
-        fechaExamen: form.fechaExamen,
-        edad: form.edad,
-        motivoEvaluacion: form.motivoEvaluacion,
-        tiempoTrabajo: form.tiempoExperiencia,
-        principalRiesgo: form.principalesRiesgos,
-        medidasSeguridad: form.medidasSeguridad,
-        historialFamiliar: form.historiaFamiliar,
-        habitos: form.habitos,
-        otrasObservaciones: form.otrasObservaciones,
-        presentacionAdecuado: form.presentacion === 'ADECUADO',
-        presentacionIndecuado: form.presentacion === 'INADECUADO',
-        posturaErguida: form.postura === 'ERGUIDA',
-        posturaEncorvada: form.postura === 'ENCORVADA',
-        ritmoLento: form.ritmo === 'LENTO',
-        ritmoRapido: form.ritmo === 'RAPIDO',
-        ritmoFluido: form.ritmo === 'FLUIDO',
-        tonoBajo: form.tono === 'BAJO',
-        tonoModerado: form.tono === 'MODERADO',
-        tonoAlto: form.tono === 'ALTO',
-        articulacionConDificultad: form.articulacion === 'CON_DIFICULTAD',
-        articulacionSinDificultad: form.articulacion === 'SIN_DIFICULTAD',
-        tiempoOrientado: form.orientacionTiempo === 'ORIENTADO',
-        tiempoDesorientado: form.orientacionTiempo === 'DESORIENTADO',
-        espacioOrientado: form.orientacionEspacio === 'ORIENTADO',
-        espacioDesorientado: form.orientacionEspacio === 'DESORIENTADO',
-        personaOrientado: form.orientacionPersona === 'ORIENTADO',
-        personaDesorientado: form.orientacionPersona === 'DESORIENTADO',
-        lucido: form.lucidoAtento,
-        pensamiento: form.pensamiento,
-        percepcion: form.percepcion,
-        memoriaCortoPlazo: form.memoria === 'CORTO_PLAZO',
-        memoriaMedianoPlazo: form.memoria === 'MEDIANO_PLAZO',
-        memoriaLargoPlazo: form.memoria === 'LARGO_PLAZO',
-        inteligenciaMuySuperior: form.inteligencia === 'MUY_SUPERIOR',
-        inteligenciaSuperior: form.inteligencia === 'SUPERIOR',
-        inteligenciaNormal: form.inteligencia === 'NORMAL_BRILLANTE',
-        inteligenciaPromedio: form.inteligencia === 'PROMEDIO',
-        inteligenciaTorpe: form.inteligencia === 'N_TORPE',
-        inteligenciaFronterizo: form.inteligencia === 'FRONTERIZO',
-        inteligenciaRMLeve: form.inteligencia === 'RM_LEVE',
-        inteligenciaRMModerado: form.inteligencia === 'RM_MODERADO',
-        inteligenciaRMSevero: form.inteligencia === 'RM_SEVERO',
-        inteligenciaRMProfundo: form.inteligencia === 'RM_PROFUNDO',
-        apetito: form.apetito,
-        sueno: form.sueno,
-        personalidad: form.personalidad,
-        afectividad: form.afectividad,
-        conductaSexual: form.conductaSexual,
-
-        puntajeMips: form.mips ? "X" : "",
-        puntajeMps: form.mps ? "X" : "",
-        puntajeDna: form.luria ? "X" : "",
-        puntajeEAE: form.eae ? "X" : "",
-        puntajeInventarioBormout: form.maslach ? "X" : "",
-        puntajeClimaLaboral: form.climaLaboral ? "X" : "",
-        puntajeBacteriaConductores: form.conductores ? "X" : "",
-        puntajeWais: form.wais ? "X" : "",
-        puntajeBenton: form.benton ? "X" : "",
-        puntajeBender: form.bender ? "X" : "",
-        puntajeAnsiedadZung: form.zungAnsiedad ? "X" : "",
-        puntajeDepresionZung: form.zungDepresion ? "X" : "",
-        puntajeEscalaMemoriaWechsler: form.wechsler ? "X" : "",
-        puntajeOtrasPruebas: form.otrasPruebas ? "X" : "",
-
-        areaCognitiva: form.areaCognitiva,
-        areaEmocional: form.areaEmocional,
-
-        apto: form.esApto,
-        usuarioRegistro: user,
-
-        usuarioFirma: form.user_medicoFirma,
-    };
-
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-    });
-};
-
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/FichaAnexo3/*.jsx");
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/FichaAnexo3"
-    );
-};
-
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRPerzonalizadoDefault(
-        nro,
-        tabla,
-        token,
-        set,
-        sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Psicológica 3.",
-                    "warning"
-                );
-            });
-        },
-        () => {
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Cuestionario Nórdico.",
-                "warning"
-            );
-        }
-    );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
     const res = await GetInfoPacDefault(nro, token, sede);
     if (res) {
         set((prev) => ({
@@ -314,8 +45,356 @@ const GetInfoPac = async (nro, set, token, sede) => {
             domicilioActual: res.direccion ?? "",
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
             gradoInstruccion: res.nivelEstudios,
+            tieneRegistro: false,
         }));
     }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (!res) return;
+    set((prev) => ({
+        ...prev,
+        // ===== TAB: DATOS PERSONALES =====
+        // Información General
+        norden: res.norden,
+        fechaExamen: res.fechaExamen_fecha,
+        esApto: res.apto_apto,
+        nombreExamen: res.nombreExamen,
+        codigoAnexo: res.codigoAnexo_cod_anexo03,
+
+        // Datos Personales
+        nombres: res.nombresPaciente,
+        dni: res.dniPaciente,
+        sexo: res.sexoPaciente,
+        apellidos: res.apellidosPaciente,
+        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
+        lugarNacimiento: res.lugarNacimientoPaciente,
+        edad: res.edadPaciente,
+        estadoCivil: res.estadoCivilPaciente,
+        gradoInstruccion: res.nivelEstudioPaciente,
+
+        // Datos Laborales
+        empresa: res.empresa,
+        tiempoExperiencia: res.tiempoTrabajo_timpo_trab,
+        contrata: res.contrata,
+        puesto: res.cargoPaciente,
+        area: res.areaPaciente,
+        mineralExp: res.mineralExp ?? "",
+        explotacionEn: res.explotacionEn ?? "",
+        alturaLabor: res.alturaLabor ?? "",
+
+        // Evaluación y Riesgos
+        motivoEvaluacion: res.motivoEvaluacion_motivo_eval,
+        principalesRiesgos: res.principalRiesgo_princ_riesgo,
+        medidasSeguridad: res.medidasSeguridad_med_seguridad,
+
+        // Historia y Observaciones
+        historiaFamiliar: res.historialFamiliar_hist_familiar,
+        habitos: res.habitos_habitos,
+        otrasObservaciones: res.otrasObservaciones_otras_observ,
+
+        // ===== TAB: EXAMEN MENTAL =====
+        // Observación de Conductas - Presentación
+        presentacion: res.presentacionAdecuado_rb_adecuado ? "ADECUADO" : (res.presentacionIndecuado_rb_indecuado ? "INADECUADO" : ""),
+
+        // Observación de Conductas - Postura
+        postura: res.posturaErguida_rb_erguida ? "ERGUIDA" : (res.posturaEncorvada_rb_encorvada ? "ENCORVADA" : ""),
+
+        // Observación de Conductas - Discurso
+        ritmo: res.ritmoLento_rb_lento ? "LENTO" :
+            (res.ritmoRapido_rb_rapido ? "RAPIDO" :
+                (res.ritmoFluido_rb_fluido ? "FLUIDO" : "")),
+        tono: res.tonoBajo_rb_bajo ? "BAJO" :
+            (res.tonoModerado_rb_moderado ? "MODERADO" :
+                (res.tonoAlto_rb_alto ? "ALTO" : "")),
+        articulacion: res.articulacionConDificultad_rb_condificultad ? "CON_DIFICULTAD" :
+            (res.articulacionSinDificultad_rb_sindificultad ? "SIN_DIFICULTAD" : ""),
+
+        // Observación de Conductas - Orientación
+        orientacionTiempo: res.tiempoOrientado_rb_torientado ? "ORIENTADO" :
+            (res.tiempoDesorientado_rb_tdesorientado ? "DESORIENTADO" : ""),
+        orientacionEspacio: res.espacioOrientado_rb_eorientado ? "ORIENTADO" :
+            (res.espacioDesorientado_rb_edesorientado ? "DESORIENTADO" : ""),
+        orientacionPersona: res.personaOrientado_rb_porientado ? "ORIENTADO" :
+            (res.personaDesorientado_rb_pdesorientado ? "DESORIENTADO" : ""),
+
+        // Observación de Conductas - Área Cognitiva
+        areaCognitiva: res.areaCognitiva_area_cognitiva,
+
+        // Procesos Cognitivos
+        lucidoAtento: res.lucido_lucido,
+        pensamiento: res.pensamiento_pensamiento,
+        percepcion: res.percepcion_percepcion,
+        memoria: res.memoriaCortoPlazo_rb_cortoplazo ? "CORTO_PLAZO" :
+            (res.memoriaMedianoPlazo_rb_medianoplazo ? "MEDIANO_PLAZO" :
+                (res.memoriaLargoPlazo_rb_largoplazo ? "LARGO_PLAZO" : "")),
+
+        inteligencia: res.inteligenciaMuySuperior_rb_muysuperior ? "MUY_SUPERIOR" :
+            (res.inteligenciaSuperior_rb_superior ? "SUPERIOR" :
+                (res.inteligenciaNormal_rb_normal ? "NORMAL" :
+                    (res.inteligenciaPromedio_rb_promedio ? "PROMEDIO" :
+                        (res.inteligenciaTorpe_rb_torpe ? "TORPE" :
+                            (res.inteligenciaFronterizo_rb_fronterizo ? "FRONTERIZO" :
+                                (res.inteligenciaRMLeve_rb_rleve ? "RM_LEVE" :
+                                    (res.inteligenciaRMModerado_rb_rmoderado ? "RM_MODERADO" :
+                                        (res.inteligenciaRMSevero_rb_rsevero ? "RM_SEVERO" :
+                                            (res.inteligenciaRMProfundo_rb_rprofundo ? "RM_PROFUNDO" : ""))))))))),
+        apetito: res.apetito_apetito,
+        sueno: res.sueno_sueno,
+        personalidad: res.personalidad_personalidad,
+        afectividad: res.afectividad_afectividad,
+        conductaSexual: res.conductaSexual_conducta_sexual,
+
+        empresasAnteriores: res.detalles ?? [],
+
+        // Pruebas Psicológicas - Ptje Nombre
+        mips: res.puntajeMips_puntaje1 == "X" ? true : false,
+        mps: res.puntajeMps_puntaje2 == "X" ? true : false,
+        luria: res.puntajeDna_puntaje3 == "X" ? true : false,
+        eae: res.puntajeEAE_puntaje4 == "X" ? true : false,
+        maslach: res.puntajeInventarioBormout_puntaje5 == "X" ? true : false,
+        climaLaboral: res.puntajeClimaLaboral_puntaje6 == "X" ? true : false,
+        conductores: res.puntajeBacteriaConductores_puntaje7 == "X" ? true : false,
+        wais: res.puntajeWais_puntaje8 == "X" ? true : false,
+        benton: res.puntajeBenton_puntaje9 == "X" ? true : false,
+        bender: res.puntajeBender_puntaje10 == "X" ? true : false,
+        zungAnsiedad: res.puntajeAnsiedadZung_puntaje11 == "X" ? true : false,
+        zungDepresion: res.puntajeDepresionZung_puntaje12 == "X" ? true : false,
+        wechsler: res.puntajeEscalaMemoriaWechsler_puntaje13 == "X" ? true : false,
+        otrasPruebas: res.puntajeOtrasPruebas_puntaje14 == "X" ? true : false,
+
+        // Pruebas Psicológicas - Área Emocional
+        areaEmocional: res.areaEmocional_area_emocional,
+
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        fechaRegistro: res.fechaRegistro ?? "",
+        userRegistro: res.usuarioRegistro ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        tieneRegistro: true,
+    }));
+};
+
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+    norden: form.norden,
+    codigoAnexo: form.codigoAnexo,
+    fechaExamen: form.fechaExamen,
+    edad: form.edad,
+    motivoEvaluacion: form.motivoEvaluacion,
+    tiempoTrabajo: form.tiempoExperiencia,
+    principalRiesgo: form.principalesRiesgos,
+    medidasSeguridad: form.medidasSeguridad,
+    historialFamiliar: form.historiaFamiliar,
+    habitos: form.habitos,
+    otrasObservaciones: form.otrasObservaciones,
+    presentacionAdecuado: form.presentacion === 'ADECUADO',
+    presentacionIndecuado: form.presentacion === 'INADECUADO',
+    posturaErguida: form.postura === 'ERGUIDA',
+    posturaEncorvada: form.postura === 'ENCORVADA',
+    ritmoLento: form.ritmo === 'LENTO',
+    ritmoRapido: form.ritmo === 'RAPIDO',
+    ritmoFluido: form.ritmo === 'FLUIDO',
+    tonoBajo: form.tono === 'BAJO',
+    tonoModerado: form.tono === 'MODERADO',
+    tonoAlto: form.tono === 'ALTO',
+    articulacionConDificultad: form.articulacion === 'CON_DIFICULTAD',
+    articulacionSinDificultad: form.articulacion === 'SIN_DIFICULTAD',
+    tiempoOrientado: form.orientacionTiempo === 'ORIENTADO',
+    tiempoDesorientado: form.orientacionTiempo === 'DESORIENTADO',
+    espacioOrientado: form.orientacionEspacio === 'ORIENTADO',
+    espacioDesorientado: form.orientacionEspacio === 'DESORIENTADO',
+    personaOrientado: form.orientacionPersona === 'ORIENTADO',
+    personaDesorientado: form.orientacionPersona === 'DESORIENTADO',
+    lucido: form.lucidoAtento,
+    pensamiento: form.pensamiento,
+    percepcion: form.percepcion,
+    memoriaCortoPlazo: form.memoria === 'CORTO_PLAZO',
+    memoriaMedianoPlazo: form.memoria === 'MEDIANO_PLAZO',
+    memoriaLargoPlazo: form.memoria === 'LARGO_PLAZO',
+    inteligenciaMuySuperior: form.inteligencia === 'MUY_SUPERIOR',
+    inteligenciaSuperior: form.inteligencia === 'SUPERIOR',
+    inteligenciaNormal: form.inteligencia === 'NORMAL_BRILLANTE',
+    inteligenciaPromedio: form.inteligencia === 'PROMEDIO',
+    inteligenciaTorpe: form.inteligencia === 'N_TORPE',
+    inteligenciaFronterizo: form.inteligencia === 'FRONTERIZO',
+    inteligenciaRMLeve: form.inteligencia === 'RM_LEVE',
+    inteligenciaRMModerado: form.inteligencia === 'RM_MODERADO',
+    inteligenciaRMSevero: form.inteligencia === 'RM_SEVERO',
+    inteligenciaRMProfundo: form.inteligencia === 'RM_PROFUNDO',
+    apetito: form.apetito,
+    sueno: form.sueno,
+    personalidad: form.personalidad,
+    afectividad: form.afectividad,
+    conductaSexual: form.conductaSexual,
+
+    puntajeMips: form.mips ? "X" : "",
+    puntajeMps: form.mps ? "X" : "",
+    puntajeDna: form.luria ? "X" : "",
+    puntajeEAE: form.eae ? "X" : "",
+    puntajeInventarioBormout: form.maslach ? "X" : "",
+    puntajeClimaLaboral: form.climaLaboral ? "X" : "",
+    puntajeBacteriaConductores: form.conductores ? "X" : "",
+    puntajeWais: form.wais ? "X" : "",
+    puntajeBenton: form.benton ? "X" : "",
+    puntajeBender: form.bender ? "X" : "",
+    puntajeAnsiedadZung: form.zungAnsiedad ? "X" : "",
+    puntajeDepresionZung: form.zungDepresion ? "X" : "",
+    puntajeEscalaMemoriaWechsler: form.wechsler ? "X" : "",
+    puntajeOtrasPruebas: form.otrasPruebas ? "X" : "",
+
+    areaCognitiva: form.areaCognitiva,
+    areaEmocional: form.areaEmocional,
+
+    apto: form.esApto,
+    usuarioFirma: form.user_medicoFirma,
+});
+
+// Body completo (creación / actualización). El backend de este módulo espera la
+// clave "usuarioRegistro" (no "userRegistro") para el usuario que registra.
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
+        campoUserRegistro: "usuarioRegistro",
+    });
+
+// ===== Validación de datos obligatorios =====
+const datosCompletos = (form) => {
+    if (!form.norden) {
+        Swal.fire("Error", "Datos Incompletos", "error");
+        return false;
+    }
+    if (form.esApto === undefined || form.esApto === "") {
+        Swal.fire({
+            icon: "error",
+            title: "Datos Incompletos",
+            text: "Por favor, marque la aptitud.",
+        });
+        return false;
+    }
+    return true;
+};
+
+// ===== Impresión =====
+export const PrintHojaR = (nro, token, tabla, datosFooter, sede) =>
+    imprimirReporteJasper({
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        sede,
+        obtenerReporteUrl,
+        jasperModules,
+        rutaModulo: rutaReporte,
+    });
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!datosCompletos(form)) return;
+    return guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!datosCompletos(form)) return;
+    return actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Búsqueda / verificación por N° Orden =====
+// Este formulario exige que el paciente haya pasado antes por el Cuestionario Nórdico:
+// el backend de existenciaExamenes devuelve un 3er estado (id === 2) para señalarlo.
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    if (!nro) {
+        await Swal.fire("Error", "Debe Introducir un Nro de Historia Clínica válido", "error");
+        return;
+    }
+    LoadingDefault("Validando datos");
+
+    if (sede) {
+        const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
+        if (estadoSede === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a otra sede${descripcionSede ? ` (${descripcionSede})` : ""}.`,
+            });
+            return;
+        }
+        if (estadoSede !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
+    VerifyTRPerzonalizadoDefault(
+        nro,
+        tabla,
+        token,
+        set,
+        sede,
+        () => {
+            //NO Tiene registro
+            GetInfoServicio(nro, set, token, sede);
+        },
+        () => {
+            //Tiene registro
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Ficha Psicológica 3.",
+                    "warning"
+                );
+            });
+        },
+        () => {
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Cuestionario Nórdico.",
+                "warning"
+            );
+        }
+    );
 };
 
 export const Loading = (mensaje) => {

@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -9,9 +7,15 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerFichaPsicologica2";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_psicologica_anexo02"
@@ -28,6 +32,9 @@ const orientacionOptions = [
     { value: "DESORIENTADO", label: "Desorientado" },
     { value: "ORIENTADO", label: "Orientado" }
 ];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fechaExamen", "esApto", "recomendaciones", "user_medicoFirma", "nombre_medico"];
 
 export default function FichaPsicologica2() {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -83,6 +90,15 @@ export default function FichaPsicologica2() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -96,42 +112,102 @@ export default function FichaPsicologica2() {
         handleClear,
         handleRadioButtonBoolean,
         handleRadioButton,
+        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "fichaPsicologicaAnexo2" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.apellidos || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+            </div>
+
             {/* Header con información del examen */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha Entrevista"
                     name="fechaExamen"
                     type="date"
                     value={form.fechaExamen}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaExamen")}
+                    onRevert={() => revertField("fechaExamen")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -149,6 +225,9 @@ export default function FichaPsicologica2() {
                     trueLabel="APTO"
                     falseLabel="NO APTO"
                     onChange={handleRadioButtonBoolean}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("esApto")}
+                    onRevert={() => revertField("esApto")}
                 />
             </SectionFieldset>
             {/* Datos Personales */}
@@ -190,6 +269,7 @@ export default function FichaPsicologica2() {
                             name="motivoEvaluacion"
                             value={form.motivoEvaluacion}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                         />
                     </SectionFieldset>
 
@@ -201,6 +281,7 @@ export default function FichaPsicologica2() {
                                 value={form.presentacion}
                                 vertical
                                 onChange={handleRadioButton}
+                                disabled={camposDeshabilitados}
                                 options={[
                                     { label: "Adecuado", value: "ADECUADO" },
                                     { label: "Inadecuado", value: "INADECUADO" },
@@ -214,6 +295,7 @@ export default function FichaPsicologica2() {
                                 value={form.postura}
                                 vertical
                                 onChange={handleRadioButton}
+                                disabled={camposDeshabilitados}
                                 options={[
                                     { label: "Erguida", value: "ERGUIDA" },
                                     { label: "Encorvada", value: "ENCORVADA" },
@@ -227,6 +309,7 @@ export default function FichaPsicologica2() {
                                 value={form.discursoRitmo}
                                 onChange={handleRadioButton}
                                 vertical
+                                disabled={camposDeshabilitados}
                                 options={[
                                     { label: "Lento", value: "LENTO" },
                                     { label: "Rápido", value: "RAPIDO" },
@@ -241,6 +324,7 @@ export default function FichaPsicologica2() {
                                 value={form.discursoTono}
                                 onChange={handleRadioButton}
                                 vertical
+                                disabled={camposDeshabilitados}
                                 options={[
                                     { label: "Bajo", value: "BAJO" },
                                     { label: "Moderado", value: "MODERADO" },
@@ -255,6 +339,7 @@ export default function FichaPsicologica2() {
                                 value={form.discursoArticulacion}
                                 onChange={handleRadioButton}
                                 vertical
+                                disabled={camposDeshabilitados}
                                 options={[
                                     { label: "Con dificultad", value: "CON_DIFICULTAD" },
                                     { label: "Sin dificultad", value: "SIN_DIFICULTAD" },
@@ -269,6 +354,7 @@ export default function FichaPsicologica2() {
                                 form={form}
                                 handleRadioButton={handleRadioButton}
                                 labelColumns={1}
+                                disabled={camposDeshabilitados}
                             />
                         </SectionFieldset>
                     </SectionFieldset>
@@ -282,6 +368,7 @@ export default function FichaPsicologica2() {
                             value={form.nivelIntelectual}
                             onChange={handleChange}
                             labelWidth="160px"
+                            disabled={camposDeshabilitados}
                         />
                         <InputTextOneLine
                             label="Coordinación Visomotriz"
@@ -289,6 +376,7 @@ export default function FichaPsicologica2() {
                             value={form.coordinacionVisomotriz}
                             onChange={handleChange}
                             labelWidth="160px"
+                            disabled={camposDeshabilitados}
                         />
                         <InputTextOneLine
                             label="Nivel de Memoria"
@@ -296,6 +384,7 @@ export default function FichaPsicologica2() {
                             value={form.nivelMemoria}
                             onChange={handleChange}
                             labelWidth="160px"
+                            disabled={camposDeshabilitados}
                         />
                         <InputTextArea
                             rows={8}
@@ -303,6 +392,7 @@ export default function FichaPsicologica2() {
                             name="personalidad"
                             value={form.personalidad}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                         />
                         <InputTextArea
                             rows={5}
@@ -310,6 +400,7 @@ export default function FichaPsicologica2() {
                             name="afectividad"
                             value={form.afectividad}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                         />
                     </div>
                 </SectionFieldset>
@@ -322,6 +413,9 @@ export default function FichaPsicologica2() {
                         name="recomendaciones"
                         value={form.recomendaciones}
                         onChange={handleChange}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("recomendaciones")}
+                        onRevert={() => revertField("recomendaciones")}
                     />
                 </SectionFieldset>
                 <SectionFieldset legend="Conclusiones" fieldsetClassName="border-gray-200 rounded-lg">
@@ -332,6 +426,7 @@ export default function FichaPsicologica2() {
                             name="areaCognitiva"
                             value={form.areaCognitiva}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                         />
                         <InputTextArea
                             rows={4}
@@ -339,6 +434,7 @@ export default function FichaPsicologica2() {
                             name="areaEmocional"
                             value={form.areaEmocional}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
                         />
                     </div>
                 </SectionFieldset>
@@ -350,45 +446,36 @@ export default function FichaPsicologica2() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
 
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </section>
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
         </div>
     );
 }
