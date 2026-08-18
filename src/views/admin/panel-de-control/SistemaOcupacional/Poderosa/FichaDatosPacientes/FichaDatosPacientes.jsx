@@ -489,15 +489,17 @@ export default function FichaDatosPacientes() {
                             label="Teléfono 1"
                             name="telefono1"
                             value={form.telefono1}
-                            onChange={handleChange}
+                            // onChange={handleChange}
                             labelWidth="120px"
+                            disabled
                         />
                         <InputTextOneLine
                             label="Teléfono 2"
                             name="telefono2"
                             value={form.telefono2}
-                            onChange={handleChange}
+                            // onChange={handleChange}
                             labelWidth="120px"
+                            disabled
                         />
                         <InputsRadioGroup
                             label="Tipo Vivienda"
@@ -511,8 +513,9 @@ export default function FichaDatosPacientes() {
                             label="E-mail"
                             name="email"
                             value={form.email}
-                            onChange={handleChange}
+                            // onChange={handleChange}
                             labelWidth="120px"
+                            disabled
                         />
                         <div className="grid grid-cols-2 gap-x-4">
                             <InputTextOneLine
