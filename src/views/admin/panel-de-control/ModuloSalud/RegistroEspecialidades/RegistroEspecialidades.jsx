@@ -9,6 +9,21 @@ import { getVisita, patchAtencion } from "./controllerRegistroEspecialidades";
 import FichaEspecialidadCard from "./FichaEspecialidadCard";
 import BuscarMedicamentoModal from "./BuscarMedicamentoModal/BuscarMedicamentoModal";
 import AnularEntregaModal from "./AnularEntregaModal/AnularEntregaModal";
+import {formatearFechaCorta} from "../../../../utils/formatDateUtils"
+
+const construirEntregasPorFicha = (fichasData) => {
+  const mapa = {};
+  fichasData.forEach((f) => {
+    mapa[f.id] = (Array.isArray(f.medicamentosEntregados) ? f.medicamentosEntregados : []).map((m) => ({
+      id: m.id,
+      nombre: m.nombre,
+      presentacion: m.presentacion,
+      cantidad: m.cantidad,
+      estado: "ACTIVA",
+    }));
+  });
+  return mapa;
+};
 
 export default function RegistroEspecialidades() {
   const { token, userlogued } = useSessionData();
@@ -16,6 +31,7 @@ export default function RegistroEspecialidades() {
   const [codVisita, setCodVisita] = useState("");
   const [loading, setLoading] = useState(false);
   const [visita, setVisita] = useState(null);
+  const [paciente, setPaciente] = useState(null);
   const [fichas, setFichas] = useState([]);
   const [entregasPorFicha, setEntregasPorFicha] = useState({});
   const [atencionLoadingId, setAtencionLoadingId] = useState(null);
@@ -27,6 +43,7 @@ export default function RegistroEspecialidades() {
   const handleLimpiar = () => {
     setCodVisita("");
     setVisita(null);
+    setPaciente(null);
     setFichas([]);
     setEntregasPorFicha({});
   };
@@ -42,13 +59,16 @@ export default function RegistroEspecialidades() {
     setLoading(false);
 
     if (res.ok) {
+      const fichasData = Array.isArray(res.data?.fichas) ? res.data.fichas : [];
       setVisita(res.data?.visita ?? null);
-      setFichas(Array.isArray(res.data?.fichas) ? res.data.fichas : []);
-      setEntregasPorFicha({});
+      setPaciente(res.data?.paciente ?? null);
+      setFichas(fichasData);
+      setEntregasPorFicha(construirEntregasPorFicha(fichasData));
       return;
     }
 
     setVisita(null);
+    setPaciente(null);
     setFichas([]);
     if (res.status === 404) {
       Swal.fire("No encontrado", "No existe una visita con ese id.", "warning");
@@ -79,15 +99,6 @@ export default function RegistroEspecialidades() {
     }
 
     const nuevoEstado = estaPaso ? "NO_PASO" : "PASO";
-    const confirm = await Swal.fire({
-      title: estaPaso ? "¿Desmarcar atención?" : "¿Marcar como atendida?",
-      text: `Especialidad: ${ficha.especialidad?.nombre}`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: estaPaso ? "Sí, desmarcar" : "Sí, marcar",
-      cancelButtonText: "Cancelar",
-    });
-    if (!confirm.isConfirmed) return;
 
     setAtencionLoadingId(ficha.id);
     const res = await patchAtencion(ficha.id, { usuarioRegistro: userlogued, estado: nuevoEstado }, token);
@@ -95,6 +106,18 @@ export default function RegistroEspecialidades() {
 
     if (res.ok) {
       setFichas((prev) => prev.map((f) => (f.id === ficha.id ? { ...f, estado: nuevoEstado } : f)));
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "success",
+        title:
+          nuevoEstado === "PASO"
+            ? `${ficha.especialidad?.nombre}: marcado como atendido`
+            : `${ficha.especialidad?.nombre}: desmarcado`,
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
       return;
     }
 
@@ -135,7 +158,7 @@ export default function RegistroEspecialidades() {
             value={codVisita}
             onChange={(e) => setCodVisita(e.target.value.replace(/\D/g, ""))}
             onKeyUp={handleSearchKeyUp}
-            labelWidth="110px"
+            labelWidth="100px"
             className="flex-1 min-w-[220px]"
           />
           <button
@@ -160,12 +183,21 @@ export default function RegistroEspecialidades() {
 
       {visita && (
         <>
-          <SectionFieldset legend="Información de la Visita" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <InputTextOneLine label="N° Visita" value={visita.id} disabled labelWidth="100px" />
-            <InputTextOneLine label="N° Orden" value={visita.norden} disabled labelWidth="100px" />
+          <SectionFieldset legend="Información de la Visita" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* <InputTextOneLine label="N° Visita" value={visita.id} disabled labelWidth="100px" />
+            <InputTextOneLine label="N° Orden" value={visita.norden} disabled labelWidth="100px" /> */}
             <InputTextOneLine label="Estado" value={visita.estado} disabled labelWidth="100px" />
-            <InputTextOneLine label="Fecha" value={visita.fechaVisita} disabled labelWidth="100px" />
+            <InputTextOneLine label="Fecha" value={formatearFechaCorta(visita.fechaVisita)} disabled labelWidth="100px" />
           </SectionFieldset>
+
+          {paciente && (
+            <SectionFieldset legend="Datos del Paciente" className="grid grid-cols-1  sm:grid-cols-2 gap-4">
+              <InputTextOneLine label="Nombres" value={paciente.apellidos + " " + paciente.nombres} disabled labelWidth="100px" className="sm:col-span-2" />
+              <InputTextOneLine label="DNI" value={paciente.dni} disabled labelWidth="100px" />
+              <InputTextOneLine label="Sexo" value={paciente.sexo === "M" ? "Masculino" : paciente.sexo === "F" ? "Femenino" : ""} disabled labelWidth="100px" />
+              <InputTextOneLine label="Fecha Nacimiento" value={formatearFechaCorta(paciente.fechaNacimiento) || ""} disabled labelWidth="100px" />
+            </SectionFieldset>
+          )}
 
           {!visitaAbierta && (
             <div className="text-sm bg-yellow-50 text-yellow-700 border border-yellow-200 rounded px-4 py-2">
@@ -201,8 +233,10 @@ export default function RegistroEspecialidades() {
           ficha={fichaMedicamento}
           token={token}
           usuarioRegistro={userlogued}
+          entregasExistentes={entregasPorFicha[fichaMedicamento.id] || []}
           closeModal={() => setFichaMedicamento(null)}
           onEntregaRegistrada={handleEntregaRegistrada}
+          onEntregaAnulada={(entregaId) => handleEntregaAnulada(fichaMedicamento, entregaId)}
         />
       )}
 
