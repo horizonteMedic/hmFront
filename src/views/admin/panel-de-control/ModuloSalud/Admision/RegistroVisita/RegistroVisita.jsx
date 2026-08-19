@@ -8,8 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { getEspecialidades, getInfoTabla, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faCheck } from "@fortawesome/free-solid-svg-icons";
-
-
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
   const initialFormState = {
@@ -100,7 +99,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   };
 
   return (
-    <div className="px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6">
+    <div className="px-4 max-w-[95%] mx-auto grid  gap-6">
       {/* Columna izquierda: Formulario */}
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
@@ -227,20 +226,27 @@ function Table({ data, tabla, set, token, clean, datosFooter, onRowClick }) {
     {
       label: "Fecha Visita",
       accessor: "fechaVisita",
-      render: (row) => row.fechaVisita,
-    },
-    {
-      label: "Estado Visita",
-      accessor: "fechaVisita",
-      render: (row) => <span className={`px-2 text-center text-white rounded-xl ${row.estadoVisita === "ABIERTA" ? "bg-green-400" : ""}`}>{row.estadoVisita}</span>,
+      render: (row) => formatearFechaCorta(row.fechaVisita),
     },
     {
       label: "Especialidades",
       accessor: "especialidades",
       render: (row) => (
-        <ul className="list-disc list-inside space-y-0.5">
+        <ul className="space-y-1">
           {row.especialidades.map((option) => (
-            <li key={option.id ?? option.nombre} className="text-sm">{option.nombre}</li>
+            <li key={option.id ?? option.nombre} className="flex items-center gap-2 text-sm">
+              <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${option.estado === "PASO" ? "bg-green-500" :
+                option.estado === "NO PASO" ? "bg-red-500" :
+                  "bg-gray-400"
+                }`} />
+              <span className={
+                option.estado === "PASO" ? "text-green-700" :
+                  option.estado === "NO PASO" ? "text-red-600" :
+                    "text-gray-600"
+              }>
+                {option.nombre}
+              </span>
+            </li>
           ))}
         </ul>
       ),
