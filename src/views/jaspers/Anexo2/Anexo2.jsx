@@ -158,6 +158,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     presionArterialSistolica: (data.sistolica_sistolica === null || data.sistolica_sistolica === undefined || data.sistolica_sistolica === "") ? "" : data.sistolica_sistolica,
     presionArterialDiastolica: (data.diastolica_diastolica === null || data.diastolica_diastolica === undefined || data.diastolica_diastolica === "") ? "" : data.diastolica_diastolica,
     temperatura: (data.temperatura_temperatura === null || data.temperatura_temperatura === undefined || data.temperatura_temperatura === "") ? "" : data.temperatura_temperatura,
+    cintura: data.cintura_cintura ?? "",
     // Datos de evaluación médica
     anamnesis: (data.anamnesis_txtanamnesis === null || data.anamnesis_txtanamnesis === undefined || data.anamnesis_txtanamnesis === "") ? "" : data.anamnesis_txtanamnesis,
     otrosExamenClinico: (data.sat02_sat_02 === null || data.sat02_sat_02 === undefined || data.sat02_sat_02 === "") ? "" : data.sat02_sat_02,
@@ -1315,6 +1316,10 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     {
       label: "Temperatura:",
       value: datosFinales.temperatura ? `${datosFinales.temperatura} °C` : ''
+    },
+    {
+      label: "Perímetro Abdominal:",
+      value: datosFinales.cintura ? `${datosFinales.cintura} cm` : ''
     }
   ];
 
@@ -1378,14 +1383,30 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
   yPos += filaAltura;
 
-  // === FILA: OTROS ===
+  // === FILA: PERÍMETRO ABDOMINAL (IZQUIERDA) / OTROS (DERECHA) ===
+  const perimetroAbdominal = vitales[8];
+  const mitadTablaAncho = tablaAncho / 2;
+
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + mitadTablaAncho, yPos, tablaInicioX + mitadTablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
 
+  // Perímetro Abdominal (mitad izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
+  doc.setTextColor(0, 0, 0);
+  doc.text(perimetroAbdominal.label, tablaInicioX + 2, yPos + 3.5);
+  if (perimetroAbdominal.value) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    const labelWidth = doc.getTextWidth(perimetroAbdominal.label);
+    doc.text(perimetroAbdominal.value, tablaInicioX + labelWidth + 5, yPos + 3.5);
+  }
+
+  // Otros (mitad derecha)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Otros:", tablaInicioX + mitadTablaAncho + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.otrosExamenClinico) {
     // Agregar % si no está presente
@@ -1393,7 +1414,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     const valorConPorcentaje = valorSatO2.endsWith('%') ? valorSatO2 : `${valorSatO2}%`;
     const otrosTexto = `SAT O2: ${valorConPorcentaje}`;
     const labelWidth = doc.getTextWidth("Otros:");
-    doc.text(otrosTexto, tablaInicioX + labelWidth + 5, yPos + 3.5);
+    doc.text(otrosTexto, tablaInicioX + mitadTablaAncho + labelWidth + 5, yPos + 3.5);
   }
   yPos += filaAltura;
 
