@@ -2621,7 +2621,12 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const anchoMarcha = (tablaInicioX + tablaAncho) - (divColEvaluacion + 20) - 2;
   const alturaFila1Evaluacion = Math.max(alturaFilaEvaluacion, Math.max(calcularAlturaTextoConSalto(textoReflejos, anchoReflejos), calcularAlturaTextoConSalto(textoMarcha, anchoMarcha)) + 2);
 
-  const alturaTotalEvaluacion = alturaFila1Evaluacion + alturaFilaEvaluacion * 3; // 1 dinámica + 3 fijas
+  // Altura dinámica fila Abdomen (según texto con salto de línea)
+  const textoAbdomen = datosFinales.evaluacionColumnaAbdomen?.abdomen || "";
+  const anchoAbdomen = (tablaInicioX + tablaAncho) - (tablaInicioX + 25) - 2;
+  const alturaFilaAbdomen = Math.max(alturaFilaEvaluacion, calcularAlturaTextoConSalto(textoAbdomen, anchoAbdomen) + 2);
+
+  const alturaTotalEvaluacion = alturaFila1Evaluacion + alturaFilaEvaluacion * 2 + alturaFilaAbdomen; // 1 dinámica + 2 fijas + abdomen dinámica
   if (yPos + alturaTotalEvaluacion > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
@@ -2662,18 +2667,18 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   yPos += alturaFilaEvaluacion;
 
-  // FILA 3: Abdomen (columna completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  // FILA 3: Abdomen (columna completa, altura dinámica)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAbdomen);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaAbdomen);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaEvaluacion, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  doc.line(tablaInicioX, yPos + alturaFilaAbdomen, tablaInicioX + tablaAncho, yPos + alturaFilaAbdomen);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("ABDOMEN", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionColumnaAbdomen?.abdomen || "", tablaInicioX + 25, yPos + 3.5);
+  dibujarTextoConSaltoLinea(textoAbdomen, tablaInicioX + 25, yPos + 3.5, anchoAbdomen);
 
-  yPos += alturaFilaEvaluacion;
+  yPos += alturaFilaAbdomen;
 
   // FILA 4: Tacto rectal (columna completa con checkboxes)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
