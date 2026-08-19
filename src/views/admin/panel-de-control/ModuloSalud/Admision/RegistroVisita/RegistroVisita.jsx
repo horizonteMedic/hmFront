@@ -11,7 +11,7 @@ import { faBroom, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 
 
-export default function RegistroVisita({ pacienteActivo, onAutoRegistrado }) {
+export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
   const initialFormState = {
     pacienteId: "",
     TipoDoc: "1",
@@ -194,6 +194,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado }) {
             token={token}
             clean={handleLimpiar}
             datosFooter={datosFooter}
+            onRowClick={(row) => onVisitaSeleccionada?.(row.visitaId)}
           />
         </SectionFieldset>
 
@@ -203,16 +204,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado }) {
 }
 
 
-function Table({ data, tabla, set, token, clean, datosFooter }) {
-  // confirmación antes de imprimir
-
-  function clicktable(nro) {
-    //clean();
-    //Loading("Importando Datos");
-    //GetInfoServicio(nro, tabla, set, token, () => {
-    //Swal.close();
-    //});
-  }
+function Table({ data, tabla, set, token, clean, datosFooter, onRowClick }) {
 
   const columns = [
     {
@@ -260,7 +252,7 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
       columns={columns}
       data={data}
       height={780}
-      onRowClick={(row) => clicktable(row.norden)}
+      onRowClick={(row) => onRowClick?.(row)}
       onRowRightClick={(row) => handlePrintConfirm(row.norden)}
     />
   );

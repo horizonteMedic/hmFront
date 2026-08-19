@@ -16,11 +16,17 @@ const sections = [
 
 const ModuloSalud = () => {
     const [activeTab, setActiveTab] = useState(null);
+    const [visitaActiva, setVisitaActiva] = useState(null);
     const navigate = useNavigate();
     const Vista = useAuthStore((state) => state.listView);
 
     const tieneVista = (nombreVista) => {
         return Vista.some((item) => item === nombreVista);
+    };
+
+    const handleVisitaSeleccionada = (visitaId) => {
+        setVisitaActiva(visitaId);
+        setActiveTab(2);
     };
 
     const activeSection = sections.find((section) => section.tab === activeTab);
@@ -58,7 +64,15 @@ const ModuloSalud = () => {
                 )}
                 {activeSection && (
                     <SectionWithBack title={activeSection.label} onBack={() => setActiveTab(null)}>
-                        <activeSection.component tieneVista={tieneVista} />
+                        {activeSection.tab === 1 && (
+                            <AdmisionTabSelector tieneVista={tieneVista} onVisitaSeleccionada={handleVisitaSeleccionada} />
+                        )}
+                        {activeSection.tab === 2 && (
+                            <RegistroEspecialidades tieneVista={tieneVista} visitaActiva={visitaActiva} onVisitaConsumida={() => setVisitaActiva(null)} />
+                        )}
+                        {activeSection.tab !== 1 && activeSection.tab !== 2 && (
+                            <activeSection.component tieneVista={tieneVista} />
+                        )}
                     </SectionWithBack>
                 )}
             </div>

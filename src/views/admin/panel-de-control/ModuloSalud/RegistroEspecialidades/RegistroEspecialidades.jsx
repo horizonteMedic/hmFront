@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faBroom } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ import { getVisita, patchAtencion } from "./controllerRegistroEspecialidades";
 import FichaEspecialidadCard from "./FichaEspecialidadCard";
 import BuscarMedicamentoModal from "./BuscarMedicamentoModal/BuscarMedicamentoModal";
 import AnularEntregaModal from "./AnularEntregaModal/AnularEntregaModal";
-import {formatearFechaCorta} from "../../../../utils/formatDateUtils"
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils"
 
 const construirEntregasPorFicha = (fichasData) => {
   const mapa = {};
@@ -25,7 +25,7 @@ const construirEntregasPorFicha = (fichasData) => {
   return mapa;
 };
 
-export default function RegistroEspecialidades() {
+export default function RegistroEspecialidades({ visitaActiva, onVisitaConsumida }) {
   const { token, userlogued } = useSessionData();
 
   const [codVisita, setCodVisita] = useState("");
@@ -40,6 +40,23 @@ export default function RegistroEspecialidades() {
 
   const visitaAbierta = visita?.estado === "ABIERTA";
 
+  useEffect(() => {
+    if (!visitaActiva) return;
+    setCodVisita(String(visitaActiva));
+    handleBuscar(visitaActiva)
+    onVisitaConsumida?.();
+    /*getVisita(visitaActiva, token).then((res) => {
+      if (res.ok) {
+        const fichasData = Array.isArray(res.data?.fichas) ? res.data.fichas : [];
+        setVisita(res.data?.visita ?? null);
+        setPaciente(res.data?.paciente ?? null);
+        setFichas(fichasData);
+        setEntregasPorFicha(construirEntregasPorFicha(fichasData));
+      }
+      onVisitaConsumida?.();
+    });*/
+  }, [visitaActiva]);
+
   const handleLimpiar = () => {
     setCodVisita("");
     setVisita(null);
@@ -48,14 +65,18 @@ export default function RegistroEspecialidades() {
     setEntregasPorFicha({});
   };
 
-  const handleBuscar = async () => {
-    if (!codVisita) {
+  const handleBuscar = async (Visita = null) => {
+
+
+    const cod = Visita ? Visita : codVisita
+    console.log(cod)
+    if (!cod) {
       Swal.fire("Error", "Debe ingresar un código de visita", "error");
       return;
     }
 
     setLoading(true);
-    const res = await getVisita(codVisita, token);
+    const res = await getVisita(cod, token);
     setLoading(false);
 
     if (res.ok) {
@@ -163,7 +184,7 @@ export default function RegistroEspecialidades() {
           />
           <button
             type="button"
-            onClick={handleBuscar}
+            onClick={() => handleBuscar()}
             disabled={loading}
             className="azul-btn px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
           >

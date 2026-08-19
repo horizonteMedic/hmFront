@@ -3,7 +3,7 @@ import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import RegistroPaciente from "./RegistroPaciente/RegistroPaciente";
 import RegistroVisita from "./RegistroVisita/RegistroVisita";
 
-export default function AdmisionTabSelector({ tieneVista }) {
+export default function AdmisionTabSelector({ tieneVista, onVisitaSeleccionada }) {
     const [activeTab, setActiveTab] = useState(null);
     const [pacienteActivo, setPacienteActivo] = useState(null);
 
@@ -25,7 +25,7 @@ export default function AdmisionTabSelector({ tieneVista }) {
             permission: "Registro Visita Salud",
             label: "Registro Visita",
             component: RegistroVisita,
-            props: { pacienteActivo, onAutoRegistrado: () => setPacienteActivo(null) },
+            props: { pacienteActivo, onAutoRegistrado: () => setPacienteActivo(null), onVisitaSeleccionada },
         },
     ];
 
