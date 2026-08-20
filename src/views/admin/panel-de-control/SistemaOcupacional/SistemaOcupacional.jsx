@@ -555,6 +555,13 @@ const TabComponent = () => {
                   >
                     Cuestionario de Audiometria
                   </button>
+                  <button
+                    className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
+                      }`}
+                    onClick={() => setSubTab(3)}
+                  >
+                    Audiometria OHLA N
+                  </button>
                 </div>
                 <div>
                   <AudiometriaTabSelector

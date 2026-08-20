@@ -30,7 +30,7 @@ const initialFormState = {
   caserio: "",
 };
 
-export default function RegistroPaciente() {
+export default function RegistroPaciente({ onRegistrado }) {
   const { token, userlogued, selectedSede } = useSessionData();
   const dniRef = useRef(null);
 
@@ -79,18 +79,20 @@ export default function RegistroPaciente() {
     if (vacios.length > 0)
       return Swal.fire("Error", `Faltan completar: ${vacios.join(", ")}`, "error");
 
-    try {
-      const r = await SubmitRegistro(form, token, userlogued, handleLimpiar);
-      if (!r.id) {
-        Swal.fire("Error", "No se pudo registrar", "error");
-      } else {
-        Swal.fire("Registrado", "Paciente registrado correctamente", "success");
-        handleLimpiar();
-      }
-    } catch {
-      Swal.close();
-      Swal.fire("Error", "Problema al registrar", "error");
+    const r = await SubmitRegistro(form, token, userlogued, handleLimpiar);
+    console.log(r)
+    if (!r?.pacienteId) {
+      Swal.fire("Error", "No se pudo registrar", "error");
+    } else {
+      await Swal.fire("Registrado", "Paciente registrado correctamente", "success");
+      onRegistrado?.({
+        pacienteId: r.pacienteId,
+        dni: form.dni,
+        nombres: `${form.nombres} ${form.apellidos}`.trim(),
+      });
+      handleLimpiar();
     }
+
   };
 
   return (
@@ -118,8 +120,8 @@ export default function RegistroPaciente() {
               labelWidth="130px"
               options={[
                 { label: "DNI", value: "1" },
-                { label: "Sin DNI", value: "0" },
-                { label: "Pasaporte", value: "2" },
+                { label: "Sin DNI", value: "4" },
+                { label: "Pasaporte", value: "3" },
               ]}
             />
           </div>
