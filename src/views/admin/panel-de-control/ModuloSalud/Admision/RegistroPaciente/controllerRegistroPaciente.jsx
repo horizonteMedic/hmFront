@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
+import { getFetch, SubmitData, updateData } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, SubmitDataServiceDefault } from "../../../../../utils/functionUtils";
 
 const SearchURL = "/api/pacientes/buscar"
@@ -31,6 +31,7 @@ export const SearchPacienteDNI = async (dni, TipoDoc, token, handleLimpiar, set)
             fechaNacimiento: res.fechaNacimiento,
             sexo: res.sexo === "M" ? "M" : res.sexo === "F" ? "F" : "",
             caserio: res.caserio,
+            pacienteId: res.pacienteId
         }));
         Swal.close()
     }
@@ -38,8 +39,12 @@ export const SearchPacienteDNI = async (dni, TipoDoc, token, handleLimpiar, set)
 
 export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
     LoadingDefault("Registrando...")
+    const url = form.pacienteId
+        ? `${SubmitURL}/${form.pacienteId}`
+        : `${SubmitURL}??usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`;
     const [dd, mm, yyyy] = form.fechaNacimiento.split('-');
     const fechaFormateada = `${yyyy}-${mm}-${dd}`;
+
     const body = {
         tipoDocumento: {
             id: form.TipoDoc === "4" ? 4 : form.TipoDoc
@@ -52,6 +57,9 @@ export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
         caserio: form.caserio
 
     };
-    return await SubmitData(body, SubmitURL + `?usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`, token)
+    if (form.pacienteId) {
+        return await updateData(body, url, token);
+    }
 
+    return await SubmitData(body, url, token);
 }
