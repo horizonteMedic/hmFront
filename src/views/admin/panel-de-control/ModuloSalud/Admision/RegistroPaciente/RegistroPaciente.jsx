@@ -21,6 +21,7 @@ const SEXO_OPTIONS = [{ label: "MASCULINO", value: "M" }, { label: "FEMENINO", v
 // ── Estado inicial ────────────────────────────────────────────────────────────
 const initialFormState = {
   TipoDoc: "1",
+  pacienteId: "",
   origen: "",
   dni: "",
   nombres: "",
@@ -82,7 +83,12 @@ export default function RegistroPaciente({ onRegistrado }) {
     const r = await SubmitRegistro(form, token, userlogued, handleLimpiar);
     console.log(r)
     if (!r?.pacienteId) {
-      Swal.fire("Error", "No se pudo registrar", "error");
+      if (r.id) {
+        await Swal.fire("Editado", "Paciente editado correctamente", "success");
+        handleLimpiar();
+      } else {
+        Swal.fire("Error", "No se pudo registrar", "error");
+      }
     } else {
       await Swal.fire("Registrado", "Paciente registrado correctamente", "success");
       onRegistrado?.({

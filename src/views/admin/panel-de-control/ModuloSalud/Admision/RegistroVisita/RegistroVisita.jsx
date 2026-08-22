@@ -9,6 +9,7 @@ import { getEspecialidades, getInfoTabla, SearchPaciente, SubmitRegistro } from 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import ReporteVisitas from "./ReporteVisitas";
 
 export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
   const initialFormState = {
@@ -23,6 +24,8 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   const [especialidades, setEspecialidades] = useState([]);
   const [disabled, setDisabled] = useState(false);
   const [refresh, setRefresh] = useState(false)
+  const [modalReportePacientes, setModalReportePacientes] = useState(false)
+
 
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
   const autoSubmitRef = useRef(null);
@@ -161,32 +164,9 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
       {/* Columna derecha: Panel de historial/búsqueda */}
       <div className="space-y-3">
         <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
-          {/*<div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
-            <InputTextOneLine
-              label="Nombre"
-              labelOnTop
-              name="nombres_search"
-              value={form.nombres_search}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  obtenerInfoTabla();
-                }
-              }}
-              onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
-            />
-            <InputTextOneLine
-              label="Código"
-              labelOnTop
-              name="codigo_search"
-              value={form.codigo_search}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  obtenerInfoTabla();
-                }
-              }}
-              onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
-            />
-          </div>*/}
+          <div className="flex justify-center gap-x-4 gap-y-3">
+            <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes</button>
+          </div>
           <Table
             data={dataTabla}
             set={setForm}
@@ -198,6 +178,11 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
         </SectionFieldset>
 
       </div>
+      {modalReportePacientes && <ReporteVisitas
+        onClose={() => setModalReportePacientes(false)}
+        sede={selectedSede}
+        token={token}
+      />}
     </div>
   );
 }
