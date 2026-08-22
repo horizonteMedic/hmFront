@@ -3,15 +3,36 @@ import {
     InputTextArea,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeBurnout";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerInformeBurnout";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "informe_burnout";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "sindromeBurnout",
+    "agotamientoEmocional",
+    "despersonalizacion",
+    "realizacionPersonal",
+    "resultados",
+    "conclusiones",
+    "recomendaciones",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 export default function InformeBurnout() {
     const today = getToday();
@@ -53,6 +74,15 @@ export default function InformeBurnout() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -67,57 +97,122 @@ export default function InformeBurnout() {
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "informeBurnoutPsicologia" });
 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
+            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
+                />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
+            </div>
+
             {/* Header con información del examen */}
-            <div className="w-full space-y-3">
-                <SectionFieldset legend="Información del Examen">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <SectionFieldset legend="Información del Examen">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="flex gap-x-3 w-full">
                         <InputTextOneLine
                             label="N° Orden"
                             name="norden"
                             value={form.norden}
                             onKeyUp={handleSearch}
                             onChange={handleChangeNumber}
+                            disabled={hayRegistroCargado}
                             labelWidth="120px"
+                            className="w-full"
                         />
-                        <InputTextOneLine
-                            label="Fecha"
-                            name="fecha"
-                            type="date"
-                            value={form.fecha}
-                            onChange={handleChangeSimple}
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Nombre de Examen"
-                            name="nombreExamen"
-                            value={form.nombreExamen}
-                            disabled
-                            labelWidth="120px"
-                        />
+                        <SearchButton onClick={executeSearch} className="lg:hidden" />
                     </div>
-                </SectionFieldset>
+                    <InputTextOneLine
+                        label="Fecha"
+                        name="fecha"
+                        type="date"
+                        value={form.fecha}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fecha")}
+                        onRevert={() => revertField("fecha")}
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Nombre de Examen"
+                        name="nombreExamen"
+                        value={form.nombreExamen}
+                        disabled
+                        labelWidth="120px"
+                    />
+                </div>
+            </SectionFieldset>
 
-                <DatosPersonalesLaborales form={form} />
-            </div>
+            <DatosPersonalesLaborales form={form} />
 
             <SectionFieldset legend="Criterios Psicológicos">
                 <div className="space-y-4">
@@ -127,6 +222,9 @@ export default function InformeBurnout() {
                         value={form?.sindromeBurnout}
                         onChange={handleChange}
                         labelWidth="170px"
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("sindromeBurnout")}
+                        onRevert={() => revertField("sindromeBurnout")}
                     />
                     <div className="pt-2">
                         <h5 className="font-bold  mb-3">III. Sub Escalas</h5>
@@ -137,6 +235,9 @@ export default function InformeBurnout() {
                                 value={form?.agotamientoEmocional}
                                 onChange={handleChange}
                                 labelWidth="160px"
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("agotamientoEmocional")}
+                                onRevert={() => revertField("agotamientoEmocional")}
                             />
                             <InputTextOneLine
                                 label="-Despersonalización"
@@ -144,6 +245,9 @@ export default function InformeBurnout() {
                                 value={form?.despersonalizacion}
                                 onChange={handleChange}
                                 labelWidth="160px"
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("despersonalizacion")}
+                                onRevert={() => revertField("despersonalizacion")}
                             />
                             <InputTextOneLine
                                 label="-Realización Personal"
@@ -151,6 +255,9 @@ export default function InformeBurnout() {
                                 value={form?.realizacionPersonal}
                                 onChange={handleChange}
                                 labelWidth="160px"
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("realizacionPersonal")}
+                                onRevert={() => revertField("realizacionPersonal")}
                             />
                         </div>
                     </div>
@@ -164,6 +271,9 @@ export default function InformeBurnout() {
                     value={form?.resultados}
                     onChange={handleChange}
                     rows={4}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("resultados")}
+                    onRevert={() => revertField("resultados")}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputTextArea
@@ -172,6 +282,9 @@ export default function InformeBurnout() {
                         value={form?.conclusiones}
                         onChange={handleChange}
                         rows={4}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("conclusiones")}
+                        onRevert={() => revertField("conclusiones")}
                     />
                     <InputTextArea
                         label="Recomendaciones"
@@ -179,6 +292,9 @@ export default function InformeBurnout() {
                         value={form?.recomendaciones}
                         onChange={handleChange}
                         rows={4}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("recomendaciones")}
+                        onRevert={() => revertField("recomendaciones")}
                     />
                 </div>
             </SectionFieldset>
@@ -189,15 +305,35 @@ export default function InformeBurnout() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

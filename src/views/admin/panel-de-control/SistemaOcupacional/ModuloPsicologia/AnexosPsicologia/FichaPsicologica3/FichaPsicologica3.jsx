@@ -18,6 +18,9 @@ import RegistroEstadoPill from '../../../../../../components/reusableComponents/
 import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import BotonesForm from '../../../../../../components/templates/BotonesForm';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 const tabla = "ficha_psicologica_anexo03";
 
@@ -35,210 +38,13 @@ const orientacionOptions = [
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = ["fechaExamen", "esApto", "areaCognitiva", "areaEmocional", "user_medicoFirma", "nombre_medico"];
 
-function DatosPersonales({
+function EvaluacionRiesgosHistoria({
   form,
   handleChange,
-  handleChangeNumber,
-  handleChangeSimple,
-  handleSearch,
-  executeSearch,
-  handleRadioButtonBoolean,
   disabled,
-  isFieldEdited,
-  revertField,
-  hayRegistroCargado,
 }) {
   return (
     <div className="space-y-3">
-      <SectionFieldset legend="Información del Examen">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="flex gap-x-3 w-full">
-            <InputTextOneLine
-              label="N° Orden"
-              name="norden"
-              value={form.norden}
-              onKeyUp={handleSearch}
-              onChange={handleChangeNumber}
-              disabled={hayRegistroCargado}
-              labelWidth="120px"
-              className="w-full"
-            />
-            <SearchButton onClick={executeSearch} className="lg:hidden" />
-          </div>
-          <InputTextOneLine
-            label="Fecha Examen"
-            name="fechaExamen"
-            type="date"
-            value={form.fechaExamen}
-            onChange={handleChangeSimple}
-            disabled={disabled}
-            edited={isFieldEdited("fechaExamen")}
-            onRevert={() => revertField("fechaExamen")}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nombre Examen"
-            name="nombreExamen"
-            type="text"
-            value={form.nombreExamen}
-            disabled
-            labelWidth="120px"
-          />
-          <InputsBooleanRadioGroup
-            label="Aptitud"
-            labelWidth="120px"
-            name="esApto"
-            value={form.esApto}
-            trueLabel="APTO"
-            falseLabel="NO APTO"
-            onChange={handleRadioButtonBoolean}
-            disabled={disabled}
-            edited={isFieldEdited("esApto")}
-            onRevert={() => revertField("esApto")}
-          />
-        </div>
-      </SectionFieldset>
-
-      <SectionFieldset legend="Datos Personales">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
-          <InputTextOneLine
-            label="Nombres"
-            name="nombres"
-            value={form.nombres}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <InputTextOneLine
-              label="DNI"
-              name="dni"
-              value={form.dni}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Sexo"
-              name="sexo"
-              value={form.sexo}
-              disabled
-              labelWidth="120px"
-            />
-          </div>
-          <InputTextOneLine
-            label="Apellidos"
-            name="apellidos"
-            value={form.apellidos}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Lugar Nacimiento"
-            name="lugarNacimiento"
-            value={form.lugarNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Grado Instrucción"
-            name="gradoInstruccion"
-            value={form.gradoInstruccion}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-      </SectionFieldset>
-
-      <SectionFieldset legend="Datos Laborales">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
-          <InputTextOneLine
-            label="Empresa"
-            name="empresa"
-            value={form.empresa}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Tiempo de Experiencia"
-            name="tiempoExperiencia"
-            value={form.tiempoExperiencia}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Contrata"
-            name="contrata"
-            value={form.contrata}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Puesto"
-            name="puesto"
-            value={form.puesto}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Área"
-            name="area"
-            value={form.area}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Mineral Exp"
-            name="mineralExp"
-            value={form.mineralExp}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Explotación en"
-            name="explotacionEn"
-            value={form.explotacionEn}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Altura de Labor"
-            name="alturaLabor"
-            value={form.alturaLabor}
-            onChange={handleChange}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-      </SectionFieldset>
-
       <SectionFieldset legend="Evaluación y Riesgos" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
         <InputTextArea
           rows={5}
@@ -354,6 +160,7 @@ function ExamenMental({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="space-y-3">
           <SectionFieldset legend="Observación de Conductas" className="grid grid-cols-2 gap-4">
+
             <SectionFieldset legend="Presentación" >
               <InputsRadioGroup
                 name="presentacion"
@@ -368,6 +175,7 @@ function ExamenMental({
 
               />
             </SectionFieldset>
+
             <SectionFieldset legend="Postura" >
               <InputsRadioGroup
                 name="postura"
@@ -381,6 +189,7 @@ function ExamenMental({
                 ]}
               />
             </SectionFieldset>
+
             <SectionFieldset legend="Discurso: Ritmo">
               <InputsRadioGroup
                 name="ritmo"
@@ -395,6 +204,7 @@ function ExamenMental({
                 ]}
               />
             </SectionFieldset>
+
             <SectionFieldset legend="Discurso: Tono" >
               <InputsRadioGroup
                 name="tono"
@@ -409,6 +219,7 @@ function ExamenMental({
                 ]}
               />
             </SectionFieldset>
+
             <SectionFieldset legend="Discurso: Articulación" >
               <InputsRadioGroup
                 name="articulacion"
@@ -422,6 +233,7 @@ function ExamenMental({
                 ]}
               />
             </SectionFieldset>
+
             <SectionFieldset legend="Orientación" fieldsetClassName="col-span-2">
               <RadioTable
                 items={orientacionItems}
@@ -720,14 +532,14 @@ export default function FichaPsicologica3() {
     lugarNacimiento: "",
     edad: "",
     estadoCivil: "",
-    gradoInstruccion: "",
+    nivelEstudios: "",
 
     // Datos Laborales
     empresa: "",
     tiempoExperiencia: "",
     contrata: "",
-    puesto: "",
-    area: "",
+    cargoDesempenar: "",
+    ocupacion: "",
     mineralExp: "",
     explotacionEn: "",
     alturaLabor: "",
@@ -892,20 +704,107 @@ export default function FichaPsicologica3() {
           tieneRegistro={form.tieneRegistro}
           className={hayRegistroCargado ? "" : "invisible"}
         />
+        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+          <button
+            type="button"
+            onClick={habilitarEdicion}
+            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+          >
+            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+          </button>
+        )}
       </div>
 
-      <DatosPersonales
+      <SectionFieldset legend="Información del Examen">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="flex gap-x-3 w-full">
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
+              onKeyUp={handleSearch}
+              onChange={handleChangeNumber}
+              disabled={hayRegistroCargado}
+              labelWidth="120px"
+              className="w-full"
+            />
+            <SearchButton onClick={executeSearch} className="lg:hidden" />
+          </div>
+          <InputTextOneLine
+            label="Fecha Examen"
+            name="fechaExamen"
+            type="date"
+            value={form.fechaExamen}
+            onChange={handleChangeSimple}
+            // disabled={disabled}
+            edited={isFieldEdited("fechaExamen")}
+            onRevert={() => revertField("fechaExamen")}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nombre Examen"
+            name="nombreExamen"
+            type="text"
+            value={form.nombreExamen}
+            disabled
+            labelWidth="120px"
+          />
+          <InputsBooleanRadioGroup
+            label="Aptitud"
+            labelWidth="120px"
+            name="esApto"
+            value={form.esApto}
+            trueLabel="APTO"
+            falseLabel="NO APTO"
+            onChange={handleRadioButtonBoolean}
+            // disabled={disabled}
+            edited={isFieldEdited("esApto")}
+            onRevert={() => revertField("esApto")}
+          />
+        </div>
+      </SectionFieldset>
+
+      <DatosPersonalesLaborales form={form} />
+
+      <SectionFieldset legend="Datos Laborales (Adicional)">
+        <InputTextOneLine
+          label="Tiempo de Experiencia"
+          name="tiempoExperiencia"
+          value={form.tiempoExperiencia}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Mineral Exp"
+          name="mineralExp"
+          value={form.mineralExp}
+          onChange={handleChange}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Explotación en"
+          name="explotacionEn"
+          value={form.explotacionEn}
+          onChange={handleChange}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Altura de Labor"
+          name="alturaLabor"
+          value={form.alturaLabor}
+          onChange={handleChange}
+          disabled
+          labelWidth="120px"
+        />
+
+      </SectionFieldset>
+
+      <EvaluacionRiesgosHistoria
         form={form}
         handleChange={handleChange}
-        handleChangeNumber={handleChangeNumber}
-        handleChangeSimple={handleChangeSimple}
-        handleSearch={handleSearch}
-        executeSearch={executeSearch}
-        handleRadioButtonBoolean={handleRadioButtonBoolean}
         disabled={camposDeshabilitados}
-        isFieldEdited={isFieldEdited}
-        revertField={revertField}
-        hayRegistroCargado={hayRegistroCargado}
       />
       <ExamenMental
         form={form}

@@ -30,6 +30,8 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            dni: res.dni,
+            nombres: res.nombresApellidos,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad,
             ocupacion: res.areaO ?? "",
@@ -92,8 +94,8 @@ export const GetInfoServicioEditar = async (
         sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
         // Datos personales
-        nombres: res.nombresPaciente,
-        apellidos: res.apellidosPaciente,
+        nombres: res.nombresPaciente + " " + res.apellidosPaciente,
+        dni: res.dniPaciente,
         fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
         lugarNacimiento: res.lugarNacimientoPaciente,
         domicilioActual: res.direccionPaciente,
@@ -134,7 +136,7 @@ export const GetInfoServicioEditar = async (
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
-        userRegistro: res.usuarioRegistro ?? "",
+        userRegistro: res.userRegistro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
         usuarioActualizacion: res.usuarioActualizacion ?? "",
         tieneRegistro: true,

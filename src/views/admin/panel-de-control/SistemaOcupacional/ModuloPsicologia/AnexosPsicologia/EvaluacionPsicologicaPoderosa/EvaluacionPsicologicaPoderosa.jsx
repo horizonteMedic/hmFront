@@ -17,6 +17,9 @@ import AuditoriaRegistro from "../../../../../../components/reusableComponents/A
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 // Áreas de Evaluación: Inteligencia
 const inteligenciaItems = [
@@ -68,6 +71,7 @@ export default function EvaluacionPsicologicaPoderosa() {
         // Datos personales
         nombres: "",
         apellidos: "",
+        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
@@ -216,6 +220,15 @@ export default function EvaluacionPsicologicaPoderosa() {
                     tieneRegistro={form.tieneRegistro}
                     className={hayRegistroCargado ? "" : "invisible"}
                 />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
             </div>
 
             {/* Header */}
@@ -280,38 +293,18 @@ export default function EvaluacionPsicologicaPoderosa() {
                     onRevert={() => revertField("aptitud")}
                 />
             </SectionFieldset>
-            {/* Datos Necesarios */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Izquierda */}
-                <div className="space-y-3">
-                    <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                </div>
-                {/* Derecha */}
-                <div className="space-y-3">
-                    <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                        <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
-                    </div>
-                    <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                </div>
+
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio">
+                <InputTextOneLine
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
+                    disabled
+                    labelWidth="160px" />
             </SectionFieldset>
 
-            {/* Datos Laborales */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                </div>
-                <div className="space-y-3">
-                    <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                </div>
-            </SectionFieldset>
 
             <div className="grid md:grid-cols-2 gap-4">
                 {/* Áreas de Evaluación - Inteligencia */}

@@ -17,8 +17,9 @@ import RegistroEstadoPill from "../../../../../../components/reusableComponents/
 import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_psicologico";
 
@@ -37,6 +38,7 @@ export default function InformePsicologico() {
         nombreExamen: "",
         nombres: "",
         apellidos: "",
+        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
@@ -375,6 +377,15 @@ export default function InformePsicologico() {
                     tieneRegistro={form.tieneRegistro}
                     className={hayRegistroCargado ? "" : "invisible"}
                 />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
             </div>
 
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
@@ -426,113 +437,18 @@ export default function InformePsicologico() {
                     handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
                 />
             </SectionFieldset>
-            {/* Contenido principal */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Columna Izquierda */}
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Nombres"
-                        name="nombres"
-                        value={form.nombres}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Apellidos"
-                        name="apellidos"
-                        value={form.apellidos}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Fecha Nacimiento"
-                        name="fechaNacimiento"
-                        value={form.fechaNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Lugar Nacimiento"
-                        name="lugarNacimiento"
-                        value={form.lugarNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
 
-                {/* Columna Derecha */}
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Domicilio Actual"
-                        name="domicilioActual"
-                        value={form.domicilioActual}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <div className="grid md:grid-cols-2 gap-3">
-                        <InputTextOneLine
-                            label="Edad (Años)"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Sexo"
-                            name="sexo"
-                            value={form.sexo}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                    <InputTextOneLine
-                        label="Estado Civil"
-                        name="estadoCivil"
-                        value={form.estadoCivil}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Nivel Estudios"
-                        name="nivelEstudios"
-                        value={form.nivelEstudios}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-            </SectionFieldset>
-            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio">
                 <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
-                    value={form.empresa}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Contrata"
-                    name="contrata"
-                    value={form.contrata}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Ocupación"
-                    name="ocupacion"
-                    value={form.ocupacion}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Cargo Desempeñar"
-                    name="cargoDesempenar"
-                    value={form.cargoDesempenar}
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
                     disabled
                     labelWidth="120px"
                 />
             </SectionFieldset>
-
 
             {/*==========================Área Intelectual Section==========================*/}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

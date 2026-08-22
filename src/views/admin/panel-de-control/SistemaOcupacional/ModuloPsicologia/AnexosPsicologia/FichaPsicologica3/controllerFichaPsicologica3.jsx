@@ -31,11 +31,11 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             fechaExamen: prev.fechaExamen,
             edad: res.edad,
-            area: res.areaO ?? "",
-            puesto: res.cargo ?? "",
+            ocupacion: res.areaO ?? "",
             nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
             explotacionEn: res.explotacion ?? "",
@@ -44,7 +44,7 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
             lugarNacimiento: res.lugarNacimiento ?? "",
             domicilioActual: res.direccion ?? "",
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            gradoInstruccion: res.nivelEstudios,
+            nivelEstudios: res.nivelEstudios ?? "",
             tieneRegistro: false,
         }));
     }
@@ -79,20 +79,20 @@ export const GetInfoServicioEditar = async (
         // Datos Personales
         nombres: res.nombresPaciente,
         dni: res.dniPaciente,
-        sexo: res.sexoPaciente,
+        sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
         apellidos: res.apellidosPaciente,
         fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
         lugarNacimiento: res.lugarNacimientoPaciente,
         edad: res.edadPaciente,
         estadoCivil: res.estadoCivilPaciente,
-        gradoInstruccion: res.nivelEstudioPaciente,
+        nivelEstudios: res.nivelEstudioPaciente,
 
         // Datos Laborales
         empresa: res.empresa,
         tiempoExperiencia: res.tiempoTrabajo_timpo_trab,
         contrata: res.contrata,
-        puesto: res.cargoPaciente,
-        area: res.areaPaciente,
+        cargoDesempenar: res.cargoPaciente,
+        ocupacion: res.areaPaciente,
         mineralExp: res.mineralExp ?? "",
         explotacionEn: res.explotacionEn ?? "",
         alturaLabor: res.alturaLabor ?? "",
@@ -184,7 +184,7 @@ export const GetInfoServicioEditar = async (
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
-        userRegistro: res.usuarioRegistro ?? "",
+        userRegistro: res.usuarioRegistro_user_registro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
         usuarioActualizacion: res.usuarioActualizacion ?? "",
         tieneRegistro: true,

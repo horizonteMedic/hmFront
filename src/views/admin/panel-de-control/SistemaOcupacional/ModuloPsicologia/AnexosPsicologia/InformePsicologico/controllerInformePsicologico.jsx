@@ -68,6 +68,7 @@ export const GetInfoServicioEditar = async (
         nombreExamen: res.nombreExamen ?? "",
         nombres: res.nombresPaciente,
         apellidos: res.apellidosPaciente,
+        dni: res.dniPaciente,
         fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
         lugarNacimiento: res.lugarNacimientoPaciente,
         domicilioActual: res.direccionPaciente,
@@ -135,7 +136,7 @@ export const GetInfoServicioEditar = async (
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
-        userRegistro: res.usuarioRegistro ?? "",
+        userRegistro: res.userRegistro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
         usuarioActualizacion: res.usuarioActualizacion ?? "",
         tieneRegistro: true,

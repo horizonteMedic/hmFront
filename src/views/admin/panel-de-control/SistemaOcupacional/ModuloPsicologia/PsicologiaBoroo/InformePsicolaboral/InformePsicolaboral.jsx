@@ -3,23 +3,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBrain,
   faUsers,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "../../../../../../hooks/useForm";
-import { getToday } from "../../../../../../utils/helpers";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import CriteriosPsicologicosI from "./TabsInformePsicolaboral/CriteriosPsicologicosI";
 import CriteriosPsicologicosII from "./TabsInformePsicolaboral/CriteriosPsicologicosII";
-import Swal from "sweetalert2";
 import {
   InputTextArea, InputsBooleanRadioGroup, InputTextOneLine,
   InputCheckbox
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicolaboral";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerInformePsicolaboral";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_psicolaboral";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+// Por el volumen de campos (~30 entre las 2 pestañas), el resaltado/revertido individual solo
+// se aplica a los campos "core" de la sección principal; el resto de campos (criterios
+// psicológicos en pestañas) solo respeta el bloqueo general (camposDeshabilitados).
+const CAMPOS_EDITABLES = [
+  "fechaExam",
+  "esApto",
+  "observaciones",
+  "recomendaciones",
+  "user_medicoFirma",
+  "nombre_medico",
+];
 
 export default function InformePsicolaboral() {
   const today = getToday();
@@ -92,6 +111,14 @@ export default function InformePsicolaboral() {
     nombre_medico: userName,
     user_medicoFirma: userlogued,
 
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -109,27 +136,57 @@ export default function InformePsicolaboral() {
     handlePrintDefault,
   } = useForm(initialFormState, { storageKey: "informePsicolaboralPsicologia" });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+  // el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
   const tabs = [
     { id: 0, name: "Criterios Psicológicos I", icon: faBrain, component: CriteriosPsicologicosI },
     { id: 1, name: "Criterios Psicológicos II", icon: faUsers, component: CriteriosPsicologicosII },
   ];
 
   const handleSave = () => {
-    if (form.esApto === undefined) {
-      Swal.fire({
-        icon: "warning",
-        title: "Advertencia",
-        text: "Por favor, marque si es apto o no apto.",
-      });
-      return;
-    }
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -139,25 +196,54 @@ export default function InformePsicolaboral() {
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
   return (
     <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
+      <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
+        <RegistroEstadoPill
+          tieneRegistro={form.tieneRegistro}
+          className={hayRegistroCargado ? "" : "invisible"}
+        />
+        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+          <button
+            type="button"
+            onClick={habilitarEdicion}
+            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+          >
+            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+          </button>
+        )}
+      </div>
+
       <SectionFieldset legend="Información del Examen" className="m-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form?.norden}
-            onChange={handleChangeNumber}
-            onKeyUp={handleSearch}
-          />
+          <div className="flex gap-x-3 w-full">
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form?.norden}
+              onChange={handleChangeNumber}
+              onKeyUp={handleSearch}
+              disabled={hayRegistroCargado}
+              className="w-full"
+            />
+            <SearchButton onClick={executeSearch} className="md:hidden" />
+          </div>
           <InputTextOneLine
             label="Fecha"
             name="fechaExam"
             type="date"
             value={form?.fechaExam}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("fechaExam")}
+            onRevert={() => revertField("fechaExam")}
           />
           <InputTextOneLine
             label="Tipo de Examen"
@@ -173,6 +259,9 @@ export default function InformePsicolaboral() {
             trueLabel="APTO"
             falseLabel="NO APTO"
             onChange={handleRadioButtonBoolean}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("esApto")}
+            onRevert={() => revertField("esApto")}
           />
           <InputCheckbox
             label={<p className="text-red-500 text-[10px]">Examen Anual</p>}
@@ -182,6 +271,8 @@ export default function InformePsicolaboral() {
           />
         </div>
       </SectionFieldset>
+
+      <DatosPersonalesLaborales form={form}/>
 
       <SectionFieldset legend="Datos del Paciente" className="m-4">
         {/* Fila 1: Nombres, DNI, Edad, Género */}
@@ -264,6 +355,7 @@ export default function InformePsicolaboral() {
         handleRadioButtonBoolean={handleRadioButtonBoolean}
         handleRadioButton={handleRadioButton}
         handleChangeSimple={handleChangeSimple}
+        disabled={camposDeshabilitados}
       />
       <SectionFieldset legend="Observaciones y Recomendaciones" className="grid gap-x-4 gap-y-3 grid-cols-1 md:grid-cols-2">
         <InputTextArea
@@ -272,6 +364,9 @@ export default function InformePsicolaboral() {
           value={form?.observaciones}
           onChange={handleChange}
           rows={4}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("observaciones")}
+          onRevert={() => revertField("observaciones")}
         />
         <InputTextArea
           label="Recomendaciones"
@@ -279,6 +374,9 @@ export default function InformePsicolaboral() {
           value={form?.recomendaciones}
           onChange={handleChange}
           rows={4}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("recomendaciones")}
+          onRevert={() => revertField("recomendaciones")}
         />
       </SectionFieldset>
 
@@ -288,15 +386,35 @@ export default function InformePsicolaboral() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );
