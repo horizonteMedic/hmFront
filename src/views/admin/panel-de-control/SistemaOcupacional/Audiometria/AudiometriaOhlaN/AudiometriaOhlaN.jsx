@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeadphones, faFileAlt } from "@fortawesome/free-solid-svg-icons";
+import { faHeadphones, faFileAlt, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -394,13 +394,34 @@ export default function AudiometriaOhlaN() {
         />
       </SectionFieldset>
 
-      <BotonesAccion
-        form={formOhla}
-        handleSave={handleSave}
-        handleClear={handleClear}
-        handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNorden}
-      />
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        {activeTab === 0 && (
+          <button
+            type="button"
+            onClick={() => setActiveTab(1)}
+            className="
+              bg-[#233245] hover:bg-[#1a2531]
+              text-white text-base px-6 py-2 rounded
+              flex items-center gap-2
+              transition-all duration-150 ease-out
+              hover:shadow-lg
+              active:scale-95 active:shadow-inner ml-6"
+          >
+            Siguiente <FontAwesomeIcon icon={faArrowRight} />
+          </button>
+        )}
+
+        <div className="flex-1 w-full">
+          <BotonesAccion
+            form={formOhla}
+            handleSave={handleSave}
+            handleClear={handleClear}
+            handlePrint={handlePrint}
+            handleChangeNumberDecimals={handleChangeNorden}
+            hideSave={activeTab === 0}
+          />
+        </div>
+      </div>
     </div>
   );
 }
