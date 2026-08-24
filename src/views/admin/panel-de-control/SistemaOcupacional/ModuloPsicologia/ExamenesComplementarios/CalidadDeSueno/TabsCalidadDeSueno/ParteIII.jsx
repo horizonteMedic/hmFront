@@ -1,7 +1,7 @@
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
 import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
-export default function ParteIII({ form, handleRadioButton }) {
+export default function ParteIII({ form, handleRadioButton, disabled = false }) {
   return (
     <SectionFieldset legend="Preguntas (durante el último mes)" className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -19,6 +19,7 @@ export default function ParteIII({ form, handleRadioButton }) {
             ]}
             labelOnTop
             vertical
+            disabled={disabled}
           />
 
           <InputsRadioGroup
@@ -34,6 +35,7 @@ export default function ParteIII({ form, handleRadioButton }) {
             ]}
             labelOnTop
             vertical
+            disabled={disabled}
           />
 
           <InputsRadioGroup
@@ -49,6 +51,7 @@ export default function ParteIII({ form, handleRadioButton }) {
             ]}
             labelOnTop
             vertical
+            disabled={disabled}
           />
         </div>
         <div className="space-y-6">
@@ -65,6 +68,7 @@ export default function ParteIII({ form, handleRadioButton }) {
             ]}
             labelOnTop
             vertical
+            disabled={disabled}
           />
 
           <InputsRadioGroup
@@ -80,6 +84,7 @@ export default function ParteIII({ form, handleRadioButton }) {
             ]}
             labelOnTop
             vertical
+            disabled={disabled}
           />
 
           <InputsRadioGroup
@@ -95,6 +100,7 @@ export default function ParteIII({ form, handleRadioButton }) {
               { value: "DOS_O_MAS", label: "Con dos o más personas en el mismo cuarto" },
             ]}
             vertical
+            disabled={disabled}
           />
         </div>
       </div>

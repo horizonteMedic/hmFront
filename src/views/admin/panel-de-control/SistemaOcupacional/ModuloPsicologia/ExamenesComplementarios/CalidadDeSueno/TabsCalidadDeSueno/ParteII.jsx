@@ -8,7 +8,7 @@ const opcionesFrecuencia = [
   { value: "TRES_SEMANA", label: "Tres veces/sem" },
 ];
 
-export default function ParteII({ form, handleRadioButton }) {
+export default function ParteII({ form, handleRadioButton, disabled = false }) {
   const items = [
     { name: "probPrimeraHora", label: "a) No pudo quedarse dormido la primera hora" },
     { name: "probDespertoNoche", label: "b) Se despertó durante la noche o de madrugada" },
@@ -30,6 +30,7 @@ export default function ParteII({ form, handleRadioButton }) {
         form={form}
         handleRadioButton={handleRadioButton}
         labelColumns={1}
+        disabled={disabled}
       />
     </SectionFieldset>
   );

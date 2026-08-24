@@ -2,7 +2,7 @@ import { InputTextOneLine } from "../../../../../../../components/reusableCompon
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
 import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
-export default function ParteI({ form, handleChange, handleRadioButton }) {
+export default function ParteI({ form, handleChange, handleRadioButton, disabled = false }) {
   return (
     <SectionFieldset legend="Preguntas (durante el último mes)">
       <div className="space-y-4">
@@ -12,6 +12,7 @@ export default function ParteI({ form, handleChange, handleRadioButton }) {
           value={form?.horaAcostarse}
           onChange={handleChange}
           labelWidth="200px"
+          disabled={disabled}
         />
         <InputsRadioGroup
           label="2. Tiempo para quedarse dormido"
@@ -25,6 +26,7 @@ export default function ParteI({ form, handleChange, handleRadioButton }) {
             { label: "Entre 31 y 60 min", value: "ENTRE_31_60" },
             { label: "Más de 60 min", value: "MAS_60" },
           ]}
+          disabled={disabled}
         />
         <InputTextOneLine
           label="3. Hora de levantarse normalmente"
@@ -32,6 +34,7 @@ export default function ParteI({ form, handleChange, handleRadioButton }) {
           value={form?.horaLevantarse}
           onChange={handleChange}
           labelWidth="200px"
+          disabled={disabled}
         />
         <InputTextOneLine
           label="4. Horas dormidas por noche (promedio)"
@@ -39,6 +42,7 @@ export default function ParteI({ form, handleChange, handleRadioButton }) {
           value={form?.horasDormidas}
           onChange={handleChange}
           labelWidth="200px"
+          disabled={disabled}
         />
       </div>
     </SectionFieldset>

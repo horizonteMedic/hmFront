@@ -11,6 +11,7 @@ import {
     actualizarRegistro,
     verificarRegistro,
 } from "../../../../../../utils/registroOcupacionalUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // ===== Configuración =====
 const obtenerReporteUrl =
@@ -26,13 +27,16 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             nombres: res.nombresApellidos ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            anual: res.nomExam === "ANUAL",
-            dni: res.dni,
             edad: res.edad,
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            dni: res.dni,
+            fechaNacimiento: formatearFechaCorta(res.fechaNac) ?? "",
+            anual: res.nomExam === "ANUAL",
             tipoExamen: res.nomExam,
             empresa: res.empresa,
             contrata: res.contrata,
+            ocupacion: res.areaO ?? "",
+            cargoDesempenar: res.cargo ?? "",
             puestoPostula: res.cargo,
             puestoActual: res.areaO,
             tieneRegistro: false,
@@ -67,9 +71,15 @@ export const GetInfoServicioEditar = async (
         nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
         dni: res.dniPaciente,
         edad: res.edadPaciente,
-        sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+        sexo: `${res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO"}`,
+        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
+        lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+        estadoCivil: res.estadoCivilPaciente ?? "",
+        nivelEstudios: res.nivelEstudioPaciente ?? "",
         empresa: res.empresa,
         contrata: res.contrata,
+        ocupacion: res.areaPaciente ?? "",
+        cargoDesempenar: res.cargoPaciente ?? "",
         // Campos usados por la interfaz principal
         puestoPostula: res.cargoPaciente,
         puestoActual: res.ocupacionPaciente,
@@ -111,7 +121,7 @@ export const GetInfoServicioEditar = async (
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
-        userRegistro: res.userRegistro ?? "",
+        userRegistro: res.usuarioRegistro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
         usuarioActualizacion: res.usuarioActualizacion ?? "",
         tieneRegistro: true,

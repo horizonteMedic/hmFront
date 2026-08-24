@@ -273,63 +273,7 @@ export default function InformePsicolaboral() {
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form}/>
-
-      <SectionFieldset legend="Datos del Paciente" className="m-4">
-        {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-4 gap-y-3">
-          <InputTextOneLine
-            label="Nombres y Apellidos"
-            name="nombres"
-            value={form?.nombres}
-            disabled
-          />
-          <div className="grid 2xl:grid-cols-3 gap-4">
-            <InputTextOneLine
-              label="DNI"
-              name="dni"
-              value={form?.dni}
-              disabled
-            />
-            <InputTextOneLine
-              label="Edad"
-              name="edad"
-              value={form?.edad}
-              disabled
-            />
-            <InputTextOneLine
-              label="Sexo"
-              name="sexo"
-              value={form?.sexo}
-              disabled
-            />
-          </div>
-          <InputTextOneLine
-            label="Empresa"
-            name="empresa"
-            value={form?.empresa}
-            disabled
-          />
-          <InputTextOneLine
-            label="Contrata"
-            name="contrata"
-            value={form?.contrata}
-            disabled
-          />
-          <InputTextOneLine
-            label="Area de Trabajo"
-            name="puestoPostula"
-            value={form?.puestoPostula}
-            disabled
-          />
-          <InputTextOneLine
-            label="Puesto de Trabajo"
-            name="puestoActual"
-            value={form?.puestoActual}
-            disabled
-          />
-        </div>
-      </SectionFieldset>
-
+      
       {/* Navegación de pestañas */}
       <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
         {tabs.map((tab) => (
