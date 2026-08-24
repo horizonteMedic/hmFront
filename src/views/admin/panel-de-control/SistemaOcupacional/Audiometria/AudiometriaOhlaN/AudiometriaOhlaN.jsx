@@ -295,7 +295,7 @@ export default function AudiometriaOhlaN() {
     empresa: formOhla.empresa,
     contrata: formOhla.contrata,
     ocupacion: formOhla.ocupacion,
-    cargoDesempenar: formOhla.cargo ?? formOhla.ocupacion,
+    cargoDesempenar: formOhla.cargo,
   };
 
   return (
