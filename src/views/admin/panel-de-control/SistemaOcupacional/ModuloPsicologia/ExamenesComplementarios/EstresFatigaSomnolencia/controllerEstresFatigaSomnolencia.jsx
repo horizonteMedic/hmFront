@@ -12,6 +12,7 @@ import {
     verificarRegistro,
     imprimirReporteJasper,
 } from "../../../../../../utils/registroOcupacionalUtils";
+import { convertirGenero } from "../../../../../../utils/helpers";
 
 // ===== Configuración =====
 const obtenerReporteUrl =
@@ -33,6 +34,7 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
             nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad ? `${res.edad} AÑOS` : "",
+            sexo: convertirGenero(res.genero) ?? "",
             ocupacion: res.areaO ?? "",
             domicilioActual: res.direccion ?? "",
             nombreExamen: res.nomExam ?? "",
@@ -67,10 +69,12 @@ export const GetInfoServicioEditar = async (
         esApto: res.apto,
 
         // Datos Personales
-        nombres: res.nombresPaciente ?? "",
-        apellidos: res.apellidosPaciente ?? "",
+        nombres: res.nombresPaciente + " " + res.apellidosPaciente,
+
         fechaNacimiento: res.fechaNacimientoPaciente ?? "",
         edad: res.edadPaciente ?? "",
+        sexo: convertirGenero(res.sexoPaciente) ?? "",
+        dni: res.dniPaciente ?? "",
         lugarNacimiento: res.lugarNacimientoPaciente ?? "",
         domicilioActual: res.direccionPaciente ?? "",
         estadoCivil: res.estadoCivilPaciente ?? "",

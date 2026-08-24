@@ -13,6 +13,8 @@ import {
     validarSede,
     imprimirReporteJasper,
 } from "../../../../../../utils/registroOcupacionalUtils";
+import { getFetch } from "../../../../../../utils/apiHelpers";
+import { convertirGenero } from "../../../../../../utils/helpers";
 
 // ===== Configuración =====
 const obtenerReporteUrl =
@@ -25,29 +27,57 @@ const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicolog
 const rutaReporte = "../../../../../../jaspers/ModuloPsicologia/FichaAnexo3/FichaPsicologicaOcupacional_Digitalizado.jsx";
 
 // ===== Mapeo Registro nuevo (datos del paciente) =====
-export const GetInfoServicio = async (nro, set, token, sede) => {
-    const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            fechaExamen: prev.fechaExamen,
-            edad: res.edad,
-            ocupacion: res.areaO ?? "",
-            nombreExamen: res.nomExam ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            explotacionEn: res.explotacion ?? "",
-            mineral: res.mineralExp ?? "",
-            alturaLabor: res.alturaLabor ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            domicilioActual: res.direccion ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            nivelEstudios: res.nivelEstudios ?? "",
-            tieneRegistro: false,
-        }));
-    }
+export const GetInfoServicio = (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    getFetch(
+        `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+        token
+    )
+        .then((res) => {
+            if (res.norden) {
+                console.log(res);
+                if (res) {
+                    set((prev) => ({
+                        ...prev,
+                        ...res,
+                        nombres: (res.nombresPaciente + " " + res.apellidosPaciente) ?? "",
+                        fechaExamen: prev.fechaExamen,  
+                        edad: res.edadPaciente ? `${res.edadPaciente} AÑOS` : "",
+                        sexo: convertirGenero(res.sexoPaciente) ?? "",
+                        dni: res.dniPaciente ?? "",
+                        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+                        lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+                        estadoCivil: res.estadoCivilPaciente ?? "",
+                        nivelEstudios: res.nivelEstudioPaciente ?? "",
+                        nombreExamen: res.nombreExamen ?? "",
+
+                        empresa: res.empresa ?? "",
+                        contrata: res.contrata ?? "",
+                        ocupacion: res.areaPaciente ?? "",
+                        cargoDesempenar: res.cargoPaciente ?? "",
+                        
+                        tiempoExperiencia: res.tiempoExperiencia ?? "", 
+                        explotacionEn: res.explotacionEn ?? "",
+                        mineral: res.mineralExp ?? "",
+                        alturaLabor: res.alturaLabor ?? "",
+
+                        domicilioActual: res.direccion ?? "",
+                        tieneRegistro: false,
+                    }));
+                }
+                Swal.close();
+            } else {
+                Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+            }
+        })
+        .finally(() => {
+            onFinish();
+        });
 };
 
 // ===== Mapeo Edición (registro existente) =====
@@ -79,7 +109,8 @@ export const GetInfoServicioEditar = async (
         // Datos Personales
         nombres: res.nombresPaciente,
         dni: res.dniPaciente,
-        sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+        
+        sexo: convertirGenero(res.sexoPaciente) ?? "",
         apellidos: res.apellidosPaciente,
         fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
         lugarNacimiento: res.lugarNacimientoPaciente,
@@ -89,7 +120,8 @@ export const GetInfoServicioEditar = async (
 
         // Datos Laborales
         empresa: res.empresa,
-        tiempoExperiencia: res.tiempoTrabajo_timpo_trab,
+        // tiempoExperiencia: res.tiempoTrabajo_timpo_trab,
+        tiempoExperiencia: res.tiempoExperiencia,
         contrata: res.contrata,
         cargoDesempenar: res.cargoPaciente,
         ocupacion: res.areaPaciente,
@@ -375,7 +407,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
+            GetInfoServicio(nro, tabla, set, token, () => {});
         },
         () => {
             //Tiene registro
