@@ -7,9 +7,10 @@ import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { useEffect, useRef, useState } from "react";
 import { getEspecialidades, getInfoTabla, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faChartLine, faCheck, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import ReporteVisitas from "./ReporteVisitas";
+import ReporteDashboard from "./ReporteDashboard";
 
 export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
   const initialFormState = {
@@ -25,6 +26,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   const [disabled, setDisabled] = useState(false);
   const [refresh, setRefresh] = useState(false)
   const [modalReportePacientes, setModalReportePacientes] = useState(false)
+  const [modalDashboard, setModalDashboard] = useState(false)
 
 
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
@@ -105,7 +107,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     <div className="px-4 max-w-[95%] mx-auto grid  gap-6">
       {/* Columna izquierda: Formulario */}
       <div className="space-y-3">
-        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
+        {/*<SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
           <div className="flex gap-4 w-full col-span-full">
             <InputTextOneLine
               label="DNI"
@@ -158,14 +160,15 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
             </div>
           </div>
 
-        </SectionFieldset>
+        </SectionFieldset>*/}
 
       </div>
       {/* Columna derecha: Panel de historial/búsqueda */}
       <div className="space-y-3">
         <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
           <div className="flex justify-center gap-x-4 gap-y-3">
-            <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes</button>
+            <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes <FontAwesomeIcon className="ml-2" icon={faDownload} /></button>
+            <button onClick={() => setModalDashboard(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Dashboard <FontAwesomeIcon className="ml-2" icon={faChartLine} /></button>
           </div>
           <Table
             data={dataTabla}
@@ -181,6 +184,10 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
       {modalReportePacientes && <ReporteVisitas
         onClose={() => setModalReportePacientes(false)}
         sede={selectedSede}
+        token={token}
+      />}
+      {modalDashboard && <ReporteDashboard
+        onClose={() => setModalDashboard(false)}
         token={token}
       />}
     </div>

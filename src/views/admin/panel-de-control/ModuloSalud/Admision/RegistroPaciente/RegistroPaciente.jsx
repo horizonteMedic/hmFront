@@ -58,6 +58,12 @@ export default function RegistroPaciente({ onRegistrado }) {
     setTimeout(() => dniRef.current?.focus(), 0);
   };
 
+  // ── Tipo de documento ─────────────────────────────────────────────────────
+  const handleTipoDoc = (e, value) => {
+    handleRadioButton(e, value);
+    if (value === "4") setForm((f) => ({ ...f, dni: "" }));
+  };
+
   // ── Búsqueda ──────────────────────────────────────────────────────────────
   const handleSearch = async (e) => {
     if (e.key === "Enter") {
@@ -121,7 +127,7 @@ export default function RegistroPaciente({ onRegistrado }) {
             <InputsRadioGroup
               name="TipoDoc"
               value={form.TipoDoc}
-              onChange={handleRadioButton}
+              onChange={handleTipoDoc}
               label="Tipo Doc."
               labelWidth="130px"
               options={[
