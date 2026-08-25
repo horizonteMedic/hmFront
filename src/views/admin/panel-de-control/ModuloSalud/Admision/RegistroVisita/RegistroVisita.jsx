@@ -226,7 +226,7 @@ function Table({ data, tabla, set, token, clean, datosFooter, onRowClick }) {
       render: (row) => (
         <ul className="space-y-1">
           {row.especialidades.map((option) => (
-            <li key={option.id ?? option.nombre} className="flex items-center gap-2 text-sm">
+            <li key={option.id ?? option.nombre} className="flex items-center gap-2 text-lg">
               <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${option.estado === "PASO" ? "bg-green-500" :
                 option.estado === "NO PASO" ? "bg-red-500" :
                   "bg-gray-400"
