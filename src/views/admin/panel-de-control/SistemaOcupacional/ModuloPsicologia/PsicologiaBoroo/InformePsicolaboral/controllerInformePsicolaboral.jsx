@@ -7,13 +7,11 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
-import { getToday } from "../../../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral";
 const registrarUrl =
     "/api/v01/ct/informePsicolaboral/registrarActualizarInformePsicolaboral";
-const today = getToday();
 
 export const GetInfoServicio = async (
     nro,
@@ -35,7 +33,6 @@ export const GetInfoServicio = async (
             ...res,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            anual: res.nombreExamen == "ANUAL",
             fechaExam: res.fecha,
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             dni: res.dniPaciente,
@@ -73,6 +70,7 @@ export const GetInfoServicio = async (
             crecimientoPersonal: res.aspectosPsicolaborales7A ? "A" : res.aspectosPsicolaborales7D ? "D" : res.aspectosPsicolaborales7NA ? "NA" : res.aspectosPsicolaborales7NM ? "NM" : res.aspectosPsicolaborales7PD ? "PD" : undefined,
             motivacion: res.aspectosPsicolaborales8A ? "A" : res.aspectosPsicolaborales8D ? "D" : res.aspectosPsicolaborales8NA ? "NA" : res.aspectosPsicolaborales8NM ? "NM" : res.aspectosPsicolaborales8PD ? "PD" : undefined,
 
+            anual: res.anual,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
