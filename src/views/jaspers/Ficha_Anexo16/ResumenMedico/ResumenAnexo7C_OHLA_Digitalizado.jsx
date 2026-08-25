@@ -923,7 +923,7 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaHallazgos, tablaInicioX + tablaAncho, yPos + alturaHallazgos);
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   dibujarTextoConSaltoLinea(hallazgosTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
   yPos += alturaHallazgos;
 
@@ -951,7 +951,7 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   dibujarTextoConSaltoLinea(recomendacionesTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
   yPos += alturaRecomendaciones;
 
