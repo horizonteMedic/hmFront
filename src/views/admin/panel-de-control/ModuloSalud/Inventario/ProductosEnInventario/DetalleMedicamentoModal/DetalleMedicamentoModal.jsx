@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPen } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import { getMedicamentoDetalle, editarMedicamento } from '../model/ProductosEnInventario';
-import { FloatingInput } from '../components/FloatingField';
+import { FloatingInput, FloatingAutocomplete, PRESENTACIONES_OPTIONS } from '../components/FloatingField';
 
 const Campo = ({ label, value }) => (
   <div className="mb-3">
@@ -135,7 +135,7 @@ const DetalleMedicamentoModal = ({ closeModal, id, token, Refresgpag }) => {
                 <>
                   <form className="space-y-4">
                     <FloatingInput id="d-nombre" label="Nombre" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                    <FloatingInput id="d-presentacion" label="Presentación" required value={presentacion} onChange={(e) => setPresentacion(e.target.value)} />
+                    <FloatingAutocomplete id="d-presentacion" label="Presentación" required value={presentacion} onChange={(e) => setPresentacion(e.target.value)} groupedOptions={PRESENTACIONES_OPTIONS} />
                     <FloatingInput id="d-laboratorio" label="Laboratorio" value={laboratorio} onChange={(e) => setLaboratorio(e.target.value)} />
                     <FloatingInput id="d-marca" label="Marca" value={marca} onChange={(e) => setMarca(e.target.value)} />
                     <FloatingInput id="d-unidadMedida" label="Unidad de Medida" value={unidadMedida} onChange={(e) => setUnidadMedida(e.target.value)} />

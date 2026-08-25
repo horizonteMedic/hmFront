@@ -88,7 +88,7 @@ export default function ProductosEnInventario() {
     setLoading(true);
     getMedicamentos(token)
       .then(response => {
-        setData(Array.isArray(response) ? response : []);
+        setData(Array.isArray(response) ? response.sort((a, b) => a.nombre.localeCompare(b.nombre)) : []);
       })
       .catch(error => {
         console.error('Error', error);
@@ -173,7 +173,7 @@ export default function ProductosEnInventario() {
                   <option value={100}>100</option>
                 </select>
               </div>
-                <button
+              <button
                 onClick={() => setShowCreateModal(true)}
                 className="azul-btn font-semibold py-2 px-4 rounded-lg flex items-center gap-2 text-sm"
               >
@@ -224,39 +224,39 @@ export default function ProductosEnInventario() {
                   {visibleData.map((item, index) => {
                     const estadoStock = getEstadoStock(item.stockActual, item.stockMinimo);
                     return (
-                    <tr
-                      key={item.id ?? index}
-                      onClick={() => openDetalle(item.id)}
-                      className="cursor-pointer hover:bg-blue-50 transition-colors"
-                      title="Click para ver el detalle"
-                    >
-                      <td className="px-3 py-3 text-gray-500">{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                      <td className="px-3 py-3 font-semibold text-gray-800">{item.nombre}</td>
-                      <td className="px-3 py-3 text-gray-700">{item.presentacion}</td>
-                      <td className="px-3 py-3 text-gray-700">{item.stockMinimo}</td>
-                      <td className="px-3 py-3 font-semibold cursor-default" onClick={(e) => e.stopPropagation()}>
-                        <span className="inline-flex items-center gap-2">
-                          {estadoStock && (
-                            <span
-                              className={`w-2 h-2 rounded-full shrink-0 ${estadoStock === 'critico' ? 'bg-red-400' : 'bg-orange-400'}`}
-                              title={estadoStock === 'critico' ? 'Stock igual o menor al mínimo' : 'Stock cerca del mínimo'}
-                            />
-                          )}
-                          <span className={estadoStock === 'critico' ? 'text-red-600' : estadoStock === 'cercano' ? 'text-orange-600' : 'text-gray-700'}>
-                            {item.stockActual ?? 0}
+                      <tr
+                        key={item.id ?? index}
+                        onClick={() => openDetalle(item.id)}
+                        className="cursor-pointer hover:bg-blue-50 transition-colors"
+                        title="Click para ver el detalle"
+                      >
+                        <td className="px-3 py-3 text-gray-500">{(currentPage - 1) * recordsPerPage + index + 1}</td>
+                        <td className="px-3 py-3 font-semibold text-gray-800">{item.nombre}</td>
+                        <td className="px-3 py-3 text-gray-700">{item.presentacion}</td>
+                        <td className="px-3 py-3 text-gray-700">{item.stockMinimo}</td>
+                        <td className="px-3 py-3 font-semibold cursor-default" onClick={(e) => e.stopPropagation()}>
+                          <span className="inline-flex items-center gap-2">
+                            {estadoStock && (
+                              <span
+                                className={`w-2 h-2 rounded-full shrink-0 ${estadoStock === 'critico' ? 'bg-red-400' : 'bg-orange-400'}`}
+                                title={estadoStock === 'critico' ? 'Stock igual o menor al mínimo' : 'Stock cerca del mínimo'}
+                              />
+                            )}
+                            <span className={estadoStock === 'critico' ? 'text-red-600' : estadoStock === 'cercano' ? 'text-orange-600' : 'text-gray-700'}>
+                              {item.stockActual ?? 0}
+                            </span>
                           </span>
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 text-center cursor-default" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={(e) => openIngreso(item, e)}
-                          title="Agregar Stock"
-                          className="w-7 h-7 rounded-full inline-flex items-center justify-center azul-btn"
-                        >
-                          <FontAwesomeIcon icon={faPlus} className="text-xs" />
-                        </button>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="px-2 py-3 text-center cursor-default" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => openIngreso(item, e)}
+                            title="Agregar Stock"
+                            className="w-7 h-7 rounded-full inline-flex items-center justify-center azul-btn"
+                          >
+                            <FontAwesomeIcon icon={faPlus} className="text-xs" />
+                          </button>
+                        </td>
+                      </tr>
                     );
                   })}
                   {filteredData.length === 0 && (

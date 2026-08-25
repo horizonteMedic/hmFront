@@ -292,7 +292,8 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
         genero: res.genero == "M" ? "Masculino" : "Femenino",
-        nombres: res.nombresApellidos,
+        nombres: res.nombresApellidos,  
+        ocupacion: res.areaO
       }));
     })
     .catch((error) => {
