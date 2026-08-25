@@ -19,16 +19,21 @@ import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "psicologia_espacios_confinados";
 
-// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-// Los criterios de RadioTable / InputsRadioGroup solo respetan el bloqueo general
-// (camposDeshabilitados), sin resaltado individual (mismo criterio que otros formularios
-// con muchos campos de selección).
 const CAMPOS_EDITABLES = [
     "fechaExamen",
     "esApto",
+    "razonamiento",
+    "memoria",
+    "atencionConcentracion",
+    "coordinacionVisoMotora",
+    "orientacionEspacial",
+    "estabilidadEmocional",
+    "nivelAnsiedadGeneral",
+    "ansiedadEspaciosConfinados",
     "analisisResultados",
     "recomendaciones",
     "user_medicoFirma",
@@ -265,105 +270,19 @@ export default function ExamenEspacioConfinado() {
                     onRevert={() => revertField("esApto")}
                 />
             </SectionFieldset>
-            <SectionFieldset legend="Datos Personales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Columna Izquierda */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Nombres"
-                            name="nombres"
-                            value={form.nombres}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Apellidos"
-                            name="apellidos"
-                            value={form.apellidos}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Fecha Nacimiento"
-                            name="fechaNacimiento"
-                            value={form.fechaNacimiento}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Lugar Nacimiento"
-                            name="lugarNacimiento"
-                            value={form.lugarNacimiento}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
 
-                    {/* Columna Derecha */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Domicilio Actual"
-                            name="domicilioActual"
-                            value={form.domicilioActual}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Estado Civil"
-                            name="estadoCivil"
-                            value={form.estadoCivil}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Nivel Estudios"
-                            name="nivelEstudios"
-                            value={form.nivelEstudios}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                </div>
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio Actual">
+                <InputTextOneLine
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
+                    disabled
+                    labelWidth="120px"
+                />
             </SectionFieldset>
-            <SectionFieldset legend="Datos Laborales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="Empresa"
-                        name="empresa"
-                        value={form.empresa}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Contrata"
-                        name="contrata"
-                        value={form.contrata}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Ocupación"
-                        name="ocupacion"
-                        value={form.ocupacion}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Cargo Desempeñar"
-                        name="cargoDesempenar"
-                        value={form.cargoDesempenar}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-            </SectionFieldset>
+ 
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <SectionFieldset legend="Aspecto Intelectual">
@@ -373,6 +292,8 @@ export default function ExamenEspacioConfinado() {
                         form={form}
                         handleRadioButton={handleRadioButton}
                         disabled={camposDeshabilitados}
+                        isFieldEdited={isFieldEdited}
+                        onRevert={revertField}
                     />
                 </SectionFieldset>
 
@@ -386,6 +307,8 @@ export default function ExamenEspacioConfinado() {
                             onChange={handleRadioButton}
                             options={estabilidadOptions}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("estabilidadEmocional")}
+                            onRevert={() => revertField("estabilidadEmocional")}
                         />
                         <InputsRadioGroup
                             label="2.- NIVEL DE ANSIEDAD GENERAL"
@@ -395,6 +318,8 @@ export default function ExamenEspacioConfinado() {
                             onChange={handleRadioButton}
                             options={nivelAnsiedadOptions}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("nivelAnsiedadGeneral")}
+                            onRevert={() => revertField("nivelAnsiedadGeneral")}
                         />
                         <InputsRadioGroup
                             label="3.- ANSIEDAD A ESPACIOS CONFINADOS"
@@ -405,6 +330,8 @@ export default function ExamenEspacioConfinado() {
                             options={ansiedadOptions}
                             vertical
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("ansiedadEspaciosConfinados")}
+                            onRevert={() => revertField("ansiedadEspaciosConfinados")}
                         />
                     </div>
                 </SectionFieldset>

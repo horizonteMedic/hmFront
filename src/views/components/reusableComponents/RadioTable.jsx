@@ -1,3 +1,5 @@
+import RevertButton from "./RevertButton";
+
 export default function RadioTable({
   items = [],
   options = [],
@@ -6,6 +8,8 @@ export default function RadioTable({
   labelColumns = 2,
   groupLabel,
   disabled = false,
+  isFieldEdited,
+  onRevert,
 }) {
   const styleButton = ` w-5 h-5
                         rounded-md
@@ -14,8 +18,10 @@ export default function RadioTable({
                         cursor-pointer
                         disabled:cursor-not-allowed
                         disabled:opacity-50 `
-  // Calcular el número de columnas dinámicamente (labelColumns para texto + número de opciones)
-  const totalColumns = labelColumns + options.length;
+  const hasRevert = typeof onRevert === "function";
+  // Calcular el número de columnas dinámicamente (labelColumns para texto + número de opciones
+  // + 1 columna extra para el botón de revertir, si aplica).
+  const totalColumns = labelColumns + options.length + (hasRevert ? 1 : 0);
   const gridColsClass = `grid-cols-${totalColumns}`;
   const labelColSpanClass = `col-span-${labelColumns}`;
 
@@ -29,6 +35,7 @@ export default function RadioTable({
             <div className={`col-span-${options.length} text-center font-bold p-2`}>
               {groupLabel}
             </div>
+            {hasRevert && <div></div>}
           </div>
         )}
         <div className={`grid ${gridColsClass} bg-gray-100 border-b rounded-t-lg`}>
@@ -38,44 +45,57 @@ export default function RadioTable({
               {option.label}
             </div>
           ))}
+          {hasRevert && <div></div>}
         </div>
       </div>
 
       {/* Filas de items */}
-      {items.map((item, itemIndex) => (
-        <div
-          key={itemIndex}
-          className={`grid ${gridColsClass} ${itemIndex < items.length - 1 ? 'border-b border-gray-200 ' : 'rounded-b-lg'
-            } hover:bg-gray-300 `}
-        >
-          {/* Columna de texto (ocupa labelColumns columnas) */}
-          <div className={`p-3 font-semibold ${labelColSpanClass}`}>
-            {item.label}
+      {items.map((item, itemIndex) => {
+        const edited = hasRevert && typeof isFieldEdited === "function" && isFieldEdited(item.name);
+        return (
+          <div
+            key={itemIndex}
+            className={`grid ${gridColsClass} ${itemIndex < items.length - 1 ? 'border-b border-gray-200 ' : 'rounded-b-lg'
+              } hover:bg-gray-300 `}
+          >
+            {/* Columna de texto (ocupa labelColumns columnas) */}
+            <div className={`p-3 font-semibold ${labelColSpanClass}`}>
+              {item.label}
+            </div>
+
+            {/* Columnas de opciones */}
+            {options.map((option, optionIndex) => (
+              <div key={optionIndex} className="p-3 flex justify-center">
+                <input
+                  type="radio"
+                  name={item.name}
+                  value={option.value}
+                  checked={form?.[item.name] === option.value}
+                  onChange={(e) => (disabled ? null : handleRadioButton(e, option.value))}
+                  disabled={disabled}
+                  className={styleButton}
+                />
+              </div>
+            ))}
+
+            {/* Columna del botón de revertir */}
+            {hasRevert && (
+              <div className="p-3 flex items-center justify-center">
+                {edited && (
+                  <RevertButton onClick={() => onRevert(item.name)} title="Revertir selección" />
+                )}
+              </div>
+            )}
+
+            {/* Fila extra para contenido opcional */}
+            {item.extraContent && (
+              <div className={`col-span-${totalColumns} p-3`}>
+                {item.extraContent}
+              </div>
+            )}
           </div>
-
-          {/* Columnas de opciones */}
-          {options.map((option, optionIndex) => (
-            <div key={optionIndex} className="p-3 flex justify-center">
-              <input
-                type="radio"
-                name={item.name}
-                value={option.value}
-                checked={form?.[item.name] === option.value}
-                onChange={(e) => (disabled ? null : handleRadioButton(e, option.value))}
-                disabled={disabled}
-                className={styleButton}
-              />
-            </div>
-          ))}
-
-          {/* Fila extra para contenido opcional */}
-          {item.extraContent && (
-            <div className={`col-span-${totalColumns} p-3`}>
-              {item.extraContent}
-            </div>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

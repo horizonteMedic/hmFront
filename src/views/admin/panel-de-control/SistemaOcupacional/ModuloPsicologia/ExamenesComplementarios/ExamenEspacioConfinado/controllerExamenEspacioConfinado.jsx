@@ -12,6 +12,7 @@ import {
     verificarRegistro,
     imprimirReporteJasper,
 } from "../../../../../../utils/registroOcupacionalUtils";
+import { convertirGenero } from "../../../../../../utils/helpers";
 
 // ===== Configuración =====
 const obtenerReporteUrl =
@@ -31,11 +32,12 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
             ...prev,
             nombreExamen: res.nomExam ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad ? `${res.edad} AÑOS` : "",
             ocupacion: res.areaO ?? "",
 
-            nombres: res.nombres ?? "",
-            apellidos: res.apellidos ?? "",
+            nombres: (res.nombres + " " + res.apellidos) ?? "",
+            edad: res.edad ? `${res.edad} AÑOS` : "",
+            sexo: convertirGenero(res.genero) ?? "",
+            dni: res.dni ?? "",
             lugarNacimiento: res.lugarNacimiento ?? "",
 
             domicilioActual: res.direccion ?? "",
@@ -74,14 +76,15 @@ export const GetInfoServicioEditar = async (
         esApto: res.apto === true ? true : false,
 
         // Datos Personales - Columna Izquierda
-        nombres: res.nombresPaciente ?? "",
-        apellidos: res.apellidosPaciente ?? "",
-        fechaNacimiento: res.fechaNacimientoPaciente ?? "",
+        nombres: (res.nombresPaciente + " " + res.apellidosPaciente) ?? "",
+        edad: res.edadPaciente ? `${res.edadPaciente} AÑOS` : "",
+        sexo: convertirGenero(res.sexoPaciente) ?? "",
+        dni: res.dniPaciente ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente) ?? "",
         lugarNacimiento: res.lugarNacimientoPaciente ?? "",
 
         // Datos Personales - Columna Derecha
         domicilioActual: res.direccionPaciente ?? "",
-        edad: res.edadPaciente ?? "",
         estadoCivil: res.estadoCivilPaciente ?? "",
         nivelEstudios: res.nivelEstudioPaciente ?? "",
 
