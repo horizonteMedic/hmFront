@@ -34,12 +34,13 @@ import { getToday } from '../../../../utils/helpers';
 //      VerifyTR,
 //  } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
+import { PlantillaDiagnosticoManager } from '../../../../components/reusableComponents/PlantillaDiagnostico';
 import Swal from 'sweetalert2';
 
 const today = getToday();
 
 export default function TriajeAsistencial() {
-    const { token, selectedSede } = useSessionData();
+    const { token, selectedSede, userlogued } = useSessionData();
     const debounceTimeout = useRef(null);
 
     // Estado inicial del formulario
@@ -77,6 +78,9 @@ export default function TriajeAsistencial() {
         diastolica: '',
         fRespiratoria: '',
         diagnostico: '',
+        // Plantillas de diagnóstico vinculadas a este triaje (JSON: array de
+        // { idPlantilla, codigo, titulo, diagnostico, cie10s, recomendaciones, restricciones })
+        diagnosticoCompleto: '',
 
         // Búsqueda
         tipoPaciente: false,
@@ -146,6 +150,39 @@ export default function TriajeAsistencial() {
 
     const refreshtable = () => {
         setRefresh((prev) => prev + 1);
+    };
+
+    // Vincula una plantilla de diagnóstico seleccionada. No se escribe en
+    // "diagnostico": se guarda en "diagnosticoCompleto" como JSON con toda
+    // la info de la(s) plantilla(s) vinculadas (permite vincular varias).
+    const handleVincularPlantilla = (plantilla) => {
+        setForm((prev) => {
+            let vinculadas = [];
+            try {
+                const parsed = prev.diagnosticoCompleto ? JSON.parse(prev.diagnosticoCompleto) : [];
+                vinculadas = Array.isArray(parsed) ? parsed : [];
+            } catch {
+                vinculadas = [];
+            }
+
+            const yaVinculada = vinculadas.some((p) => p.idPlantilla === plantilla.idPlantilla);
+            const nuevaLista = yaVinculada
+                ? vinculadas
+                : [
+                      ...vinculadas,
+                      {
+                          idPlantilla: plantilla.idPlantilla,
+                          codigo: plantilla.codigo,
+                          titulo: plantilla.titulo,
+                          diagnostico: plantilla.diagnostico,
+                          cie10s: plantilla.cie10s || [],
+                          recomendaciones: plantilla.recomendaciones || [],
+                          restricciones: plantilla.restricciones || [],
+                      },
+                  ];
+
+            return { ...prev, diagnosticoCompleto: JSON.stringify(nuevaLista) };
+        });
     };
 
     // Calcular resumen de pacientes para la fecha seleccionada
@@ -529,8 +566,17 @@ export default function TriajeAsistencial() {
                                 labelWidth="120px"
                             />
                         </div>
+                        {/* <div className="flex justify-between items-center">
+                            <label className="font-semibold">Diagnóstico :</label>
+                            <PlantillaDiagnosticoManager
+                                token={token}
+                                usuarioCreacion={userlogued}
+                                onVincular={handleVincularPlantilla}
+                                buttonLabel="Plantillas de Diagnóstico"
+                                buttonClassName="bg-[#233245] hover:bg-[#1a2535] text-white text-sm px-3 py-1.5 rounded flex items-center gap-2"
+                            />
+                        </div> */}
                         <InputTextArea
-                            label="Diagnóstico"
                             name="diagnostico"
                             value={form.diagnostico}
                             rows={7}
