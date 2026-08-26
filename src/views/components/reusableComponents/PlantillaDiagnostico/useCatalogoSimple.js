@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * comparten exactamente la misma forma de API.
  */
 export function useCatalogoSimple({ token, usuarioCreacion, api }) {
-    const { list, create, update, remove } = api;
+    const { list, guardar, remove } = api;
 
     const [items, setItems] = useState([]);
     const [filtro, setFiltro] = useState("");
@@ -36,13 +36,15 @@ export function useCatalogoSimple({ token, usuarioCreacion, api }) {
     }, [filtro, token]);
 
     const crear = useCallback(
-        (descripcion) => create(descripcion, usuarioCreacion, token),
-        [create, token, usuarioCreacion]
+        (descripcion) =>
+            guardar({ id: null, descripcion, usuarioRegistro: usuarioCreacion }, token),
+        [guardar, token, usuarioCreacion]
     );
 
     const actualizar = useCallback(
-        (id, descripcion) => update(id, descripcion, token),
-        [update, token]
+        (id, descripcion) =>
+            guardar({ id, descripcion, usuarioRegistro: usuarioCreacion }, token),
+        [guardar, token, usuarioCreacion]
     );
 
     const eliminar = useCallback((id) => remove(id, token), [remove, token]);

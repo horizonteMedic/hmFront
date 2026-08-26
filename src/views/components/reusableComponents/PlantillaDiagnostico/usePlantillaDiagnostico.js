@@ -1,18 +1,36 @@
 import { useCallback, useState } from "react";
 import Swal from "sweetalert2";
 import {
-    actualizarPlantillaDiagnostico,
-    crearPlantillaDiagnostico,
+    guardarPlantillaDiagnostico,
     eliminarPlantillaDiagnostico,
     getPlantillaDiagnostico,
     getPlantillasDiagnostico,
+    getRecomendaciones,
+    guardarRecomendacion,
+    eliminarRecomendacion,
+    getRestricciones,
+    guardarRestriccion,
+    eliminarRestriccion,
 } from "./model";
+import { useCatalogoSimple } from "./useCatalogoSimple";
 
 const initialFormState = {
     idPlantilla: null,
     codigo: "",
     titulo: "",
     diagnostico: "",
+};
+
+const recomendacionApi = {
+    list: getRecomendaciones,
+    guardar: guardarRecomendacion,
+    remove: eliminarRecomendacion,
+};
+
+const restriccionApi = {
+    list: getRestricciones,
+    guardar: guardarRestriccion,
+    remove: eliminarRestriccion,
 };
 
 /**
@@ -26,6 +44,19 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
     const [cie10s, setCie10s] = useState([]);
     const [recomendaciones, setRecomendaciones] = useState([]);
     const [restricciones, setRestricciones] = useState([]);
+
+    // Catálogos completos de recomendaciones/restricciones (búsqueda + CRUD),
+    // reutilizados por ejemplo por CatalogoSimpleManager.
+    const catalogoRecomendaciones = useCatalogoSimple({
+        token,
+        usuarioCreacion,
+        api: recomendacionApi,
+    });
+    const catalogoRestricciones = useCatalogoSimple({
+        token,
+        usuarioCreacion,
+        api: restriccionApi,
+    });
 
     const [plantillas, setPlantillas] = useState([]);
     const [filtros, setFiltros] = useState({
@@ -131,6 +162,7 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
             if (!ok) return null;
 
             const body = {
+                idPlantilla: form.idPlantilla ?? null,
                 codigo: form.codigo.trim(),
                 titulo: form.titulo.trim(),
                 diagnostico: form.diagnostico.trim(),
@@ -145,9 +177,7 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
                     .map((r) => r.descripcion),
             };
 
-            const res = form.idPlantilla
-                ? await actualizarPlantillaDiagnostico(form.idPlantilla, body, usuarioCreacion, token)
-                : await crearPlantillaDiagnostico(body, usuarioCreacion, token);
+            const res = await guardarPlantillaDiagnostico(body, usuarioCreacion, token);
 
             if (!res || res.error || res.status) {
                 Swal.fire("Error", "No se pudo guardar la plantilla", "error");
@@ -181,7 +211,7 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
             });
             if (!confirm.isConfirmed) return;
             const res = await eliminarPlantillaDiagnostico(idPlantilla, token);
-            if (res && res.error) {
+            if (!res || res.error || res.status) {
                 Swal.fire("Error", "No se pudo eliminar la plantilla", "error");
                 return;
             }
@@ -206,6 +236,8 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
         setRecomendaciones,
         restricciones,
         setRestricciones,
+        catalogoRecomendaciones,
+        catalogoRestricciones,
         plantillas,
         filtros,
         setFiltros,
