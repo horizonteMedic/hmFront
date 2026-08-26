@@ -200,7 +200,7 @@ export default function CalidadDeSueno() {
                 )}
             </div>
 
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="flex gap-x-3 w-full">
                     <InputTextOneLine
                         label="N° Orden"

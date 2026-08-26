@@ -142,7 +142,7 @@ export const GetInfoServicioEditar = async (
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
-        userRegistro: res.userRegistro ?? "",
+        userRegistro: res.usuarioRegistro ?? "",
         fechaActualizacion: res.fechaActualizacion ?? "",
         usuarioActualizacion: res.usuarioActualizacion ?? "",
         tieneRegistro: true,

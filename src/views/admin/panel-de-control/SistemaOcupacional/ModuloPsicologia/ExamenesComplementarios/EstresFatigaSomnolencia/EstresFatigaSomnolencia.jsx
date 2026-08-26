@@ -184,7 +184,7 @@ export default function EstresFatigaSomnolencia() {
                 )}
             </div>
 
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <div className="flex gap-x-3 w-full">
                     <InputTextOneLine
                         label="N° Orden"
