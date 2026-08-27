@@ -267,7 +267,7 @@ export default function InformePsicolaboral() {
             label={<p className="text-red-500 text-[10px]">Examen Anual</p>}
             name="anual"
             checked={form?.anual}
-          // onChange={handleCheckBoxChange}
+            onChange={handleCheckBoxChange}
           />
         </div>
       </SectionFieldset>

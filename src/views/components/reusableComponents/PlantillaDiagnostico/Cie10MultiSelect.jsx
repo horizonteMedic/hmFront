@@ -77,10 +77,6 @@ export default function Cie10MultiSelect({
         <div className="space-y-1" ref={boxRef}>
             {label && <label className="font-semibold block">{label} :</label>}
             <div className="relative">
-                <FontAwesomeIcon
-                    icon={faSearch}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                />
                 <input
                     type="text"
                     disabled={disabled}
@@ -98,7 +94,7 @@ export default function Cie10MultiSelect({
                 {loading && (
                     <FontAwesomeIcon
                         icon={faSpinner}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-sm animate-spin pointer-events-none"
+                        className="absolute right-3 top-[30%]  text-blue-500 text-sm animate-spin pointer-events-none"
                     />
                 )}
 

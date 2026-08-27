@@ -22,13 +22,8 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
         limpiar,
     } = hook;
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
-
     return (
-        <SectionFieldset legend={form.idPlantilla ? "Editar Plantilla" : "Nueva Plantilla"} className="space-y-3">
+        <SectionFieldset legend={form.idPlantilla ? "Editar Plantilla" : "Nueva Plantilla"} className="grid md:grid-cols-2 gap-x-4 gap-y-3">
             <InputTextOneLine
                 label="Código"
                 name="codigo"
@@ -47,17 +42,19 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
                 }
                 labelWidth="120px"
             />
-            <InputTextArea
+            <InputTextOneLine
                 label="Diagnóstico"
                 name="diagnostico"
-                rows={4}
                 value={form.diagnostico}
+                labelWidth="120px"
+                className="col-span-2"
                 onChange={(e) =>
                     setForm((prev) => ({ ...prev, diagnostico: e.target.value.toUpperCase() }))
                 }
             />
-
-            <Cie10MultiSelect token={token} selected={cie10s} onChange={setCie10s} label="CIE10" />
+            <div className="col-span-2">
+                <Cie10MultiSelect token={token} selected={cie10s} onChange={setCie10s} label="CIE10" />
+            </div>
 
             <CreatableMultiSelect
                 label="Recomendaciones"

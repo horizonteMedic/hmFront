@@ -169,17 +169,17 @@ export default function TriajeAsistencial() {
             const nuevaLista = yaVinculada
                 ? vinculadas
                 : [
-                      ...vinculadas,
-                      {
-                          idPlantilla: plantilla.idPlantilla,
-                          codigo: plantilla.codigo,
-                          titulo: plantilla.titulo,
-                          diagnostico: plantilla.diagnostico,
-                          cie10s: plantilla.cie10s || [],
-                          recomendaciones: plantilla.recomendaciones || [],
-                          restricciones: plantilla.restricciones || [],
-                      },
-                  ];
+                    ...vinculadas,
+                    {
+                        idPlantilla: plantilla.idPlantilla,
+                        codigo: plantilla.codigo,
+                        titulo: plantilla.titulo,
+                        diagnostico: plantilla.diagnostico,
+                        cie10s: plantilla.cie10s || [],
+                        recomendaciones: plantilla.recomendaciones || [],
+                        restricciones: plantilla.restricciones || [],
+                    },
+                ];
 
             return { ...prev, diagnosticoCompleto: JSON.stringify(nuevaLista) };
         });
@@ -566,7 +566,7 @@ export default function TriajeAsistencial() {
                                 labelWidth="120px"
                             />
                         </div>
-                        {/* <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center">
                             <label className="font-semibold">Diagnóstico :</label>
                             <PlantillaDiagnosticoManager
                                 token={token}
@@ -575,7 +575,7 @@ export default function TriajeAsistencial() {
                                 buttonLabel="Plantillas de Diagnóstico"
                                 buttonClassName="bg-[#233245] hover:bg-[#1a2535] text-white text-sm px-3 py-1.5 rounded flex items-center gap-2"
                             />
-                        </div> */}
+                        </div>
                         <InputTextArea
                             name="diagnostico"
                             value={form.diagnostico}
@@ -747,20 +747,18 @@ export default function TriajeAsistencial() {
                                     <tr
                                         key={i}
                                         className={`text-center cursor-pointer transition-all duration-200
-                      ${
-                          row.color === 'AMARILLO'
-                              ? 'bg-[#ffff00]'
-                              : row.color === 'VERDE'
-                              ? 'bg-[#00ff00]'
-                              : row.color === 'ROJO'
-                              ? 'bg-[#ff6767]'
-                              : ''
-                      }
-                      ${
-                          hoveredRow !== null && hoveredRow !== i
-                              ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
-                              : ''
-                      }`}
+                      ${row.color === 'AMARILLO'
+                                                ? 'bg-[#ffff00]'
+                                                : row.color === 'VERDE'
+                                                    ? 'bg-[#00ff00]'
+                                                    : row.color === 'ROJO'
+                                                        ? 'bg-[#ff6767]'
+                                                        : ''
+                                            }
+                      ${hoveredRow !== null && hoveredRow !== i
+                                                ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
+                                                : ''
+                                            }`}
                                         style={{ zIndex: 1, position: 'relative' }}
                                         // onClick={() => handleRowClick(row)}
                                         onContextMenu={(e) => handleRowContextMenu(e, row)}

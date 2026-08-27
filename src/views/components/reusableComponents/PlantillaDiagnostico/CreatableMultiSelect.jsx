@@ -30,20 +30,27 @@ export default function CreatableMultiSelect({
 
     useEffect(() => {
         let active = true;
-        setLoadingAll(true);
-        Promise.resolve(fetchAll())
-            .then((res) => {
-                if (active) setAllItems(Array.isArray(res) ? res : []);
-            })
-            .catch((err) => {
-                console.error("CreatableMultiSelect: error cargando lista", err);
-                if (active) setAllItems([]);
-            })
-            .finally(() => {
-                if (active) setLoadingAll(false);
-            });
+        // El timeout (con su cleanup) evita que React.StrictMode dispare la
+        // petición dos veces en desarrollo: el montaje "fantasma" cancela su
+        // timer antes de que llegue a ejecutarse, y solo el montaje real
+        // termina llamando a fetchAll().
+        const timeout = setTimeout(() => {
+            setLoadingAll(true);
+            Promise.resolve(fetchAll())
+                .then((res) => {
+                    if (active) setAllItems(Array.isArray(res) ? res : []);
+                })
+                .catch((err) => {
+                    console.error("CreatableMultiSelect: error cargando lista", err);
+                    if (active) setAllItems([]);
+                })
+                .finally(() => {
+                    if (active) setLoadingAll(false);
+                });
+        }, 0);
         return () => {
             active = false;
+            clearTimeout(timeout);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -105,10 +112,6 @@ export default function CreatableMultiSelect({
                 </label>
             )}
             <div className="relative">
-                <FontAwesomeIcon
-                    icon={faSearch}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                />
                 <input
                     type="text"
                     disabled={disabled}
@@ -129,7 +132,6 @@ export default function CreatableMultiSelect({
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-sm animate-spin pointer-events-none"
                     />
                 )}
-
                 {showDropdown && !loadingAll && (
                     <div className="absolute top-full left-0 z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md max-h-52 overflow-y-auto">
                         {visibleResults.length === 0 && (

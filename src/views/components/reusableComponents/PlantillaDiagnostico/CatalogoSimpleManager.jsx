@@ -84,7 +84,7 @@ export default function CatalogoSimpleManager({
         });
         if (!confirm.isConfirmed) return;
         const res = await eliminar(id);
-        if (res && res.error) {
+        if (!res || res.error || res.status) {
             Swal.fire("Error", "No se pudo eliminar el registro", "error");
             return;
         }

@@ -114,6 +114,7 @@ export const GetInfoServicioEditar = async (
         crecimientoPersonal: res.aspectosPsicolaborales7A ? "A" : res.aspectosPsicolaborales7D ? "D" : res.aspectosPsicolaborales7NA ? "NA" : res.aspectosPsicolaborales7NM ? "NM" : res.aspectosPsicolaborales7PD ? "PD" : undefined,
         motivacion: res.aspectosPsicolaborales8A ? "A" : res.aspectosPsicolaborales8D ? "D" : res.aspectosPsicolaborales8NA ? "NA" : res.aspectosPsicolaborales8NM ? "NM" : res.aspectosPsicolaborales8PD ? "PD" : undefined,
 
+            anual: res.anual,
         observaciones: res.observaciones ?? "",
         recomendaciones: res.recomendaciones ?? "",
 
