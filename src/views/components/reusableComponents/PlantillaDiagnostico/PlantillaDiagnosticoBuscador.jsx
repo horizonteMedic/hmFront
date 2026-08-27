@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import InputTextOneLine from "../InputTextOneLine";
+import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
 import SectionFieldset from "../SectionFieldset";
 
 function FilaPlantilla({ p, idx, checked, onToggle, onDobleClick, stripeA, stripeB }) {
@@ -211,40 +211,22 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
     };
 
     return (
-        <SectionFieldset legend="Buscar Plantillas" className="space-y-3">
+        <SectionFieldset legend="Buscar Plantillas" className="space-y-3" fieldsetClassName="bg-white">
             <div className="grid grid-cols-2 gap-3">
-                <InputTextOneLine
-                    label="Código"
-                    name="codigo"
-                    value={filtros.codigo}
-                    onChange={handleFiltro}
-                    labelWidth="90px"
-                />
-                <InputTextOneLine
-                    label="Título"
-                    name="titulo"
-                    value={filtros.titulo}
-                    onChange={handleFiltro}
-                    labelWidth="90px"
-                />
-                <InputTextOneLine
-                    label="Diagnóstico"
+                <FloatingInput id="filtro-codigo" name="codigo" label="Código" value={filtros.codigo} onChange={handleFiltro} />
+                <FloatingInput id="filtro-titulo" name="titulo" label="Título" value={filtros.titulo} onChange={handleFiltro} />
+                <FloatingInput
+                    id="filtro-diagnostico"
                     name="diagnostico"
+                    label="Diagnóstico"
                     value={filtros.diagnostico}
                     onChange={handleFiltro}
-                    labelWidth="90px"
                 />
-                <InputTextOneLine
-                    label="CIE10"
-                    name="cie10"
-                    value={filtros.cie10}
-                    onChange={handleFiltro}
-                    labelWidth="90px"
-                />
+                <FloatingInput id="filtro-cie10" name="cie10" label="CIE10" value={filtros.cie10} onChange={handleFiltro} />
             </div>
 
             <div>
-                <p className="text-xs font-semibold text-gray-600 mb-1">
+                <p className="text-sm font-semibold text-gray-600 my-1">
                     Disponibles ({disponibles.length})
                 </p>
                 <TablaPlantillas
@@ -262,7 +244,7 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
 
             <div>
                 <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs font-semibold text-emerald-700">
+                    <p className="text-sm font-semibold text-emerald-700 my-auto">
                         Seleccionadas ({listaSeleccionados.length})
                     </p>
                     <div className="flex gap-2">

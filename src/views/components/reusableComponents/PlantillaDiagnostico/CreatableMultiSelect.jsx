@@ -112,6 +112,10 @@ export default function CreatableMultiSelect({
                 </label>
             )}
             <div className="relative">
+                <FontAwesomeIcon
+                    icon={faSearch}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
+                />
                 <input
                     type="text"
                     disabled={disabled}
@@ -122,8 +126,8 @@ export default function CreatableMultiSelect({
                     }}
                     onFocus={() => setShowDropdown(true)}
                     placeholder={placeholder}
-                    className={`border rounded px-2 py-1.5 pl-9 pr-8 w-full ${
-                        disabled ? "bg-gray-300" : ""
+                    className={`block pl-9 pr-8 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] ${
+                        disabled ? "bg-gray-100" : ""
                     }`}
                 />
                 {loadingAll && (
