@@ -6,7 +6,6 @@ import {
     faSave,
     faSpinner,
     faTimes,
-    faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
@@ -25,7 +24,7 @@ export default function CatalogoSimpleManager({
     token,
     usuarioCreacion,
 }) {
-    const { items, filtro, setFiltro, loading, crear, actualizar, eliminar, refresh } =
+    const { items, filtro, setFiltro, loading, crear, actualizar, refresh } =
         useCatalogoSimple({ token, usuarioCreacion, api });
 
     const [editId, setEditId] = useState(null);
@@ -72,23 +71,6 @@ export default function CatalogoSimpleManager({
         } finally {
             setSaving(false);
         }
-    };
-
-    const handleEliminar = async (id) => {
-        const confirm = await Swal.fire({
-            title: "¿Eliminar registro?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        });
-        if (!confirm.isConfirmed) return;
-        const res = await eliminar(id);
-        if (!res || res.error || res.status) {
-            Swal.fire("Error", "No se pudo eliminar el registro", "error");
-            return;
-        }
-        refresh();
     };
 
     return (
@@ -174,13 +156,6 @@ export default function CatalogoSimpleManager({
                                                 className="text-blue-600 hover:text-blue-800"
                                             >
                                                 <FontAwesomeIcon icon={faPencil} />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEliminar(item.id)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
                                             </button>
                                         </>
                                     )}

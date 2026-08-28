@@ -29,12 +29,6 @@ const postJson = (url, body, token) =>
         body: JSON.stringify(body),
     }).then((res) => (res.ok ? res.json().then(unwrap) : res));
 
-const deleteJson = (url, token) =>
-    fetch(`${URLAzure}${url}`, {
-        method: "DELETE",
-        headers: jsonHeaders(token),
-    }).then((res) => (res.ok ? res.json().then(unwrap) : res));
-
 const getJson = (url, token) => getFetch(url, token).then(unwrap);
 
 // ---------- CIE10 (solo búsqueda, catálogo existente) ----------
@@ -44,42 +38,36 @@ export const buscarCie10 = (q, token) =>
     );
 
 // ---------- Recomendación ----------
-export const getRecomendaciones = (filtro, token) =>
-    getJson(`/api/v01/ct/recomendacion${buildQuery({ filtro })}`, token);
+// El GET ya no acepta filtro por query: siempre trae el listado completo de
+// activas y se filtra en el front (ver useCatalogoSimple/CreatableMultiSelect).
+export const getRecomendaciones = (token) => getJson(`/api/v01/ct/recomendacion`, token);
 
-export const getRecomendacion = (id, token) =>
-    getJson(`/api/v01/ct/recomendacion/${id}`, token);
-
-// Registra (id null) o actualiza (id enviado) una recomendación.
-export const guardarRecomendacion = ({ id = null, descripcion, usuarioRegistro }, token) =>
+// Registra (id null) o actualiza (id enviado) una recomendación. Ya no hay
+// endpoint de eliminación.
+export const guardarRecomendacion = ({ id = null, descripcion, usuarioRegistro, usuarioActualizacion }, token) =>
     postJson(
         `/api/v01/ct/recomendacion/registrarActualizar`,
-        { id, descripcion, usuarioRegistro },
+        { id, descripcion, usuarioRegistro, usuarioActualizacion },
         token
     );
-
-export const eliminarRecomendacion = (id, token) =>
-    deleteJson(`/api/v01/ct/recomendacion/eliminar/${id}`, token);
 
 // ---------- Restricción ----------
-export const getRestricciones = (filtro, token) =>
-    getJson(`/api/v01/ct/restriccion${buildQuery({ filtro })}`, token);
+export const getRestricciones = (token) => getJson(`/api/v01/ct/restriccion`, token);
 
-export const getRestriccion = (id, token) =>
-    getJson(`/api/v01/ct/restriccion/${id}`, token);
-
-// Registra (id null) o actualiza (id enviado) una restricción.
-export const guardarRestriccion = ({ id = null, descripcion, usuarioRegistro }, token) =>
+export const guardarRestriccion = ({ id = null, descripcion, usuarioRegistro, usuarioActualizacion }, token) =>
     postJson(
         `/api/v01/ct/restriccion/registrarActualizar`,
-        { id, descripcion, usuarioRegistro },
+        { id, descripcion, usuarioRegistro, usuarioActualizacion },
         token
     );
 
-export const eliminarRestriccion = (id, token) =>
-    deleteJson(`/api/v01/ct/restriccion/eliminar/${id}`, token);
-
-// ---------- Plantilla de Diagnóstico ----------
+// ---------- Diagnóstico (antes "Plantilla de Diagnóstico") ----------
+// PENDIENTE: el backend confirmó que también cambiaron los endpoints GET
+// (listado con filtros y obtener por id) de este recurso, pero aún no
+// mandaron el nuevo contrato. Mientras tanto se deja apuntando al contrato
+// anterior (/api/v01/ct/plantillaDiagnostico) como placeholder: el buscador
+// y "editar/clonar" van a fallar (mostrarán "sin resultados") hasta que se
+// actualice esto con el nuevo swagger.
 export const getPlantillasDiagnostico = (filtros, token) =>
     getJson(
         `/api/v01/ct/plantillaDiagnostico${buildQuery({
@@ -94,28 +82,24 @@ export const getPlantillasDiagnostico = (filtros, token) =>
 export const getPlantillaDiagnostico = (id, token) =>
     getJson(`/api/v01/ct/plantillaDiagnostico/${id}`, token);
 
-// Registra (idPlantilla null) o actualiza (idPlantilla enviado) una plantilla.
-export const guardarPlantillaDiagnostico = (data, usuarioCreacion, token) =>
-    postJson(
-        `/api/v01/ct/plantillaDiagnostico/registrarActualizar`,
-        {
-            idPlantilla: data.idPlantilla ?? null,
-            codigo: data.codigo,
-            titulo: data.titulo,
-            // El esquema de la API no expone "diagnostico" en el DTO de
-            // request, pero el GET de listado sí lo acepta como filtro. Se
-            // envía igual por si el backend lo persiste; si lo ignora, no
-            // afecta el resto del payload.
-            diagnostico: data.diagnostico,
-            cie10Cods: data.cie10Cods || [],
-            recomendacionIds: data.recomendacionIds || [],
-            recomendacionesNuevas: data.recomendacionesNuevas || [],
-            restriccionIds: data.restriccionIds || [],
-            restriccionesNuevas: data.restriccionesNuevas || [],
-            usuarioCreacion,
-        },
-        token
-    );
-
-export const eliminarPlantillaDiagnostico = (id, token) =>
-    deleteJson(`/api/v01/ct/plantillaDiagnostico/eliminar/${id}`, token);
+// Registra (POST /diagnostico/registrar, sin id) o actualiza
+// (POST /diagnostico/actualizar, con id) un diagnóstico. Ya no admite crear
+// recomendaciones/restricciones "al vuelo": solo ids ya existentes
+// (idsRecomendacion / idsRestriccion). Tampoco hay endpoint de eliminación.
+export const guardarPlantillaDiagnostico = (data, usuario, token) => {
+    const body = {
+        id: data.id ?? null,
+        codigo: data.codigo,
+        titulo: data.titulo,
+        diagnostico: data.diagnostico,
+        cie10Cods: data.cie10Cods || [],
+        idsRestriccion: data.idsRestriccion || [],
+        idsRecomendacion: data.idsRecomendacion || [],
+        usuarioRegistro: usuario,
+        usuarioActualizacion: usuario,
+    };
+    const url = data.id
+        ? `/api/v01/ct/diagnostico/actualizar`
+        : `/api/v01/ct/diagnostico/registrar`;
+    return postJson(url, body, token);
+};

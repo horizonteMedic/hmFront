@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
-
-let tempIdCounter = 0;
-const nextTempId = () => `nuevo-${Date.now()}-${tempIdCounter++}`;
+import Swal from "sweetalert2";
 
 /**
  * Selector múltiple reutilizable: carga TODA la lista de {id, descripcion}
  * una sola vez (vía `fetchAll`) y filtra en el front mientras el usuario
  * escribe. Al hacer click sin escribir nada, muestra la lista completa.
- * Si no existe el ítem que se busca, permite crearlo en el momento (queda
- * marcado `isNew` hasta que el formulario padre lo persista).
+ * Si no existe el ítem que se busca, y se pasa `onCreate`, lo crea de
+ * inmediato contra su propio endpoint (el diagnóstico ya no admite crear
+ * recomendaciones/restricciones "al vuelo", solo referenciar ids reales).
  */
 export default function CreatableMultiSelect({
     label,
     fetchAll,
+    onCreate,
     selected = [],
     onChange,
     placeholder = "Buscar...",
@@ -25,6 +25,7 @@ export default function CreatableMultiSelect({
     const [allItems, setAllItems] = useState([]);
     const [query, setQuery] = useState("");
     const [loadingAll, setLoadingAll] = useState(false);
+    const [creating, setCreating] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const boxRef = useRef(null);
 
@@ -75,24 +76,33 @@ export default function CreatableMultiSelect({
         setShowDropdown(false);
     };
 
-    const addNew = () => {
+    const addNew = async () => {
         const descripcion = query.trim().toUpperCase();
-        if (!descripcion) return;
+        if (!descripcion || !onCreate) return;
         const yaExiste = selected.some(
             (s) => (s.descripcion || "").toUpperCase() === descripcion
         );
         if (yaExiste) return;
-        onChange([...selected, { tempId: nextTempId(), descripcion, isNew: true }]);
-        setQuery("");
-        setShowDropdown(false);
+
+        setCreating(true);
+        try {
+            const res = await onCreate(descripcion);
+            if (!res || res.error || res.status || res.id == null) {
+                Swal.fire("Error", "No se pudo crear el registro", "error");
+                return;
+            }
+            const nuevoItem = { id: res.id, descripcion: res.descripcion || descripcion };
+            onChange([...selected, nuevoItem]);
+            setAllItems((prev) => [...prev, nuevoItem]);
+            setQuery("");
+            setShowDropdown(false);
+        } finally {
+            setCreating(false);
+        }
     };
 
     const removeItem = (item) => {
-        onChange(
-            selected.filter((s) =>
-                item.id != null ? s.id !== item.id : s.tempId !== item.tempId
-            )
-        );
+        onChange(selected.filter((s) => s.id !== item.id));
     };
 
     const q = query.trim().toUpperCase();
@@ -130,7 +140,7 @@ export default function CreatableMultiSelect({
                         disabled ? "bg-gray-100" : ""
                     }`}
                 />
-                {loadingAll && (
+                {(loadingAll || creating) && (
                     <FontAwesomeIcon
                         icon={faSpinner}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-sm animate-spin pointer-events-none"
@@ -152,12 +162,14 @@ export default function CreatableMultiSelect({
                                 {item.descripcion}
                             </div>
                         ))}
-                        {allowCreate && query.trim() && !exactMatch && (
+                        {allowCreate && onCreate && query.trim() && !exactMatch && (
                             <div
-                                onMouseDown={addNew}
-                                className="px-3 py-2 text-sm cursor-pointer hover:bg-emerald-50 text-emerald-700 font-semibold flex items-center gap-2"
+                                onMouseDown={creating ? undefined : addNew}
+                                className={`px-3 py-2 text-sm flex items-center gap-2 text-emerald-700 font-semibold ${
+                                    creating ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-emerald-50"
+                                }`}
                             >
-                                <FontAwesomeIcon icon={faPlus} />
+                                <FontAwesomeIcon icon={creating ? faSpinner : faPlus} spin={creating} />
                                 Crear "{query.trim().toUpperCase()}"
                             </div>
                         )}
@@ -169,17 +181,10 @@ export default function CreatableMultiSelect({
                 <div className="flex flex-wrap gap-2 pt-1">
                     {selected.map((item) => (
                         <span
-                            key={item.id ?? item.tempId}
-                            className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm border ${
-                                item.isNew
-                                    ? "bg-amber-50 border-amber-300 text-amber-800"
-                                    : "bg-green-50 border-green-200 text-green-800"
-                            }`}
+                            key={item.id}
+                            className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-sm border bg-green-50 border-green-200 text-green-800"
                         >
                             {item.descripcion}
-                            {item.isNew && (
-                                <span className="text-[10px] uppercase font-bold">nuevo</span>
-                            )}
                             {!disabled && (
                                 <button
                                     type="button"
