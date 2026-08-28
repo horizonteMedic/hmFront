@@ -182,7 +182,7 @@ export default function BombaElectrica() {
                 )}
             </div>
 
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <div className="flex gap-x-3 w-full">
                     <InputTextOneLine
                         label="N° Orden"
@@ -194,7 +194,7 @@ export default function BombaElectrica() {
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} className="2xl:hidden" />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
                 </div>
                 <InputTextOneLine
                     label="Fecha"

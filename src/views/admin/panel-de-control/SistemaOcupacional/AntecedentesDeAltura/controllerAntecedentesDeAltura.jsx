@@ -4,23 +4,76 @@ import {
   GetInfoServicioDefault,
   LoadingDefault,
   PrintHojaRDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { convertirGenero } from "../../../../utils/helpers";
+import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../utils/registroOcupacionalUtils";
 
+// ===== Configuración =====
 const obtenerReporteUrl =
   "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura";
 export const registrarUrl =
   "/api/v01/ct/antecedentesEnfermedadesAltura/registrarActualizarAntecedentesEnfermedadesAltura";
 
-export const GetInfoServicio = async (
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build.
+// Este examen tiene 2 formatos posibles (AnexoCB / AnexoCB_boro) que el backend resuelve
+// vía `nameJasper`, por eso se mantiene PrintHojaRDefault (resolución dinámica por carpeta).
+const jasperModules = import.meta.glob("../../../../jaspers/AntecedentesAltura/*.jsx");
+const rutaCarpeta = "../../../../jaspers/AntecedentesAltura";
+
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (!res || res.error || !res.norden) {
+    Swal.fire({
+      icon: "warning",
+      title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+      html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+    });
+    return;
+  }
+
+  // Validación HTA (mal de altura): si la presión está fuera de rango se marca el
+  // antecedente de hipertensión arterial automáticamente.
+  const sistolica = parseFloat(res.sistolica);
+  const diastolica = parseFloat(res.diastolica);
+  const hipertension =
+    (!isNaN(sistolica) && sistolica >= 140) ||
+    (!isNaN(diastolica) && diastolica >= 90);
+
+  set((prev) => ({
+    ...prev,
+    norden: res.norden ?? "",
+    nombres: res.nombresApellidos ?? "",
+    fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+    lugarNacimiento: res.lugarNacimiento ?? "",
+    estadoCivil: res.estadoCivil ?? "",
+    nivelEstudios: res.nivelEstudios ?? "",
+    dni: res.dni ?? "",
+    edad: res.edad ?? "",
+    sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+    empresa: res.empresa ?? "",
+    contrata: res.contrata ?? "",
+    ocupacion: res.areaO ?? "",
+    cargoDesempenar: res.cargo ?? "",
+    cargo: res.cargo ?? "",
+
+    hipertensionArterial: hipertension,
+    tieneRegistro: false,
+  }));
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (
   nro,
   tabla,
   set,
   token,
-  onFinish = () => { }
+  onFinish = () => {}
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -29,63 +82,74 @@ export const GetInfoServicio = async (
     obtenerReporteUrl,
     onFinish
   );
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      norden: res.antecedentes?.norden ?? "",
-      codigoAntecedentesAltura: res.antecedentes?.codigoEnfermedadesAltura,
-      nombres: `${res.nombres ?? ""} ${res.apellidos ?? ""}`,
-      edad: res.edad,
-      fechaNacimiento: formatearFechaCorta(res?.fechaNacimientoPaciente ?? ""),
-      fechaExam: res.antecedentes?.fechaAntecedente ?? "",
-      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      estadoCivil: res.estadoCivilPaciente ?? "",
-      nivelEstudios: res.nivelEstudiosPaciente ?? "",
-      contrata: res.contrata ?? "",
-      empresa: res.empresa ?? "",
-      ocupacion: res.ocupacionPaciente ?? "",
-      cargoDesempenar: res.cargoPaciente ?? "",
-      dni: res.dni ?? "",
-      sexo: res?.sexo === "M" ? "MASCULINO" : "FEMENINO",
-      cargo: res.cargo ?? "",
-      apto: res.antecedentes?.esApto,
+  if (!res) return;
 
-      // Antecedentes patológicos
-      accidenteCerebrovascular: res.antecedentes?.accidenteCerebroVascularSi,
-      anginaInestable: res.antecedentes?.anginaInestableSi,
-      antecedenteBypass: res.antecedentes?.antecedenteBypassArterialSi,
-      antecedenteEdemaCerebral: res.antecedentes?.antecedenteEdemaCerebralSi,
-      antecedenteEdemaPulmonar: res.antecedentes?.antecedenteEdemaPulmonarSi,
-      antecedenteNeumotorax: res.antecedentes?.antecedenteNeumotoraxSi,
-      arritmiaCardiaca: res.antecedentes?.arritmiaCardiacaSi,
-      cardiomiopatiaHipertrofica: res.antecedentes?.cardiomiopatiaSi,
-      cirugiaMayor: res.antecedentes?.cirujiaMayorSi,
-      insuficienciaValvulaAortica: res.antecedentes?.cualquierInsuficienciaSi,
-      diabetesMellitus: res.antecedentes?.diabetesMellitusSi,
-      embarazo: res.antecedentes?.embarazoSi,
-      epilepsia: res.antecedentes?.epilepsiaSi,
-      epoc: res.antecedentes?.epocSi,
-      eritrocitosisExcesiva: res.antecedentes?.eritrocitosisSi,
-      hipertensionArterial: res.antecedentes?.hipertensionArterialSi,
-      hipertensionPulmonar: res.antecedentes?.hipertensionPulmonarSi,
-      infartoMiocardio: res.antecedentes?.infartoMiocardioSi,
-      insuficienciaCardiaca: res.antecedentes?.insuficienciaCardiacaSi,
-      patologiaHemorragicaRetina: res.antecedentes?.patologiaHemorragicaSi,
-      patologiaValvularCardiaca: res.antecedentes?.patologiaValvularSi,
-      presenciaMarcapasos: res.antecedentes?.presenciaMarcaPasosSi,
-      riesgoCardiovascularAlto: res.antecedentes?.presenciaRiesgoCardioSi,
-      trastornosCoagulacion: res.antecedentes?.transtornoCoagulacionSi,
-      trombosisVenosaCerebral: res.antecedentes?.trombosisSi,
-      otros: res.antecedentes?.otrosSi,
-      otrosDescripcion: res.antecedentes?.otrosDescripcion ?? "",
-      comentarios: res.antecedentes?.observaciones ?? "",
+  const a = res.antecedentes ?? {};
 
-      user_medicoFirma: res.antecedentes.usuarioFirma,
-    }));
-  }
+  set((prev) => ({
+    ...prev,
+    norden: a.norden ?? res.norden ?? "",
+    codigoAntecedentesAltura: a.codigoEnfermedadesAltura ?? null,
+    nombres: `${res.nombres ?? ""} ${res.apellidos ?? ""}`.trim(),
+    edad: res.edad ?? "",
+    fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+    fechaExam: a.fechaAntecedente ?? "",
+    lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+    estadoCivil: res.estadoCivilPaciente ?? "",
+    nivelEstudios: res.nivelEstudiosPaciente ?? "",
+    contrata: res.contrata ?? "",
+    empresa: res.empresa ?? "",
+    ocupacion: res.ocupacionPaciente ?? "",
+    cargoDesempenar: res.cargoPaciente ?? "",
+    dni: res.dni ?? "",
+    sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
+    cargo: res.cargo ?? "",
+    apto: a.esApto,
+
+    // Antecedentes patológicos
+    accidenteCerebrovascular: a.accidenteCerebroVascularSi,
+    anginaInestable: a.anginaInestableSi,
+    antecedenteBypass: a.antecedenteBypassArterialSi,
+    antecedenteEdemaCerebral: a.antecedenteEdemaCerebralSi,
+    antecedenteEdemaPulmonar: a.antecedenteEdemaPulmonarSi,
+    antecedenteNeumotorax: a.antecedenteNeumotoraxSi,
+    arritmiaCardiaca: a.arritmiaCardiacaSi,
+    cardiomiopatiaHipertrofica: a.cardiomiopatiaSi,
+    cirugiaMayor: a.cirujiaMayorSi,
+    insuficienciaValvulaAortica: a.cualquierInsuficienciaSi,
+    diabetesMellitus: a.diabetesMellitusSi,
+    embarazo: a.embarazoSi,
+    epilepsia: a.epilepsiaSi,
+    epoc: a.epocSi,
+    eritrocitosisExcesiva: a.eritrocitosisSi,
+    hipertensionArterial: a.hipertensionArterialSi,
+    hipertensionPulmonar: a.hipertensionPulmonarSi,
+    infartoMiocardio: a.infartoMiocardioSi,
+    insuficienciaCardiaca: a.insuficienciaCardiacaSi,
+    patologiaHemorragicaRetina: a.patologiaHemorragicaSi,
+    patologiaValvularCardiaca: a.patologiaValvularSi,
+    presenciaMarcapasos: a.presenciaMarcaPasosSi,
+    riesgoCardiovascularAlto: a.presenciaRiesgoCardioSi,
+    trastornosCoagulacion: a.transtornoCoagulacionSi,
+    trombosisVenosaCerebral: a.trombosisSi,
+    otros: a.otrosSi,
+    otrosDescripcion: a.otrosDescripcion ?? "",
+    comentarios: a.observaciones ?? "",
+
+    user_medicoFirma: a.usuarioFirma ? a.usuarioFirma : prev.user_medicoFirma,
+
+    // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+    fechaRegistro: a.fechaRegistro ?? res.fechaRegistro ?? "",
+    userRegistro: a.userRegistro ?? res.userRegistro ?? a.usuarioRegistro ?? "",
+    fechaActualizacion: a.fechaActualizacion ?? res.fechaActualizacion ?? "",
+    usuarioActualizacion:
+      a.usuarioActualizacion ?? res.usuarioActualizacion ?? "",
+    tieneRegistro: true,
+  }));
 };
 
-export const construirBodyAntecedentesDeAltura = (form, user) => ({
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
   codigoEnfermedadesAltura: form.codigoAntecedentesAltura,
   fechaAntecedente: form.fechaExam,
   edad: form.edad,
@@ -151,39 +215,21 @@ export const construirBodyAntecedentesDeAltura = (form, user) => ({
   observaciones: form.comentarios,
 
   usuarioFirma: form.user_medicoFirma,
-  usuarioRegistro: user,
 });
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-
-  const body = construirBodyAntecedentesDeAltura(form, user);
-
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). El backend de este módulo espera la
+// clave "usuarioRegistro" (no "userRegistro") para el usuario que registra.
+export const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro,
+    fechaRegistro: form.fechaRegistro,
+    campoUserRegistro: "usuarioRegistro",
   });
-};
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-  GetInfoServicio(nro, tabla, set, token, () => {
-    Swal.close();
-  });
-};
-
+// ===== Impresión =====
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  const jasperModules = import.meta.glob(
-    "../../../../jaspers/AntecedentesAltura/*.jsx"
-  );
   PrintHojaRDefault(
     nro,
     token,
@@ -191,64 +237,53 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     datosFooter,
     obtenerReporteUrl,
     jasperModules,
-    "../../../../jaspers/AntecedentesAltura"
+    rutaCarpeta
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+  verificarRegistro({
     nro,
     tabla,
     token,
-    set,
     sede,
-    () => {
-      //NO Tiene registro
-      GetInfoPac(nro, set, token, sede);
-    },
-    () => {
-      //Tiene registro
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Antecedentes de Altura.",
-          "warning"
-        );
-      });
-    }
-  );
-};
-
-export const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    //Validacion HTA
-    let presion_sistolica = parseFloat(res.sistolica);
-    let presion_diastolica = parseFloat(res.diastolica);
-    let hipertension = false;
-    if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
-      (presion_sistolica >= 140 || presion_diastolica >= 90)) {
-      // concatenacionObservacion += "HTA NO CONTROLADA.\n";
-      hipertension = true;
-    }
-
-    set((prev) => ({
-      ...prev,
-      ...res,
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      nombres: res.nombresApellidos,
-      dni: res.dni,
-      sexo: convertirGenero(res.genero ?? ""),
-      cargo: res.cargo,
-
-      ocupacion: res.areaO,
-      cargoDesempenar: res.cargo,
-
-      hipertensionArterial: hipertension,
-    }));
-  }
-};
+    onNuevo: () => GetInfoServicio(nro, set, token, sede),
+    onExistente: () =>
+      GetInfoServicioEditar(nro, tabla, set, token, () => {
+        Swal.fire({
+          icon: "warning",
+          title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+          html: "Este paciente ya cuenta con registros de Antecedentes de Altura.",
+        });
+      }),
+  });
 
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);

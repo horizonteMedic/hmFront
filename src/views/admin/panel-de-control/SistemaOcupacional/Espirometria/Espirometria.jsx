@@ -1,25 +1,57 @@
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputCheckbox,
     InputTextArea,
     InputsBooleanRadioGroup,
     InputsRadioGroup,
-    CIE10List
+    CIE10List,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
-import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerEspirometria";
-import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { useForm } from "../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+import {
+    handleSubirArchivoMasivo,
+    PrintHojaR,
+    ReadArchivosForm,
+    SubmitDataService,
+    UpdateDataService,
+    VerifyTR,
+} from "./controllerEspirometria";
 import { handleSubirArchivo } from "../Altura18/controllerAltura18";
 
 const tabla = "funcion_abs";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "fvc",
+    "fev1",
+    "fev1_fvc",
+    "fef",
+    "fvcTeorico",
+    "fev1Teorico",
+    "interpretacion",
+    "pasoExamen",
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+    "user_doctorExtra",
+    "nombre_doctorExtra",
+];
 
 export default function Espirometria() {
     const today = getToday();
@@ -43,6 +75,12 @@ export default function Espirometria() {
         sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
+
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         fvc: "",
         fev1: "",
@@ -88,12 +126,22 @@ export default function Espirometria() {
         ohlaFumoCigarroCuantos: "",
         ohlaEjercicioFisico: null,
         ohlaResultadoPrueba: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
         form,
         setForm,
         handleChange,
+        handleChangeNumber,
         handleChangeNumberDecimals,
         handleFocusNext,
         handleChangeSimple,
@@ -105,16 +153,63 @@ export default function Espirometria() {
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "espirometria" });
 
-    const [visualerOpen, setVisualerOpen] = useState(null)
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, {
+        tieneRegistro: form.tieneRegistro,
+        camposEditables: CAMPOS_EDITABLES,
+    });
+
+    // Cada médico se compone de 2 campos (id + nombre): se detecta el cambio por el id
+    // y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorAsignadoEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctorAsignado = () =>
+        revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
+    const isDoctorExtraEdited = isFieldEdited("user_doctorExtra");
+    const revertDoctorExtra = () =>
+        revertFields(["user_doctorExtra", "nombre_doctorExtra"]);
+
+    const [visualerOpen, setVisualerOpen] = useState(null);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -123,25 +218,53 @@ export default function Espirometria() {
             PrintHojaR(form.norden, token, tabla);
         });
     };
-    console.log(form)
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
+            <div className="sticky top-2 z-20 flex justify-end items-center gap-2 pointer-events-none">
+                <RegistroEstadoPill
+                    tieneRegistro={form.tieneRegistro}
+                    className={hayRegistroCargado ? "" : "invisible"}
                 />
+                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+                    <button
+                        type="button"
+                        onClick={habilitarEdicion}
+                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+                    >
+                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+                    </button>
+                )}
+            </div>
+
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumber}
+                        onKeyUp={handleSearch}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     name="fecha"
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -155,6 +278,7 @@ export default function Espirometria() {
                     label={<span className="text-red-500">No Pasó Examen</span>}
                     name="pasoExamen"
                     checked={form.pasoExamen}
+                    disabled={camposDeshabilitados}
                     onChange={(e) => {
                         setForm((prev) => ({
                             ...prev,
@@ -173,6 +297,7 @@ export default function Espirometria() {
                     label="Es OHLA"
                     name="esOHLA"
                     checked={form.esOHLA}
+                    disabled={camposDeshabilitados}
                     onChange={(e) => {
                         const checked = e.target.checked;
                         setForm((prev) => ({
@@ -212,6 +337,9 @@ export default function Espirometria() {
                         value={form?.fvc}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fvc")}
+                        onRevert={() => revertField("fvc")}
                     />
                     <InputTextOneLine
                         label="FEV1 %"
@@ -219,6 +347,9 @@ export default function Espirometria() {
                         value={form?.fev1}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fev1")}
+                        onRevert={() => revertField("fev1")}
                     />
                     <InputTextOneLine
                         label="FEV1/FVC %"
@@ -226,6 +357,9 @@ export default function Espirometria() {
                         value={form?.fev1_fvc}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fev1_fvc")}
+                        onRevert={() => revertField("fev1_fvc")}
                     />
                     <InputTextOneLine
                         label="FEF 25-75 %"
@@ -233,33 +367,16 @@ export default function Espirometria() {
                         value={form?.fef}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fef")}
+                        onRevert={() => revertField("fef")}
                     />
                 </div>
                 <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Peso"
-                        name="peso"
-                        value={form?.peso}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Talla"
-                        name="talla"
-                        value={form?.talla}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Sistólica"
-                        name="sistolica"
-                        value={form?.sistolica}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Diastólica"
-                        name="diastolica"
-                        value={form?.diastolica}
-                        disabled
-                    />
+                    <InputTextOneLine label="Peso" name="peso" value={form?.peso} disabled />
+                    <InputTextOneLine label="Talla" name="talla" value={form?.talla} disabled />
+                    <InputTextOneLine label="Sistólica" name="sistolica" value={form?.sistolica} disabled />
+                    <InputTextOneLine label="Diastólica" name="diastolica" value={form?.diastolica} disabled />
                 </div>
                 <div className="space-y-3">
                     <InputTextOneLine
@@ -268,6 +385,9 @@ export default function Espirometria() {
                         value={form?.fvcTeorico}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fvcTeorico")}
+                        onRevert={() => revertField("fvcTeorico")}
                     />
                     <InputTextOneLine
                         label="FEV1 Teórico"
@@ -275,6 +395,9 @@ export default function Espirometria() {
                         value={form?.fev1Teorico}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("fev1Teorico")}
+                        onRevert={() => revertField("fev1Teorico")}
                     />
                 </div>
                 <InputTextArea
@@ -284,6 +407,9 @@ export default function Espirometria() {
                     value={form?.interpretacion}
                     className="xl:col-span-3 ml-0"
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("interpretacion")}
+                    onRevert={() => revertField("interpretacion")}
                 />
                 <div className="bg-green-200 p-3 rounded-xl col-span-3">
                     <CIE10List
@@ -292,6 +418,7 @@ export default function Espirometria() {
                         label="Interpretación CIE10"
                         token={token}
                         setForm={setForm}
+                        disabled={camposDeshabilitados}
                     />
                 </div>
             </SectionFieldset>
@@ -304,6 +431,7 @@ export default function Espirometria() {
                             name="ohlaCirugiaPulmonToraxAbdomen"
                             value={form.ohlaCirugiaPulmonToraxAbdomen}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -311,6 +439,7 @@ export default function Espirometria() {
                             name="ohlaInfartoCorazon"
                             value={form.ohlaInfartoCorazon}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -318,6 +447,7 @@ export default function Espirometria() {
                             name="ohlaDesprendimientoRetina"
                             value={form.ohlaDesprendimientoRetina}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -325,6 +455,7 @@ export default function Espirometria() {
                             name="ohlaHospitalizadoCorazon"
                             value={form.ohlaHospitalizadoCorazon}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -332,6 +463,7 @@ export default function Espirometria() {
                             name="ohlaMedicamentoTuberculosis"
                             value={form.ohlaMedicamentoTuberculosis}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -339,6 +471,7 @@ export default function Espirometria() {
                             name="ohlaEmbarazada"
                             value={form.ohlaEmbarazada}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputTextOneLine
@@ -356,6 +489,7 @@ export default function Espirometria() {
                             name="ohlaInfeccionRespiratoria"
                             value={form.ohlaInfeccionRespiratoria}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -363,6 +497,7 @@ export default function Espirometria() {
                             name="ohlaUsoMedicamentoRespiracion"
                             value={form.ohlaUsoMedicamentoRespiracion}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsBooleanRadioGroup
@@ -370,6 +505,7 @@ export default function Espirometria() {
                             name="ohlaFumoCigarro"
                             value={form.ohlaFumoCigarro}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         {form.ohlaFumoCigarro && (
@@ -378,6 +514,7 @@ export default function Espirometria() {
                                 name="ohlaFumoCigarroCuantos"
                                 value={form.ohlaFumoCigarroCuantos}
                                 onChange={handleChangeNumberDecimals}
+                                disabled={camposDeshabilitados}
                                 labelWidth="220px"
                             />
                         )}
@@ -386,6 +523,7 @@ export default function Espirometria() {
                             name="ohlaEjercicioFisico"
                             value={form.ohlaEjercicioFisico}
                             onChange={handleRadioButtonBoolean}
+                            disabled={camposDeshabilitados}
                             labelOnTop
                         />
                         <InputsRadioGroup
@@ -394,6 +532,7 @@ export default function Espirometria() {
                             labelOnTop
                             value={form.ohlaResultadoPrueba}
                             onChange={handleRadioButton}
+                            disabled={camposDeshabilitados}
                             vertical
                             options={[
                                 { label: "Prueba completa", value: "COMPLETA" },
@@ -406,6 +545,7 @@ export default function Espirometria() {
                             name="ohlaResultadoPrueba"
                             value={form.ohlaResultadoPrueba}
                             onChange={handleRadioButton}
+                            disabled={camposDeshabilitados}
                             vertical
                             options={[
                                 { label: "Incompleta: El(la) entrevistado(a) no entendió las instrucciones", value: "INCOMPLETA_NO_ENTENDIO" },
@@ -424,6 +564,9 @@ export default function Espirometria() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
                 <EmpleadoComboBox
                     value={form.nombre_doctorAsignado}
@@ -432,6 +575,9 @@ export default function Espirometria() {
                     onChange={handleChangeSimple}
                     nameField="nombre_doctorAsignado"
                     idField="user_doctorAsignado"
+                    disabled={camposDeshabilitados}
+                    edited={isDoctorAsignadoEdited}
+                    onRevert={revertDoctorAsignado}
                 />
                 <EmpleadoComboBox
                     value={form.nombre_doctorExtra}
@@ -440,16 +586,37 @@ export default function Espirometria() {
                     onChange={handleChangeSimple}
                     nameField="nombre_doctorExtra"
                     idField="user_doctorExtra"
+                    disabled={camposDeshabilitados}
+                    edited={isDoctorExtraEdited}
+                    onRevert={revertDoctorExtra}
                 />
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
+
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
@@ -468,6 +635,6 @@ export default function Espirometria() {
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 }

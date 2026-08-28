@@ -4,9 +4,9 @@ import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../utils/apiHelpers";
 import {
-    GetInfoPac,
     GetInfoServicio,
-    construirBodyAntecedentesDeAltura,
+    GetInfoServicioEditar,
+    construirBody,
     registrarUrl,
 } from "../controllerAntecedentesDeAltura";
 import { getAntecedentesDeAlturaInitialFormState } from "../antecedentesDeAlturaFormDefaults";
@@ -82,7 +82,7 @@ export const handleSubirExcelCargaMasivaAntecedentesDeAltura = async (setData) =
 };
 
 // Obtiene los datos básicos del paciente para un norden nuevo (sin registro previo),
-// reutilizando el mismo análisis que usa el formulario individual (GetInfoPac).
+// reutilizando el mismo análisis que usa el formulario individual (GetInfoServicio).
 const obtenerDatosPacienteAntecedentesDeAltura = (
     norden,
     { token, userDNI, userCMP, userEmail, userDireccion, userName, userlogued, fecha, sede }
@@ -104,11 +104,11 @@ const obtenerDatosPacienteAntecedentesDeAltura = (
             state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
         };
 
-        GetInfoPac(norden, fakeSet, token, sede).then(() => resolve(state));
+        GetInfoServicio(norden, fakeSet, token, sede).then(() => resolve(state));
     });
 
 // Obtiene el código y los datos demográficos de un registro YA EXISTENTE
-// (reutilizando GetInfoServicio, el mismo análisis que usa el formulario
+// (reutilizando GetInfoServicioEditar, el mismo análisis que usa el formulario
 // individual al editar), para poder reemplazarlo sin perder su identificador.
 const obtenerDatosServicioExistenteAntecedentesDeAltura = (norden, { token, tabla }) =>
     new Promise((resolve) => {
@@ -116,7 +116,7 @@ const obtenerDatosServicioExistenteAntecedentesDeAltura = (norden, { token, tabl
         const fakeSet = (updater) => {
             state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
         };
-        GetInfoServicio(norden, tabla, fakeSet, token).then(() => resolve(state));
+        GetInfoServicioEditar(norden, tabla, fakeSet, token).then(() => resolve(state));
     });
 
 // Procesa la lista de N° de Orden uno por uno:
@@ -125,7 +125,7 @@ const obtenerDatosServicioExistenteAntecedentesDeAltura = (norden, { token, tabl
 //     información demográfica y se sobreescribe con los antecedentes
 //     patológicos por defecto (todos en NO), la firma y la fecha elegidas.
 //   - Si no tiene registro -> obtiene los datos básicos del paciente
-//     (GetInfoPac), asigna la firma y fecha elegidas para todos, y crea el
+//     (GetInfoServicio), asigna la firma y fecha elegidas para todos, y crea el
 //     registro como APTO.
 export const guardarCargaMasivaAntecedentesDeAltura = async (
     data,
@@ -207,7 +207,7 @@ export const guardarCargaMasivaAntecedentesDeAltura = async (
             state.user_medicoFirma = medicoUsername;
             state.apto = true;
 
-            const body = construirBodyAntecedentesDeAltura(state, userlogued);
+            const body = construirBody(state, userlogued, false);
             const res = await SubmitData(body, registrarUrl, token);
 
             const ok = res?.id === 1 || !!res?.nOrden || res?.codigo == "201";
