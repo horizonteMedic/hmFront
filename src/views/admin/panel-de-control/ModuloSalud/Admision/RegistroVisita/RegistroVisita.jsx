@@ -5,12 +5,14 @@ import { useForm } from "../../../../../hooks/useForm";
 import Swal from "sweetalert2";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { useEffect, useRef, useState } from "react";
-import { getEspecialidades, getInfoTabla, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
+import { getEspecialidades, getInfoTabla, getVisitaById, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
+import Ticket from "../../../../../jaspers/Ticket/Ticket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faChartLine, faCheck, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faChartLine, faCheck, faDownload, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import ReporteVisitas from "./ReporteVisitas";
 import ReporteDashboard from "./ReporteDashboard";
+import RegistrarNuevaVisita from "./RegistrarNuevaVisita";
 
 export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
   const initialFormState = {
@@ -27,6 +29,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   const [refresh, setRefresh] = useState(false)
   const [modalReportePacientes, setModalReportePacientes] = useState(false)
   const [modalDashboard, setModalDashboard] = useState(false)
+  const [modalRegistrarVisita, setModalRegistrarVisita] = useState(false)
 
 
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
@@ -92,8 +95,38 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   };
 
   const handleSubmit = () => {
-    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) })
+    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, askPrintAfterRegister);
   }
+
+  // ── Imprimir ticket ───────────────────────────────────────────────────────
+  const fetchAndPrint = async (visitaId) => {
+    const datos = await getVisitaById(visitaId, token);
+    Ticket({ datos });
+  };
+
+  const handlePrintConfirm = async (row) => {
+    const result = await Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir el ticket N° ${row.norden}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    });
+    if (result.isConfirmed) fetchAndPrint(row.visitaId);
+  };
+
+  const askPrintAfterRegister = async (res) => {
+    const result = await Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir el ticket N° ${res.norden}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    });
+    if (result.isConfirmed) fetchAndPrint(res.id);
+  };
 
   // ── Búsqueda ──────────────────────────────────────────────────────────────
   const handleSearch = async (e, tipoBusqueda) => {
@@ -103,10 +136,44 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     }
   };
 
+  const handleRegistrarDesdeModal = (paciente) => {
+    if (!paciente) return;
+
+    const seleccionadas = especialidades
+      .filter((e) => e.activo)
+      .map((e) => ({ id: e.id, nombre: e.nombre }));
+
+    const formData = {
+      ...initialFormState,
+      pacienteId: paciente.pacienteId,
+      dni: paciente.dni,
+      nombres: paciente.nombres,
+      Seleccionespecialidades: seleccionadas,
+    };
+
+    SubmitRegistro(
+      formData,
+      token,
+      userlogued,
+      () => setModalRegistrarVisita(false),
+      () => setRefresh(refresh + 1),
+      askPrintAfterRegister
+    );
+  };
+
   return (
     <div className="px-4 max-w-[95%] mx-auto grid  gap-6">
       {/* Columna izquierda: Formulario */}
       <div className="space-y-3">
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setModalRegistrarVisita(true)}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold flex items-center gap-3 shadow-md"
+          >
+            <FontAwesomeIcon icon={faUserPlus} /> Registrar Nueva Visita
+          </button>
+        </div>
         {/*<SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
           <div className="flex gap-4 w-full col-span-full">
             <InputTextOneLine
@@ -177,6 +244,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
             clean={handleLimpiar}
             datosFooter={datosFooter}
             onRowClick={(row) => onVisitaSeleccionada?.(row.visitaId)}
+            onPrintConfirm={handlePrintConfirm}
           />
         </SectionFieldset>
 
@@ -190,12 +258,17 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
         onClose={() => setModalDashboard(false)}
         token={token}
       />}
+      {modalRegistrarVisita && <RegistrarNuevaVisita
+        onClose={() => setModalRegistrarVisita(false)}
+        token={token}
+        onRegistrar={handleRegistrarDesdeModal}
+      />}
     </div>
   );
 }
 
 
-function Table({ data, tabla, set, token, clean, datosFooter, onRowClick }) {
+function Table({ data, tabla, set, token, clean, datosFooter, onRowClick, onPrintConfirm }) {
 
   const columns = [
     {
@@ -251,7 +324,7 @@ function Table({ data, tabla, set, token, clean, datosFooter, onRowClick }) {
       data={data}
       height={780}
       onRowClick={(row) => onRowClick?.(row)}
-      onRowRightClick={(row) => handlePrintConfirm(row.norden)}
+      onRowRightClick={(row) => onPrintConfirm?.(row)}
     />
   );
 }

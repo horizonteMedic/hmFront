@@ -1,27 +1,31 @@
 import { jsPDF } from "jspdf";
 
+const TITULO_DEFAULT = "Campaña de Salud Integral - Caseríos José Carlos Mariátegui, Llaray, El Hospital, Las Pajillas y Quiruvilca";
+
 export default function Ticket({
-    norden = "000001",
-    titulo = "Campaña de Salud Integral - Caseríos José Carlos Mariátegui, Llaray, El Hospital, Las Pajillas y Quiruvilca",
-    nombres = "Robert Daniel Plasencia",
-    dni = "71234567",
-    edad = "28",
-    especialidades = [
-        { nombre: "Medicina General" },
-        { nombre: "Laboratorio" },
-        { nombre: "Psicología" },
-        { nombre: "Odontología" },
-        { nombre: "Nutrición" },
-    ],
+    datos = null,
+    titulo = TITULO_DEFAULT,
 }) {
+    // ── Desestructurar datos de la API ────────────────────────────────────────
+    const visita = datos?.visita ?? {};
+    const paciente = datos?.paciente ?? {};
+    const fichas = datos?.fichas ?? [];
+
+    const norden = String(visita.norden ?? "");
+    const nombres = `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`.trim();
+    const dni = paciente.dni ?? "";
+    const edad = calcularEdad(paciente.fechaNacimiento);
+    const especialidades = fichas.map((f) => ({ nombre: f.especialidad?.nombre ?? "" }));
+    const parentescos = Array.isArray(paciente.parentescos) ? paciente.parentescos : [];
     const ancho = 80;
     const margen = 5;
 
-    // Altura dinámica: base + espacio por filas de especialidades
+    // Altura dinámica: base + parentescos + filas de especialidades
     const filas = Math.ceil(especialidades.length / 2);
-    const altoCelda = 18;
-    const altoBase = 110;
-    const altoDoc = altoBase + filas * altoCelda - 10;
+    const altoCelda = 27;
+    const altoParentesco = parentescos.length > 0 ? 6 + parentescos.length * 5 : 0;
+    const altoBase = 115;
+    const altoDoc = altoBase + altoParentesco + filas * altoCelda - 10;
 
     const doc = new jsPDF({
         orientation: "portrait",
@@ -69,6 +73,31 @@ export default function Ticket({
     doc.text(`${edad} años`, margen + 51, y);
     y += 7;
 
+    // ── Parentesco (solo si existe) ───────────────────────────────────────────
+    if (parentescos.length > 0) {
+        y += 2;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7.5);
+        doc.text("Parentesco:", margen, y);
+        y += 4.5;
+
+        doc.setFontSize(7);
+        parentescos.forEach((p) => {
+            const relacion  = p.tipoRelacion ?? "";
+            const nombreRel = p.nombreRelacionado ?? "";
+            const dniRel    = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
+            const prefijo   = `Es ${relacion} de:`;
+            doc.setFont("helvetica", "bold");
+            doc.text(prefijo, margen + 2, y);
+            const anchoLabel = doc.getTextWidth(prefijo) + 2;
+            doc.setFont("helvetica", "normal");
+            const textoNombre = doc.splitTextToSize(`${nombreRel}${dniRel}`, ancho - margen - anchoLabel - 2);
+            doc.text(textoNombre, margen + 2 + anchoLabel, y);
+            y += Math.max(textoNombre.length * 3.5, 4) + 1;
+        });
+        y += 1;
+    }
+
     // ── Línea separadora ──────────────────────────────────────────────────────
     separador(doc, margen, ancho, y);
     y += 6;
@@ -100,7 +129,7 @@ export default function Ticket({
     const colAncho = (ancho - margen * 2 - 3) / 2;   // ancho de cada celda
     const padding = 2.5;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(6.5);
+    doc.setFontSize(8);
 
     especialidades.forEach((esp, i) => {
         const col = i % 2;
@@ -130,6 +159,17 @@ export default function Ticket({
     imprimir(doc);
 }
 
+function calcularEdad(fechaNacimiento) {
+    if (!fechaNacimiento) return "";
+    const fecha = new Date(fechaNacimiento);
+    if (isNaN(fecha)) return "";
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const cumple = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
+    if (hoy < cumple) edad--;
+    return String(edad);
+}
+
 function separador(doc, margen, ancho, y) {
     doc.setLineDashPattern([1, 1], 0);
     doc.line(margen, y, ancho - margen, y);
@@ -137,11 +177,15 @@ function separador(doc, margen, ancho, y) {
 }
 
 function imprimir(doc) {
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+    doc.autoPrint();
+    const url = URL.createObjectURL(doc.output("blob"));
+    const a = window.open(url, "_blank");
+    if (!a) {
+        // fallback si el navegador bloquea la pestaña
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "ticket.pdf";
+        link.click();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
 }

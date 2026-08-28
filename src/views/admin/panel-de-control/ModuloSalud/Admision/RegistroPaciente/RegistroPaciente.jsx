@@ -14,6 +14,7 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { SearchPacienteDNI, SubmitRegistro } from "./controllerRegistroPaciente";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import RegistroParentesco from "./RegistroParentesco";
 
 // ── Opciones fijas ────────────────────────────────────────────────────────────
 const SEXO_OPTIONS = [{ label: "MASCULINO", value: "M" }, { label: "FEMENINO", value: "F" }];
@@ -34,6 +35,7 @@ const initialFormState = {
 export default function RegistroPaciente({ onRegistrado }) {
   const { token, userlogued, selectedSede } = useSessionData();
   const dniRef = useRef(null);
+  const [modalParentesco, setModalParentesco] = useState(false);
 
   const { form, setForm, handleChange, handleChangeSimple, handleRadioButton } = useForm(initialFormState);
 
@@ -109,6 +111,17 @@ export default function RegistroPaciente({ onRegistrado }) {
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+
+      {/* ── Acciones rápidas ──────────────────────────────────────────── */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setModalParentesco(true)}
+          className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm flex items-center gap-2"
+        >
+          Registrar Parentesco
+        </button>
+      </div>
 
       {/* ── Búsqueda ─────────────────────────────────────────────────── */}
       <SectionFieldset legend="Búsqueda de Paciente">
@@ -221,6 +234,9 @@ export default function RegistroPaciente({ onRegistrado }) {
         </div>
       </SectionFieldset>
 
+      {modalParentesco && (
+        <RegistroParentesco onClose={() => setModalParentesco(false)} />
+      )}
     </div>
   );
 }
