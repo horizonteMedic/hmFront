@@ -1,51 +1,56 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 /**
- * Hook genérico de CRUD con filtro para catálogos simples {id, descripcion}.
- * Sirve tanto para Recomendación como para Restricción, ya que ambas
- * comparten exactamente la misma forma de API.
+ * Hook genérico para catálogos simples {id, descripcion} (Recomendación /
+ * Restricción). El GET ya no admite filtro por query ni eliminación: trae
+ * el listado completo una sola vez y el filtro se aplica en el front.
  */
 export function useCatalogoSimple({ token, usuarioCreacion, api }) {
-    const { list, create, update, remove } = api;
+    const { list, guardar } = api;
 
-    const [items, setItems] = useState([]);
+    const [allItems, setAllItems] = useState([]);
     const [filtro, setFiltro] = useState("");
     const [loading, setLoading] = useState(false);
-    const debounceRef = useRef(null);
 
-    const refresh = useCallback(
-        async (customFiltro) => {
-            setLoading(true);
-            try {
-                const res = await list(customFiltro ?? filtro, token);
-                setItems(Array.isArray(res) ? res : []);
-            } finally {
-                setLoading(false);
-            }
-        },
-        [filtro, list, token]
-    );
+    const refresh = useCallback(() => {
+        setLoading(true);
+        return Promise.resolve(list(token))
+            .then((res) => setAllItems(Array.isArray(res) ? res : []))
+            .catch(() => setAllItems([]))
+            .finally(() => setLoading(false));
+    }, [list, token]);
 
+    // Se trae una sola vez al montar (timeout+cleanup evita el doble
+    // disparo de React.StrictMode en desarrollo).
     useEffect(() => {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-            refresh(filtro);
-        }, 300);
-        return () => clearTimeout(debounceRef.current);
+        const timeout = setTimeout(() => refresh(), 0);
+        return () => clearTimeout(timeout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filtro, token]);
+    }, []);
+
+    const items = useMemo(() => {
+        const q = (filtro || "").toUpperCase().trim();
+        if (!q) return allItems;
+        return allItems.filter((item) => (item.descripcion || "").toUpperCase().includes(q));
+    }, [allItems, filtro]);
 
     const crear = useCallback(
-        (descripcion) => create(descripcion, usuarioCreacion, token),
-        [create, token, usuarioCreacion]
+        (descripcion) =>
+            guardar(
+                { id: null, descripcion, usuarioRegistro: usuarioCreacion, usuarioActualizacion: usuarioCreacion },
+                token
+            ),
+        [guardar, token, usuarioCreacion]
     );
 
     const actualizar = useCallback(
-        (id, descripcion) => update(id, descripcion, token),
-        [update, token]
+        (id, descripcion) =>
+            guardar(
+                { id, descripcion, usuarioRegistro: usuarioCreacion, usuarioActualizacion: usuarioCreacion },
+                token
+            ),
+        [guardar, token, usuarioCreacion]
     );
-
-    const eliminar = useCallback((id) => remove(id, token), [remove, token]);
 
     return {
         items,
@@ -55,6 +60,5 @@ export function useCatalogoSimple({ token, usuarioCreacion, api }) {
         refresh,
         crear,
         actualizar,
-        eliminar,
     };
 }

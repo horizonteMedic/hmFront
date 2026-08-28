@@ -6,28 +6,20 @@ import PlantillaDiagnosticoBuscador from "./PlantillaDiagnosticoBuscador";
 import PlantillaDiagnosticoForm from "./PlantillaDiagnosticoForm";
 import CatalogoSimpleManager from "./CatalogoSimpleManager";
 import {
-    crearRecomendacion,
-    actualizarRecomendacion,
-    eliminarRecomendacion,
+    guardarRecomendacion,
     getRecomendaciones,
-    crearRestriccion,
-    actualizarRestriccion,
-    eliminarRestriccion,
+    guardarRestriccion,
     getRestricciones,
 } from "./model";
 
 const recomendacionApi = {
     list: getRecomendaciones,
-    create: crearRecomendacion,
-    update: actualizarRecomendacion,
-    remove: eliminarRecomendacion,
+    guardar: guardarRecomendacion,
 };
 
 const restriccionApi = {
     list: getRestricciones,
-    create: crearRestriccion,
-    update: actualizarRestriccion,
-    remove: eliminarRestriccion,
+    guardar: guardarRestriccion,
 };
 
 /**
@@ -57,9 +49,33 @@ export default function PlantillaDiagnosticoManager({
         setTab("buscar");
     };
 
-    const handleVincular = (plantilla) => {
-        if (onVincular) onVincular(plantilla);
+    const handleVincular = (plantillaOPlantillas) => {
+        const lista = Array.isArray(plantillaOPlantillas)
+            ? plantillaOPlantillas
+            : [plantillaOPlantillas];
+        lista.forEach((p) => onVincular && onVincular(p));
         close();
+    };
+
+    const handleEditar = async (idPlantilla) => {
+        await hook.cargarParaEditar(idPlantilla);
+        setTab("form");
+    };
+
+    // Clona una plantilla existente: precarga el formulario con sus datos
+    // pero sin id ni código (deben ser irrepetibles), para que al guardar
+    // se registre como una plantilla nueva.
+    const handleClonar = (p) => {
+        hook.setForm({
+            id: null,
+            codigo: "",
+            titulo: p.titulo ? `${p.titulo} (COPIA)` : "",
+            diagnostico: p.diagnostico || "",
+        });
+        hook.setCie10s(p.cie10s || []);
+        hook.setRecomendaciones(p.recomendaciones || []);
+        hook.setRestricciones(p.restricciones || []);
+        setTab("form");
     };
 
     return (
@@ -71,7 +87,7 @@ export default function PlantillaDiagnosticoManager({
 
             {open && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-[680px] max-h-[90vh] flex flex-col">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-[90%] h-full max-h-[95vh] flex flex-col">
                         <div className="azuloscurobackground text-white px-4 py-3 flex justify-between items-center rounded-t-xl">
                             <h1 className="font-semibold text-base">Plantillas de Diagnóstico</h1>
                             <FontAwesomeIcon icon={faTimes} className="cursor-pointer" onClick={close} />
@@ -81,28 +97,31 @@ export default function PlantillaDiagnosticoManager({
                             <button
                                 type="button"
                                 onClick={() => setTab("buscar")}
-                                className={`flex-1 py-2 text-sm font-semibold ${
-                                    tab === "buscar" ? "bg-blue-50 text-blue-700" : "text-gray-500"
-                                }`}
+                                className={`flex-1 py-6  font-semibold ${tab === "buscar" ? "bg-blue-50 text-blue-700" : "text-gray-500"
+                                    }`}
                             >
                                 Buscar / Vincular
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setTab("form")}
-                                className={`flex-1 py-2 text-sm font-semibold ${
-                                    tab === "form" ? "bg-blue-50 text-blue-700" : "text-gray-500"
-                                }`}
+                                className={`flex-1 py-6  font-semibold ${tab === "form" ? "bg-blue-50 text-blue-700" : "text-gray-500"
+                                    }`}
                             >
-                                {hook.form.idPlantilla ? "Editar" : "Nueva"}
+                                {hook.form.id ? "Editar" : "Nueva"}
                             </button>
                         </div>
 
                         <div className="p-4 flex-1 overflow-y-auto">
                             {tab === "buscar" ? (
-                                <PlantillaDiagnosticoBuscador hook={hook} onVincular={handleVincular} />
+                                <PlantillaDiagnosticoBuscador
+                                    hook={hook}
+                                    onVincular={handleVincular}
+                                    onEditar={handleEditar}
+                                    onClonar={handleClonar}
+                                />
                             ) : (
-                                <PlantillaDiagnosticoForm hook={hook} token={token} />
+                                <PlantillaDiagnosticoForm hook={hook} token={token} usuarioCreacion={usuarioCreacion} />
                             )}
                         </div>
 
@@ -111,21 +130,21 @@ export default function PlantillaDiagnosticoManager({
                                 <button
                                     type="button"
                                     onClick={() => setCatalogoAbierto("recomendacion")}
-                                    className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-2"
+                                    className=" px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faListCheck} /> Recomendaciones
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setCatalogoAbierto("restriccion")}
-                                    className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-2"
+                                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faListCheck} /> Restricciones
                                 </button>
                             </div>
                             <button
                                 onClick={close}
-                                className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                                className="px-4 py-3  bg-gray-200 rounded hover:bg-gray-300"
                             >
                                 Cerrar
                             </button>

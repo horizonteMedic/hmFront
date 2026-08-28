@@ -33,15 +33,20 @@ export const PRESENTACIONES_OPTIONS = [
   }
 ];
 
-export function FloatingInput({ id, label, value, onChange, type = 'text', min, required = false, className = '' }) {
+export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false }) {
   return (
     <div className={`relative ${className}`}>
       <input
         type={type}
         min={min}
         id={id}
+        name={name || id}
         value={value}
         onChange={onChange}
+        onKeyUp={onKeyUp}
+        onBlur={onBlur}
+        disabled={disabled}
+        autoFocus={autoFocus}
         placeholder=" "
         className="block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer"
       />
@@ -115,6 +120,27 @@ export function FloatingAutocomplete({ id, label, value, onChange, groupedOption
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+export function FloatingTextarea({ id, label, value, onChange, rows = 4, required = false, className = '' }) {
+  return (
+    <div className={`relative ${className}`}>
+      <textarea
+        id={id}
+        rows={rows}
+        value={value}
+        onChange={onChange}
+        placeholder=" "
+        className="block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none resize-none focus:outline-none focus:ring-0 focus:border-[#084788] peer"
+      />
+      <label
+        htmlFor={id}
+        className="absolute text-sm text-gray-500 duration-200 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-1 peer-focus:px-2 peer-focus:text-[#084788] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-6 peer-focus:top-2 peer-focus:scale-90 peer-focus:-translate-y-4"
+      >
+        {label}{required && <span className="text-red-500"> *</span>}
+      </label>
     </div>
   );
 }

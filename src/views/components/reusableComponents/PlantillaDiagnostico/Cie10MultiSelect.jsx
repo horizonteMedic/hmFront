@@ -91,8 +91,8 @@ export default function Cie10MultiSelect({
                     }}
                     onFocus={() => setShowDropdown(true)}
                     placeholder="Buscar por código o descripción..."
-                    className={`border rounded px-2 py-1.5 pl-9 pr-8 w-full ${
-                        disabled ? "bg-gray-300" : ""
+                    className={`block pl-9 pr-8 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] ${
+                        disabled ? "bg-gray-100" : ""
                     }`}
                 />
                 {loading && (
