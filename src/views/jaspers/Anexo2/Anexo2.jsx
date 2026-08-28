@@ -39,6 +39,24 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
+  // Footer que sólo se dibuja si NO se superpone con el contenido de la hoja.
+  // Si el contenido llega hasta la zona del footer (línea divisoria púrpura),
+  // se omite el footer de esa página para evitar que se pise con el texto.
+  const footerTRSiCabe = (yPosContenido, opts = { footerOffsetY: 8 }) => {
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginBottom = 25; // mismo valor usado en footerTR
+    const offsetY = Number(opts?.footerOffsetY ?? 0);
+    // Inicio de la línea divisoria del footer (baseY - 3.6 en footerTR)
+    const footerTopY = pageHeight - marginBottom + offsetY - 3.6;
+
+    if (typeof yPosContenido === "number" && yPosContenido > footerTopY) {
+      return false; // el footer se superpondría con el contenido: no se dibuja
+    }
+
+    footerTR(doc, opts);
+    return true;
+  };
+
   const datosReales = {
     apellidosNombres: String((data.datosPaciente.apellidos_apellidos_pa || "") + " " + (data.datosPaciente.nombres_nombres_pa || "")).trim(),
     fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha || ""),
@@ -779,7 +797,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
           doc.setFont("helvetica", "normal").setFontSize(8);
           // Mostrar descripción al costado si existe
           if (ant.descripcion && ant.descripcion.trim() !== "") {
-            doc.setFont("helvetica", "normal").setFontSize(5);
+            doc.setFont("helvetica", "normal").setFontSize(ant.descripcion.length > 50 ? 3 : 5);
+
             // Ajustar posición según el antecedente (ajustado para colAnteWidth de 54mm o 50mm)
             let xTexto = xSi - (colAnteWidthActual + 5); // Posición base ajustada
             const maxWidthTexto = colAnteWidthActual - 12; // Ancho máximo ajustado
@@ -1452,8 +1471,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const alturaMaximaPag1 = doc.internal.pageSize.getHeight() - 25; // Margen inferior para footer
 
   if (yPos > alturaMaximaPag1) {
-    // === FOOTER PÁGINA 1 ===
-    footerTR(doc, { footerOffsetY: 8 });
+    // === FOOTER PÁGINA 1 (sólo si no se superpone con el contenido) ===
+    footerTRSiCabe(yPos);
 
     // === CREAR PÁGINA INTERMEDIA ===
     doc.addPage();
@@ -1461,8 +1480,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     await drawHeader(numeroPagina);
     yPos = 35.5;
   } else {
-    // === FOOTER PÁGINA 1 ===
-    footerTR(doc, { footerOffsetY: 8 });
+    // === FOOTER PÁGINA 1 (sólo si no se superpone con el contenido) ===
+    footerTRSiCabe(yPos);
 
     // === CREAR PÁGINA 2 ===
     doc.addPage();
@@ -1925,8 +1944,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
   yPos = yPosInicial + filaAltura + alturaDinamica;
 
-  // === FOOTER PÁGINA 2 ===
-  footerTR(doc, { footerOffsetY: 8 });
+  // === FOOTER PÁGINA 2 (sólo si no se superpone con el contenido) ===
+  footerTRSiCabe(yPos);
 
   // === CREAR PÁGINA 3 ===
   doc.addPage();
@@ -2184,7 +2203,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const alturaMaximaPag3 = doc.internal.pageSize.getHeight() - 25; // Margen inferior para footer
   if (yPos > alturaMaximaPag3 - 30) {
     // No hay espacio suficiente, crear nueva página
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTRSiCabe(yPos);
     doc.addPage();
     numeroPagina++;
     await drawHeader(numeroPagina);
@@ -2263,8 +2282,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.text("Sello y Firma del Médico", centroColumna2X, yPos + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna2X, yPos + 28.5, { align: "center" });
 
-  // === FOOTER PÁGINA 3 ===
-  footerTR(doc, { footerOffsetY: 8 });
+  // === FOOTER PÁGINA 3 (sólo si no se superpone con las firmas) ===
+  footerTRSiCabe(yPos + alturaSeccionFirmas);
 
   // === Imprimir ===
   if (docExistente) {
