@@ -62,25 +62,21 @@ export const guardarRestriccion = ({ id = null, descripcion, usuarioRegistro, us
     );
 
 // ---------- Diagnóstico (antes "Plantilla de Diagnóstico") ----------
-// PENDIENTE: el backend confirmó que también cambiaron los endpoints GET
-// (listado con filtros y obtener por id) de este recurso, pero aún no
-// mandaron el nuevo contrato. Mientras tanto se deja apuntando al contrato
-// anterior (/api/v01/ct/plantillaDiagnostico) como placeholder: el buscador
-// y "editar/clonar" van a fallar (mostrarán "sin resultados") hasta que se
-// actualice esto con el nuevo swagger.
+// El GET solo admite filtrar por código y/o título (coincidencia parcial);
+// no hay filtro por diagnóstico ni cie10 a nivel de servidor, por eso el
+// buscador siempre trae el listado completo y filtra los 4 campos en el
+// front (ver PlantillaDiagnosticoBuscador.jsx).
 export const getPlantillasDiagnostico = (filtros, token) =>
     getJson(
-        `/api/v01/ct/plantillaDiagnostico${buildQuery({
-            titulo: filtros?.titulo,
+        `/api/v01/ct/diagnostico${buildQuery({
             codigo: filtros?.codigo,
-            diagnostico: filtros?.diagnostico,
-            cie10: filtros?.cie10,
+            titulo: filtros?.titulo,
         })}`,
         token
     );
 
 export const getPlantillaDiagnostico = (id, token) =>
-    getJson(`/api/v01/ct/plantillaDiagnostico/${id}`, token);
+    getJson(`/api/v01/ct/diagnostico/${id}`, token);
 
 // Registra (POST /diagnostico/registrar, sin id) o actualiza
 // (POST /diagnostico/actualizar, con id) un diagnóstico. Ya no admite crear

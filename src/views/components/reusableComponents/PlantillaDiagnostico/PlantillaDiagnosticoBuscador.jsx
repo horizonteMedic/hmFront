@@ -29,16 +29,16 @@ function FilaPlantilla({ p, idx, checked, onToggle, onDobleClick, stripeA, strip
                 <div className="space-y-1">
                     {(p.cie10s || []).map((c, i) => (
                         <div
-                            key={c.cod}
+                            key={c.codigo}
                             className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 rounded-md px-1.5 py-1"
                         >
                             <span className="text-[10px] font-bold text-sky-600 rounded-full w-4 h-4 flex items-center justify-center shrink-0">
                                 {i + 1})
                             </span>
                             <span className=" font-bold text-sky-700 bg-sky-100 px-1 py-0.5 rounded shrink-0">
-                                {c.cod}
+                                {c.codigo}
                             </span>
-                            <span className="uppercase text-sky-800">{c.diagnostico}</span>
+                            <span className="uppercase text-sky-800">{c.descripcion}</span>
                         </div>
                     ))}
                 </div>
@@ -110,7 +110,7 @@ function TablaPlantillas({ items, checked, onToggle, onDobleClick, loading, empt
                     {!loading &&
                         items.map((p, idx) => (
                             <FilaPlantilla
-                                key={p.idPlantilla}
+                                key={p.id}
                                 p={p}
                                 idx={idx}
                                 checked={checked}
@@ -130,7 +130,7 @@ const normalizar = (s) => (s || "").toString().toUpperCase().trim();
 
 export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEditar, onClonar }) {
     const { plantillas, filtros, setFiltros, loadingList, buscarPlantillas } = hook;
-    // Map<idPlantilla, plantilla> en vez de un Set de ids: así la lista de
+    // Map<id, plantilla> en vez de un Set de ids: así la lista de
     // seleccionadas se mantiene aunque, al filtrar, la plantilla ya no
     // aparezca en los resultados visibles.
     const [seleccionados, setSeleccionados] = useState(new Map());
@@ -161,7 +161,7 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
             if (qDiagnostico && !normalizar(p.diagnostico).includes(qDiagnostico)) return false;
             if (qCie10) {
                 const matchCie10 = (p.cie10s || []).some(
-                    (c) => normalizar(c.cod).includes(qCie10) || normalizar(c.diagnostico).includes(qCie10)
+                    (c) => normalizar(c.codigo).includes(qCie10) || normalizar(c.descripcion).includes(qCie10)
                 );
                 if (!matchCie10) return false;
             }
@@ -170,13 +170,13 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
     }, [plantillas, filtros]);
 
     const seleccionar = (p) => {
-        setSeleccionados((prev) => new Map(prev).set(p.idPlantilla, p));
+        setSeleccionados((prev) => new Map(prev).set(p.id, p));
     };
 
     const quitarSeleccionado = (p) => {
         setSeleccionados((prev) => {
             const next = new Map(prev);
-            next.delete(p.idPlantilla);
+            next.delete(p.id);
             return next;
         });
     };
@@ -184,7 +184,7 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
     const listaSeleccionados = Array.from(seleccionados.values());
     // "Disponibles": lo que se ve en la tabla es lo que aún no está en la
     // lista de seleccionadas.
-    const disponibles = plantillasFiltradas.filter((p) => !seleccionados.has(p.idPlantilla));
+    const disponibles = plantillasFiltradas.filter((p) => !seleccionados.has(p.id));
 
     const handleVincularSeleccionados = () => {
         if (listaSeleccionados.length === 0) return;
@@ -204,7 +204,7 @@ export default function PlantillaDiagnosticoBuscador({ hook, onVincular, onEdita
             cancelButtonText: "Cancelar",
         });
         if (result.isConfirmed) {
-            onEditar && onEditar(p.idPlantilla);
+            onEditar && onEditar(p.id);
         } else if (result.isDenied) {
             onClonar && onClonar(p);
         }

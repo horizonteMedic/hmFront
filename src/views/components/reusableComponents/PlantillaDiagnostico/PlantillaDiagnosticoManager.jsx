@@ -57,8 +57,8 @@ export default function PlantillaDiagnosticoManager({
         close();
     };
 
-    const handleEditar = async (idPlantilla) => {
-        await hook.cargarParaEditar(idPlantilla);
+    const handleEditar = async (id) => {
+        await hook.cargarParaEditar(id);
         setTab("form");
     };
 

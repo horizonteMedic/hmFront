@@ -57,18 +57,18 @@ export default function Cie10MultiSelect({
         return () => document.removeEventListener("mousedown", onClickOutside);
     }, []);
 
-    const isSelected = (cod) => selected.some((s) => s.cod === cod);
+    const isSelected = (codigo) => selected.some((s) => s.codigo === codigo);
 
     const addItem = (item) => {
         if (isSelected(item.codigo)) return;
-        onChange([...selected, { cod: item.codigo, diagnostico: item.descripcion }]);
+        onChange([...selected, { codigo: item.codigo, descripcion: item.descripcion }]);
         setQuery("");
         setResults([]);
         setShowDropdown(false);
     };
 
-    const removeItem = (cod) => {
-        onChange(selected.filter((s) => s.cod !== cod));
+    const removeItem = (codigo) => {
+        onChange(selected.filter((s) => s.codigo !== codigo));
     };
 
     const filteredResults = results.filter((r) => !isSelected(r.codigo));
@@ -129,19 +129,19 @@ export default function Cie10MultiSelect({
                 <div className="space-y-1 pt-1">
                     {selected.map((item) => (
                         <div
-                            key={item.cod}
+                            key={item.codigo}
                             className="flex items-center gap-3 p-1 bg-green-50 border border-green-200 rounded-md"
                         >
                             <span className="text-sm font-mono font-bold text-green-700 bg-green-100 px-2 py-1 rounded shrink-0">
-                                {item.cod}
+                                {item.codigo}
                             </span>
                             <span className="text-sm text-green-800 flex-1 break-words">
-                                {item.diagnostico}
+                                {item.descripcion}
                             </span>
                             {!disabled && (
                                 <button
                                     type="button"
-                                    onClick={() => removeItem(item.cod)}
+                                    onClick={() => removeItem(item.codigo)}
                                     className="text-red-500 hover:text-red-700 shrink-0 pr-2"
                                 >
                                     <FontAwesomeIcon icon={faTrash} />

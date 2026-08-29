@@ -63,10 +63,8 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
     const [loadingList, setLoadingList] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // PENDIENTE: apunta al contrato anterior (GET /plantillaDiagnostico) —
-    // el backend confirmó que este GET también cambió pero aún no envió el
-    // nuevo contrato. No se auto-consulta al montar el hook: quien lo use
-    // decide cuándo pedir el listado (p.ej. el buscador lo hace al abrirse).
+    // No se auto-consulta al montar el hook: quien lo use decide cuándo
+    // pedir el listado (p.ej. el buscador lo hace al abrirse el modal).
     const buscarPlantillas = useCallback(
         async (customFiltros) => {
             setLoadingList(true);
@@ -87,9 +85,6 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
         setRestricciones([]);
     }, []);
 
-    // PENDIENTE: getPlantillaDiagnostico apunta al contrato anterior; se
-    // lee tanto "id" como "idPlantilla" para no romper apenas actualicen el
-    // GET (el registro/actualización nuevos ya solo usan "id").
     const cargarParaEditar = useCallback(
         async (id) => {
             const res = await getPlantillaDiagnostico(id, token);
@@ -98,7 +93,7 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
                 return;
             }
             setForm({
-                id: res.id ?? res.idPlantilla ?? null,
+                id: res.id ?? null,
                 codigo: res.codigo || "",
                 titulo: res.titulo || "",
                 diagnostico: res.diagnostico || "",
@@ -163,7 +158,7 @@ export function usePlantillaDiagnostico({ token, usuarioCreacion }) {
                 codigo: form.codigo.trim(),
                 titulo: form.titulo.trim(),
                 diagnostico: form.diagnostico.trim(),
-                cie10Cods: cie10s.map((c) => c.cod),
+                cie10Cods: cie10s.map((c) => c.codigo),
                 idsRecomendacion: recomendaciones.map((r) => r.id),
                 idsRestriccion: restricciones.map((r) => r.id),
             };
