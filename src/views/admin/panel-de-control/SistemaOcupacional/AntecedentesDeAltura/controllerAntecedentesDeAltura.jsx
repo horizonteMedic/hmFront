@@ -138,6 +138,18 @@ export const GetInfoServicioEditar = async (
 
     user_medicoFirma: a.usuarioFirma ? a.usuarioFirma : prev.user_medicoFirma,
 
+    // Información del médico DEL REGISTRO (viene del obtenerReporte, no de la sesión).
+    // Sin esto el editar seguiría mostrando los datos del usuario logueado.
+    dniMedico: res.dniUsuario ?? prev.dniMedico,
+    nombreMedico:
+      `${res.apellidosUsuario ?? ""} ${res.nombresUsuario ?? ""}`.trim() ||
+      prev.nombreMedico,
+    cmp: res.cmpUsuario ?? prev.cmp,
+    email: (res.emailUsuario ?? "").toUpperCase() || prev.email,
+    direccionMedico:
+      (res.direccionUsuario ?? res.direccionSede ?? "").toUpperCase() ||
+      prev.direccionMedico,
+
     // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
     fechaRegistro: a.fechaRegistro ?? res.fechaRegistro ?? "",
     userRegistro: a.userRegistro ?? res.userRegistro ?? a.usuarioRegistro ?? "",

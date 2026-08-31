@@ -234,7 +234,7 @@ export default function Espirometria() {
                 onLimpiar={handleClear}
             />
 
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 <div className="flex gap-x-3 w-full">
                     <InputTextOneLine
                         label="N° Orden"
@@ -246,7 +246,7 @@ export default function Espirometria() {
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
                 </div>
                 <InputTextOneLine
                     label="Fecha"
@@ -266,6 +266,7 @@ export default function Espirometria() {
                     disabled
                     labelWidth="120px"
                 />
+                <div>
                 <InputCheckbox
                     label={<span className="text-red-500">No Pasó Examen</span>}
                     name="pasoExamen"
@@ -312,6 +313,8 @@ export default function Espirometria() {
                         }));
                     }}
                 />
+                </div>
+
                 <ButtonsPDF
                     {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
                     {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
