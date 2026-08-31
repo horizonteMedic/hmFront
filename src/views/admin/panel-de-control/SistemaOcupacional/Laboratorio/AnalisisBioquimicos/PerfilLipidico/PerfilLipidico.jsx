@@ -1,17 +1,37 @@
-import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilLipidico';
+import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPerfilLipidico';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import Swal from 'sweetalert2';
 import {
   InputTextOneLine,
   SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import { useEffect, useState } from 'react';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const tabla = 'analisis_bioquimicos';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "colesterolTotal",
+  "trigliceridos",
+  "hdl",
+  "ldl",
+  "vldl",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function PerfilLipidico() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -55,6 +75,15 @@ export default function PerfilLipidico() {
     // Doctor Asignado //BUSCADOR
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
   const [dataTabla, setDataTabla] = useState([]);
 
@@ -62,23 +91,67 @@ export default function PerfilLipidico() {
     form,
     setForm,
     handleChange,
+    handleChangeNumber,
     handleChangeNumberDecimals,
     handleFocusNext,
     handleChangeSimple,
     handleClearnotO,
     handleClear,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "perfilLipidico" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
+  };
+
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === 'Enter') {
+      executeSearch();
     }
   };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
   const obtenerInfoTabla = () => {
     const data = {
@@ -104,9 +177,7 @@ export default function PerfilLipidico() {
   }, [selectedSede]);
 
   useEffect(() => {
-    console.log("no")
     if (!form.Editando) {
-      console.log("Ssi")
       const ct = form.colesterolTotal;
       const tg = form.trigliceridos;
       const nCT = parseFloat(String(ct).replace(',', '.'));
@@ -146,226 +217,191 @@ export default function PerfilLipidico() {
   }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
-    <div className="p-4 grid xl:grid-cols-2 gap-x-4 gap-y-3">
-      <div className="space-y-3">
-        <SectionFieldset legend="Información del Examen" className="grid lg:grid-cols-2 gap-3 col-span-2">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumberDecimals}
-            onKeyUp={handleSearch}
+    <div className="p-4 space-y-3">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+      <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="space-y-3">
+          <SectionFieldset legend="Información del Examen" className="grid lg:grid-cols-2 gap-3 col-span-2">
+            <div className="flex gap-x-3 w-full">
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form.norden}
+                onChange={handleChangeNumber}
+                onKeyUp={handleSearch}
+                disabled={hayRegistroCargado}
+                className="w-full"
+              />
+              <SearchButton onClick={executeSearch} />
+            </div>
+            <InputTextOneLine
+              label="Fecha"
+              name="fecha"
+              type="date"
+              value={form.fecha}
+              onChange={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("fecha")}
+              onRevert={() => revertField("fecha")}
+            />
+            <InputTextOneLine
+              label="Nombre Examen"
+              name="nombreExamen"
+              value={form.nombreExamen}
+              disabled
+            />
+          </SectionFieldset>
+
+          <DatosPersonalesLaborales form={form} />
+
+          <SectionFieldset legend="Parámetros Bioquímicos" className="grid grid-cols-1 gap-3">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="Colesterol Total"
+                name="colesterolTotal"
+                value={form.colesterolTotal}
+                labelWidth="120px"
+                onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
+                onKeyUp={handleFocusNext}
+                className='w-[75%]'
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("colesterolTotal")}
+                onRevert={() => revertField("colesterolTotal")}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="Triglicéridos"
+                name="trigliceridos"
+                value={form.trigliceridos}
+                labelWidth="120px"
+                onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
+                onKeyUp={handleFocusNext}
+                className='w-[75%]'
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("trigliceridos")}
+                onRevert={() => revertField("trigliceridos")}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="H.D.L. Colesterol"
+                name="hdl"
+                value={form.hdl}
+                labelWidth="120px"
+                onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
+                onKeyUp={handleFocusNext}
+                className='w-[75%]'
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("hdl")}
+                onRevert={() => revertField("hdl")}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="L.D.L. Colesterol"
+                name="ldl"
+                value={form.ldl}
+                labelWidth="120px"
+                onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
+                onKeyUp={handleFocusNext}
+                className='w-[75%]'
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("ldl")}
+                onRevert={() => revertField("ldl")}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="V.L.D.L. Colesterol"
+                name="vldl"
+                value={form.vldl}
+                labelWidth="120px"
+                onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
+                className='w-[75%]'
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("vldl")}
+                onRevert={() => revertField("vldl")}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
+            </div>
+          </SectionFieldset>
+          <SectionFieldset legend="Especialista">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              label='Especialista que Certifica'
+              onChange={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              edited={isMedicoEdited}
+              onRevert={revertMedico}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_doctorAsignado}
+              form={form}
+              label="Doctor Asignado"
+              onChange={handleChangeSimple}
+              nameField="nombre_doctorAsignado"
+              idField="user_doctorAsignado"
+              disabled={camposDeshabilitados}
+              edited={isDoctorEdited}
+              onRevert={revertDoctor}
+            />
+          </SectionFieldset>
+
+          {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+          {hayRegistroCargado && (
+            <AuditoriaRegistro
+              mostrarEdicion={form.tieneRegistro}
+              fechaCreacion={auditoria.fechaCreacion}
+              fechaEdicion={auditoria.fechaActualizacion}
+              usuarioRegistro={auditoria.usuarioRegistro}
+              usuarioEdicion={auditoria.usuarioActualizacion}
+            />
+          )}
+
+          <BotonesForm
+            form={form}
+            handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+            saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+            handleEdit={habilitarEdicion}
+            handleClear={handleClear}
+            onNordenChange={handlePrintNordenChange}
+            handleChangeNumberDecimals={handleChangeNumberDecimals}
+            hideSave={form.tieneRegistro && !edicionHabilitada}
+            hideEdit={!form.tieneRegistro || edicionHabilitada}
+            hidePrint
           />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChangeSimple}
-          />
-          <InputTextOneLine
-            label="Nombre Examen"
-            name="nombreExamen"
-            value={form.nombreExamen}
-            onChange={handleChangeNumberDecimals}
-          />
-        </SectionFieldset>
-        <SectionFieldset legend="Datos Personales" collapsible className="grid lg:grid-cols-2 gap-3 lg:gap-4">
+        </div>
+        <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Nombres"
-            name="nombres"
-            value={form.nombres}
-            disabled
-            labelWidth="120px"
-            className='lg:col-span-2'
+            name="nombres_search"
+            value={form.nombres_search}
+            onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+            onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
           />
           <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
+            label="Código"
+            name="codigo_search"
+            value={form.codigo_search}
+            onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+            onChange={(e) => { handleChangeNumberDecimals(e, 0); setForm(prev => ({ ...prev, nombres_search: "" })) }}
           />
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Lugar Nacimiento"
-            name="lugarNacimiento"
-            value={form.lugarNacimiento}
-            className='lg:col-span-2'
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nivel Estudios"
-            name="nivelEstudios"
-            value={form.nivelEstudios}
-            disabled
-            labelWidth="120px"
-          />
-        </SectionFieldset>
-        <SectionFieldset legend="Datos Laborales" collapsible className="grid gap-3">
-          <InputTextOneLine
-            label="Empresa"
-            name="empresa"
-            value={form.empresa}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Contrata"
-            name="contrata"
-            value={form.contrata}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Ocupación"
-            name="ocupacion"
-            value={form.ocupacion}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Cargo Desempeñar"
-            name="cargoDesempenar"
-            value={form.cargoDesempenar}
-            disabled
-            labelWidth="120px"
-          />
+          <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
         </SectionFieldset>
 
-        <SectionFieldset legend="Parámetros Bioquímicos" className="grid grid-cols-1 gap-3">
-          <div className="flex items-center gap-4">
-            <InputTextOneLine
-              label="Colesterol Total"
-              name="colesterolTotal"
-              value={form.colesterolTotal}
-              labelWidth="120px"
-              onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
-              onKeyUp={handleFocusNext}
-              className='w-[75%]'
-            />
-            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <InputTextOneLine
-              label="Triglicéridos"
-              name="trigliceridos"
-              value={form.trigliceridos}
-              labelWidth="120px"
-              onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
-              onKeyUp={handleFocusNext}
-              className='w-[75%]'
-            />
-            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <InputTextOneLine
-              label="H.D.L. Colesterol"
-              name="hdl"
-              value={form.hdl}
-              labelWidth="120px"
-              onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
-              onKeyUp={handleFocusNext}
-              className='w-[75%]'
-            />
-            <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <InputTextOneLine
-              label="L.D.L. Colesterol"
-              name="ldl"
-              value={form.ldl}
-              labelWidth="120px"
-              onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
-              onKeyUp={handleFocusNext}
-              className='w-[75%]'
-            />
-            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <InputTextOneLine
-              label="V.L.D.L. Colesterol"
-              name="vldl"
-              value={form.vldl}
-              labelWidth="120px"
-              onChange={(e) => { handleChangeNumberDecimals(e, 1); }}
-              className='w-[75%]'
-            />
-            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
-          </div>
-        </SectionFieldset>
-        <SectionFieldset legend="Especialista">
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            form={form}
-            label='Especialista que Certifica'
-            onChange={handleChangeSimple}
-          />
-          <EmpleadoComboBox
-            value={form.nombre_doctorAsignado}
-            form={form}
-            label="Doctor Asignado"
-            onChange={handleChangeSimple}
-            nameField="nombre_doctorAsignado"
-            idField="user_doctorAsignado"
-          />
-        </SectionFieldset>
-
-        <BotonesAccion
-          form={form}
-          handleSave={handleSave}
-          handleClear={handleClear}
-          handlePrint={() => { }}
-          handleChangeNumberDecimals={handleChangeNumberDecimals}
-          hidePrint
-        />
       </div>
-      <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres_search"
-          value={form.nombres_search}
-          onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
-          onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
-        />
-        <InputTextOneLine
-          label="Código"
-          name="codigo_search"
-          value={form.codigo_search}
-          onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
-          onChange={(e) => { handleChangeNumberDecimals(e, 0); setForm(prev => ({ ...prev, nombres_search: "" })) }}
-        />
-        <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
-      </SectionFieldset>
-
     </div>
   );
 }

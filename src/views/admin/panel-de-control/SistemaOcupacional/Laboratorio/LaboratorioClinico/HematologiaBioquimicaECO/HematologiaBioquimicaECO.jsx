@@ -9,18 +9,76 @@ import {
   InputsRadioGroup,
   CIE10List
 } from '../../../../../../components/reusableComponents/ResusableComponents';
-import { getToday } from "../../../../../../utils/helpers";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import CIE10 from "../../../Anexo16/CIE10/CIE10";
+import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "lab_clinico";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fechaExamen",
+  "grupoSanguineo",
+  "factorRh",
+  "hemoglobina",
+  "hematocrito",
+  "vsg",
+  "leucocitos",
+  "hematies",
+  "plaquetas",
+  "neutrofilos",
+  "abastonados",
+  "segmentados",
+  "monocitos",
+  "eosinofilos",
+  "basofilos",
+  "linfocitos",
+  "rpr",
+  "vih",
+  "glucosa",
+  "creatinina",
+  "color",
+  "aspecto",
+  "densidad",
+  "ph",
+  "nitritos",
+  "proteinas",
+  "cetonas",
+  "leucocitosExamenQuimico",
+  "acAscorbico",
+  "urobilinogeno",
+  "bilirrubina",
+  "glucosaExamenQuimico",
+  "sangre",
+  "leucocitosSedimentoUnitario",
+  "hematiesSedimentoUnitario",
+  "celEpiteliales",
+  "cristales",
+  "cilindros",
+  "bacterias",
+  "gramSc",
+  "otros",
+  "cocaina",
+  "marihuana",
+  "observaciones",
+  "observacionesCie10",
+  "notasDoctor",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function HematologiaBioquimicaECO() {
   const today = getToday();
@@ -209,6 +267,15 @@ export default function HematologiaBioquimicaECO() {
     user_doctorAsignado: "",
 
     listExamLab: EXAMENES_LABORATORIO,
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
 
@@ -220,15 +287,36 @@ export default function HematologiaBioquimicaECO() {
     handleChange,
     handleClearnotO,
     handlePrintDefault,
+    handleChangeNumber,
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleClear,
     handleFocusNext,
     handleRadioButton,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "laboratorioClinico" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleHemoglobinaBlur = (e) => {
@@ -242,10 +330,30 @@ export default function HematologiaBioquimicaECO() {
     }
   };
 
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede, form.listExamLab);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede, form.listExamLab);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -254,6 +362,11 @@ export default function HematologiaBioquimicaECO() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
   // const GetTable = (nro) => {
   //   getFetch(
@@ -305,24 +418,47 @@ export default function HematologiaBioquimicaECO() {
 
 
   return (
-    <>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 max-w-[95%] xl:max-w-[90%] mx-auto">
+    <div className="max-w-[95%] xl:max-w-[90%] mx-auto space-y-3">
+      <div className="sticky top-2 z-20 flex justify-end pointer-events-none px-4">
+        <RegistroEstadoPill
+          tieneRegistro={form.tieneRegistro}
+          className={hayRegistroCargado ? "" : "invisible"}
+        />
+        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
+          <button
+            type="button"
+            onClick={habilitarEdicion}
+            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
+          >
+            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="space-y-3 px-4 lg:col-span-3">
           <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
-            <InputTextOneLine
-              label="N° Orden"
-              name="norden"
-              value={form.norden}
-              onChange={handleChangeNumberDecimals}
-              onKeyUp={handleSearch}
-              labelWidth="120px"
-            />
+            <div className="flex gap-x-3 w-full">
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form.norden}
+                onChange={handleChangeNumber}
+                onKeyUp={handleSearch}
+                disabled={hayRegistroCargado}
+                labelWidth="120px"
+                className="w-full"
+              />
+              <SearchButton onClick={executeSearch} className="xl:hidden" />
+            </div>
             <InputTextOneLine
               label="Fecha"
               name="fechaExamen"
               type="date"
               value={form.fechaExamen}
               onChange={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("fechaExamen")}
+              onRevert={() => revertField("fechaExamen")}
               labelWidth="120px"
             />
             <InputTextOneLine
@@ -442,7 +578,8 @@ export default function HematologiaBioquimicaECO() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="bg-red-600 text-white px-4 py-2 rounded-md"
+                  disabled={camposDeshabilitados}
+                  className="bg-red-600 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
                     const text = form.vsg == "N/A" ? "" : "N/A";
                     setForm(prev => ({
@@ -475,6 +612,9 @@ export default function HematologiaBioquimicaECO() {
                     labelWidth="120px"
                     onChange={handleRadioButton}
                     allowUncheck
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("grupoSanguineo")}
+                    onRevert={() => revertField("grupoSanguineo")}
                   />
                   <InputsRadioGroup
                     label="Factor Rh"
@@ -485,6 +625,9 @@ export default function HematologiaBioquimicaECO() {
                     className="mb-4"
                     onChange={handleRadioButton}
                     allowUncheck
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("factorRh")}
+                    onRevert={() => revertField("factorRh")}
                   />
                   {[
                     ["Hemoglobina", "g/dl"],
@@ -503,6 +646,9 @@ export default function HematologiaBioquimicaECO() {
                       onChange={handleChange}
                       onKeyUp={handleFocusNext}
                       onBlur={key === "Hemoglobina" ? handleHemoglobinaBlur : undefined}
+                      disabled={camposDeshabilitados}
+                      edited={isFieldEdited(key.toLowerCase())}
+                      onRevert={() => revertField(key.toLowerCase())}
                     />
                   ))}
                 </div>
@@ -524,6 +670,9 @@ export default function HematologiaBioquimicaECO() {
                       labelWidth="120px"
                       onChange={handleChange}
                       onKeyUp={(e) => { handleFocusNext(e, key == "Linfocitos" ? "glucosa" : "") }}
+                      disabled={camposDeshabilitados}
+                      edited={isFieldEdited(key.toLowerCase())}
+                      onRevert={() => revertField(key.toLowerCase())}
                     />
                   ))}
                 </div>
@@ -550,6 +699,9 @@ export default function HematologiaBioquimicaECO() {
                           { label: 'N/A', value: 'N/A' }
                         ]}
                         onChange={handleRadioButton}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item)}
+                        onRevert={() => revertField(item)}
                       />
                     </div>
                   </div>
@@ -565,12 +717,16 @@ export default function HematologiaBioquimicaECO() {
                     labelWidth="120px"
                     onChange={handleChange}
                     onKeyUp={(e) => { handleFocusNext(e, "creatinina") }}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("glucosa")}
+                    onRevert={() => revertField("glucosa")}
                   />
                   <div className="flex gap-4 items-center">
                     <InputCheckbox
                       label="N/A"
                       checked={form.glucosa === "N/A"}
                       onChange={e => setForm(f => ({ ...f, glucosa: e.target.checked ? "N/A" : "" }))}
+                      disabled={camposDeshabilitados}
                     />
                     <span className="ml-6 text-gray-600 font-medium">
                       Valores normales 70 - 110 mg/dl
@@ -585,12 +741,16 @@ export default function HematologiaBioquimicaECO() {
                     labelWidth="120px"
                     onChange={handleChange}
                     onKeyUp={(e) => { handleFocusNext(e, "densidad") }}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("creatinina")}
+                    onRevert={() => revertField("creatinina")}
                   />
                   <div className="flex gap-4 items-center">
                     <InputCheckbox
                       label="N/A"
                       checked={form.creatinina === "N/A"}
                       onChange={e => setForm(f => ({ ...f, creatinina: e.target.checked ? "N/A" : "" }))}
+                      disabled={camposDeshabilitados}
                     />
                     <span className="ml-6 text-gray-600 font-medium">
                       Valores normales 0.8 - 1.4 mg/dl
@@ -641,7 +801,9 @@ export default function HematologiaBioquimicaECO() {
                 <SectionFieldset legend="Examen Físico" className="space-y-4 flex-1">
                   <div className="flex justify-end">
                     <button
-                      className="bg-red-600 text-white px-4 py-2 rounded-md"
+                      type="button"
+                      disabled={camposDeshabilitados}
+                      className="bg-red-600 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => {
                         setForm(prev => ({
                           ...prev,
@@ -680,7 +842,13 @@ export default function HematologiaBioquimicaECO() {
                   <div className="grid xl:grid-cols-2 gap-4">
                     <div className="flex items-center gap-4">
                       <label className="font-semibold min-w-[100px] max-w-[100px]">Color :</label>
-                      <select name="color" value={form.color} className="border rounded p-1 w-full" onChange={handleChange}>
+                      <select
+                        name="color"
+                        value={form.color}
+                        disabled={camposDeshabilitados}
+                        className={`border rounded p-1 w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("color") ? "border-orange-400 bg-orange-100" : ""}`}
+                        onChange={handleChange}
+                      >
                         <option>N/A</option>
                         <option>AMARILLO CLARO</option>
                         <option>AMARILLO PAJIZO</option>
@@ -693,7 +861,13 @@ export default function HematologiaBioquimicaECO() {
                     </div>
                     <div className="flex items-center gap-4">
                       <label className="font-semibold min-w-[100px] max-w-[100px]">Aspecto:</label>
-                      <select name="aspecto" value={form.aspecto} className="border rounded p-1 w-full" onChange={handleChange}>
+                      <select
+                        name="aspecto"
+                        value={form.aspecto}
+                        disabled={camposDeshabilitados}
+                        className={`border rounded p-1 w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("aspecto") ? "border-orange-400 bg-orange-100" : ""}`}
+                        onChange={handleChange}
+                      >
                         <option>N/A</option>
                         <option>LIGERAMENTE TURBIO</option>
                         <option>TRANSPARENTE</option>
@@ -707,6 +881,9 @@ export default function HematologiaBioquimicaECO() {
                       labelWidth="100px"
                       onChange={handleChange}
                       onKeyUp={(e) => { handleFocusNext(e, "ph") }}
+                      disabled={camposDeshabilitados}
+                      edited={isFieldEdited("densidad")}
+                      onRevert={() => revertField("densidad")}
                     />
                     <InputTextOneLine
                       label="PH"
@@ -715,6 +892,9 @@ export default function HematologiaBioquimicaECO() {
                       labelWidth="100px"
                       onChange={handleChange}
                       onKeyUp={(e) => { handleFocusNext(e, "cocaina") }}
+                      disabled={camposDeshabilitados}
+                      edited={isFieldEdited("ph")}
+                      onRevert={() => revertField("ph")}
                     />
                   </div>
                 </SectionFieldset>
@@ -734,6 +914,9 @@ export default function HematologiaBioquimicaECO() {
                         value={form[item.key]}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item.key)}
+                        onRevert={() => revertField(item.key)}
                       />
                     ))}
                   </div>
@@ -751,6 +934,9 @@ export default function HematologiaBioquimicaECO() {
                         value={form[item.key]}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item.key)}
+                        onRevert={() => revertField(item.key)}
                       />
                     ))}
                   </div>
@@ -773,6 +959,9 @@ export default function HematologiaBioquimicaECO() {
                         value={form[item.key]}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item.key)}
+                        onRevert={() => revertField(item.key)}
                       />
                     ))}
                   </div>
@@ -791,6 +980,9 @@ export default function HematologiaBioquimicaECO() {
                         value={form[item.key]}
                         onChange={handleChange}
                         onKeyUp={handleFocusNext}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item.key)}
+                        onRevert={() => revertField(item.key)}
                       />
                     ))}
                   </div>
@@ -808,6 +1000,9 @@ export default function HematologiaBioquimicaECO() {
                         value={form[item.key]}
                         onChange={handleChange}
                         onKeyUp={(e) => { handleFocusNext(e, item.key == "cocaina" ? "marihuana" : "") }}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited(item.key)}
+                        onRevert={() => revertField(item.key)}
                       />
                       <div className="flex justify-center">
                         <InputsRadioGroup
@@ -819,6 +1014,9 @@ export default function HematologiaBioquimicaECO() {
                             { label: 'N/A', value: 'N/A' }
                           ]}
                           onChange={handleRadioButton}
+                          disabled={camposDeshabilitados}
+                          edited={isFieldEdited(item.key)}
+                          onRevert={() => revertField(item.key)}
                         />
                       </div>
                     </div>
@@ -834,6 +1032,9 @@ export default function HematologiaBioquimicaECO() {
                 value={form.observaciones}
                 rows={4}
                 onChange={handleChange}
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("observaciones")}
+                onRevert={() => revertField("observaciones")}
               />
               <div className="bg-green-200 p-3 rounded-xl col-span-3">
                 <CIE10List
@@ -842,6 +1043,7 @@ export default function HematologiaBioquimicaECO() {
                   label="Observaciones CIE10"
                   token={token}
                   setForm={setForm}
+                  disabled={camposDeshabilitados}
                 />
               </div>
               <InputTextArea
@@ -850,12 +1052,18 @@ export default function HematologiaBioquimicaECO() {
                 value={form.notasDoctor}
                 rows={4}
                 onChange={handleChange}
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("notasDoctor")}
+                onRevert={() => revertField("notasDoctor")}
               />
               <EmpleadoComboBox
                 value={form.nombre_medico}
                 label="Especialista"
                 form={form}
                 onChange={handleChangeSimple}
+                disabled={camposDeshabilitados}
+                edited={isMedicoEdited}
+                onRevert={revertMedico}
               />
               <EmpleadoComboBox
                 value={form.nombre_doctorAsignado}
@@ -864,9 +1072,24 @@ export default function HematologiaBioquimicaECO() {
                 onChange={handleChangeSimple}
                 nameField="nombre_doctorAsignado"
                 idField="user_doctorAsignado"
+                disabled={camposDeshabilitados}
+                edited={isDoctorEdited}
+                onRevert={revertDoctor}
               />
             </SectionFieldset>
           </SectionFieldset>
+
+          {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+          {hayRegistroCargado && (
+            <AuditoriaRegistro
+              mostrarEdicion={form.tieneRegistro}
+              fechaCreacion={auditoria.fechaCreacion}
+              fechaEdicion={auditoria.fechaActualizacion}
+              usuarioRegistro={auditoria.usuarioRegistro}
+              usuarioEdicion={auditoria.usuarioActualizacion}
+            />
+          )}
+
           {visualerOpen && (
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
               <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
@@ -886,12 +1109,18 @@ export default function HematologiaBioquimicaECO() {
             </div>
           )}
 
-          <BotonesAccion //space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto
+          {/* ===== BOTONES DE ACCIÓN ===== */}
+          <BotonesForm
             form={form}
-            handleSave={handleSave}
+            handleChangeNumberDecimals={handleChangeNumberDecimals}
+            onNordenChange={handlePrintNordenChange}
+            handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+            saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+            handleEdit={habilitarEdicion}
             handleClear={handleClear}
             handlePrint={handlePrint}
-            handleChangeNumberDecimals={handleChangeNumberDecimals}
+            hideSave={form.tieneRegistro && !edicionHabilitada}
+            hideEdit={!form.tieneRegistro || edicionHabilitada}
           />
         </div>
 
@@ -976,6 +1205,6 @@ export default function HematologiaBioquimicaECO() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
-};
+}
