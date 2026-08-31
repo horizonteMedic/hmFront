@@ -22,7 +22,6 @@ export default function AccionesRegistroHeader({
   edicionHabilitada = false,
   onHabilitarEdicion = () => {},
   onLimpiar = () => {},
-  mostrarLimpiar = true,
   newLabel,
   editLabel,
   children,
@@ -31,6 +30,9 @@ export default function AccionesRegistroHeader({
     "pointer-events-auto inline-flex items-center justify-center gap-2 text-white text-md font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95";
 
   const mostrarHabilitar =
+    hayRegistroCargado && tieneRegistro && !edicionHabilitada;
+
+  const mostrarLimpiar =
     hayRegistroCargado && tieneRegistro && !edicionHabilitada;
 
   return (

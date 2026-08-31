@@ -173,7 +173,7 @@ export default function AntecedentesDeAltura() {
             labelWidth="120px"
             className="w-full"
           />
-          <SearchButton onClick={executeSearch} />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
         </div>
 
         <InputTextOneLine
