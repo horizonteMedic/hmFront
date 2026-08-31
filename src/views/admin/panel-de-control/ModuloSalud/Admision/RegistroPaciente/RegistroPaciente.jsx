@@ -14,6 +14,7 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { SearchPacienteDNI, SubmitRegistro } from "./controllerRegistroPaciente";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import RegistroParentesco from "./RegistroParentesco";
 
 // ── Opciones fijas ────────────────────────────────────────────────────────────
 const SEXO_OPTIONS = [{ label: "MASCULINO", value: "M" }, { label: "FEMENINO", value: "F" }];
@@ -34,6 +35,9 @@ const initialFormState = {
 export default function RegistroPaciente({ onRegistrado }) {
   const { token, userlogued, selectedSede } = useSessionData();
   const dniRef = useRef(null);
+  const [modalParentesco,       setModalParentesco]       = useState(false);
+  const [pacienteParaParentesco, setPacienteParaParentesco] = useState(null);
+  const [pendingRegistrado,      setPendingRegistrado]      = useState(null);
 
   const { form, setForm, handleChange, handleChangeSimple, handleRadioButton } = useForm(initialFormState);
 
@@ -87,28 +91,56 @@ export default function RegistroPaciente({ onRegistrado }) {
       return Swal.fire("Error", `Faltan completar: ${vacios.join(", ")}`, "error");
 
     const r = await SubmitRegistro(form, token, userlogued, handleLimpiar);
-    console.log(r)
     if (!r?.pacienteId) {
-      if (r.id) {
+      if (r?.id) {
         await Swal.fire("Editado", "Paciente editado correctamente", "success");
         handleLimpiar();
       } else {
         Swal.fire("Error", "No se pudo registrar", "error");
       }
+      return;
+    }
+
+    // Guardar datos antes de limpiar el formulario
+    const pacienteData   = { pacienteId: r.pacienteId, dni: form.dni, nombres: `${form.nombres} ${form.apellidos}`.trim() };
+    const origenParentesco = { id: r.pacienteId, nombres: form.nombres, apellidos: form.apellidos, dni: form.dni };
+
+    const result = await Swal.fire({
+      title: "Paciente registrado correctamente",
+      text: "¿Desea agregar un parentesco antes de registrar la visita?",
+      icon: "success",
+      showConfirmButton: true,
+      showDenyButton: true,
+      confirmButtonText: "Agregar parentesco",
+      denyButtonText: "No, registrar visita",
+      allowOutsideClick: false,
+    });
+
+    handleLimpiar();
+
+    if (result.isConfirmed) {
+      setPacienteParaParentesco(origenParentesco);
+      setPendingRegistrado(pacienteData);
+      setModalParentesco(true);
     } else {
-      await Swal.fire("Registrado", "Paciente registrado correctamente", "success");
-      onRegistrado?.({
-        pacienteId: r.pacienteId,
-        dni: form.dni,
-        nombres: `${form.nombres} ${form.apellidos}`.trim(),
-      });
-      handleLimpiar();
+      onRegistrado?.(pacienteData);
     }
 
   };
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+
+      {/* ── Acciones rápidas ──────────────────────────────────────────── */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setModalParentesco(true)}
+          className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm flex items-center gap-2"
+        >
+          Registrar Parentesco
+        </button>
+      </div>
 
       {/* ── Búsqueda ─────────────────────────────────────────────────── */}
       <SectionFieldset legend="Búsqueda de Paciente">
@@ -221,6 +253,21 @@ export default function RegistroPaciente({ onRegistrado }) {
         </div>
       </SectionFieldset>
 
+      {modalParentesco && (
+        <RegistroParentesco
+          onClose={() => {
+            setModalParentesco(false);
+            setPacienteParaParentesco(null);
+            setPendingRegistrado(null);
+          }}
+          pacientePreseleccionado={pacienteParaParentesco}
+          onRegistrarVisita={pendingRegistrado ? () => {
+            onRegistrado?.(pendingRegistrado);
+            setPendingRegistrado(null);
+            setModalParentesco(false);
+          } : undefined}
+        />
+      )}
     </div>
   );
 }

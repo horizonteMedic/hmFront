@@ -143,6 +143,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 return null;
             }
             let apiUrl = ""
+            if (examen.urlNordenPath) {
+                apiUrl = `${examen.url}${nro}`;
+            } else 
             if (examen.urlInfo) {
                 apiUrl = `${examen.urlInfo}?nOrden=${nro}&nameService=${examen.tablaArchivo}&esJasper=true`
             } else {

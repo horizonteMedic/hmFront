@@ -79,7 +79,7 @@ export default function TriajeAsistencial() {
         fRespiratoria: '',
         diagnostico: '',
         // Plantillas de diagnóstico vinculadas a este triaje (JSON: array de
-        // { idPlantilla, codigo, titulo, diagnostico, cie10s, recomendaciones, restricciones })
+        // { id, codigo, titulo, diagnostico, cie10s, recomendaciones, restricciones })
         diagnosticoCompleto: '',
 
         // Búsqueda
@@ -165,13 +165,13 @@ export default function TriajeAsistencial() {
                 vinculadas = [];
             }
 
-            const yaVinculada = vinculadas.some((p) => p.idPlantilla === plantilla.idPlantilla);
+            const yaVinculada = vinculadas.some((p) => p.id === plantilla.id);
             const nuevaLista = yaVinculada
                 ? vinculadas
                 : [
                     ...vinculadas,
                     {
-                        idPlantilla: plantilla.idPlantilla,
+                        id: plantilla.id,
                         codigo: plantilla.codigo,
                         titulo: plantilla.titulo,
                         diagnostico: plantilla.diagnostico,

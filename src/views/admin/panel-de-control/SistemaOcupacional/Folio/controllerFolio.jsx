@@ -36,9 +36,11 @@ export const nombresExamen = {
     "PSICOSENSOMETRIA": "PSICOSENSOMETRICO",
     "MANIPULADOR-ALIMENTOS": "MANIPULADOR ALIMENTOS",
     "ANEXO 16A": "ANEXO 16A",
-    "PSICOSENSOMETRICO ADMISION": "PSICOSENSOMETRICO",
-    "TEST ALTURA ADMISION": "TEST ALTURA",
+    "PSICOSENSOMETRICO PODEROSA": "PSICOSENSOMETRICO",
+    "TEST ALTURA PODEROSA": "TEST ALTURA",
     "MANEJO ALIMENTOS GREEN": "MANIPULADOR ALIMENTOS GREEN",
+    "PSICOSENSOMETRICO DE BOROO": "PSICOSENSOMETRICO",
+    "TRABAJOS EN CALIENTE PODEROSA": "TEST CALIENTE",
 }
 
 export const GetArchivosFolioStatus = async (nOrden, token) => {
@@ -279,7 +281,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 
 
 
-        // 🔹 Set final (un solo render)
+        // 🔹 Set final (un solo render) 
         set((prev) => ({
             ...prev,
             listaExamenes: listaActualizada,

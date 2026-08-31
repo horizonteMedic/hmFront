@@ -57,18 +57,18 @@ export default function Cie10MultiSelect({
         return () => document.removeEventListener("mousedown", onClickOutside);
     }, []);
 
-    const isSelected = (cod) => selected.some((s) => s.cod === cod);
+    const isSelected = (codigo) => selected.some((s) => s.codigo === codigo);
 
     const addItem = (item) => {
         if (isSelected(item.codigo)) return;
-        onChange([...selected, { cod: item.codigo, diagnostico: item.descripcion }]);
+        onChange([...selected, { codigo: item.codigo, descripcion: item.descripcion }]);
         setQuery("");
         setResults([]);
         setShowDropdown(false);
     };
 
-    const removeItem = (cod) => {
-        onChange(selected.filter((s) => s.cod !== cod));
+    const removeItem = (codigo) => {
+        onChange(selected.filter((s) => s.codigo !== codigo));
     };
 
     const filteredResults = results.filter((r) => !isSelected(r.codigo));
@@ -77,6 +77,10 @@ export default function Cie10MultiSelect({
         <div className="space-y-1" ref={boxRef}>
             {label && <label className="font-semibold block">{label} :</label>}
             <div className="relative">
+                <FontAwesomeIcon
+                    icon={faSearch}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
+                />
                 <input
                     type="text"
                     disabled={disabled}
@@ -87,14 +91,14 @@ export default function Cie10MultiSelect({
                     }}
                     onFocus={() => setShowDropdown(true)}
                     placeholder="Buscar por código o descripción..."
-                    className={`border rounded px-2 py-1.5 pl-9 pr-8 w-full ${
-                        disabled ? "bg-gray-300" : ""
+                    className={`block pl-9 pr-8 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] ${
+                        disabled ? "bg-gray-100" : ""
                     }`}
                 />
                 {loading && (
                     <FontAwesomeIcon
                         icon={faSpinner}
-                        className="absolute right-3 top-[30%]  text-blue-500 text-sm animate-spin pointer-events-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-sm animate-spin pointer-events-none"
                     />
                 )}
 
@@ -125,19 +129,19 @@ export default function Cie10MultiSelect({
                 <div className="space-y-1 pt-1">
                     {selected.map((item) => (
                         <div
-                            key={item.cod}
+                            key={item.codigo}
                             className="flex items-center gap-3 p-1 bg-green-50 border border-green-200 rounded-md"
                         >
                             <span className="text-sm font-mono font-bold text-green-700 bg-green-100 px-2 py-1 rounded shrink-0">
-                                {item.cod}
+                                {item.codigo}
                             </span>
                             <span className="text-sm text-green-800 flex-1 break-words">
-                                {item.diagnostico}
+                                {item.descripcion}
                             </span>
                             {!disabled && (
                                 <button
                                     type="button"
-                                    onClick={() => removeItem(item.cod)}
+                                    onClick={() => removeItem(item.codigo)}
                                     className="text-red-500 hover:text-red-700 shrink-0 pr-2"
                                 >
                                     <FontAwesomeIcon icon={faTrash} />

@@ -7,23 +7,19 @@ import PlantillaDiagnosticoForm from "./PlantillaDiagnosticoForm";
 import CatalogoSimpleManager from "./CatalogoSimpleManager";
 import {
     guardarRecomendacion,
-    eliminarRecomendacion,
     getRecomendaciones,
     guardarRestriccion,
-    eliminarRestriccion,
     getRestricciones,
 } from "./model";
 
 const recomendacionApi = {
     list: getRecomendaciones,
     guardar: guardarRecomendacion,
-    remove: eliminarRecomendacion,
 };
 
 const restriccionApi = {
     list: getRestricciones,
     guardar: guardarRestriccion,
-    remove: eliminarRestriccion,
 };
 
 /**
@@ -61,17 +57,17 @@ export default function PlantillaDiagnosticoManager({
         close();
     };
 
-    const handleEditar = async (idPlantilla) => {
-        await hook.cargarParaEditar(idPlantilla);
+    const handleEditar = async (id) => {
+        await hook.cargarParaEditar(id);
         setTab("form");
     };
 
     // Clona una plantilla existente: precarga el formulario con sus datos
-    // pero sin idPlantilla ni código (deben ser irrepetibles), para que al
-    // guardar se registre como una plantilla nueva.
+    // pero sin id ni código (deben ser irrepetibles), para que al guardar
+    // se registre como una plantilla nueva.
     const handleClonar = (p) => {
         hook.setForm({
-            idPlantilla: null,
+            id: null,
             codigo: "",
             titulo: p.titulo ? `${p.titulo} (COPIA)` : "",
             diagnostico: p.diagnostico || "",
@@ -112,7 +108,7 @@ export default function PlantillaDiagnosticoManager({
                                 className={`flex-1 py-6  font-semibold ${tab === "form" ? "bg-blue-50 text-blue-700" : "text-gray-500"
                                     }`}
                             >
-                                {hook.form.idPlantilla ? "Editar" : "Nueva"}
+                                {hook.form.id ? "Editar" : "Nueva"}
                             </button>
                         </div>
 
@@ -125,7 +121,7 @@ export default function PlantillaDiagnosticoManager({
                                     onClonar={handleClonar}
                                 />
                             ) : (
-                                <PlantillaDiagnosticoForm hook={hook} token={token} />
+                                <PlantillaDiagnosticoForm hook={hook} token={token} usuarioCreacion={usuarioCreacion} />
                             )}
                         </div>
 

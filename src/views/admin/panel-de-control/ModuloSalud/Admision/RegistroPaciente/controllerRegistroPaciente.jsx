@@ -41,7 +41,7 @@ export const SubmitRegistro = async (form, token, userlogued, limpiar) => {
     LoadingDefault("Registrando...")
     const url = form.pacienteId
         ? `${SubmitURL}/${form.pacienteId}`
-        : `${SubmitURL}??usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`;
+        : `${SubmitURL}?usuarioRegistro=${userlogued}&fuenteReniec=${form.origen === "RENIEC" ? true : false}`;
     const [dd, mm, yyyy] = form.fechaNacimiento.split('-');
     const fechaFormateada = `${yyyy}-${mm}-${dd}`;
 

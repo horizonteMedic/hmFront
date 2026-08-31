@@ -1,13 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faSave } from "@fortawesome/free-solid-svg-icons";
-import InputTextOneLine from "../InputTextOneLine";
-import InputTextArea from "../InputTextArea";
+import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
 import SectionFieldset from "../SectionFieldset";
 import CreatableMultiSelect from "./CreatableMultiSelect";
 import Cie10MultiSelect from "./Cie10MultiSelect";
-import { getRecomendaciones, getRestricciones } from "./model";
+import { getRecomendaciones, guardarRecomendacion, getRestricciones, guardarRestriccion } from "./model";
 
-export default function PlantillaDiagnosticoForm({ hook, token }) {
+export default function PlantillaDiagnosticoForm({ hook, token, usuarioCreacion }) {
     const {
         form,
         setForm,
@@ -23,31 +22,31 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
     } = hook;
 
     return (
-        <SectionFieldset legend={form.idPlantilla ? "Editar Plantilla" : "Nueva Plantilla"} className="grid md:grid-cols-2 gap-x-4 gap-y-3">
-            <InputTextOneLine
+        <SectionFieldset legend={form.id ? "Editar Plantilla" : "Nueva Plantilla"} className="grid md:grid-cols-2 gap-x-4 gap-y-3"  fieldsetClassName="bg-white">
+            <FloatingInput
+                id="plantilla-codigo"
                 label="Código"
-                name="codigo"
+                required
                 value={form.codigo}
                 onChange={(e) =>
                     setForm((prev) => ({ ...prev, codigo: e.target.value.toUpperCase() }))
                 }
-                labelWidth="120px"
             />
-            <InputTextOneLine
+            <FloatingInput
+                id="plantilla-titulo"
                 label="Título"
-                name="titulo"
+                required
                 value={form.titulo}
                 onChange={(e) =>
                     setForm((prev) => ({ ...prev, titulo: e.target.value.toUpperCase() }))
                 }
-                labelWidth="120px"
             />
-            <InputTextOneLine
+            <FloatingInput
+                id="plantilla-diagnostico"
                 label="Diagnóstico"
-                name="diagnostico"
-                value={form.diagnostico}
-                labelWidth="120px"
+                required
                 className="col-span-2"
+                value={form.diagnostico}
                 onChange={(e) =>
                     setForm((prev) => ({ ...prev, diagnostico: e.target.value.toUpperCase() }))
                 }
@@ -61,7 +60,13 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
                 placeholder="Buscar o crear recomendación..."
                 selected={recomendaciones}
                 onChange={setRecomendaciones}
-                fetchAll={() => getRecomendaciones(undefined, token)}
+                fetchAll={() => getRecomendaciones(token)}
+                onCreate={(descripcion) =>
+                    guardarRecomendacion(
+                        { descripcion, usuarioRegistro: usuarioCreacion, usuarioActualizacion: usuarioCreacion },
+                        token
+                    )
+                }
             />
 
             <CreatableMultiSelect
@@ -69,7 +74,13 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
                 placeholder="Buscar o crear restricción..."
                 selected={restricciones}
                 onChange={setRestricciones}
-                fetchAll={() => getRestricciones(undefined, token)}
+                fetchAll={() => getRestricciones(token)}
+                onCreate={(descripcion) =>
+                    guardarRestriccion(
+                        { descripcion, usuarioRegistro: usuarioCreacion, usuarioActualizacion: usuarioCreacion },
+                        token
+                    )
+                }
             />
 
             <div className="flex gap-3 pt-2">
@@ -80,7 +91,7 @@ export default function PlantillaDiagnosticoForm({ hook, token }) {
                     className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm px-4 py-2 rounded flex items-center gap-2"
                 >
                     <FontAwesomeIcon icon={faSave} />
-                    {form.idPlantilla ? "Actualizar" : "Guardar"}
+                    {form.id ? "Actualizar" : "Guardar"}
                 </button>
                 <button
                     type="button"

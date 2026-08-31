@@ -1044,6 +1044,14 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/certificadoManipuladoresAlimentos/obtenerReporteCertificadoManipuladoresAlimentos",
         esJasper: true,
     },
+
+    TRIAJE: {
+        nombre: "TRIAJE",
+        tabla: "triaje",
+        // El nOrden va como segmento de ruta, no como query param (ver urlNordenPath en FolioJasper).
+        url: "/api/v01/ct/triaje/listarFormatoTriaje/",
+        urlNordenPath: true,
+    },
 };
 
 

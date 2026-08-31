@@ -6,10 +6,9 @@ import {
     faSave,
     faSpinner,
     faTimes,
-    faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import InputTextOneLine from "../InputTextOneLine";
+import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
 import { useCatalogoSimple } from "./useCatalogoSimple";
 
 /**
@@ -25,7 +24,7 @@ export default function CatalogoSimpleManager({
     token,
     usuarioCreacion,
 }) {
-    const { items, filtro, setFiltro, loading, crear, actualizar, eliminar, refresh } =
+    const { items, filtro, setFiltro, loading, crear, actualizar, refresh } =
         useCatalogoSimple({ token, usuarioCreacion, api });
 
     const [editId, setEditId] = useState(null);
@@ -74,23 +73,6 @@ export default function CatalogoSimpleManager({
         }
     };
 
-    const handleEliminar = async (id) => {
-        const confirm = await Swal.fire({
-            title: "¿Eliminar registro?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        });
-        if (!confirm.isConfirmed) return;
-        const res = await eliminar(id);
-        if (!res || res.error || res.status) {
-            Swal.fire("Error", "No se pudo eliminar el registro", "error");
-            return;
-        }
-        refresh();
-    };
-
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50 z-[60]">
             <div className="bg-white rounded-xl shadow-xl w-[520px] max-h-[85vh] flex flex-col">
@@ -100,27 +82,26 @@ export default function CatalogoSimpleManager({
                 </div>
 
                 <div className="p-4 flex-1 overflow-y-auto space-y-3">
-                    <InputTextOneLine
+                    <FloatingInput
+                        id="catalogo-buscar"
                         label="Buscar"
-                        name="filtro"
                         value={filtro}
                         onChange={(e) => setFiltro(e.target.value)}
-                        labelWidth="70px"
                     />
 
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
+                    <div className="flex gap-2 items-center">
+                        <FloatingInput
+                            id="catalogo-nuevo"
+                            label="Nueva descripción"
+                            className="flex-1"
                             value={nuevoText}
                             onChange={(e) => setNuevoText(e.target.value)}
-                            placeholder="Nueva descripción..."
-                            className="border rounded px-2 py-1 w-full"
                         />
                         <button
                             type="button"
                             disabled={saving || !nuevoText.trim()}
                             onClick={handleCrear}
-                            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-3 rounded flex items-center gap-2"
+                            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-3 py-2.5 rounded-lg flex items-center gap-2 self-stretch"
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </button>
@@ -143,12 +124,13 @@ export default function CatalogoSimpleManager({
                                 >
                                     {editId === item.id ? (
                                         <>
-                                            <input
-                                                type="text"
+                                            <FloatingInput
+                                                id={`catalogo-editar-${item.id}`}
+                                                label="Descripción"
                                                 autoFocus
+                                                className="flex-1"
                                                 value={editText}
                                                 onChange={(e) => setEditText(e.target.value)}
-                                                className="border rounded px-2 py-1 flex-1"
                                             />
                                             <button
                                                 type="button"
@@ -174,13 +156,6 @@ export default function CatalogoSimpleManager({
                                                 className="text-blue-600 hover:text-blue-800"
                                             >
                                                 <FontAwesomeIcon icon={faPencil} />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEliminar(item.id)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
                                             </button>
                                         </>
                                     )}
