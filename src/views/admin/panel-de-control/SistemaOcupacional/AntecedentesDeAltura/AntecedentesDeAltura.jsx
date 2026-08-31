@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
@@ -16,7 +16,7 @@ import EmpleadoComboBox from "../../../../components/reusableComponents/Empleado
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SearchButton from "../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesForm from "../../../../components/templates/BotonesForm";
@@ -142,7 +142,13 @@ export default function AntecedentesDeAltura() {
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-      <div className="sticky top-2 z-20 flex justify-end items-center gap-2 pointer-events-none">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      >
         <button
           type="button"
           onClick={() => setModalCargaMasiva(true)}
@@ -150,20 +156,7 @@ export default function AntecedentesDeAltura() {
         >
           <FontAwesomeIcon icon={faUpload} /> Carga Masiva
         </button>
-        <RegistroEstadoPill
-          tieneRegistro={form.tieneRegistro}
-          className={hayRegistroCargado ? "" : "invisible"}
-        />
-        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-          <button
-            type="button"
-            onClick={habilitarEdicion}
-            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-          >
-            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-          </button>
-        )}
-      </div>
+      </AccionesRegistroHeader>
 
       <SectionFieldset
         legend="Antecedentes de Enfermedades en Altura"

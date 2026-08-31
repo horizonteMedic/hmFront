@@ -86,7 +86,7 @@ export const GetInfoServicioEditar = async (
 
     fechaExam: res.fechaInforme,
 
-    nombreExamen: res.tipoExamen ?? "",
+    nombreExamen: res.nombreExamen ?? "",
     dni: res.dni ?? "",
 
     nombres: res.nombres ?? "",
@@ -100,7 +100,7 @@ export const GetInfoServicioEditar = async (
     empresa: res.empresa ?? "",
     contrata: res.contrata ?? "",
     ocupacion: res.ocupacionPaciente ?? "",
-    cargoDesempenar: res.cargoPaciente ?? "",
+    cargoDesempenar: res.cargo ?? "",
 
     ritmo: res.mensajeRitmo ?? "",
     fc: res.mensajeFC ?? "",

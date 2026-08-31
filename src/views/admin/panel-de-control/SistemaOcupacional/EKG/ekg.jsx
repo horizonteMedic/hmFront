@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
@@ -24,7 +24,7 @@ import EmpleadoComboBox from "../../../../components/reusableComponents/Empleado
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
 import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
@@ -263,21 +263,13 @@ export default function EKG() {
 
   return (
     <div className="px-4 max-w-[90%] xl:max-w-[80%] mx-auto space-y-3">
-      <div className="sticky top-2 z-20 flex justify-end items-center gap-2 pointer-events-none">
-        <RegistroEstadoPill
-          tieneRegistro={form.tieneRegistro}
-          className={hayRegistroCargado ? "" : "invisible"}
-        />
-        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-          <button
-            type="button"
-            onClick={habilitarEdicion}
-            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-          >
-            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-          </button>
-        )}
-      </div>
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-6">
         {/* PANEL IZQUIERDO - FORMULARIO */}
@@ -294,7 +286,7 @@ export default function EKG() {
                 labelWidth="120px"
                 className="w-full"
               />
-              <SearchButton onClick={executeSearch} />
+              <SearchButton onClick={executeSearch} className="lg:hidden"  />
             </div>
             <InputTextOneLine
               label="Fecha"
@@ -347,7 +339,7 @@ export default function EKG() {
             />
           </SectionFieldset>
 
-          <DatosPersonalesLaborales form={form} />
+          <DatosPersonalesLaborales minSizePrincipal="none" minSizeSecundario="none" form={form} />
 
           <SectionFieldset
             legend="Parámetros Electrocardiográficos"
