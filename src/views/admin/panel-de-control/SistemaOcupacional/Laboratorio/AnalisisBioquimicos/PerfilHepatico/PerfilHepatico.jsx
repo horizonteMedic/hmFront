@@ -1,13 +1,19 @@
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilHepatico';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPerfilHepatico';
 import {
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const testFields = [
   { label: 'Fosfatasa Alcalina', name: 'fosfAlc' },
@@ -23,6 +29,16 @@ const testFields = [
 ];
 
 const tabla = 'perfil_hepatico';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  ...testFields.map(f => f.name),
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function PerfilHepatico() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -67,19 +83,45 @@ export default function PerfilHepatico() {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
     form,
     setForm,
     handleChange,
+    handleChangeNumber,
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "perfilHepatico" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleChangeBilirrubina = (e) => {
     const { name, value } = e.target;
@@ -111,10 +153,34 @@ export default function PerfilHepatico() {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === 'Enter') {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -124,23 +190,50 @@ export default function PerfilHepatico() {
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
+  const handleFieldChange = (name) => {
+    if (name === 'biliTotal' || name === 'biliDir') return handleChangeBilirrubina;
+    if (name === 'protTot' || name === 'albumina') return handleChangeGlobulina;
+    return handleChange;
+  };
+
   return (
-    <form className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -152,104 +245,14 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Estado Civil"
-          name="estadoCivil"
-          value={form.estadoCivil}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
 
       <SectionFieldset legend="Resultados" className='space-y-3'>
         <div className="flex justify-end">
           <button
             type="button"
-            className="bg-red-600 text-white px-4 py-2 rounded-md"
+            disabled={camposDeshabilitados}
+            className="bg-red-600 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => {
               const text = form.fosfAlc == "N/A" ? "" : "N/A";
               setForm(prev => ({
@@ -272,44 +275,38 @@ export default function PerfilHepatico() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div className='space-y-4'>
-          {testFields.slice(0, 5).map(({ label, name }) => (
-            <InputTextOneLine
-              key={name}
-              label={label}
-              name={name}
-              value={form[name]}
-              onChange={
-                name === 'biliTotal' || name === 'biliDir'
-                  ? handleChangeBilirrubina
-                  : name === 'protTot' || name === 'albumina'
-                    ? handleChangeGlobulina
-                    : handleChange
-              }
-              onKeyUp={handleFocusNext}
-              labelWidth="120px"
-            />
-          ))}
-        </div>
-        <div className='space-y-4'>
-          {testFields.slice(5, 10).map(({ label, name }) => (
-            <InputTextOneLine
-              key={name}
-              label={label}
-              name={name}
-              value={form[name]}
-              onChange={
-                name === 'biliTotal' || name === 'biliDir'
-                  ? handleChangeBilirrubina
-                  : name === 'protTot' || name === 'albumina'
-                    ? handleChangeGlobulina
-                    : handleChange
-              }
-              onKeyUp={handleFocusNext}
-              labelWidth="120px"
-            />
-          ))}
-        </div>
+          <div className='space-y-4'>
+            {testFields.slice(0, 5).map(({ label, name }) => (
+              <InputTextOneLine
+                key={name}
+                label={label}
+                name={name}
+                value={form[name]}
+                onChange={handleFieldChange(name)}
+                onKeyUp={handleFocusNext}
+                labelWidth="120px"
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited(name)}
+                onRevert={() => revertField(name)}
+              />
+            ))}
+          </div>
+          <div className='space-y-4'>
+            {testFields.slice(5, 10).map(({ label, name }) => (
+              <InputTextOneLine
+                key={name}
+                label={label}
+                name={name}
+                value={form[name]}
+                onChange={handleFieldChange(name)}
+                onKeyUp={handleFocusNext}
+                labelWidth="120px"
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited(name)}
+                onRevert={() => revertField(name)}
+              />
+            ))}
+          </div>
         </div>
 
       </SectionFieldset>
@@ -320,6 +317,9 @@ export default function PerfilHepatico() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -328,16 +328,36 @@ export default function PerfilHepatico() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
-    </form>
+    </div>
   );
 }
