@@ -13,18 +13,26 @@ import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerInformePsicologico";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_psicologico";
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-const CAMPOS_EDITABLES = ["fechaEntrevista", "aproboTest", "recomendaciones"];
+const CAMPOS_EDITABLES = [
+    "fechaEntrevista",
+    "aproboTest",
+    "recomendaciones",
+    "areaIntelectual",
+    "areaOrganicidad",
+    "areaPersonalidad",
+    "areaPsicomotricidad",
+];
 
 export default function InformePsicologico() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
@@ -372,21 +380,13 @@ export default function InformePsicologico() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-                    <button
-                        type="button"
-                        onClick={habilitarEdicion}
-                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-                    >
-                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-                    </button>
-                )}
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
@@ -464,6 +464,8 @@ export default function InformePsicologico() {
                                 value={form.areaIntelectual}
                                 onChange={handleChange}
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaIntelectual")}
+                                onRevert={() => revertField("areaIntelectual")}
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>
@@ -652,6 +654,8 @@ export default function InformePsicologico() {
                                 value={form.areaOrganicidad}
                                 onChange={handleChange}
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaOrganicidad")}
+                                onRevert={() => revertField("areaOrganicidad")}
                             />
                             <fieldset className="grid grid-cols-2 gap-2">
                                 <SectionFieldset className="flex gap-3 flex-col" >
@@ -714,6 +718,8 @@ export default function InformePsicologico() {
                             value={form.areaPersonalidad}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("areaPersonalidad")}
+                            onRevert={() => revertField("areaPersonalidad")}
                         />
                     </SectionFieldset>
 
@@ -727,6 +733,8 @@ export default function InformePsicologico() {
                                 value={form.areaPsicomotricidad}
                                 onChange={handleChange}
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaPsicomotricidad")}
+                                onRevert={() => revertField("areaPsicomotricidad")}
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>

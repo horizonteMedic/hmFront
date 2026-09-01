@@ -203,7 +203,7 @@ export default function AntecedentesDeAltura() {
 
       <DatosPersonalesLaborales form={form} />
 
-      <SectionFieldset legend="Médico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+      {/* <SectionFieldset legend="Médico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
         <InputTextOneLine
           label="Nombres"
           name="nombreMedico"
@@ -232,7 +232,7 @@ export default function AntecedentesDeAltura() {
           disabled
           labelWidth="120px"
         />
-      </SectionFieldset>
+      </SectionFieldset> */}
 
       <SectionFieldset legend="Antecedentes patológicos">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">

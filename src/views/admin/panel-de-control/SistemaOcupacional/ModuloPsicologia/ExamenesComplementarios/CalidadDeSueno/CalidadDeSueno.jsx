@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faListCheck, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useForm } from "../../../../../../hooks/useForm";
 import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
@@ -184,21 +184,13 @@ export default function CalidadDeSueno() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-                    <button
-                        type="button"
-                        onClick={habilitarEdicion}
-                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-                    >
-                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-                    </button>
-                )}
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="flex gap-x-3 w-full">

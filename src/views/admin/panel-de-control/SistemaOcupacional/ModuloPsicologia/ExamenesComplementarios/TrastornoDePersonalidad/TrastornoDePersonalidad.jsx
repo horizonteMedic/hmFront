@@ -6,13 +6,11 @@ import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerTrastornoDePersonalidad';
 import { InputsBooleanRadioGroup, InputTextArea, InputTextOneLine, RadioTable, SectionFieldset } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
-import RegistroEstadoPill from '../../../../../../components/reusableComponents/RegistroEstadoPill';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
 import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesForm from '../../../../../../components/templates/BotonesForm';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = 'trastornos_personalidad';
 
@@ -198,21 +196,13 @@ export default function TrastornoDePersonalidad() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-                    <button
-                        type="button"
-                        onClick={habilitarEdicion}
-                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-                    >
-                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-                    </button>
-                )}
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="flex gap-x-3 w-full">
