@@ -2,7 +2,7 @@ import { InputTextOneLine } from "../../../../../../../components/reusableCompon
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
 import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
-export default function ParteI({ form, handleChange, handleRadioButton, disabled = false }) {
+export default function ParteI({ form, handleChange, handleRadioButton, disabled = false, isFieldEdited, revertField }) {
   return (
     <SectionFieldset legend="Preguntas (durante el último mes)">
       <div className="space-y-4">
@@ -13,6 +13,8 @@ export default function ParteI({ form, handleChange, handleRadioButton, disabled
           onChange={handleChange}
           labelWidth="200px"
           disabled={disabled}
+          edited={isFieldEdited("horaAcostarse")}
+          onRevert={() => revertField("horaAcostarse")}
         />
         <InputsRadioGroup
           label="2. Tiempo para quedarse dormido"
@@ -27,6 +29,8 @@ export default function ParteI({ form, handleChange, handleRadioButton, disabled
             { label: "Más de 60 min", value: "MAS_60" },
           ]}
           disabled={disabled}
+          edited={isFieldEdited("tiempoDormir")}
+          onRevert={() => revertField("tiempoDormir")}
         />
         <InputTextOneLine
           label="3. Hora de levantarse normalmente"
@@ -35,6 +39,8 @@ export default function ParteI({ form, handleChange, handleRadioButton, disabled
           onChange={handleChange}
           labelWidth="200px"
           disabled={disabled}
+          edited={isFieldEdited("horaLevantarse")}
+          onRevert={() => revertField("horaLevantarse")}
         />
         <InputTextOneLine
           label="4. Horas dormidas por noche (promedio)"
@@ -43,6 +49,8 @@ export default function ParteI({ form, handleChange, handleRadioButton, disabled
           onChange={handleChange}
           labelWidth="200px"
           disabled={disabled}
+          edited={isFieldEdited("horasDormidas")}
+          onRevert={() => revertField("horasDormidas")}
         />
       </div>
     </SectionFieldset>

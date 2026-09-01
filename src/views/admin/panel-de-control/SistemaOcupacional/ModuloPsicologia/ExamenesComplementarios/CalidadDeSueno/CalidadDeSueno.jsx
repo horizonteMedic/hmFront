@@ -22,13 +22,36 @@ import EmpleadoComboBox from "../../../../../../components/reusableComponents/Em
 const tabla = "calidad_sueño";
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-// Por el volumen de campos (~20 preguntas en 3 pestañas vía RadioTable/InputsRadioGroup), el
-// resaltado/revertido individual solo se aplica a los campos "core"; el resto solo respeta el
-// bloqueo general (camposDeshabilitados) vía la nueva prop `disabled` en ParteI/II/III.
+// Incluye los campos "core" y todas las preguntas editables de las 3 pestañas
+// (RadioTable + InputsRadioGroup + InputTextOneLine), para que el revert individual
+// funcione en todo lo que no esté deshabilitado de origen.
 const CAMPOS_EDITABLES = [
     "fechaExam",
     "user_medicoFirma",
     "nombre_medico",
+    // ===== Parte I =====
+    "horaAcostarse",
+    "tiempoDormir",
+    "horaLevantarse",
+    "horasDormidas",
+    // ===== Parte II (RadioTable) =====
+    "probPrimeraHora",
+    "probDespertoNoche",
+    "probLevantarseBano",
+    "probNoRespirarBien",
+    "probTosiaRonca",
+    "probSentiaFrio",
+    "probSentiaCalor",
+    "probPesadillas",
+    "probDolores",
+    "probOtrasRazones",
+    // ===== Parte III =====
+    "medicinasDormirFrecuencia",
+    "somnolenciaSocialFrecuencia",
+    "despertaNochePromedio",
+    "calidadSuenoGeneral",
+    "animoDificultaActividad",
+    "comparteHabitacion",
 ];
 
 export default function CalidadDeSueno() {
@@ -258,6 +281,8 @@ export default function CalidadDeSueno() {
                     handleRadioButton={handleRadioButton}
                     handleChangeSimple={handleChangeSimple}
                     disabled={camposDeshabilitados}
+                    isFieldEdited={isFieldEdited}
+                    revertField={revertField}
                 />
             </div>
 

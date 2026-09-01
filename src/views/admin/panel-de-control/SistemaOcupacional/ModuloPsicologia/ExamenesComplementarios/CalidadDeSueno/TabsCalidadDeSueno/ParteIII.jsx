@@ -1,7 +1,7 @@
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
 import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
-export default function ParteIII({ form, handleRadioButton, disabled = false }) {
+export default function ParteIII({ form, handleRadioButton, disabled = false, isFieldEdited, revertField }) {
   return (
     <SectionFieldset legend="Preguntas (durante el último mes)" className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -20,6 +20,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             labelOnTop
             vertical
             disabled={disabled}
+            edited={isFieldEdited("medicinasDormirFrecuencia")}
+            onRevert={() => revertField("medicinasDormirFrecuencia")}
           />
 
           <InputsRadioGroup
@@ -36,6 +38,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             labelOnTop
             vertical
             disabled={disabled}
+            edited={isFieldEdited("somnolenciaSocialFrecuencia")}
+            onRevert={() => revertField("somnolenciaSocialFrecuencia")}
           />
 
           <InputsRadioGroup
@@ -52,6 +56,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             labelOnTop
             vertical
             disabled={disabled}
+            edited={isFieldEdited("despertaNochePromedio")}
+            onRevert={() => revertField("despertaNochePromedio")}
           />
         </div>
         <div className="space-y-6">
@@ -69,6 +75,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             labelOnTop
             vertical
             disabled={disabled}
+            edited={isFieldEdited("calidadSuenoGeneral")}
+            onRevert={() => revertField("calidadSuenoGeneral")}
           />
 
           <InputsRadioGroup
@@ -85,6 +93,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             labelOnTop
             vertical
             disabled={disabled}
+            edited={isFieldEdited("animoDificultaActividad")}
+            onRevert={() => revertField("animoDificultaActividad")}
           />
 
           <InputsRadioGroup
@@ -101,6 +111,8 @@ export default function ParteIII({ form, handleRadioButton, disabled = false }) 
             ]}
             vertical
             disabled={disabled}
+            edited={isFieldEdited("comparteHabitacion")}
+            onRevert={() => revertField("comparteHabitacion")}
           />
         </div>
       </div>

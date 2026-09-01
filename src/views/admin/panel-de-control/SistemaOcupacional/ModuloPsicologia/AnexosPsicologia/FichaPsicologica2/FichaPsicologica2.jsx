@@ -35,7 +35,33 @@ const orientacionOptions = [
 ];
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-const CAMPOS_EDITABLES = ["fechaExamen", "esApto", "recomendaciones", "user_medicoFirma", "nombre_medico"];
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "esApto",
+    "recomendaciones",
+    "user_medicoFirma",
+    "nombre_medico",
+    // Motivo de evaluación
+    "motivoEvaluacion",
+    // Observación de Conductas
+    "presentacion",
+    "postura",
+    "discursoRitmo",
+    "discursoTono",
+    "discursoArticulacion",
+    "orientacionTiempo",
+    "orientacionEspacio",
+    "orientacionPersona",
+    // Resultados de evaluación
+    "nivelIntelectual",
+    "coordinacionVisomotriz",
+    "nivelMemoria",
+    "personalidad",
+    "afectividad",
+    // Conclusiones
+    "areaCognitiva",
+    "areaEmocional",
+];
 
 export default function FichaPsicologica2() {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -256,6 +282,8 @@ export default function FichaPsicologica2() {
                             value={form.motivoEvaluacion}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("motivoEvaluacion")}
+                            onRevert={() => revertField("motivoEvaluacion")}
                         />
                     </SectionFieldset>
 
@@ -268,6 +296,8 @@ export default function FichaPsicologica2() {
                                 vertical
                                 onChange={handleRadioButton}
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("presentacion")}
+                                onRevert={() => revertField("presentacion")}
                                 options={[
                                     { label: "Adecuado", value: "ADECUADO" },
                                     { label: "Inadecuado", value: "INADECUADO" },
@@ -282,6 +312,8 @@ export default function FichaPsicologica2() {
                                 vertical
                                 onChange={handleRadioButton}
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("postura")}
+                                onRevert={() => revertField("postura")}
                                 options={[
                                     { label: "Erguida", value: "ERGUIDA" },
                                     { label: "Encorvada", value: "ENCORVADA" },
@@ -296,6 +328,8 @@ export default function FichaPsicologica2() {
                                 onChange={handleRadioButton}
                                 vertical
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("discursoRitmo")}
+                                onRevert={() => revertField("discursoRitmo")}
                                 options={[
                                     { label: "Lento", value: "LENTO" },
                                     { label: "Rápido", value: "RAPIDO" },
@@ -311,6 +345,8 @@ export default function FichaPsicologica2() {
                                 onChange={handleRadioButton}
                                 vertical
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("discursoTono")}
+                                onRevert={() => revertField("discursoTono")}
                                 options={[
                                     { label: "Bajo", value: "BAJO" },
                                     { label: "Moderado", value: "MODERADO" },
@@ -326,6 +362,8 @@ export default function FichaPsicologica2() {
                                 onChange={handleRadioButton}
                                 vertical
                                 disabled={camposDeshabilitados}
+                                edited={isFieldEdited("discursoArticulacion")}
+                                onRevert={() => revertField("discursoArticulacion")}
                                 options={[
                                     { label: "Con dificultad", value: "CON_DIFICULTAD" },
                                     { label: "Sin dificultad", value: "SIN_DIFICULTAD" },
@@ -341,6 +379,8 @@ export default function FichaPsicologica2() {
                                 handleRadioButton={handleRadioButton}
                                 labelColumns={1}
                                 disabled={camposDeshabilitados}
+                                isFieldEdited={isFieldEdited}
+                                onRevert={revertField}
                             />
                         </SectionFieldset>
                     </SectionFieldset>
@@ -355,6 +395,8 @@ export default function FichaPsicologica2() {
                             onChange={handleChange}
                             labelWidth="160px"
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("nivelIntelectual")}
+                            onRevert={() => revertField("nivelIntelectual")}
                         />
                         <InputTextOneLine
                             label="Coordinación Visomotriz"
@@ -363,6 +405,8 @@ export default function FichaPsicologica2() {
                             onChange={handleChange}
                             labelWidth="160px"
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("coordinacionVisomotriz")}
+                            onRevert={() => revertField("coordinacionVisomotriz")}
                         />
                         <InputTextOneLine
                             label="Nivel de Memoria"
@@ -371,6 +415,8 @@ export default function FichaPsicologica2() {
                             onChange={handleChange}
                             labelWidth="160px"
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("nivelMemoria")}
+                            onRevert={() => revertField("nivelMemoria")}
                         />
                         <InputTextArea
                             rows={8}
@@ -379,6 +425,8 @@ export default function FichaPsicologica2() {
                             value={form.personalidad}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("personalidad")}
+                            onRevert={() => revertField("personalidad")}
                         />
                         <InputTextArea
                             rows={5}
@@ -387,6 +435,8 @@ export default function FichaPsicologica2() {
                             value={form.afectividad}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("afectividad")}
+                            onRevert={() => revertField("afectividad")}
                         />
                     </div>
                 </SectionFieldset>
@@ -413,6 +463,8 @@ export default function FichaPsicologica2() {
                             value={form.areaCognitiva}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("areaCognitiva")}
+                            onRevert={() => revertField("areaCognitiva")}
                         />
                         <InputTextArea
                             rows={4}
@@ -421,6 +473,8 @@ export default function FichaPsicologica2() {
                             value={form.areaEmocional}
                             onChange={handleChange}
                             disabled={camposDeshabilitados}
+                            edited={isFieldEdited("areaEmocional")}
+                            onRevert={() => revertField("areaEmocional")}
                         />
                     </div>
                 </SectionFieldset>

@@ -34,12 +34,50 @@ const orientacionOptions = [
 ];
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-const CAMPOS_EDITABLES = ["fechaExamen", "esApto", "areaCognitiva", "areaEmocional", "user_medicoFirma", "nombre_medico"];
+const CAMPOS_EDITABLES = [
+  "fechaExamen",
+  "esApto",
+  "user_medicoFirma",
+  "nombre_medico",
+  // Evaluación y Riesgos
+  "motivoEvaluacion",
+  "principalesRiesgos",
+  "medidasSeguridad",
+  // Historia y Observaciones
+  "historiaFamiliar",
+  "habitos",
+  "otrasObservaciones",
+  // Observación de Conductas
+  "presentacion",
+  "postura",
+  "ritmo",
+  "tono",
+  "articulacion",
+  "orientacionTiempo",
+  "orientacionEspacio",
+  "orientacionPersona",
+  "areaCognitiva",
+  // Procesos Cognitivos / Otros Procesos
+  "lucidoAtento",
+  "pensamiento",
+  "percepcion",
+  "memoria",
+  "inteligencia",
+  "apetito",
+  "sueno",
+  "personalidad",
+  "afectividad",
+  "conductaSexual",
+  // Área Emocional
+  "areaEmocional",
+];
 
 function EvaluacionRiesgosHistoria({
   form,
   handleChange,
   disabled,
+  isFieldEdited,
+  revertField,
 }) {
   return (
     <div className="space-y-3">
@@ -51,6 +89,8 @@ function EvaluacionRiesgosHistoria({
           value={form.motivoEvaluacion}
           onChange={handleChange}
           disabled={disabled}
+          edited={isFieldEdited("motivoEvaluacion")}
+          onRevert={() => revertField("motivoEvaluacion")}
         />
         <InputTextArea
           rows={5}
@@ -59,6 +99,8 @@ function EvaluacionRiesgosHistoria({
           value={form.principalesRiesgos}
           onChange={handleChange}
           disabled={disabled}
+          edited={isFieldEdited("principalesRiesgos")}
+          onRevert={() => revertField("principalesRiesgos")}
         />
         <InputTextArea
           rows={5}
@@ -67,6 +109,8 @@ function EvaluacionRiesgosHistoria({
           value={form.medidasSeguridad}
           onChange={handleChange}
           disabled={disabled}
+          edited={isFieldEdited("medidasSeguridad")}
+          onRevert={() => revertField("medidasSeguridad")}
         />
       </SectionFieldset>
 
@@ -79,6 +123,8 @@ function EvaluacionRiesgosHistoria({
             value={form.historiaFamiliar}
             onChange={handleChange}
             disabled={disabled}
+            edited={isFieldEdited("historiaFamiliar")}
+            onRevert={() => revertField("historiaFamiliar")}
           />
           <InputTextArea
             rows={5}
@@ -87,6 +133,8 @@ function EvaluacionRiesgosHistoria({
             value={form.habitos}
             onChange={handleChange}
             disabled={disabled}
+            edited={isFieldEdited("habitos")}
+            onRevert={() => revertField("habitos")}
           />
           <InputTextArea
             rows={5}
@@ -95,6 +143,8 @@ function EvaluacionRiesgosHistoria({
             value={form.otrasObservaciones}
             onChange={handleChange}
             disabled={disabled}
+            edited={isFieldEdited("otrasObservaciones")}
+            onRevert={() => revertField("otrasObservaciones")}
           />
         </div>
       </SectionFieldset>
@@ -166,6 +216,8 @@ function ExamenMental({
                 onChange={handleRadioButton}
                 vertical
                 disabled={disabled}
+                edited={isFieldEdited("presentacion")}
+                onRevert={() => revertField("presentacion")}
                 options={[
                   { label: 'Adecuado', value: 'ADECUADO' },
                   { label: 'Inadecuado', value: 'INADECUADO' },
@@ -181,6 +233,8 @@ function ExamenMental({
                 onChange={handleRadioButton}
                 vertical
                 disabled={disabled}
+                edited={isFieldEdited("postura")}
+                onRevert={() => revertField("postura")}
                 options={[
                   { label: 'Erguida', value: 'ERGUIDA' },
                   { label: 'Encorvada', value: 'ENCORVADA' },
@@ -195,6 +249,8 @@ function ExamenMental({
                 onChange={handleRadioButton}
                 vertical
                 disabled={disabled}
+                edited={isFieldEdited("ritmo")}
+                onRevert={() => revertField("ritmo")}
                 options={[
                   { label: 'Lento', value: 'LENTO' },
                   { label: 'Rápido', value: 'RAPIDO' },
@@ -210,6 +266,8 @@ function ExamenMental({
                 onChange={handleRadioButton}
                 vertical
                 disabled={disabled}
+                edited={isFieldEdited("tono")}
+                onRevert={() => revertField("tono")}
                 options={[
                   { label: 'Bajo', value: 'BAJO' },
                   { label: 'Moderado', value: 'MODERADO' },
@@ -225,6 +283,8 @@ function ExamenMental({
                 onChange={handleRadioButton}
                 vertical
                 disabled={disabled}
+                edited={isFieldEdited("articulacion")}
+                onRevert={() => revertField("articulacion")}
                 options={[
                   { label: 'Con dificultad', value: 'CON_DIFICULTAD' },
                   { label: 'Sin dificultad', value: 'SIN_DIFICULTAD' },
@@ -240,6 +300,8 @@ function ExamenMental({
                 handleRadioButton={handleRadioButton}
                 labelColumns={1}
                 disabled={disabled}
+                isFieldEdited={isFieldEdited}
+                onRevert={revertField}
               />
             </SectionFieldset>
           </SectionFieldset>
@@ -267,6 +329,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("lucidoAtento")}
+              onRevert={() => revertField("lucidoAtento")}
             />
             <InputTextOneLine
               label="Pensamiento"
@@ -275,6 +339,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("pensamiento")}
+              onRevert={() => revertField("pensamiento")}
             />
             <InputTextOneLine
               label="Percepción"
@@ -283,6 +349,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("percepcion")}
+              onRevert={() => revertField("percepcion")}
             />
           </SectionFieldset>
 
@@ -292,6 +360,8 @@ function ExamenMental({
               value={form.memoria}
               onChange={handleRadioButton}
               disabled={disabled}
+              edited={isFieldEdited("memoria")}
+              onRevert={() => revertField("memoria")}
               options={[
                 { label: 'Corto Plazo', value: 'CORTO_PLAZO' },
                 { label: 'Mediano Plazo', value: 'MEDIANO_PLAZO' },
@@ -307,6 +377,8 @@ function ExamenMental({
               onChange={handleRadioButton}
               vertical
               disabled={disabled}
+              edited={isFieldEdited("inteligencia")}
+              onRevert={() => revertField("inteligencia")}
               options={[
                 { label: 'Muy Superior', value: 'MUY_SUPERIOR' },
                 { label: 'Superior', value: 'SUPERIOR' },
@@ -321,6 +393,8 @@ function ExamenMental({
               onChange={handleRadioButton}
               vertical
               disabled={disabled}
+              edited={isFieldEdited("inteligencia")}
+              onRevert={() => revertField("inteligencia")}
               options={[
                 { label: 'Fronterizo', value: 'FRONTERIZO' },
                 { label: 'RM Leve', value: 'RM_LEVE' },
@@ -339,6 +413,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("apetito")}
+              onRevert={() => revertField("apetito")}
             />
             <InputTextOneLine
               label="Sueño"
@@ -347,6 +423,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("sueno")}
+              onRevert={() => revertField("sueno")}
             />
             <InputTextOneLine
               label="Personalidad"
@@ -355,6 +433,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("personalidad")}
+              onRevert={() => revertField("personalidad")}
             />
             <InputTextOneLine
               label="Afectividad"
@@ -363,6 +443,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("afectividad")}
+              onRevert={() => revertField("afectividad")}
             />
             <InputTextOneLine
               label="Conducta Sexual"
@@ -371,6 +453,8 @@ function ExamenMental({
               onChange={handleChange}
               labelWidth="120px"
               disabled={disabled}
+              edited={isFieldEdited("conductaSexual")}
+              onRevert={() => revertField("conductaSexual")}
             />
           </SectionFieldset>
         </div>
@@ -795,6 +879,8 @@ export default function FichaPsicologica3() {
         form={form}
         handleChange={handleChange}
         disabled={camposDeshabilitados}
+        isFieldEdited={isFieldEdited}
+        revertField={revertField}
       />
       <ExamenMental
         form={form}

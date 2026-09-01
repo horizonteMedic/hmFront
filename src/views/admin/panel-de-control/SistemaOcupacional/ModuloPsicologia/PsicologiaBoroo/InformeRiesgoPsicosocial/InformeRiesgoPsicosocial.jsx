@@ -44,6 +44,12 @@ const CAMPOS_EDITABLES = [
     "conclusionPerfil",
     "user_medicoFirma",
     "nombre_medico",
+    // Riesgos Psicosociales (RadioTable)
+    "exigenciasPsicologicas",
+    "trabajoActivoDesarrollo",
+    "apoyoSocial",
+    "compensaciones",
+    "doblePresencia",
 ];
 
 export default function InformeRiesgoPsicosocial() {
@@ -226,6 +232,8 @@ export default function InformeRiesgoPsicosocial() {
                         form={form}
                         handleRadioButton={handleRadioButton}
                         disabled={camposDeshabilitados}
+                        isFieldEdited={isFieldEdited}
+                        onRevert={revertField}
                     />
                 </SectionFieldset>
                 <SectionFieldset legend="Recomendaciones y Conclusión">

@@ -27,13 +27,13 @@ export default function AccionesRegistroHeader({
   children,
 }) {
   const btnBase =
-    "pointer-events-auto inline-flex items-center justify-center gap-2 text-white text-md font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95";
+    "pointer-events-auto inline-flex items-center justify-center gap-2 text-white text-md font-semibold px-3 py-1.5 rounded transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner";
 
   const mostrarHabilitar =
     hayRegistroCargado && tieneRegistro && !edicionHabilitada;
 
   const mostrarLimpiar =
-    hayRegistroCargado && tieneRegistro && !edicionHabilitada;
+    hayRegistroCargado && tieneRegistro ;
 
   return (
     <div className="sticky top-2 z-20 flex justify-end items-center gap-2 pointer-events-none">

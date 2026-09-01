@@ -27,9 +27,9 @@ import DatosPersonalesLaborales from "../../../../../../components/templates/Dat
 const tabla = "informe_psicolaboral";
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-// Por el volumen de campos (~30 entre las 2 pestañas), el resaltado/revertido individual solo
-// se aplica a los campos "core" de la sección principal; el resto de campos (criterios
-// psicológicos en pestañas) solo respeta el bloqueo general (camposDeshabilitados).
+// Incluye los campos "core" de la sección principal y todos los criterios psicológicos
+// editables de las 2 pestañas (RadioTable + textos), para que el revert individual funcione
+// en todo lo que no esté deshabilitado de origen.
 const CAMPOS_EDITABLES = [
   "fechaExam",
   "esApto",
@@ -37,6 +37,35 @@ const CAMPOS_EDITABLES = [
   "recomendaciones",
   "user_medicoFirma",
   "nombre_medico",
+  // ===== Criterios Psicológicos I =====
+  // Aspecto Intelectual
+  "razonamientoProblemas",
+  "memoria",
+  "atencionConcentracion",
+  "coordinacionVisoMotora",
+  "orientacionEspacial",
+  "comprensionVerbal",
+  // Aspectos Personalidad
+  "estabilidadEmocional",
+  "toleranciaFrustracion",
+  "autoestima",
+  "asertividad",
+  "ansiedadEstado",
+  "ansiedadRasgo",
+  // ===== Criterios Psicológicos II =====
+  // Aspectos Conductuales
+  "nivelAlerta",
+  "hostigamientoSexual",
+  "consecuencia",
+  // Aspectos Psicolaborales
+  "capacidadInfluencia",
+  "adaptacionCambios",
+  "trabajoEquipoColaboracion",
+  "orientacionAccionMejoraProcesos",
+  "autonomiaProactividad",
+  "tomaDecisiones",
+  "crecimientoPersonal",
+  "motivacion",
 ];
 
 export default function InformePsicolaboral() {
@@ -291,6 +320,8 @@ export default function InformePsicolaboral() {
         handleRadioButton={handleRadioButton}
         handleChangeSimple={handleChangeSimple}
         disabled={camposDeshabilitados}
+        isFieldEdited={isFieldEdited}
+        revertField={revertField}
       />
       <SectionFieldset legend="Observaciones y Recomendaciones" className="grid gap-x-4 gap-y-3 grid-cols-1 md:grid-cols-2">
         <InputTextArea
