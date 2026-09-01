@@ -8,6 +8,8 @@ export default function Neurologico({
   handleChange,
   handleRadioButtonBoolean,
   disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => {},
 }) {
   // Configuración de pruebas neurológicas
   const leftColumnTests = [
@@ -40,6 +42,8 @@ export default function Neurologico({
           onChange={handleChange}
           disabled={disabled}
           labelWidth="100px"
+          edited={isFieldEdited("reflejos")}
+          onRevert={() => revertField("reflejos")}
         />
       </fieldset>
       <fieldset className="p-4 bg-white border border-gray-200 rounded-lg">
@@ -60,6 +64,8 @@ export default function Neurologico({
                 falseLabel="NEGATIVO"
                 labelWidth="150px"
                 disabled={disabled}
+                edited={isFieldEdited(test.name)}
+                onRevert={() => revertField(test.name)}
               />
             ))}
           </div>
@@ -77,6 +83,8 @@ export default function Neurologico({
                 falseLabel="NEGATIVO"
                 labelWidth="150px"
                 disabled={disabled}
+                edited={isFieldEdited(test.name)}
+                onRevert={() => revertField(test.name)}
               />
             ))}
           </div>

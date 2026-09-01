@@ -3,7 +3,7 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
@@ -153,12 +153,13 @@ const HojaConsultaExterna = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             {/* ===== SECCIÓN: INFORMACIÓN GENERAL ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">

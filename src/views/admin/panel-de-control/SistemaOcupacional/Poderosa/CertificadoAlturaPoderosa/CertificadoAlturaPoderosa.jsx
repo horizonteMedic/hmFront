@@ -6,7 +6,6 @@ import {
     faStethoscope,
     faBrain,
     faDownload,
-    faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
@@ -15,7 +14,8 @@ import InputsBooleanRadioGroup from "../../../../../components/reusableComponent
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
@@ -58,10 +58,11 @@ const RECOMENDACIONES_TEXT_MAP = {
     corregirAgudezaLecturaCerca: "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA.",
 };
 
-// Campos que el usuario puede editar en la sección principal (para resaltar/revertir cambios).
-// El contenido de las pestañas (Antecedentes, Test de CAGE, Examen Físico, Neurológico) también
-// respeta el bloqueo de edición, pero por su volumen no lleva resaltado/revertido individual.
+// Campos que el usuario puede editar (para resaltar/revertir cambios). Incluye la sección
+// principal y el contenido de las 4 pestañas (Antecedentes, Test de CAGE, Examen Físico,
+// Neurológico); los campos de Triaje que llegan solo-lectura quedan fuera de esta lista.
 const CAMPOS_EDITABLES = [
+    // ===== Sección principal =====
     "tituloExamen",
     "fechaExam",
     "fechaHasta",
@@ -75,6 +76,82 @@ const CAMPOS_EDITABLES = [
     "nombre_medico",
     "user_doctorAsignado",
     "nombre_doctorAsignado",
+    // ===== Pestaña: Antecedentes =====
+    "accidentesTrabajoEnfermedades",
+    "antecedentesFamiliares",
+    "tecModeradoGrave",
+    "tecModeradoGraveDescripcion",
+    "convulsiones",
+    "convulsionesDescripcion",
+    "mareosModosidadAcatisia",
+    "mareosModosidadAcatasiaDescripcion",
+    "problemasAudicion",
+    "problemasAudicionDescripcion",
+    "problemasEquilibrio",
+    "problemasEquilibrioDescripcion",
+    "acrofobia",
+    "acrofobiaDescripcion",
+    "agarofobia",
+    "agarofobiaDescripcion",
+    "tabaco",
+    "tabacoFrecuencia",
+    "alcohol",
+    "alcoholFrecuencia",
+    "drogas",
+    "drogasFrecuencia",
+    "hojaCoca",
+    "hojaCocaFrecuencia",
+    "cafe",
+    "cafeFrecuencia",
+    // ===== Pestaña: Test de CAGE =====
+    "gustaSalirDivertirse",
+    "gustaSalirDivertirsePuntaje",
+    "molestaLlegaTardeCompromiso",
+    "molestaLlegaTardeCompromisoPuntaje",
+    "molestadoGenteCriticaBeber",
+    "molestadoGenteCriticaBeberPuntaje",
+    "sentidoEstarReunionDivirtiendoseReanima",
+    "sentidoEstarReunionDivirtiendoseReanimaPuntaje",
+    "impresionDeberiaBeberMenos",
+    "impresionDeberiaBeberMenosPuntaje",
+    "duermeBien",
+    "duermeBienPuntaje",
+    "sentidoCulpablePorBeber",
+    "sentidoCulpablePorBeberPuntaje",
+    "poneNerviosoMenudo",
+    "poneNerviosoMenudoPuntaje",
+    "bebeMananaParaCalmarNervios",
+    "bebeMananaParaCalmarNerviosPuntaje",
+    "doloresEspaldaLevantarse",
+    "doloresEspaldaLevantarsePuntaje",
+    "anamnesisTestDeCage",
+    // ===== Pestaña: Examen Físico =====
+    "apreciacionGeneral",
+    "cabeza",
+    "piel",
+    "movilidadOcular",
+    "otoscopiaOD",
+    "otoscopiaOI",
+    "nariz",
+    "aparatoRespiratorio",
+    "aparatoCardiovascular",
+    "abdomen",
+    "musculoEsqueletico",
+    "columna",
+    "testEpworth",
+    "otrosExaLaboratorio",
+    // ===== Pestaña: Neurológico =====
+    "reflejos",
+    "pruebaDedoNariz",
+    "indiceBarany",
+    "diadococinesia",
+    "rombergSimple",
+    "rombergSensibilizado",
+    "marchaEnTandem",
+    "unterberg",
+    "babinskiWeil",
+    "dixHallpike",
+    "marcha",
 ];
 
 export default function CertificadoAlturaPoderosa() {
@@ -364,21 +441,13 @@ export default function CertificadoAlturaPoderosa() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-                {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-                    <button
-                        type="button"
-                        onClick={habilitarEdicion}
-                        className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-                    >
-                        <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-                    </button>
-                )}
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             <div className="flex flex-col lg:flex-row gap-3 items-start">
                 {/* ===== COLUMNA PRINCIPAL ===== */}
@@ -414,17 +483,22 @@ export default function CertificadoAlturaPoderosa() {
                         />
                         <div className="flex gap-4 items-center lg:col-span-2">
                             <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
-                            <select
-                                name="tituloExamen"
-                                value={form.tituloExamen}
-                                onChange={handleChangeSimple}
-                                disabled={camposDeshabilitados}
-                                className="border rounded px-2 py-1 text-base w-full disabled:bg-gray-300"
-                            >
-                                {TITULOS_EXAMEN.map((titulo) => (
-                                    <option key={titulo} value={titulo}>{titulo}</option>
-                                ))}
-                            </select>
+                            <div className="w-full flex items-center gap-1.5">
+                                <select
+                                    name="tituloExamen"
+                                    value={form.tituloExamen}
+                                    onChange={handleChangeSimple}
+                                    disabled={camposDeshabilitados}
+                                    className={`border rounded px-2 py-1 text-base w-full disabled:bg-gray-300 ${isFieldEdited("tituloExamen") ? "border-orange-400 bg-orange-100" : ""}`}
+                                >
+                                    {TITULOS_EXAMEN.map((titulo) => (
+                                        <option key={titulo} value={titulo}>{titulo}</option>
+                                    ))}
+                                </select>
+                                {isFieldEdited("tituloExamen") && (
+                                    <RevertButton onClick={() => revertField("tituloExamen")} title="Revertir selección" />
+                                )}
+                            </div>
                         </div>
                         <InputsBooleanRadioGroup
                             label="Aptitud"
@@ -513,6 +587,8 @@ export default function CertificadoAlturaPoderosa() {
                                 handleRadioButton={handleRadioButton}
                                 handleChangeSimple={handleChangeSimple}
                                 disabled={camposDeshabilitados}
+                                isFieldEdited={isFieldEdited}
+                                revertField={revertField}
                             />
                         </div>
                     </div>

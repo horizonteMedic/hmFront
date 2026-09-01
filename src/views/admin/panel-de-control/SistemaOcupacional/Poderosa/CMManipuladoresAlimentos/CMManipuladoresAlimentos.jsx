@@ -4,7 +4,7 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import InputsBooleanRadioGroup from "../../../../../components/reusableComponents/InputsBooleanRadioGroup";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -177,12 +177,13 @@ export default function CMManipuladoresAlimentos() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClearForm}
+            />
 
             {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">

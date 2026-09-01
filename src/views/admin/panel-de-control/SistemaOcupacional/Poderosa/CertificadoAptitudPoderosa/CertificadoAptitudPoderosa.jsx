@@ -5,7 +5,6 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -15,6 +14,7 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual, getTodayPlusOneYear } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./ControllerAptitudPoderosa";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 
 const tabla = "aptitud_altura_poderosa";
 const today = getToday();
@@ -239,12 +239,13 @@ const CertificadoAptitudPoderosa = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%]  mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             <div className="flex flex-col lg:flex-row gap-3 items-start">
                 {/* ===== COLUMNA PRINCIPAL ===== */}

@@ -5,7 +5,8 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -173,12 +174,13 @@ const CAHerramientasManuales = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                <RegistroEstadoPill
-                    tieneRegistro={form.tieneRegistro}
-                    className={hayRegistroCargado ? "" : "invisible"}
-                />
-            </div>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
             {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
@@ -204,17 +206,22 @@ const CAHerramientasManuales = () => {
                 />
                 <div className="flex items-center gap-4 w-full md:col-span-2 lg:col-span-2">
                     <label className="font-semibold min-w-[120px] max-w-[120px]">Título del Examen :</label>
-                    <select
-                        name="tituloExamen"
-                        value={form.tituloExamen}
-                        onChange={handleChangeSimple}
-                        disabled={camposDeshabilitados}
-                        className={`border rounded px-2 py-1 text-base w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("tituloExamen") ? "border-orange-400 bg-orange-100" : ""}`}
-                    >
-                        {TITULOS_EXAMEN.map((titulo) => (
-                            <option key={titulo} value={titulo}>{titulo}</option>
-                        ))}
-                    </select>
+                    <div className="w-full flex items-center gap-1.5">
+                        <select
+                            name="tituloExamen"
+                            value={form.tituloExamen}
+                            onChange={handleChangeSimple}
+                            disabled={camposDeshabilitados}
+                            className={`border rounded px-2 py-1 text-base w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("tituloExamen") ? "border-orange-400 bg-orange-100" : ""}`}
+                        >
+                            {TITULOS_EXAMEN.map((titulo) => (
+                                <option key={titulo} value={titulo}>{titulo}</option>
+                            ))}
+                        </select>
+                        {isFieldEdited("tituloExamen") && (
+                            <RevertButton onClick={() => revertField("tituloExamen")} title="Revertir selección" />
+                        )}
+                    </div>
                 </div>
                     <InputTextOneLine
                         label="Fecha"

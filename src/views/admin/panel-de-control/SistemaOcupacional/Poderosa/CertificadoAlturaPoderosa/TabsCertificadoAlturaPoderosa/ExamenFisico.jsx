@@ -7,6 +7,8 @@ export default function ExamenFisico({
   form,
   handleChange,
   disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => {},
 }) {
   return (
     <div className="space-y-6">
@@ -117,6 +119,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               rows={3}
+              edited={isFieldEdited("apreciacionGeneral")}
+              onRevert={() => revertField("apreciacionGeneral")}
             />
             <InputTextOneLine
               label="Cabeza"
@@ -124,6 +128,8 @@ export default function ExamenFisico({
               value={form?.cabeza}
               onChange={handleChange}
               disabled={disabled}
+              edited={isFieldEdited("cabeza")}
+              onRevert={() => revertField("cabeza")}
             />
             <InputTextOneLine
               label="Piel"
@@ -131,6 +137,8 @@ export default function ExamenFisico({
               value={form?.piel}
               onChange={handleChange}
               disabled={disabled}
+              edited={isFieldEdited("piel")}
+              onRevert={() => revertField("piel")}
             />
             <InputTextOneLine
               label="Movilidad Ocular"
@@ -138,6 +146,8 @@ export default function ExamenFisico({
               value={form?.movilidadOcular}
               onChange={handleChange}
               disabled={disabled}
+              edited={isFieldEdited("movilidadOcular")}
+              onRevert={() => revertField("movilidadOcular")}
             />
             <div className="grid grid-cols-2 gap-4">
               <InputTextOneLine
@@ -146,6 +156,8 @@ export default function ExamenFisico({
                 value={form?.otoscopiaOD}
                 onChange={handleChange}
                 disabled={disabled}
+                edited={isFieldEdited("otoscopiaOD")}
+                onRevert={() => revertField("otoscopiaOD")}
               />
               <InputTextOneLine
                 label="Otoscopia O.I"
@@ -153,6 +165,8 @@ export default function ExamenFisico({
                 value={form?.otoscopiaOI}
                 onChange={handleChange}
                 disabled={disabled}
+                edited={isFieldEdited("otoscopiaOI")}
+                onRevert={() => revertField("otoscopiaOI")}
               />
             </div>
             <InputTextOneLine
@@ -161,6 +175,8 @@ export default function ExamenFisico({
               value={form?.nariz}
               onChange={handleChange}
               disabled={disabled}
+              edited={isFieldEdited("nariz")}
+              onRevert={() => revertField("nariz")}
             />
             <InputTextArea
               label="Aparato Respiratorio"
@@ -169,6 +185,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               rows={3}
+              edited={isFieldEdited("aparatoRespiratorio")}
+              onRevert={() => revertField("aparatoRespiratorio")}
             />
           </div>
           <div className="grid gap-3">
@@ -179,6 +197,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               labelWidth="120px"
+              edited={isFieldEdited("aparatoCardiovascular")}
+              onRevert={() => revertField("aparatoCardiovascular")}
             />
             <InputTextOneLine
               label="Abdomen"
@@ -187,6 +207,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               labelWidth="120px"
+              edited={isFieldEdited("abdomen")}
+              onRevert={() => revertField("abdomen")}
             />
             <InputTextOneLine
               label="Musculoesquelético"
@@ -195,6 +217,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               labelWidth="120px"
+              edited={isFieldEdited("musculoEsqueletico")}
+              onRevert={() => revertField("musculoEsqueletico")}
             />
             <InputTextOneLine
               label="Columna"
@@ -203,6 +227,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               labelWidth="120px"
+              edited={isFieldEdited("columna")}
+              onRevert={() => revertField("columna")}
             />
             <InputTextArea
               label="Test de Epworth"
@@ -211,6 +237,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               rows={3}
+              edited={isFieldEdited("testEpworth")}
+              onRevert={() => revertField("testEpworth")}
             />
             <InputTextArea
               label="Otros Exámenes de Laboratorio"
@@ -219,6 +247,8 @@ export default function ExamenFisico({
               onChange={handleChange}
               disabled={disabled}
               rows={3}
+              edited={isFieldEdited("otrosExaLaboratorio")}
+              onRevert={() => revertField("otrosExaLaboratorio")}
             />
           </div>
         </div>
