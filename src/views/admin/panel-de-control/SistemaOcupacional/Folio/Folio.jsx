@@ -322,6 +322,7 @@ const ExamenesListPSICOSENSOMETRICO_DE_BOROO = buildExamenesList([
     "CUESTIONARIO_AUDIOMETRIA",
     "TRABAJO_ESPECIFICOS",
     "OFTALMOLOGIA",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
 ]);
 
 const ExamenesListTRABAJOS_EN_CALIENTE = buildExamenesList([
@@ -337,6 +338,7 @@ const ExamenesListTRABAJOS_EN_CALIENTE = buildExamenesList([
     "AUDIOMETRIA_OHLA",
     "INFORME_PODEROSA_OPERAR_CALIENTE",
     "OFTALMOLOGIA",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
 ]);
 
 export const ListaPorPlantilla = {
