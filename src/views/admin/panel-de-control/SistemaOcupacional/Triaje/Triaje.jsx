@@ -37,6 +37,7 @@ import {
 } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
+import DiagnosticoRelacionadoModal from '../../../../components/reusableComponents/DiagnosticoRelacionado/DiagnosticoRelacionadoModal';
 
 const today = getToday();
 
@@ -86,6 +87,14 @@ export default function Triaje() {
         codigo: '',
         nombresBusqueda: '',
     };
+
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [diagnosticosRelacionados, setDiagnosticosRelacionados] = useState({
+        lista: [],
+        seleccionados: [],
+    });
+
 
     const {
         form,
@@ -531,6 +540,15 @@ export default function Triaje() {
                                 labelWidth="120px"
                             />
                         </div>
+                        <button className=' py-2 px-3 bg-emerald-600 text-white rounded-md  w-full' onClick={() => { setModalVisible(true) }}>Diagnóstico Relacionado</button>
+                        <DiagnosticoRelacionadoModal
+                            visible={modalVisible}
+                            onClose={() => { setModalVisible(false) }}
+                            diagnosticosRelacionados={diagnosticosRelacionados}
+                            setDiagnosticosRelacionados={setDiagnosticosRelacionados}
+                            token={token}
+                        />
+
                         <InputTextAreaUpper
                             label="Diagnóstico"
                             name="diagnostico"
