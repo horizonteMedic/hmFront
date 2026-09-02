@@ -33,6 +33,7 @@ export default function ParteII({ form, handleRadioButton, disabled = false, isF
         disabled={disabled}
         isFieldEdited={isFieldEdited}
         onRevert={revertField}
+        stackOnMobile
       />
     </SectionFieldset>
   );

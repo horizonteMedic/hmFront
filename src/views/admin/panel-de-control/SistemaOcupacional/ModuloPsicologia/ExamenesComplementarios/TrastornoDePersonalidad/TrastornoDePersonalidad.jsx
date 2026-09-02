@@ -263,6 +263,7 @@ export default function TrastornoDePersonalidad() {
                         disabled={camposDeshabilitados}
                         isFieldEdited={isFieldEdited}
                         onRevert={revertField}
+                        stackOnMobile
                     />
                 </SectionFieldset>
                 <div className='grid xl:grid-cols-2 gap-y-3 gap-x-4'>
@@ -276,6 +277,7 @@ export default function TrastornoDePersonalidad() {
                             disabled={camposDeshabilitados}
                             isFieldEdited={isFieldEdited}
                             onRevert={revertField}
+                            stackOnMobile
                         />
                     </SectionFieldset>
                     <SectionFieldset legend="Grupo C">
@@ -288,6 +290,7 @@ export default function TrastornoDePersonalidad() {
                             disabled={camposDeshabilitados}
                             isFieldEdited={isFieldEdited}
                             onRevert={revertField}
+                            stackOnMobile
                         />
                     </SectionFieldset>
                 </div>

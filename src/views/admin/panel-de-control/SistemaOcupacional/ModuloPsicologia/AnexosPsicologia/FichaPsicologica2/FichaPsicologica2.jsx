@@ -381,6 +381,7 @@ export default function FichaPsicologica2() {
                                 disabled={camposDeshabilitados}
                                 isFieldEdited={isFieldEdited}
                                 onRevert={revertField}
+                                stackOnMobile
                             />
                         </SectionFieldset>
                     </SectionFieldset>

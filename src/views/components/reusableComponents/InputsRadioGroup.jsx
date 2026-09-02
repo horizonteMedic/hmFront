@@ -13,6 +13,9 @@ export default function InputsRadioGroup({
   //nuevo opcional - parámetros de label como InputsBooleanRadioGroup
   label = "",
   labelOnTop = false,
+  // En mobile apila la etiqueta sobre los radios; desde sm: vuelve a fila (igual que
+  // InputsBooleanRadioGroup). Opt-in: sin pasarlo el render no cambia.
+  stackOnMobile = false,
   labelWidth = "80px",
   labelClassName = "",
   groupClassName = "",
@@ -63,9 +66,15 @@ export default function InputsRadioGroup({
     </div>
   );
 
+  const wrapperClass = labelOnTop
+    ? "flex flex-col gap-2"
+    : stackOnMobile
+    ? "flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4"
+    : "flex items-center gap-4";
+
   return (
     <div className={`${className}`}>
-      <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"}`}>
+      <div className={wrapperClass}>
         {label && (
           <label
             className={`font-semibold ${labelClassName}`}

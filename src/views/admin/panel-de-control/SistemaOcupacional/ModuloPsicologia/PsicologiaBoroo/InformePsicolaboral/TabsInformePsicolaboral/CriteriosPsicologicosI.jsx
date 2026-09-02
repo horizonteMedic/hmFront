@@ -35,6 +35,7 @@ export default function CriteriosPsicologicosI({
               disabled={disabled}
               isFieldEdited={isFieldEdited}
               onRevert={revertField}
+              stackOnMobile
             />
           </SectionFieldset>
         )}
@@ -61,6 +62,7 @@ export default function CriteriosPsicologicosI({
             disabled={disabled}
             isFieldEdited={isFieldEdited}
             onRevert={revertField}
+            stackOnMobile
           />
         </SectionFieldset>
       </div>

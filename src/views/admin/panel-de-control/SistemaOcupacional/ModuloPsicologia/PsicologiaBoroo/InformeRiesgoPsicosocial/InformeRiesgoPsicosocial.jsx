@@ -224,7 +224,7 @@ export default function InformeRiesgoPsicosocial() {
 
             <DatosPersonalesLaborales form={form} />
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid lg:grid-cols-2 gap-4">
                 <SectionFieldset legend="Riesgos Psicosociales">
                     <RadioTable
                         items={riesgosItems}
@@ -234,6 +234,7 @@ export default function InformeRiesgoPsicosocial() {
                         disabled={camposDeshabilitados}
                         isFieldEdited={isFieldEdited}
                         onRevert={revertField}
+                        stackOnMobile
                     />
                 </SectionFieldset>
                 <SectionFieldset legend="Recomendaciones y Conclusión">

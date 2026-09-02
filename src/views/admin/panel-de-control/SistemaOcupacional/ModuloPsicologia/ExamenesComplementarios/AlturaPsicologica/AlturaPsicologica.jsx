@@ -271,6 +271,7 @@ export default function AlturaPsicologica() {
             disabled={camposDeshabilitados}
             isFieldEdited={isFieldEdited}
             onRevert={revertField}
+            stackOnMobile
           />
         </SectionFieldset>
         <SectionFieldset legend="Aspecto Personalidad" className="space-y-8">

@@ -302,6 +302,7 @@ function ExamenMental({
                 disabled={disabled}
                 isFieldEdited={isFieldEdited}
                 onRevert={revertField}
+                stackOnMobile
               />
             </SectionFieldset>
           </SectionFieldset>

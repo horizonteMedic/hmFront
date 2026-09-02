@@ -242,7 +242,7 @@ export default function InformePsicolaboral() {
       />
 
       <SectionFieldset legend="Información del Examen" className="m-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <div className="flex gap-x-3 w-full">
             <InputTextOneLine
               label="N° Orden"

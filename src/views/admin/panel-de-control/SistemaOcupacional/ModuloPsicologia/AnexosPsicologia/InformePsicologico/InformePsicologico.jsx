@@ -785,12 +785,12 @@ export default function InformePsicologico() {
                     {/* Recomendaciones */}
                     <SectionFieldset legend="Recomendaciones">
                         {/* Select y botón para agregar recomendaciones predefinidas */}
-                        <div className="flex gap-2 mb-3">
+                        <div className="flex flex-col sm:flex-row gap-2 mb-3">
                             <select
                                 value={selectedRecomendacion}
                                 onChange={(e) => setSelectedRecomendacion(e.target.value)}
                                 disabled={camposDeshabilitados}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                             >
                                 <option value="">Seleccionar recomendación predefinida...</option>
                                 {opcionesRecomendaciones.map((opcion, index) => (
@@ -803,7 +803,7 @@ export default function InformePsicologico() {
                                 type="button"
                                 onClick={agregarRecomendacion}
                                 disabled={!selectedRecomendacion || camposDeshabilitados}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                             >
                                 Agregar
                             </button>

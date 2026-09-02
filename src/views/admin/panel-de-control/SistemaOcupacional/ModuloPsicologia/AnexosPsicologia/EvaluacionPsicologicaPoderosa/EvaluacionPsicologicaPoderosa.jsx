@@ -39,7 +39,17 @@ const personalidadItems = [
     { name: "persRelaciones", label: "4. Relaciones interpersonales / Adaptación al medio" },
     { name: "persNormasReglas", label: "5. Disposición para acatar normas y reglas" },
 ];
-// Opciones estandarizadas S / NPS / NP / NPI
+// Opciones estandarizadas S / NPS / NP / NPI / I.
+// Las cabeceras usan el código corto (el largo no entra en la columna y se superpone);
+// el significado se muestra en la leyenda debajo de las tablas.
+// const evalOptions = [
+//     { value: "S", label: "S" },
+//     { value: "NPS", label: "NPS" },
+//     { value: "NP", label: "NP" },
+//     { value: "NPI", label: "NPI" },
+//     { value: "I", label: "I" },
+// ];
+
 const evalOptions = [
     { value: "S", label: "Superior" },
     { value: "NPS", label: "Nivel Promedio Superior" },
@@ -47,6 +57,8 @@ const evalOptions = [
     { value: "NPI", label: "Nivel Promedio Inferior" },
     { value: "I", label: "Inferior" },
 ];
+
+// const evalLeyenda = "S = Superior · NPS = Nivel Promedio Superior · NP = Nivel Promedio · NPI = Nivel Promedio Inferior · I = Inferior";
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -285,6 +297,8 @@ export default function EvaluacionPsicologicaPoderosa() {
                     name="tipoInforme"
                     value={tipoInforme.tipoInforme}
                     labelWidth="120px"
+                    stackOnMobile
+                    groupClassName="flex-wrap"
                     options={[
                         { label: "NORMAL", value: "NORMAL" },
                         { label: "LICENCIA", value: "LICENCIA" },
@@ -297,6 +311,8 @@ export default function EvaluacionPsicologicaPoderosa() {
                     name="aptitud"
                     value={form.aptitud}
                     labelWidth="120px"
+                    stackOnMobile
+                    groupClassName="flex-wrap"
                     options={[
                         { label: "APTO", value: "APTO" },
                         { label: "NO APTO", value: "NO APTO" },
@@ -322,33 +338,40 @@ export default function EvaluacionPsicologicaPoderosa() {
             </SectionFieldset>
 
 
-            <div className="grid md:grid-cols-2 gap-4">
-                {/* Áreas de Evaluación - Inteligencia */}
-                <SectionFieldset legend="Áreas de Evaluación - Inteligencia" >
-                    <RadioTable
-                        items={inteligenciaItems}
-                        options={evalOptions}
-                        labelColumns={3}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                        disabled={camposDeshabilitados}
-                        isFieldEdited={isFieldEdited}
-                        onRevert={revertField}
-                    />
-                </SectionFieldset>
-                {/* Áreas de Evaluación - Personalidad */}
-                <SectionFieldset legend="Áreas de Evaluación - Personalidad" >
-                    <RadioTable
-                        items={personalidadItems}
-                        options={evalOptions}
-                        form={form}
-                        labelColumns={3}
-                        handleRadioButton={handleRadioButton}
-                        disabled={camposDeshabilitados}
-                        isFieldEdited={isFieldEdited}
-                        onRevert={revertField}
-                    />
-                </SectionFieldset>
+            <div className="space-y-2">
+                <div className="grid xl:grid-cols-2 gap-4">
+                    {/* Áreas de Evaluación - Inteligencia */}
+                    <SectionFieldset legend="Áreas de Evaluación - Inteligencia" >
+                        <RadioTable
+                            items={inteligenciaItems}
+                            options={evalOptions}
+                            labelColumns={3}
+                            form={form}
+                            handleRadioButton={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            isFieldEdited={isFieldEdited}
+                            onRevert={revertField}
+                            stackOnMobile
+                        />
+                    </SectionFieldset>
+                    {/* Áreas de Evaluación - Personalidad */}
+                    <SectionFieldset legend="Áreas de Evaluación - Personalidad" >
+                        <RadioTable
+                            items={personalidadItems}
+                            options={evalOptions}
+                            form={form}
+                            labelColumns={3}
+                            handleRadioButton={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            isFieldEdited={isFieldEdited}
+                            onRevert={revertField}
+                            stackOnMobile
+                        />
+                    </SectionFieldset>
+                </div>
+                {/* <p className="text-xs text-gray-500 px-1">
+                    <span className="font-semibold">Leyenda:</span> {evalLeyenda}
+                </p> */}
             </div>
             {/* Campos de texto libres */}
             <SectionFieldset legend="Conclusiones Finales" className="grid md:grid-cols-2 gap-4">

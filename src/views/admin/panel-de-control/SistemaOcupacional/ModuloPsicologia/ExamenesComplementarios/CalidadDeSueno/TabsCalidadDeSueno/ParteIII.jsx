@@ -4,7 +4,7 @@ import SectionFieldset from "../../../../../../../components/reusableComponents/
 export default function ParteIII({ form, handleRadioButton, disabled = false, isFieldEdited, revertField }) {
   return (
     <SectionFieldset legend="Preguntas (durante el último mes)" className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <InputsRadioGroup
             label="6. Veces que tomó medicinas para dormir"

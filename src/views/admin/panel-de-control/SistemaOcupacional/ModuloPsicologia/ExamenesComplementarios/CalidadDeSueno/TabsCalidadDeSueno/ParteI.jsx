@@ -31,6 +31,7 @@ export default function ParteI({ form, handleChange, handleRadioButton, disabled
           disabled={disabled}
           edited={isFieldEdited("tiempoDormir")}
           onRevert={() => revertField("tiempoDormir")}
+          stackOnMobile
         />
         <InputTextOneLine
           label="3. Hora de levantarse normalmente"
