@@ -68,9 +68,12 @@ export default function Antecedentes({
         <legend className="font-bold mb-2 text-gray-800 text-[10px]">
           Antecedentes Psiconeuroológicos
         </legend>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           {psicoNeuro.map((row) => (
-            <div key={row.name} className="flex gap-4">
+            <div
+              key={row.name}
+              className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
+            >
               <InputsBooleanRadioGroup
                 label={row.label}
                 name={row.name}
@@ -80,6 +83,7 @@ export default function Antecedentes({
                   setForm((prev) => ({ ...prev, [row.desc]: "" }));
                 }}
                 labelWidth="130px"
+                className="shrink-0"
                 disabled={disabled}
                 edited={isFieldEdited(row.name)}
                 onRevert={() => revertField(row.name)}
@@ -88,7 +92,7 @@ export default function Antecedentes({
                 name={row.desc}
                 value={form?.[row.desc]}
                 onChange={handleChange}
-                className="w-full my-auto"
+                className="w-full md:my-auto"
                 disabled={disabled || !form?.[row.name]}
                 edited={isFieldEdited(row.desc)}
                 onRevert={() => revertField(row.desc)}

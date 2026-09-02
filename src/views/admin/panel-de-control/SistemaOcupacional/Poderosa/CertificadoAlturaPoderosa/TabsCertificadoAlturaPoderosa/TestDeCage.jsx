@@ -91,6 +91,7 @@ export default function TestDeCage({
                     disabled={disabled}
                     edited={isFieldEdited(question.name)}
                     onRevert={() => revertField(question.name)}
+                    stackOnMobile
                   />
                   <InputTextOneLine
                     label="Puntaje"

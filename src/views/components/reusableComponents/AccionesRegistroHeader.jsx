@@ -36,7 +36,7 @@ export default function AccionesRegistroHeader({
     hayRegistroCargado && tieneRegistro ;
 
   return (
-    <div className="sticky top-2 z-20 flex justify-end items-center gap-2 pointer-events-none">
+    <div className="sticky top-2 z-20 my-4 flex justify-end items-center gap-3 pointer-events-none">
       {children}
 
       <RegistroEstadoPill

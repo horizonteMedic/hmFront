@@ -263,7 +263,7 @@ const DireccionGeneralMineria = () => {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -397,7 +397,7 @@ const DireccionGeneralMineria = () => {
             {/* ===== SECCIÓN: DETALLES ===== */}
             <SectionFieldset legend="Detalles" className="grid grid-cols-1 gap-x-4 gap-y-3">
                 <SectionFieldset legend="Exámen Médico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Fecha"
                             name="fechaExamenDetalle"
@@ -661,7 +661,7 @@ const DireccionGeneralMineria = () => {
 
             {/* ===== SECCIÓN: OPINIONES ===== */}
             <SectionFieldset legend="Opiniones" className="grid grid-cols-1 gap-x-4 gap-y-3">
-                <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Pecho Normal"
                         name="pechoNormal"

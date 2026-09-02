@@ -192,7 +192,7 @@ const HojaDeRutaEmo = () => {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -248,22 +248,22 @@ const HojaDeRutaEmo = () => {
 
             {/* ===== SECCIÓN: EXÁMENES ===== */}
             <SectionFieldset legend="Exámenes" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
-                <label className="text-center text-lg font-semibold" htmlFor="">EXÁMENES</label>
-                <label className="text-center text-lg font-semibold" htmlFor="">PRUEBAS REALIZADAS POR</label>
-                <label className="text-center text-lg font-semibold" htmlFor="">OBSERVACIONES</label>
+                <label className="text-center text-lg font-semibold hidden lg:block" htmlFor="">EXÁMENES</label>
+                <label className="text-center text-lg font-semibold hidden lg:block" htmlFor="">PRUEBAS REALIZADAS POR</label>
+                <label className="text-center text-lg font-semibold hidden lg:block" htmlFor="">OBSERVACIONES</label>
 
                 {/* Vitales (Triaje) */}
-                <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine label="PESO" name="peso" value={form.peso} labelWidth="34px" disabled />
                     <InputTextOneLine label="TALLA" name="talla" value={form.talla} labelWidth="36px" disabled />
                     <InputTextOneLine label="P/A" name="pa" value={form.pa} labelWidth="35px" disabled />
                 </div>
-                <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine label="SAT02" name="sat02" value={form.sat02} labelWidth="38px" disabled />
                     <InputTextOneLine label="CINTURA" name="cintura" value={form.cintura} labelWidth="55px" disabled />
                     <InputTextOneLine label="CADERA" name="cadera" value={form.cadera} labelWidth="55px" disabled />
                 </div>
-                <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine label="FC" name="fc" value={form.fc} labelWidth="34px" disabled />
                     <InputTextOneLine label="FR" name="fr" value={form.fr} labelWidth="36px" disabled />
                     <InputTextOneLine label="CUELLO" name="cuello" value={form.cuello} labelWidth="45px" disabled />
@@ -271,8 +271,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* MEDICINA */}
                 <h1 className="font-bold text-lg text-center self-center">MEDICINA<br />*Evaluación médica</h1>
-                <InputTextOneLine name="usuarioEvaluacionMedica" value={form.usuarioEvaluacionMedica} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioEvaluacionMedica" value={form.usuarioEvaluacionMedica} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionesEvaluacionMedica"
                     value={form.observacionesEvaluacionMedica}
                     onChange={handleChange}
@@ -283,8 +286,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* PSICOLÓGICA */}
                 <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN PSICOLÓGICA<br />*Informe Psicológico Brigadista</h1>
-                <InputTextOneLine name="usuarioInformeBrigadista" value={form.usuarioInformeBrigadista} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioInformeBrigadista" value={form.usuarioInformeBrigadista} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionInformeBrigadista"
                     value={form.observacionInformeBrigadista}
                     onChange={handleChange}
@@ -295,8 +301,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* EVALUACIÓN VISUAL */}
                 <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN VISUAL<br />*Evaluación Oftalmológica *Agudeza visual</h1>
-                <InputTextOneLine name="usuarioEvaluacionOftalmologica" value={form.usuarioEvaluacionOftalmologica} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioEvaluacionOftalmologica" value={form.usuarioEvaluacionOftalmologica} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionesEvaluacionVisual"
                     value={form.observacionesEvaluacionVisual}
                     onChange={handleChange}
@@ -307,8 +316,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* AUDIOMETRÍA */}
                 <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN AUDIOMETRÍA<br />*Audiometría</h1>
-                <InputTextOneLine name="usuarioAudiometria" value={form.usuarioAudiometria} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioAudiometria" value={form.usuarioAudiometria} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionAudiometria"
                     value={form.observacionAudiometria}
                     onChange={handleChange}
@@ -319,8 +331,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* ESPIROMETRÍA */}
                 <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN ESPIROMETRÍA<br />*Cuestionario de Espirometría</h1>
-                <InputTextOneLine name="usuarioEspirometria" value={form.usuarioEspirometria} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioEspirometria" value={form.usuarioEspirometria} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionEspirometria"
                     value={form.observacionEspirometria}
                     onChange={handleChange}
@@ -331,8 +346,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* RADIOGRAFÍA DE TÓRAX */}
                 <h1 className="font-bold text-lg text-center self-center">EVALUACIÓN RADIOGRAFÍA DE TÓRAX<br />*Tórax Convencional *Tórax OIT</h1>
-                <InputTextOneLine name="usuarioToraxConvencional" value={form.usuarioToraxConvencional} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioToraxConvencional" value={form.usuarioToraxConvencional} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionRadiografiaTorax"
                     value={form.observacionRadiografiaTorax}
                     onChange={handleChange}
@@ -343,8 +361,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* CARDIOLOGÍA */}
                 <h1 className="font-bold text-lg text-center self-center">CARDIOLOGÍA<br />*Electrocardiograma</h1>
-                <InputTextOneLine name="usuarioElectrocardiograma" value={form.usuarioElectrocardiograma} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioElectrocardiograma" value={form.usuarioElectrocardiograma} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionesElectrocardiograma"
                     value={form.observacionesElectrocardiograma}
                     onChange={handleChange}
@@ -355,8 +376,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* LABORATORIO */}
                 <h1 className="font-bold text-lg text-center self-center">EXÁMENES DE LABORATORIO</h1>
-                <InputTextOneLine name="usuarioExamenLaboratorio" value={form.usuarioExamenLaboratorio} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioExamenLaboratorio" value={form.usuarioExamenLaboratorio} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionesExamenLaboratorio"
                     value={form.observacionesExamenLaboratorio}
                     onChange={handleChange}
@@ -367,8 +391,11 @@ const HojaDeRutaEmo = () => {
 
                 {/* BRIGADISTA */}
                 <h1 className="font-bold text-lg text-center self-center">BRIGADISTA<br />*Examen Médico Brigadista *Certificado de Aptitud Brigadista *Hoja de Consulta Externa - Brl</h1>
-                <InputTextOneLine name="usuarioCertificadoAptitudBrigadista" value={form.usuarioCertificadoAptitudBrigadista} disabled />
+                <InputTextOneLine label="Realizado por" labelOnTop labelClassName="lg:hidden" name="usuarioCertificadoAptitudBrigadista" value={form.usuarioCertificadoAptitudBrigadista} disabled />
                 <InputTextOneLine
+                    label="Observaciones"
+                    labelOnTop
+                    labelClassName="lg:hidden"
                     name="observacionBrigadista"
                     value={form.observacionBrigadista}
                     onChange={handleChange}

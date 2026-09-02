@@ -361,7 +361,7 @@ export default function FichaDatosPacientes() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -522,7 +522,7 @@ export default function FichaDatosPacientes() {
                             disabled
                             labelWidth="120px"
                         />
-                        <div className="grid grid-cols-2 gap-x-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
                                 label="AFP/SNP"
                                 name="afpSnp"
@@ -541,7 +541,7 @@ export default function FichaDatosPacientes() {
                                 labelWidth="120px"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
                                 label="Lic.Conducir"
                                 name="licConducirNo"
@@ -651,7 +651,7 @@ export default function FichaDatosPacientes() {
                             labelWidth="120px"
                             disabled
                         />
-                        <div className="grid grid-cols-2 gap-x-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
                                 label="Radio Frec."
                                 name="radioFrec"
@@ -673,7 +673,7 @@ export default function FichaDatosPacientes() {
                                 onRevert={() => revertField("celular")}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
                                 label="Nº Cuenta"
                                 name="numeroCuentaAhorro"
@@ -702,7 +702,7 @@ export default function FichaDatosPacientes() {
             {/* ===== SECCIÓN: COMPOSICIÓN FAMILIAR ===== */}
             <SectionFieldset legend="Composición Familiar">
                 <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-300">
+                    <table className="w-full min-w-[960px] border-collapse border border-gray-300">
                         <thead className="bg-gray-100">
                             <tr>
                                 <th className="border border-gray-300 px-2 py-1"></th>
@@ -794,7 +794,7 @@ export default function FichaDatosPacientes() {
             {/* ===== SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===== */}
             <SectionFieldset legend="Instrucción Adquirida">
                 <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-300 ">
+                    <table className="w-full min-w-[680px] border-collapse border border-gray-300 ">
                         <thead className="bg-gray-100">
                             <tr>
                                 <th className="border border-gray-300 px-2 py-1">Instrucción</th>
@@ -821,7 +821,7 @@ export default function FichaDatosPacientes() {
 
             {/* ===== SECCIÓN: EXPERIENCIA LABORAL ===== */}
             <SectionFieldset legend="Experiencia Laboral (Comenzar por último empleo)">
-                <div className="grid grid-cols-6 gap-2 mb-3 items-end">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 mb-3 items-end">
                     <InputTextOneLine
                         label="Nombre de la Empresa"
                         name="experienciaNombre"
@@ -889,7 +889,7 @@ export default function FichaDatosPacientes() {
                 {/* Tabla de experiencias agregadas */}
                 {form.experiencias.length > 0 && (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 ">
+                        <table className="w-full min-w-[820px] border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
                                 <tr>
                                     <th className="border border-gray-300 px-2 py-1">Nombre de la Empresa</th>
@@ -930,7 +930,7 @@ export default function FichaDatosPacientes() {
 
             {/* ===== SECCIÓN: REFERENCIAS PERSONALES ===== */}
             <SectionFieldset legend="Referencias Personales">
-                <div className="grid grid-cols-5 gap-2 mb-3 items-end">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 mb-3 items-end">
                     <InputTextOneLine
                         label="Apellidos y Nombres"
                         name="referenciaNombres"
@@ -988,7 +988,7 @@ export default function FichaDatosPacientes() {
                 {/* Tabla de referencias agregadas */}
                 {form.referencias.length > 0 && (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 ">
+                        <table className="w-full min-w-[720px] border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
                                 <tr>
                                     <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
@@ -1076,7 +1076,7 @@ export default function FichaDatosPacientes() {
                         />
                     </div>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-x-4">
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-x-4 gap-y-2">
                             <InputsRadioGroup
                                 label="Viáticos"
                                 name="viaticos"

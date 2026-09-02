@@ -62,7 +62,8 @@ export default function Neurologico({
                 onChange={handleRadioButtonBoolean}
                 trueLabel="POSITIVO"
                 falseLabel="NEGATIVO"
-                labelWidth="150px"
+                labelWidth="125px"
+                stackOnMobile
                 disabled={disabled}
                 edited={isFieldEdited(test.name)}
                 onRevert={() => revertField(test.name)}
@@ -81,7 +82,8 @@ export default function Neurologico({
                 onChange={handleRadioButtonBoolean}
                 trueLabel="POSITIVO"
                 falseLabel="NEGATIVO"
-                labelWidth="150px"
+                labelWidth="125px"
+                stackOnMobile
                 disabled={disabled}
                 edited={isFieldEdited(test.name)}
                 onRevert={() => revertField(test.name)}

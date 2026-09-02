@@ -560,12 +560,12 @@ export default function CertificadoAlturaPoderosa() {
 
                     {/* ===== PESTAÑAS: ANTECEDENTES / TEST DE CAGE / EXAMEN FÍSICO / NEUROLÓGICO ===== */}
                     <div className="bg-primarioClaro border rounded">
-                        <nav className="flex bg-white border-b border-gray-200 rounded-t sticky top-0 z-10">
+                        <nav className="flex overflow-x-auto scrollbar-tabs bg-white border-b border-gray-200 rounded-t sticky top-0 z-10">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     type="button"
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                                    className={`shrink-0 whitespace-nowrap lg:flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
                                         ? "border-[#233245] text-[#233245] font-semibold"
                                         : "border-transparent"
                                         }`}
