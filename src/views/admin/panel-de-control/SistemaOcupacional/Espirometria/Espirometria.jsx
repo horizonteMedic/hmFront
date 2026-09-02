@@ -324,7 +324,7 @@ export default function Espirometria() {
 
             <DatosPersonalesLaborales form={form} />
 
-            <SectionFieldset legend="Criterios" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Criterios" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="space-y-3">
                     <InputTextOneLine
                         label="FVC %"
@@ -400,13 +400,13 @@ export default function Espirometria() {
                     rows={4}
                     name="interpretacion"
                     value={form?.interpretacion}
-                    className="xl:col-span-3 ml-0"
+                    className="md:col-span-2 lg:col-span-3 ml-0"
                     onChange={handleChange}
                     disabled={camposDeshabilitados}
                     edited={isFieldEdited("interpretacion")}
                     onRevert={() => revertField("interpretacion")}
                 />
-                <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                <div className="bg-green-200 p-3 rounded-xl md:col-span-2 lg:col-span-3">
                     <CIE10List
                         value={form.interpretacionCie10}
                         fieldName="interpretacionCie10"
