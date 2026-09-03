@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getDiagnosticosRelacionados } from "./controllerDiagnosticoRelacionado";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import DiagnosticoRelacionadoFormModal from "./DiagnosticoRelacionadoFormModal";
 
 
 export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnosticosRelacionados, setDiagnosticosRelacionados, token }) {
@@ -11,6 +12,7 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
     diagnostico: "",
   })
   const [loading, setLoading] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -75,8 +77,21 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
           />
         </div>
         <div className="w-full flex justify-end">
-          <button className="bg-green-600  px-3 py-2 rounded-md text-white"> <FontAwesomeIcon icon={faPlus} className="mr-2"/> Agregar Nuevo</button>
+          <button
+            type="button"
+            onClick={() => setFormVisible(true)}
+            className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md text-white"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" /> Agregar Nuevo
+          </button>
         </div>
+
+        <DiagnosticoRelacionadoFormModal
+          visible={formVisible}
+          onClose={() => setFormVisible(false)}
+          onCreated={() => obtenerDiagnósticosRelacionados()}
+          token={token}
+        />
         <div className="max-h-[65vh] overflow-auto border border-gray-200 rounded-lg">
           <table className="w-full border-collapse text-[11px] table-fixed">
             <colgroup>
@@ -105,14 +120,13 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
                 return (!checked &&
                   <tr
                     key={dx.id}
-                    onClick={() => toggleSeleccion(dx.id)}
-                    className={`align-top border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors ${checked ? "bg-sky-50/70" : "hover:bg-gray-50"}`}
+                    className={`align-top border-b border-gray-200 last:border-b-0 transition-colors hover:bg-gray-50`}
                   >
                     <td className="px-2 py-2 ">
                       <FontAwesomeIcon
                         icon={faPlusCircle}
-                        className="text-sky-600 text-2xl"
-                        onClick={(e) => e.stopPropagation()}
+                        className="text-sky-600 text-2xl cursor-pointer hover:text-sky-700"
+                        onClick={(e) => {e.stopPropagation(); toggleSeleccion(dx.id)}}
                       />
                     </td>
                     <td className="px-2 py-2 font-bold text-sky-700">{dx.id}</td>
