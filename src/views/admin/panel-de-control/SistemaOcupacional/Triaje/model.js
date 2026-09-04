@@ -29,6 +29,8 @@ export function SubmitTriaje(data, edad, nOrden, fecha, token) {
         fCardiaca: data.fCardiaca,
         fRespiratoria: data.fRespiratoria,
         conclusionesCie10: data.conclusionesCie10,
+        usuarioRegistro: data.usuario,
+        usuarioActualizacion: data.usuario,
         formulariosDiagnostico: serializarFormulariosDiagnostico(data.formulariosDiagnostico),
     }
 

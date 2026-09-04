@@ -42,7 +42,7 @@ import { DiagnosticoRelacionadoField } from '../../../../components/reusableComp
 const today = getToday();
 
 export default function Triaje() {
-    const { token, selectedSede } = useSessionData();
+    const { token, selectedSede, userlogued } = useSessionData();
     const debounceTimeout = useRef(null);
 
     // Estado inicial del formulario
@@ -84,6 +84,8 @@ export default function Triaje() {
         // ordenFila, diagnosticoPersonalizado, detalle }]. Viaja en el form
         // para llegar al submit (ver DiagnosticoRelacionadoField).
         formulariosDiagnostico: [],
+
+        usuario: userlogued,
 
         // Búsqueda
         tipoPaciente: false,
@@ -738,7 +740,7 @@ export default function Triaje() {
                 </div>
             </div>
 
-            <div className='p-4'>
+            <div className='p-4 w-full'>
                 <DiagnosticoRelacionadoField
                     token={token}
                     seleccionados={form.formulariosDiagnostico}
