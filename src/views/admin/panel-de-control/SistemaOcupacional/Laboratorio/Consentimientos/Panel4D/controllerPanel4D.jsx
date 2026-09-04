@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch';
-import { GetInfoLaboratioEx } from '../Controller/model';
+import { GetInfoLaboratioEx, registrarConsentimiento } from '../Controller/model';
 import { GetInfoPacDefault, LoadingDefault, VerifyTRDefault } from '../../../../../../utils/functionUtils';
 import { getToday } from "../../../../../../utils/helpers";
 
@@ -23,23 +23,26 @@ export const VerifyTR = async (nro, token, setForm, selectedSede, form) => {
     token,
     setForm,
     selectedSede,
-    async () => {
-      const res = await GetInfoPacDefault(nro, token, selectedSede);
-      if (res) {
-        setForm(prev => ({
-          ...prev,
-          ...res,
-          nombres: res.nombresApellidos || '',
-        }));
-      }
-    },
-    async () => {
-      await GetInfoServicio(nro, token, setForm, form);
-    }
+    () => GetInfoServicio(nro, token, setForm, selectedSede),
+    () => GetInfoServicioEditar(nro, token, setForm, form)
   );
 };
 
-export const GetInfoServicio = async (nro, token, setForm, form) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, token, setForm, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    setForm(prev => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos || '',
+      tieneRegistro: false,
+    }));
+  }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (nro, token, setForm, form) => {
   LoadingDefault('Obteniendo datos');
   try {
     const res = await getFetch(
@@ -74,8 +77,14 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
         ...res,
         antecedentes: antecedentesActualizados,
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-        user_doctorAsignado: res.userMedicoOcup ?? "",
+        user_doctorAsignado: res.doctorAsignado ?? "",
 
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        userRegistro: res.userRegistro ?? "",
+        fechaRegistro: res.fechaRegistro ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        tieneRegistro: true,
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
@@ -88,35 +97,29 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
   }
 };
 
-export const SubmitDataService = async (form, token, userlogued, limpiar) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos', 'error');
-    return;
-  }
-  LoadingDefault('Registrando Datos');
-  try {
-    const res = await GetInfoLaboratioEx(form, tabla, token, userlogued);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: 'Exito',
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: 'success',
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form, token);
-        }
-      });
-    } else {
-      Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-    }
-  } catch (error) {
-    Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-  }
-};
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: false,
+    submitFn: (data, tk, usr, auditCtx) => GetInfoLaboratioEx(data, tabla, tk, usr, auditCtx),
+    onPrint: () => PrintHojaR(form, token),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: true,
+    submitFn: (data, tk, usr, auditCtx) => GetInfoLaboratioEx(data, tabla, tk, usr, auditCtx),
+    onPrint: () => PrintHojaR(form, token),
+  });
 
 export const PrintHojaR = async (form, token) => {
   LoadingDefault('Cargando Formato a Imprimir');
@@ -142,17 +145,13 @@ export const PrintHojaR = async (form, token) => {
 
     if (res.norden) {
       const nombre = res.nameJasper;
-      console.log('📄 Jasper a llamar:', nombre);
-      console.log('📋 Datos recibidos:', res);
       const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
       const rutaCompleta = `../../../../../../jaspers/Consentimientos/${nombre}.jsx`;
-      console.log('🔍 Buscando módulo en:', rutaCompleta);
       const modulo = await jasperModules[rutaCompleta]();
       if (typeof modulo.default === 'function') {
-        console.log('✅ Módulo encontrado y función válida, ejecutando...');
         modulo.default(res);
       } else {
-        console.error(`❌ El archivo ${nombre}.jsx no exporta una función por defecto`);
+        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
     } else {
       Swal.fire({
@@ -172,4 +171,3 @@ export const PrintHojaR = async (form, token) => {
     Swal.close();
   }
 };
-

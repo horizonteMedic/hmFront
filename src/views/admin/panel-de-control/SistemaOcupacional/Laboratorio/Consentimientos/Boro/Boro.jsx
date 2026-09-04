@@ -1,12 +1,33 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faBroom, faPrint, faPen } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
 import { InputTextOneLine, InputTextArea, InputCheckbox } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerBoro';
-import { getToday } from '../../../../../../utils/helpers';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerBoro';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "trabajador",
+  "postulante",
+  "enfermedad",
+  "medicamento",
+  "matecoca",
+  "chaccha",
+  "tratamiento",
+  "notas",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 const Boro = () => {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -34,9 +55,32 @@ const Boro = () => {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
-  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
+  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState, { storageKey: "consBoro" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handlePreguntaChange = (field, key, value) => {
     setForm(prev => ({
@@ -65,6 +109,15 @@ const Boro = () => {
       // Médico que Certifica //BUSCADOR
       nombre_medico: userName,
       user_medicoFirma: userlogued,
+
+      nombre_doctorAsignado: "",
+      user_doctorAsignado: "",
+
+      tieneRegistro: false,
+      userRegistro: "",
+      fechaRegistro: "",
+      usuarioActualizacion: "",
+      fechaActualizacion: "",
     }));
   };
 
@@ -74,12 +127,31 @@ const Boro = () => {
     }, '¿Desea Imprimir Consentimiento BORO?', form.norden);
   };
 
-  const handleSubmit = () => {
+  const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear);
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA Y COCAÍNA</h2>
 
       <form className="space-y-6">
@@ -96,6 +168,7 @@ const Boro = () => {
                   VerifyTR(form.norden, token, setForm, selectedSede);
                 }
               }}
+              disabled={hayRegistroCargado}
               labelWidth="120px"
               className="flex-1"
             />
@@ -105,6 +178,9 @@ const Boro = () => {
               type="date"
               value={form.fecha}
               onChange={handleChange}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("fecha")}
+              onRevert={() => revertField("fecha")}
               labelWidth="120px"
               className="flex-1"
             />
@@ -145,6 +221,7 @@ const Boro = () => {
                 type="radio"
                 name="trabajador_postulante"
                 checked={form.trabajador}
+                disabled={camposDeshabilitados}
                 onChange={() => setForm(prev => ({ ...prev, trabajador: true, postulante: false }))}
               />
               <span>Sí</span>
@@ -155,6 +232,7 @@ const Boro = () => {
                 type="radio"
                 name="trabajador_postulante"
                 checked={form.postulante}
+                disabled={camposDeshabilitados}
                 onChange={() => setForm(prev => ({ ...prev, trabajador: false, postulante: true }))}
               />
               <span>Sí</span>
@@ -181,6 +259,7 @@ const Boro = () => {
                 checked={form.enfermedad.key}
                 onChange={() => handlePreguntaChange('enfermedad', 'key', !form.enfermedad.key)}
                 label="¿Sufre alguna enfermedad?"
+                disabled={camposDeshabilitados}
               />
               {form.enfermedad.key && (
                 <InputTextOneLine
@@ -190,7 +269,7 @@ const Boro = () => {
                   onChange={(e) => handlePreguntaChange('enfermedad', 'cual', e.target.value)}
                   labelWidth="80px"
                   className="flex-1"
-                  disabled={!form.enfermedad.key}
+                  disabled={camposDeshabilitados || !form.enfermedad.key}
                 />
               )}
             </div>
@@ -201,6 +280,7 @@ const Boro = () => {
                 checked={form.medicamento.key}
                 onChange={() => handlePreguntaChange('medicamento', 'key', !form.medicamento.key)}
                 label="¿Consume regularmente algún medicamento?"
+                disabled={camposDeshabilitados}
               />
               {form.medicamento.key && (
                 <InputTextOneLine
@@ -210,7 +290,7 @@ const Boro = () => {
                   onChange={(e) => handlePreguntaChange('medicamento', 'cual', e.target.value)}
                   labelWidth="80px"
                   className="flex-1"
-                  disabled={!form.medicamento.key}
+                  disabled={camposDeshabilitados || !form.medicamento.key}
                 />
               )}
             </div>
@@ -221,6 +301,7 @@ const Boro = () => {
                 checked={form.matecoca.key}
                 onChange={() => handlePreguntaChange('matecoca', 'key', !form.matecoca.key)}
                 label="¿Consume regularmente mate de coca?"
+                disabled={camposDeshabilitados}
               />
               {form.matecoca.key && (
                 <InputTextOneLine
@@ -231,6 +312,7 @@ const Boro = () => {
                   onChange={(e) => handlePreguntaChange('matecoca', 'fecha', e.target.value)}
                   labelWidth="150px"
                   className="w-48"
+                  disabled={camposDeshabilitados}
                 />
               )}
             </div>
@@ -241,6 +323,7 @@ const Boro = () => {
                 checked={form.chaccha.key}
                 onChange={() => handlePreguntaChange('chaccha', 'key', !form.chaccha.key)}
                 label="¿Chaccha o mastica hoja de coca?"
+                disabled={camposDeshabilitados}
               />
               {form.chaccha.key && (
                 <InputTextOneLine
@@ -251,6 +334,7 @@ const Boro = () => {
                   onChange={(e) => handlePreguntaChange('chaccha', 'fecha', e.target.value)}
                   labelWidth="150px"
                   className="w-48"
+                  disabled={camposDeshabilitados}
                 />
               )}
             </div>
@@ -261,6 +345,7 @@ const Boro = () => {
                 checked={form.tratamiento.key}
                 onChange={() => handlePreguntaChange('tratamiento', 'key', !form.tratamiento.key)}
                 label="¿En las últimas 48 horas, se realizó algún tratamiento quirúrgico o dental?"
+                disabled={camposDeshabilitados}
               />
             </div>
             {form.tratamiento.key && (
@@ -272,6 +357,7 @@ const Boro = () => {
                   onChange={(e) => handlePreguntaChange('tratamiento', 'cual', e.target.value)}
                   labelWidth="150px"
                   className="flex-1"
+                  disabled={camposDeshabilitados}
                 />
                 <div className="flex flex-col md:flex-row gap-4">
                   <InputTextOneLine
@@ -281,6 +367,7 @@ const Boro = () => {
                     onChange={(e) => handlePreguntaChange('tratamiento', 'cuando', e.target.value)}
                     labelWidth="150px"
                     className="flex-1"
+                    disabled={camposDeshabilitados}
                   />
                   <InputTextOneLine
                     label="Especifique dónde:"
@@ -289,6 +376,7 @@ const Boro = () => {
                     onChange={(e) => handlePreguntaChange('tratamiento', 'donde', e.target.value)}
                     labelWidth="150px"
                     className="flex-1"
+                    disabled={camposDeshabilitados}
                   />
                 </div>
               </div>
@@ -302,6 +390,9 @@ const Boro = () => {
             name="notas"
             value={form.notas}
             onChange={handleChange}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("notas")}
+            onRevert={() => revertField("notas")}
             rows={4}
           />
         </SectionFieldset>
@@ -311,6 +402,9 @@ const Boro = () => {
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
           />
           <EmpleadoComboBox
             value={form.nombre_doctorAsignado}
@@ -319,18 +413,42 @@ const Boro = () => {
             onChange={handleChangeSimple}
             nameField="nombre_doctorAsignado"
             idField="user_doctorAsignado"
+            disabled={camposDeshabilitados}
+            edited={isDoctorEdited}
+            onRevert={revertDoctor}
           />
         </SectionFieldset>
 
+        {hayRegistroCargado && (
+          <AuditoriaRegistro
+            mostrarEdicion={form.tieneRegistro}
+            fechaCreacion={auditoria.fechaCreacion}
+            fechaEdicion={auditoria.fechaActualizacion}
+            usuarioRegistro={auditoria.usuarioRegistro}
+            usuarioEdicion={auditoria.usuarioActualizacion}
+          />
+        )}
+
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
+            {(!form.tieneRegistro || edicionHabilitada) && (
+              <button
+                type="button"
+                onClick={form.tieneRegistro ? handleEdit : handleSave}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSave} /> {form.tieneRegistro ? "Guardar Cambios" : "Guardar"}
+              </button>
+            )}
+            {form.tieneRegistro && !edicionHabilitada && (
+              <button
+                type="button"
+                onClick={habilitarEdicion}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPen} /> Editar
+              </button>
+            )}
             <button
               type="button"
               className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"

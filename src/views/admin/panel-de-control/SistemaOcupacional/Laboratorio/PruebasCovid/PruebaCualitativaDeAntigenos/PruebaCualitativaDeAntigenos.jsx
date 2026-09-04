@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPruebaCualitativaDeAntigenos';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPruebaCualitativaDeAntigenos';
 import {
   InputTextOneLine,
   InputTextArea,
@@ -10,9 +12,13 @@ import {
   InputsBooleanRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import { getFetch } from '../../../../getFetch/getFetch';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const sintomasList = [
   'Tos', 'Dolor de garganta', 'Congestión nasal', 'Dificultad respiratoria',
@@ -28,6 +34,21 @@ const DEFAULT_METODO = {
 };
 
 const tabla = 'examen_inmunologico';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "marsa",
+  "marca",
+  "resultado",
+  "fechaSintomas",
+  "sintomas",
+  "observaciones",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function PruebaCualitativaDeAntigenos() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -71,8 +92,7 @@ export default function PruebaCualitativaDeAntigenos() {
 
     marca: '',
     doctor: 'N/A',
-    positivo: false,
-    negativo: false,
+    resultado: false,
     fechaSintomas: today,
     sintomas: [],
     marsa: false,
@@ -84,12 +104,20 @@ export default function PruebaCualitativaDeAntigenos() {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
     form,
     setForm,
-    handleChange,
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButtonBoolean,
@@ -97,16 +125,56 @@ export default function PruebaCualitativaDeAntigenos() {
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "pruebaCualitativaDeAntigenos" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === 'Enter') {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -152,24 +220,45 @@ export default function PruebaCualitativaDeAntigenos() {
     }));
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -184,101 +273,12 @@ export default function PruebaCualitativaDeAntigenos() {
           name="marsa"
           checked={form.marsa}
           onChange={handleCheckBoxChange}
+          disabled={camposDeshabilitados}
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Estado Civil"
-          name="estadoCivil"
-          value={form.estadoCivil}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
+
       <SectionFieldset legend="Marca y Método" className="space-y-4">
         <div className="grid grid-cols-1  gap-6">
           <div className="space-y-4">
@@ -290,6 +290,7 @@ export default function PruebaCualitativaDeAntigenos() {
                 name="marca"
                 value={form.marca}
                 onChange={handleChangeSimple}
+                disabled={camposDeshabilitados}
                 className="border rounded px-2 py-1 w-full"
               >
                 <option value="">--Seleccione--</option>
@@ -323,6 +324,7 @@ export default function PruebaCualitativaDeAntigenos() {
             onChange={handleRadioButtonBoolean}
             trueLabel='Positivo'
             falseLabel='Negativo'
+            disabled={camposDeshabilitados}
           />
         </SectionFieldset>
 
@@ -333,6 +335,9 @@ export default function PruebaCualitativaDeAntigenos() {
             type="date"
             value={form.fechaSintomas}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("fechaSintomas")}
+            onRevert={() => revertField("fechaSintomas")}
             labelWidth="140px"
           />
         </SectionFieldset>
@@ -344,6 +349,7 @@ export default function PruebaCualitativaDeAntigenos() {
               <input
                 type="checkbox"
                 checked={form.sintomas.includes(s)}
+                disabled={camposDeshabilitados}
                 onChange={(e) => handleSintomaChange(s, e.target.checked)}
               />
               {s}
@@ -355,6 +361,9 @@ export default function PruebaCualitativaDeAntigenos() {
           name="observaciones"
           value={form.observaciones}
           onChange={handleObservacionesChange}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("observaciones")}
+          onRevert={() => revertField("observaciones")}
           rows={4}
         />
       </SectionFieldset>
@@ -365,6 +374,9 @@ export default function PruebaCualitativaDeAntigenos() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -373,15 +385,35 @@ export default function PruebaCualitativaDeAntigenos() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );

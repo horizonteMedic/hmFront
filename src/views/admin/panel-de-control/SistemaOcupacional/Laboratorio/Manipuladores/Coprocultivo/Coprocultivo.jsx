@@ -1,14 +1,24 @@
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../../hooks/useForm";
-import { getToday } from "../../../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import {
   InputTextOneLine,
   InputTextArea,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-import { PrintHojaR, VerifyTR, SubmitDataService } from "./controllerCoprocultivo";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import {
+  PrintHojaR,
+  VerifyTR,
+  SubmitDataService,
+  UpdateDataService,
+} from "./controllerCoprocultivo";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 
 const tabla = "ac_coprocultivo";
 const colorOptions = ["Marrón", "Mostaza", "Verdoso"];
@@ -16,6 +26,30 @@ const consistenciaOptions = ["Sólido", "Semisólido", "Diarreico"];
 const presenceOptions = ["Ausente", "Presente"];
 const floraOptions = ["Presente", "Regular cantidad"];
 const resultadoOptions = ["Negativo", "Positivo"];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "muestra",
+  "color",
+  "consistencia",
+  "moco_fecal",
+  "sangrev",
+  "restosa",
+  "leucocitos",
+  "hematies",
+  "parasitos",
+  "gotasg",
+  "levaduras",
+  "identificacion",
+  "florac",
+  "resultado",
+  "observaciones",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function Coprocultivo() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -66,6 +100,15 @@ export default function Coprocultivo() {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -77,7 +120,23 @@ export default function Coprocultivo() {
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "coprocultivo" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const toggleOption = (field, value) => {
     const normalized = value.toUpperCase();
@@ -105,10 +164,34 @@ export default function Coprocultivo() {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -118,15 +201,21 @@ export default function Coprocultivo() {
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
-  const renderPresenceGroup = (label, field, options = presenceOptions, disabledInput = true) => (
+  const renderPresenceGroup = (label, field, options = presenceOptions) => (
     <div className="space-y-2">
       <InputTextOneLine
         label={label}
         name={field}
         value={form[field]}
         onChange={handleChange}
-        disabled={disabledInput}
+        disabled={camposDeshabilitados}
+        edited={isFieldEdited(field)}
+        onRevert={() => revertField(field)}
         labelWidth="120px"
       />
       <div className="flex items-center gap-4">
@@ -139,6 +228,7 @@ export default function Coprocultivo() {
             >
               <input
                 type="checkbox"
+                disabled={camposDeshabilitados}
                 checked={form[field] === opt.toUpperCase()}
                 onChange={() => toggleOption(field, opt)}
               />
@@ -152,22 +242,38 @@ export default function Coprocultivo() {
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -279,6 +385,9 @@ export default function Coprocultivo() {
             name="muestra"
             value={form.muestra}
             onChange={handleChange}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("muestra")}
+            onRevert={() => revertField("muestra")}
             labelWidth="120px"
           />
           {renderPresenceGroup("Color", "color", colorOptions)}
@@ -295,6 +404,9 @@ export default function Coprocultivo() {
               name="leucocitos"
               value={form.leucocitos}
               onChange={handleChange}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("leucocitos")}
+              onRevert={() => revertField("leucocitos")}
               labelWidth="120px"
             />
             <div className="flex items-center gap-4">
@@ -303,6 +415,7 @@ export default function Coprocultivo() {
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
+                    disabled={camposDeshabilitados}
                     checked={form.leucocitos === "NO SE OBSERVAN"}
                     onChange={() => toggleOption("leucocitos", "No se observan")}
                   />
@@ -311,6 +424,7 @@ export default function Coprocultivo() {
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
+                    disabled={camposDeshabilitados}
                     checked={form.leucocitos?.toUpperCase().includes("X CAMPO")}
                     onChange={() => toggleCampoValue("leucocitos")}
                   />
@@ -326,6 +440,9 @@ export default function Coprocultivo() {
               name="hematies"
               value={form.hematies}
               onChange={handleChange}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("hematies")}
+              onRevert={() => revertField("hematies")}
               labelWidth="120px"
             />
             <div className="flex items-center gap-4">
@@ -334,6 +451,7 @@ export default function Coprocultivo() {
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
+                    disabled={camposDeshabilitados}
                     checked={form.hematies === "NO SE OBSERVAN"}
                     onChange={() => toggleOption("hematies", "No se observan")}
                   />
@@ -342,6 +460,7 @@ export default function Coprocultivo() {
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
+                    disabled={camposDeshabilitados}
                     checked={form.hematies?.toUpperCase().includes("X CAMPO")}
                     onChange={() => toggleCampoValue("hematies")}
                   />
@@ -365,6 +484,9 @@ export default function Coprocultivo() {
             name="identificacion"
             value={form.identificacion}
             onChange={handleChange}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("identificacion")}
+            onRevert={() => revertField("identificacion")}
             labelWidth="120px"
           />
           {renderPresenceGroup("Flora Coliforme", "florac", floraOptions)}
@@ -381,6 +503,9 @@ export default function Coprocultivo() {
           name="observaciones"
           value={form.observaciones}
           onChange={handleChange}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("observaciones")}
+          onRevert={() => revertField("observaciones")}
           rows={4}
         />
       </SectionFieldset>
@@ -391,6 +516,9 @@ export default function Coprocultivo() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -399,17 +527,36 @@ export default function Coprocultivo() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );
 }
-

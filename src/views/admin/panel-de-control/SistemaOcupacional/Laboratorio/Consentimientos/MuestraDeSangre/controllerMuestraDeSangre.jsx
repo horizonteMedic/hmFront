@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { GetInfoLaboratioEx } from '../Controller/model.js';
+import { GetInfoLaboratioEx, registrarConsentimiento } from '../Controller/model.js';
 
 const Loading = (text) => {
   Swal.fire({
@@ -47,6 +47,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     })
 }
 
+// ===== Mapeo Registro nuevo (datos del paciente) =====
 export const GetInfoPac = (nro, set, token, sede) => {
   getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
     .then((res) => {
@@ -54,6 +55,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
+        tieneRegistro: false,
       }));
     })
     .finally(() => {
@@ -61,7 +63,8 @@ export const GetInfoPac = (nro, set, token, sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, user) => {
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
   getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
@@ -76,7 +79,12 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, user) => {
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           user_doctorAsignado: res.doctorAsignado ?? "",
 
-
+          // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+          userRegistro: res.userRegistro ?? "",
+          fechaRegistro: res.fechaRegistro ?? "",
+          usuarioActualizacion: res.usuarioActualizacion ?? "",
+          fechaActualizacion: res.fechaActualizacion ?? "",
+          tieneRegistro: true,
         }));
       } else {
         Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error')
@@ -87,33 +95,29 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, user) => {
     })
 }
 
-export const SubmitConsentimientoLab = async (form, tabla, token, user, limpiar = null) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos', 'error')
-    return
-  }
-  Loading('Registrando Datos')
-  GetInfoLaboratioEx(form, tabla, token, user)
-    .then((res) => {
-      if (res.id === 1 || res.id === 0) {
-        Swal.fire({
-          title: 'Exito', text: `${res.mensaje},\n¿Desea imprimir?`, icon: 'success', showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-        }).then((result) => {
-          if (limpiar) limpiar()
-          if (result.isConfirmed) {
-            PrintHojaR(form, tabla, token)
-          }
-        })
-      } else {
-        Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
-      }
-    })
-    .catch(() => {
-      Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
-    })
-}
+// ===== Guardar (registro nuevo) =====
+export const SubmitConsentimientoLab = (form, tabla, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: false,
+    submitFn: (data, tk, usr, auditCtx) => GetInfoLaboratioEx(data, tabla, tk, usr, auditCtx),
+    onPrint: () => PrintHojaR(form, tabla, token),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateConsentimientoLab = (form, tabla, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: true,
+    submitFn: (data, tk, usr, auditCtx) => GetInfoLaboratioEx(data, tabla, tk, usr, auditCtx),
+    onPrint: () => PrintHojaR(form, tabla, token),
+  });
 
 export const PrintHojaR = async (datos, tabla, token) => {
   Loading('Cargando Formato a Imprimir')
@@ -139,4 +143,3 @@ export const PrintHojaR = async (datos, tabla, token) => {
       });
     });
 }
-

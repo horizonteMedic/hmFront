@@ -1,18 +1,37 @@
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel3D';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPanel3D';
 import {
   InputTextOneLine,
   InputsRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const tabla = 'panel3d';
 
-export default function Resultado_Panel3D() {
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "metodo",
+  "valueM",
+  "valueC",
+  "valueE",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
+
+export default function Panel3D() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
@@ -49,29 +68,78 @@ export default function Resultado_Panel3D() {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
     form,
     setForm,
     handleChange,
+    handleChangeNumber,
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
-    handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "panel3d" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === 'Enter') {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -81,24 +149,45 @@ export default function Resultado_Panel3D() {
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -110,98 +199,7 @@ export default function Resultado_Panel3D() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Estado Civil"
-          name="estadoCivil"
-          value={form.estadoCivil}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
 
       {/* Resultados */}
       <SectionFieldset legend="Resultados" className='grid gap-y-3'>
@@ -211,6 +209,9 @@ export default function Resultado_Panel3D() {
           value={form.metodo}
           onChange={handleChange}
           labelWidth='120px'
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("metodo")}
+          onRevert={() => revertField("metodo")}
         />
         <div className="grid  gap-x-4 gap-y-3">
 
@@ -222,6 +223,9 @@ export default function Resultado_Panel3D() {
               onChange={handleChange}
               labelWidth='120px'
               className='w-full max-w-[85%]'
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("valueM")}
+              onRevert={() => revertField("valueM")}
             />
             <InputsRadioGroup
               name="valueM"
@@ -231,6 +235,7 @@ export default function Resultado_Panel3D() {
                 { label: 'Positivo', value: 'POSITIVO' },
                 { label: 'Negativo', value: 'NEGATIVO' }
               ]}
+              disabled={camposDeshabilitados}
             />
           </div>
 
@@ -242,6 +247,9 @@ export default function Resultado_Panel3D() {
               onChange={handleChange}
               labelWidth='120px'
               className='w-full max-w-[85%]'
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("valueC")}
+              onRevert={() => revertField("valueC")}
             />
             <InputsRadioGroup
               name="valueC"
@@ -251,6 +259,7 @@ export default function Resultado_Panel3D() {
                 { label: 'Positivo', value: 'POSITIVO' },
                 { label: 'Negativo', value: 'NEGATIVO' }
               ]}
+              disabled={camposDeshabilitados}
             />
           </div>
 
@@ -262,6 +271,9 @@ export default function Resultado_Panel3D() {
               onChange={handleChange}
               labelWidth='120px'
               className='w-full max-w-[85%]'
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("valueE")}
+              onRevert={() => revertField("valueE")}
             />
             <InputsRadioGroup
               name="valueE"
@@ -271,6 +283,7 @@ export default function Resultado_Panel3D() {
                 { label: 'Positivo', value: 'POSITIVO' },
                 { label: 'Negativo', value: 'NEGATIVO' }
               ]}
+              disabled={camposDeshabilitados}
             />
           </div>
         </div>
@@ -282,6 +295,9 @@ export default function Resultado_Panel3D() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -290,16 +306,35 @@ export default function Resultado_Panel3D() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      {/* Acciones */}
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );

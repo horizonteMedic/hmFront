@@ -1,16 +1,53 @@
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerExamenOrina';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerExamenOrina';
 import {
     InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const tabla = 'lab_clinico_examen_orina';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "color",
+    "aspecto",
+    "densidad",
+    "ph",
+    "nitritos",
+    "proteinas",
+    "cetonas",
+    "leucocitosExamenQuimico",
+    "acAscorbico",
+    "urobilinogeno",
+    "bilirrubina",
+    "glucosaExamenQuimico",
+    "sangre",
+    "leucocitosSedimentoUnitario",
+    "hematiesSedimentoUnitario",
+    "celEpiteliales",
+    "cristales",
+    "almidon",
+    "levadura",
+    "cilindros",
+    "bacterias",
+    "gramSc",
+    "otros",
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 export default function ExamenOrina() {
     const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -73,6 +110,15 @@ export default function ExamenOrina() {
 
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -85,16 +131,56 @@ export default function ExamenOrina() {
         handleClearnotO,
         handleClear,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "examenOrina" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+    // el cambio por el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === 'Enter') {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === 'Enter') {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -104,23 +190,44 @@ export default function ExamenOrina() {
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumberDecimals}
+                        onKeyUp={handleSearch}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     name="fecha"
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -145,7 +252,7 @@ export default function ExamenOrina() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-4">
                                 <label className="font-semibold min-w-[100px] max-w-[100px]">Color :</label>
-                                <select name="color" value={form.color} className="border rounded p-1 w-full" onChange={handleChange}>
+                                <select name="color" value={form.color} disabled={camposDeshabilitados} className="border rounded p-1 w-full" onChange={handleChange}>
                                     <option>N/A</option>
                                     <option>AMARILLO CLARO</option>
                                     <option>AMARILLO PAJIZO</option>
@@ -158,7 +265,7 @@ export default function ExamenOrina() {
                             </div>
                             <div className="flex items-center gap-4">
                                 <label className="font-semibold min-w-[100px] max-w-[100px]">Aspecto:</label>
-                                <select name="aspecto" value={form.aspecto} className="border rounded p-1 w-full" onChange={handleChange}>
+                                <select name="aspecto" value={form.aspecto} disabled={camposDeshabilitados} className="border rounded p-1 w-full" onChange={handleChange}>
                                     <option>N/A</option>
                                     <option>LIGERAMENTE TURBIO</option>
                                     <option>TRANSPARENTE</option>
@@ -172,6 +279,9 @@ export default function ExamenOrina() {
                                 labelWidth="100px"
                                 onChange={handleChange}
                                 onKeyUp={(e) => { handleFocusNext(e, "ph") }}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("densidad")}
+                                onRevert={() => revertField("densidad")}
                             />
                             <InputTextOneLine
                                 label="PH"
@@ -179,11 +289,15 @@ export default function ExamenOrina() {
                                 value={form.ph}
                                 labelWidth="100px"
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("ph")}
+                                onRevert={() => revertField("ph")}
                             />
                         </div>
                         <div className="flex justify-end">
                             <button
-                                className="bg-red-600 text-white px-4 py-2 rounded-md"
+                                className="bg-red-600 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:pointer-events-none"
+                                disabled={camposDeshabilitados}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setForm(prev => {
@@ -246,6 +360,9 @@ export default function ExamenOrina() {
                                     value={form[item.key]}
                                     onChange={handleChange}
                                     onKeyUp={handleFocusNext}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited(item.key)}
+                                    onRevert={() => revertField(item.key)}
                                 />
                             ))}
                         </div>
@@ -264,6 +381,9 @@ export default function ExamenOrina() {
                                     value={form[item.key]}
                                     onChange={handleChange}
                                     onKeyUp={handleFocusNext}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited(item.key)}
+                                    onRevert={() => revertField(item.key)}
                                 />
                             ))}
                         </div>
@@ -286,6 +406,9 @@ export default function ExamenOrina() {
                                     value={form[item.key]}
                                     onChange={handleChange}
                                     onKeyUp={handleFocusNext}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited(item.key)}
+                                    onRevert={() => revertField(item.key)}
                                 />
                             ))}
                         </div>
@@ -304,6 +427,9 @@ export default function ExamenOrina() {
                                     value={form[item.key]}
                                     onChange={handleChange}
                                     onKeyUp={handleFocusNext}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited(item.key)}
+                                    onRevert={() => revertField(item.key)}
                                 />
                             ))}
                         </div>
@@ -314,6 +440,9 @@ export default function ExamenOrina() {
                             label="Especialista"
                             form={form}
                             onChange={handleChangeSimple}
+                            disabled={camposDeshabilitados}
+                            edited={isMedicoEdited}
+                            onRevert={revertMedico}
                         />
                         <EmpleadoComboBox
                             value={form.nombre_doctorAsignado}
@@ -322,17 +451,37 @@ export default function ExamenOrina() {
                             onChange={handleChangeSimple}
                             nameField="nombre_doctorAsignado"
                             idField="user_doctorAsignado"
+                            disabled={camposDeshabilitados}
+                            edited={isDoctorEdited}
+                            onRevert={revertDoctor}
                         />
                     </SectionFieldset>
                 </div>
             </div>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

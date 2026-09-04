@@ -1,19 +1,25 @@
 import { useMemo } from "react";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../../hooks/useForm";
-import { getToday } from "../../../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import {
   PrintHojaR,
   VerifyTR,
   SubmitDataService,
+  UpdateDataService,
 } from "./controllerCoproParasitologia";
 import {
   InputCheckbox,
   InputTextOneLine,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 
 const tabla = "ac_coproparasitologico";
 const colorOptions = ["MARRON", "MOSTAZA", "VERDOSO"];
@@ -45,6 +51,19 @@ const microsFields = [
   { key: "leucocitos", label: "Leucocitos", type: "campo" },
   { key: "hematies", label: "Hematíes", type: "campo" },
   { key: "parasitos", label: "Parásitos", type: "presence" },
+];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "tipoCoproparasitologico",
+  "sinHecesTres",
+  ...muestrasConfig.flatMap(({ id }) => muestraFields.map(({ key }) => `heces${id}_${key}`)),
+  ...microsConfig.flatMap(({ id }) => microsFields.map(({ key }) => `micro${id}_${key}`)),
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
 ];
 
 export default function Coproparasitologia() {
@@ -83,6 +102,15 @@ export default function Coproparasitologia() {
 
       nombre_doctorAsignado: "",
       user_doctorAsignado: "",
+
+      // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+      tieneRegistro: false,
+
+      // Auditoría
+      userRegistro: "",
+      fechaRegistro: "",
+      usuarioActualizacion: "",
+      fechaActualizacion: "",
     };
     muestrasConfig.forEach(({ id }) => {
       muestraFields.forEach(({ key }) => {
@@ -104,12 +132,27 @@ export default function Coproparasitologia() {
     setForm,
     handleChangeNumberDecimals,
     handleChange,
-    //handleCheckBoxChange,
     handleChangeSimple,
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "coproparasitologia" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const toggleValue = (field, value) => {
     const normalized = value.toUpperCase();
@@ -133,15 +176,38 @@ export default function Coproparasitologia() {
     });
   };
 
-
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -150,6 +216,11 @@ export default function Coproparasitologia() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
   const renderMuestraField = (sampleId, field, disabled) => {
     const name = `heces${sampleId}_${field.key}`;
@@ -161,6 +232,8 @@ export default function Coproparasitologia() {
           value={form[name]}
           onChange={handleChange}
           disabled={disabled}
+          edited={isFieldEdited(name)}
+          onRevert={() => revertField(name)}
           labelOnTop
         />
         <div className="flex flex-wrap gap-3">
@@ -194,6 +267,8 @@ export default function Coproparasitologia() {
             value={form[name]}
             onChange={handleChange}
             disabled={disabled}
+            edited={isFieldEdited(name)}
+            onRevert={() => revertField(name)}
             labelOnTop
           />
           <div className="flex flex-wrap gap-3">
@@ -227,6 +302,8 @@ export default function Coproparasitologia() {
           value={form[name]}
           onChange={handleChange}
           disabled={disabled}
+          edited={isFieldEdited(name)}
+          onRevert={() => revertField(name)}
           labelOnTop
         />
         <div className="flex flex-wrap gap-3">
@@ -374,23 +451,39 @@ export default function Coproparasitologia() {
 
 
   return (
-    <div className="/space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="100px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="100px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -410,12 +503,14 @@ export default function Coproparasitologia() {
               name="tipoCoproparasitologico"
               checked={form.tipoCoproparasitologico}
               onChange={handleCheckBoxChange}
+              disabled={camposDeshabilitados}
             />
             <InputCheckbox
               label="2 MUESTRAS"
               name="sinHecesTres"
               checked={form.sinHecesTres}
               onChange={handleCheckBoxChange}
+              disabled={camposDeshabilitados}
             />
           </div>
         </div>
@@ -520,9 +615,10 @@ export default function Coproparasitologia() {
           <button
             type="button"
             onClick={marcarTodoAusenteMuestras}
+            disabled={camposDeshabilitados}
             className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
                         flex items-center gap-2 transition-all duration-150 ease-out
-                        hover:shadow-lg active:scale-95 active:shadow-inner"
+                        hover:shadow-lg active:scale-95 active:shadow-inner disabled:opacity-50 disabled:pointer-events-none"
           >
             Marcar todo AUSENTE
           </button>
@@ -531,6 +627,7 @@ export default function Coproparasitologia() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
             const disabled =
+              camposDeshabilitados ||
               (form.tipoCoproparasitologico && idx > 0) ||
               (sample.id === "3" && form.sinHecesTres);
 
@@ -556,9 +653,10 @@ export default function Coproparasitologia() {
           <button
             type="button"
             onClick={marcarTodoAusenteExm}
+            disabled={camposDeshabilitados}
             className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
                         flex items-center gap-2 transition-all duration-150 ease-out
-                        hover:shadow-lg active:scale-95 active:shadow-inner"
+                        hover:shadow-lg active:scale-95 active:shadow-inner disabled:opacity-50 disabled:pointer-events-none"
           >
             Marcar todo NO SE OBSERVAN / AUSENTE
           </button>
@@ -566,7 +664,8 @@ export default function Coproparasitologia() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
-            const disabled = form.tipoCoproparasitologico && idx > 0 ||
+            const disabled = camposDeshabilitados ||
+              (form.tipoCoproparasitologico && idx > 0) ||
               (sample.id === "3" && form.sinHecesTres);
             return (
               <SectionFieldset
@@ -589,6 +688,9 @@ export default function Coproparasitologia() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -597,15 +699,35 @@ export default function Coproparasitologia() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );

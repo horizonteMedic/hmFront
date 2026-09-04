@@ -1,22 +1,40 @@
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerHepatitis';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerHepatitis';
 import {
   InputTextOneLine,
   InputsRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 import { useEffect, useState } from 'react';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "marca",
+  "resultadoHAV",
+  "resultadoHBsAg",
+  "resultadoVHC",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 export default function Hepatitis() {
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const today = getToday();
 
   const [tabla, setTabla] = useState("lhepatitis");
-  const [tipoHepatitis, setTipoHepatitis] = useState({ tipoHepatitis: "A" })
 
   const initialFormState = {
     norden: '',
@@ -41,6 +59,7 @@ export default function Hepatitis() {
     ocupacion: "",
     cargoDesempenar: "",
 
+    tipoHepatitis: "A",
     marca: 'RAPID TEST - MONTEST',
     resultadoHAV: '',
     resultadoHBsAg: '',
@@ -52,6 +71,15 @@ export default function Hepatitis() {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
 
@@ -59,32 +87,79 @@ export default function Hepatitis() {
     form,
     setForm,
     handleChange,
+    handleChangeNumber,
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "hepatitis" });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
 
+  // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+  // el cambio por el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
+
+  // Cambia de tipo de prueba (A/B/C): limpia el resto del formulario pero conserva el tipo
+  // recién elegido (cada tipo vive en su propia tabla del backend).
   const handleRadioButtonTipoHepatitis = (e, value) => {
-    const { name } = e.target;
-    setTipoHepatitis((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
+    const normalized = value.toUpperCase();
     handleClearnotO();
+    setForm((f) => ({ ...f, tipoHepatitis: normalized }));
+  };
+
+  // Limpia el formulario (para una nueva búsqueda) conservando el tipo de prueba actual, para
+  // no perder la selección A/B/C mientras se busca un N° Orden distinto.
+  const handleClearKeepTipo = () => {
+    const tipoActual = form.tipoHepatitis;
+    handleClearnotO();
+    setForm((f) => ({ ...f, tipoHepatitis: tipoActual }));
   };
 
   const handleSave = () => {
-    SubmitDataService({ ...form, ...tipoHepatitis }, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearKeepTipo();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === 'Enter') {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -95,31 +170,51 @@ export default function Hepatitis() {
   };
 
   useEffect(() => {
-    const value = tipoHepatitis.tipoHepatitis;
+    const value = form.tipoHepatitis;
     setTabla(
       value == "A" ? "lhepatitis" :
         value == "B" ? "hepatitis_b" :
           value == "C" ? "hepatitis_c" : "lhepatitis")
-    handleClearnotO();
-  }, [tipoHepatitis.tipoHepatitis])
+  }, [form.tipoHepatitis])
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -131,109 +226,19 @@ export default function Hepatitis() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad (Años)"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Estado Civil"
-          name="estadoCivil"
-          value={form.estadoCivil}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
 
       <SectionFieldset legend="Tipo de Prueba">
         <InputsRadioGroup
           name="tipoHepatitis"
-          value={tipoHepatitis.tipoHepatitis}
+          value={form.tipoHepatitis}
           onChange={handleRadioButtonTipoHepatitis}
           options={[
             { label: "HEPATITIS A (HAV)", value: "A" },
             { label: "HEPATITIS B (HBsAg)", value: "B" },
             { label: "HEPATITIS C (VHC)", value: "C" },
           ]}
+          disabled={camposDeshabilitados}
         />
       </SectionFieldset>
 
@@ -244,6 +249,9 @@ export default function Hepatitis() {
           value={form.marca}
           onChange={handleChange}
           labelWidth="120px"
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("marca")}
+          onRevert={() => revertField("marca")}
         />
       </SectionFieldset>
 
@@ -255,9 +263,11 @@ export default function Hepatitis() {
             name="resultadoHAV"
             value={form.resultadoHAV}
             onChange={handleChange}
-            disabled={tipoHepatitis.tipoHepatitis != "A"}
+            disabled={form.tipoHepatitis != "A" || camposDeshabilitados}
             labelWidth='120px'
             className='w-full max-w-[85%]'
+            edited={isFieldEdited("resultadoHAV")}
+            onRevert={() => revertField("resultadoHAV")}
           />
           <InputsRadioGroup
             name="resultadoHAV"
@@ -267,7 +277,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={tipoHepatitis.tipoHepatitis != "A"}
+            disabled={form.tipoHepatitis != "A" || camposDeshabilitados}
           />
         </div>
         <div className='flex gap-4'>
@@ -277,9 +287,11 @@ export default function Hepatitis() {
             name="resultadoHBsAg"
             value={form.resultadoHBsAg}
             onChange={handleChange}
-            disabled={tipoHepatitis.tipoHepatitis != "B"}
+            disabled={form.tipoHepatitis != "B" || camposDeshabilitados}
             labelWidth='120px'
             className='w-full max-w-[85%]'
+            edited={isFieldEdited("resultadoHBsAg")}
+            onRevert={() => revertField("resultadoHBsAg")}
           />
           <InputsRadioGroup
             name="resultadoHBsAg"
@@ -289,7 +301,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={tipoHepatitis.tipoHepatitis != "B"}
+            disabled={form.tipoHepatitis != "B" || camposDeshabilitados}
           />
         </div>
         <div className='flex gap-4'>
@@ -298,9 +310,11 @@ export default function Hepatitis() {
             name="resultadoVHC"
             value={form.resultadoVHC}
             onChange={handleChange}
-            disabled={tipoHepatitis.tipoHepatitis != "C"}
+            disabled={form.tipoHepatitis != "C" || camposDeshabilitados}
             labelWidth='120px'
             className='w-full max-w-[85%]'
+            edited={isFieldEdited("resultadoVHC")}
+            onRevert={() => revertField("resultadoVHC")}
           />
           <InputsRadioGroup
             name="resultadoVHC"
@@ -310,7 +324,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={tipoHepatitis.tipoHepatitis != "C"}
+            disabled={form.tipoHepatitis != "C" || camposDeshabilitados}
           />
         </div>
       </SectionFieldset>
@@ -321,6 +335,9 @@ export default function Hepatitis() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
         <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
@@ -329,15 +346,35 @@ export default function Hepatitis() {
           onChange={handleChangeSimple}
           nameField="nombre_doctorAsignado"
           idField="user_doctorAsignado"
+          disabled={camposDeshabilitados}
+          edited={isDoctorEdited}
+          onRevert={revertDoctor}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );
