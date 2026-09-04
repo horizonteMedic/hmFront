@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -152,7 +153,8 @@ export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCr
         }
     };
 
-    return (
+    // Portal a document.body: ver el mismo comentario en DiagnosticoRelacionadoModal.
+    return createPortal(
         <div className="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-30">
             <div className="bg-white rounded-md w-[min(600px,95vw)] flex flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b">
@@ -254,6 +256,7 @@ export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCr
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

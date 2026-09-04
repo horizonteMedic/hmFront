@@ -1,6 +1,7 @@
 import { GetHistoriaCTriaje, SubmitTriaje } from './model';
 import Swal from 'sweetalert2';
 import ReporteTriaje from '../../../../jaspers/Triaje/ReporteTriaje';
+import { hidratarFormulariosDiagnostico } from '../../../../components/reusableComponents/DiagnosticoRelacionado';
 
 const Loading = (text) => {
     Swal.fire({
@@ -91,6 +92,7 @@ export const Clean = (set) => {
         diastolica: '',
         fRespiratoria: '',
         diagnostico: '',
+        formulariosDiagnostico: [],
     }));
 };
 
@@ -336,7 +338,8 @@ export const GetListTriajeMult = async (nro, set, get, token, jasper, setHTR) =>
                     diastolica: res.diastolica,
                     fRespiratoria: res.f_respiratoria,
                     diagnostico: res.conclusion,
-                    conclusionesCie10: res.conclusionesCie10
+                    conclusionesCie10: res.conclusionesCie10,
+                    formulariosDiagnostico: hidratarFormulariosDiagnostico(res.formulariosDiagnostico),
                 }));
             } else {
                 Swal.fire('Error', 'No se Encontro un Registro de Triaje para esta Historia Clinica', 'error');
@@ -387,6 +390,7 @@ export const GetListTriajeMulttable = async (nro, set, get, token, setHTR, setH)
                     diastolica: res.diastolica,
                     fRespiratoria: res.f_respiratoria,
                     diagnostico: res.conclusion,
+                    formulariosDiagnostico: hidratarFormulariosDiagnostico(res.formulariosDiagnostico),
                 }));
             } else {
                 Swal.fire('Error', 'No se Encontro un Registro de Triaje para esta Historia Clinica', 'error');

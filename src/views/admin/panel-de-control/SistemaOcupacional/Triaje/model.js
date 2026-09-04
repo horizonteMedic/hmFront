@@ -1,4 +1,5 @@
 import { URLAzure } from "../../../../config/config"
+import { serializarFormulariosDiagnostico } from "../../../../components/reusableComponents/DiagnosticoRelacionado"
 
 export function SubmitTriaje(data, edad, nOrden, fecha, token) {
     const controller = new AbortController()
@@ -27,7 +28,8 @@ export function SubmitTriaje(data, edad, nOrden, fecha, token) {
         nOrden: nOrden,
         fCardiaca: data.fCardiaca,
         fRespiratoria: data.fRespiratoria,
-        conclusionesCie10: data.conclusionesCie10
+        conclusionesCie10: data.conclusionesCie10,
+        formulariosDiagnostico: serializarFormulariosDiagnostico(data.formulariosDiagnostico),
     }
 
     const url = `${URLAzure}/api/v01/ct/triaje/registrarActualizar`

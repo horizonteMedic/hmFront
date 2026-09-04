@@ -5,14 +5,14 @@ const unwrap = (res) => (res && typeof res === "object" && "resultado" in res ? 
 
 const getJson = (url, token) => getFetch(url, token).then(unwrap);
 
-export function getDiagnosticosRelacionados(setLoading, setDiagnosticosRelacionados, token) {
+export function getDiagnosticosRelacionados(setLoading, setLista, token) {
     setLoading(true);
 
     const list = getJson(`/api/v01/ct/diagnostico`, token);
 
     return Promise.resolve(list)
-        .then((res) => setDiagnosticosRelacionados(((prev) => ({ ...prev, lista: Array.isArray(res) ? res : [] }))))
-        .catch(() => setDiagnosticosRelacionados((prev) => ({ ...prev, lista: [] })))
+        .then((res) => setLista(Array.isArray(res) ? res : []))
+        .catch(() => setLista([]))
         .finally(() => setLoading(false));
 
 };

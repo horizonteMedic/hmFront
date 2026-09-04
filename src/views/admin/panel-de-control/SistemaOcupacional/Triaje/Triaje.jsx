@@ -37,7 +37,7 @@ import {
 } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
-import DiagnosticoRelacionadoModal from '../../../../components/reusableComponents/DiagnosticoRelacionado/DiagnosticoRelacionadoModal';
+import { DiagnosticoRelacionadoField } from '../../../../components/reusableComponents/DiagnosticoRelacionado';
 
 const today = getToday();
 
@@ -80,6 +80,10 @@ export default function Triaje() {
         diastolica: '',
         fRespiratoria: '',
         diagnostico: '',
+        // Diagnósticos relacionados seleccionados: [{ id, formularioId,
+        // ordenFila, diagnosticoPersonalizado, detalle }]. Viaja en el form
+        // para llegar al submit (ver DiagnosticoRelacionadoField).
+        formulariosDiagnostico: [],
 
         // Búsqueda
         tipoPaciente: false,
@@ -89,19 +93,23 @@ export default function Triaje() {
     };
 
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [diagnosticosRelacionados, setDiagnosticosRelacionados] = useState({
-        lista: [],
-        seleccionados: [],
-    });
-
-
     const {
         form,
         setForm,
         handleChange,
         handleChangeNumber,
     } = useForm(initialFormState, { storageKey: 'triaje' });
+
+    // Los diagnósticos relacionados seleccionados viven en `form` para
+    // llegar al submit; el catálogo y el modal de búsqueda/alta los maneja
+    // DiagnosticoRelacionadoField internamente.
+    const setFormulariosDiagnostico = (updater) => {
+        setForm((prev) => ({
+            ...prev,
+            formulariosDiagnostico:
+                typeof updater === 'function' ? updater(prev.formulariosDiagnostico) : updater,
+        }));
+    };
 
     // Estados adicionales para la tabla y UI
     const [refresh, setRefresh] = useState(0);
@@ -228,7 +236,7 @@ export default function Triaje() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row w-full">
+        <div className="flex flex-col md:flex-row w-full flex-wrap">
             {/* Columna 1 - Formulario */}
             <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[45%]">
                 <form className="space-y-3 text-md" onSubmit={(e) => e.preventDefault()}>
@@ -540,14 +548,6 @@ export default function Triaje() {
                                 labelWidth="120px"
                             />
                         </div>
-                        <button className=' py-2 px-3 bg-emerald-600 text-white rounded-md  w-full' onClick={() => { setModalVisible(true) }}>Diagnóstico Relacionado</button>
-                        <DiagnosticoRelacionadoModal
-                            visible={modalVisible}
-                            onClose={() => { setModalVisible(false) }}
-                            diagnosticosRelacionados={diagnosticosRelacionados}
-                            setDiagnosticosRelacionados={setDiagnosticosRelacionados}
-                            token={token}
-                        />
 
                         <InputTextAreaUpper
                             label="Diagnóstico"
@@ -578,50 +578,7 @@ export default function Triaje() {
                                 additionalDelimiter={"\n"}
                             />
                         </div>
-                        <section className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
-                            <div className="flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setHabilitarEdicion(true);
-                                        setHabilitarTR(false);
-                                    }}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPencil} /> Editar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        handleSubmit(
-                                            form,
-                                            form.edad,
-                                            form.nro,
-                                            form.fechaExamen,
-                                            Swal,
-                                            token,
-                                            setForm,
-                                            refreshtable,
-                                            getFetch,
-                                            setHabilitar
-                                        );
-                                    }}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        Clean(setForm);
-                                        setHabilitarEdicion(false);
-                                    }}
-                                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
-                                </button>
-                            </div>
-                        </section>
+
                     </SectionFieldset>
                 </form>
             </div>
@@ -779,6 +736,58 @@ export default function Triaje() {
                         </table>
                     </div>
                 </div>
+            </div>
+
+            <div className='p-4'>
+                <DiagnosticoRelacionadoField
+                    token={token}
+                    seleccionados={form.formulariosDiagnostico}
+                    setSeleccionados={setFormulariosDiagnostico}
+                />
+                <section className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
+                    <div className="flex gap-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setHabilitarEdicion(true);
+                                setHabilitarTR(false);
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faPencil} /> Editar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                handleSubmit(
+                                    form,
+                                    form.edad,
+                                    form.nro,
+                                    form.fechaExamen,
+                                    Swal,
+                                    token,
+                                    setForm,
+                                    refreshtable,
+                                    getFetch,
+                                    setHabilitar
+                                );
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                Clean(setForm);
+                                setHabilitarEdicion(false);
+                            }}
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
+                        </button>
+                    </div>
+                </section>
             </div>
         </div>
     );
