@@ -10,6 +10,7 @@ import {
   faClone,
 } from "@fortawesome/free-solid-svg-icons";
 import DiagnosticoRelacionadoFormModal from "./DiagnosticoRelacionadoFormModal";
+import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
 
 
 // Minúsculas y sin acentos, para comparar de forma flexible.
@@ -42,7 +43,7 @@ function DescripcionInput({ value, onChange }) {
       ref={ref}
       rows={1}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value.toUpperCase())}
       onMouseDown={(e) => e.stopPropagation()}
       placeholder="Descripción..."
       className="block w-full min-w-[160px] resize-none overflow-hidden text-[11px] leading-snug border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:border-[#084788]"
@@ -390,20 +391,20 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
-        <div className="grid md:grid-cols-4 gap-x-4 gap-y-3">
-          <input
-            type='text'
-            inputMode='numeric'
-            placeholder='Identificador'
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <FloatingInput
+            id="dxrel-filtro-identificador"
+            label="Identificador"
+            inputMode="numeric"
             value={filtros.identificador}
             onChange={(e) =>
               setFiltros({ ...filtros, identificador: e.target.value.replace(/\D/g, "") })
             }
-            className="px-3 py-2 border rounded-lg "
+            className="md:w-52"
           />
-          <input
-            type='text'
-            placeholder='Diagnóstico'
+          <FloatingInput
+            id="dxrel-filtro-diagnostico"
+            label="Diagnóstico"
             value={filtros.diagnostico}
             onChange={(e) =>
               setFiltros({
@@ -411,14 +412,12 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
                 diagnostico: e.target.value.replace(/[^\p{L}\p{N}\s]/gu, ""),
               })
             }
-            className="px-3 py-2 border rounded-lg md:col-span-3"
+            className="flex-1"
           />
-        </div>
-        <div className="w-full flex justify-end">
           <button
             type="button"
             onClick={abrirNuevo}
-            className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md text-white"
+            className="bg-green-600 hover:bg-green-700 px-3 py-2.5 rounded-md text-white shrink-0"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" /> Agregar Nuevo
           </button>

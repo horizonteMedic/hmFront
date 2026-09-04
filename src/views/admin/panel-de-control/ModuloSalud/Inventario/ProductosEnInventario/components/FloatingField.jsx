@@ -33,7 +33,7 @@ export const PRESENTACIONES_OPTIONS = [
   }
 ];
 
-export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false }) {
+export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false, inputMode }) {
   return (
     <div className={`relative ${className}`}>
       <input
@@ -47,6 +47,7 @@ export function FloatingInput({ id, name, label, value, onChange, type = 'text',
         onBlur={onBlur}
         disabled={disabled}
         autoFocus={autoFocus}
+        inputMode={inputMode}
         placeholder=" "
         className="block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer"
       />
