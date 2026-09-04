@@ -15,7 +15,8 @@ const TIPOS_RELACION = [
 const URL_BUSCADOR   = "/api/pacientes/buscador";
 const URL_PARENTESCO = "/api/v01/ct/pacienteParentesco/registrar";
 
-function PacienteSelector({ label, seleccionado, onSeleccionar, token }) {
+// ── Selector de paciente (con soporte de bloqueo si está pre-cargado) ─────────
+function PacienteSelector({ label, seleccionado, onSeleccionar, token, locked = false }) {
     const [texto, setTexto] = useState("");
     const [resultados, setResultados] = useState([]);
     const [buscando, setBuscando] = useState(false);
@@ -26,9 +27,8 @@ function PacienteSelector({ label, seleccionado, onSeleccionar, token }) {
         try {
             const res = await getFetch(`${URL_BUSCADOR}?texto=${encodeURIComponent(texto.trim())}`, token);
             const lista = Array.isArray(res) ? res : (res?.resultado ?? []);
-            if (lista.length === 0) {
+            if (lista.length === 0)
                 Swal.fire("Sin resultados", `No se encontró ningún paciente con "${texto}"`, "info");
-            }
             setResultados(lista);
         } catch {
             Swal.fire("Error", "No se pudo realizar la búsqueda", "error");
@@ -37,43 +37,39 @@ function PacienteSelector({ label, seleccionado, onSeleccionar, token }) {
         }
     };
 
-    const handleKeyUp = (e) => { if (e.key === "Enter") buscar(); };
-
-    const limpiar = () => {
-        onSeleccionar(null);
-        setTexto("");
-        setResultados([]);
-    };
+    const limpiar = () => { onSeleccionar(null); setTexto(""); setResultados([]); };
 
     return (
         <div className="flex-1 min-w-0 flex flex-col gap-2">
             <p className="font-semibold text-sm text-gray-700">{label}</p>
 
-            {/* Paciente seleccionado */}
             {seleccionado ? (
-                <div className="flex items-center justify-between bg-blue-50 border border-blue-300 rounded-lg px-3 py-2">
+                <div className={`flex items-center justify-between rounded-lg px-3 py-2 border ${locked ? "bg-gray-50 border-gray-300" : "bg-blue-50 border-blue-300"}`}>
                     <div className="flex items-center gap-2 min-w-0">
-                        <FontAwesomeIcon icon={faUser} className="text-blue-500 flex-shrink-0" />
+                        <FontAwesomeIcon icon={faUser} className={locked ? "text-gray-400 flex-shrink-0" : "text-blue-500 flex-shrink-0"} />
                         <div className="min-w-0">
-                            <p className="font-semibold text-sm text-blue-800 truncate">
+                            <p className={`font-semibold text-sm truncate ${locked ? "text-gray-700" : "text-blue-800"}`}>
                                 {seleccionado.nombres} {seleccionado.apellidos}
                             </p>
-                            <p className="text-xs text-blue-600">DNI: {seleccionado.dni ?? seleccionado.numeroDocumento}</p>
+                            <p className={`text-xs ${locked ? "text-gray-500" : "text-blue-600"}`}>
+                                DNI: {seleccionado.dni ?? seleccionado.numeroDocumento}
+                            </p>
                         </div>
                     </div>
-                    <button onClick={limpiar} className="text-blue-400 hover:text-red-500 ml-2 flex-shrink-0">
-                        <FontAwesomeIcon icon={faTimes} />
-                    </button>
+                    {!locked && (
+                        <button onClick={limpiar} className="text-blue-400 hover:text-red-500 ml-2 flex-shrink-0">
+                            <FontAwesomeIcon icon={faTimes} />
+                        </button>
+                    )}
                 </div>
             ) : (
                 <>
-                    {/* Búsqueda */}
                     <div className="flex gap-2">
                         <input
                             type="text"
                             value={texto}
                             onChange={(e) => setTexto(e.target.value.toUpperCase())}
-                            onKeyUp={handleKeyUp}
+                            onKeyUp={(e) => { if (e.key === "Enter") buscar(); }}
                             placeholder="DNI o nombre..."
                             className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400"
                         />
@@ -85,8 +81,6 @@ function PacienteSelector({ label, seleccionado, onSeleccionar, token }) {
                             <FontAwesomeIcon icon={faSearch} />
                         </button>
                     </div>
-
-                    {/* Resultados */}
                     {resultados.length > 0 && (
                         <ul className="border border-gray-200 rounded max-h-40 overflow-y-auto divide-y divide-gray-100">
                             {resultados.map((p) => (
@@ -107,12 +101,13 @@ function PacienteSelector({ label, seleccionado, onSeleccionar, token }) {
     );
 }
 
-export default function RegistroParentesco({ onClose }) {
+// ── Modal principal ───────────────────────────────────────────────────────────
+export default function RegistroParentesco({ onClose, pacientePreseleccionado = null, onRegistrarVisita }) {
     const { token, userlogued } = useSessionData();
-    const [origen,     setOrigen]     = useState(null);
+    const [origen,      setOrigen]      = useState(pacientePreseleccionado);
     const [relacionado, setRelacionado] = useState(null);
     const [tipoRelacion, setTipoRelacion] = useState("");
-    const [guardando, setGuardando] = useState(false);
+    const [guardando,   setGuardando]   = useState(false);
 
     const handleSubmit = async () => {
         if (!origen)       return Swal.fire("Incompleto", "Selecciona el primer paciente", "warning");
@@ -124,7 +119,7 @@ export default function RegistroParentesco({ onClose }) {
         setGuardando(true);
         try {
             const body = {
-                pacienteOrigenId:     origen.id,
+                pacienteOrigenId:      origen.id,
                 pacienteRelacionadoId: relacionado.id,
                 tipoRelacion,
                 usuarioRegistro: userlogued,
@@ -132,19 +127,32 @@ export default function RegistroParentesco({ onClose }) {
 
             const res = await SubmitData(body, URL_PARENTESCO, token);
 
-            // SubmitData devuelve Response object si hay error HTTP
             if (res && typeof res.json === "function") {
                 const error = await res.json();
                 Swal.fire("Error", error.mensaje ?? "No se pudo registrar el parentesco", "error");
                 return;
             }
 
-            await Swal.fire(
-                "Registrado",
-                `${origen.nombres} ${origen.apellidos} vinculado/a como ${tipoRelacion} de ${relacionado.nombres} ${relacionado.apellidos}`,
-                "success"
-            );
-            onClose();
+            const textoExito = `${origen.nombres} ${origen.apellidos} es ${tipoRelacion} de ${relacionado.nombres} ${relacionado.apellidos}`;
+
+            if (onRegistrarVisita) {
+                // Viene del flujo de registro de paciente → ofrecer registrar visita
+                const result = await Swal.fire({
+                    title: "Parentesco registrado",
+                    text: textoExito,
+                    icon: "success",
+                    showConfirmButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: "Registrar Visita",
+                    denyButtonText: "Cerrar",
+                    allowOutsideClick: false,
+                });
+                if (result.isConfirmed) onRegistrarVisita();
+                onClose();
+            } else {
+                await Swal.fire("Registrado", textoExito, "success");
+                onClose();
+            }
         } catch {
             Swal.fire("Error", "Ocurrió un error al registrar el parentesco", "error");
         } finally {
@@ -156,7 +164,6 @@ export default function RegistroParentesco({ onClose }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg w-full max-w-2xl mx-4 p-6 flex flex-col gap-4">
 
-                {/* Header */}
                 <div className="flex justify-between items-center">
                     <h2 className="text-blue-600 text-lg font-semibold">Registrar Parentesco</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -164,20 +171,17 @@ export default function RegistroParentesco({ onClose }) {
                     </button>
                 </div>
 
-                {/* Selectores de pacientes */}
                 <div className="flex gap-4 items-start">
                     <PacienteSelector
                         label="Paciente origen"
                         seleccionado={origen}
                         onSeleccionar={setOrigen}
                         token={token}
+                        locked={!!pacientePreseleccionado}
                     />
-
-                    {/* Flecha central con tipo de relación */}
-                    <div className="flex flex-col items-center gap-1 pt-6 flex-shrink-0">
-                        <div className="text-gray-400 text-xl">→</div>
+                    <div className="flex flex-col items-center pt-6 flex-shrink-0">
+                        <span className="text-gray-400 text-xl">→</span>
                     </div>
-
                     <PacienteSelector
                         label="Paciente relacionado"
                         seleccionado={relacionado}
@@ -186,7 +190,6 @@ export default function RegistroParentesco({ onClose }) {
                     />
                 </div>
 
-                {/* Tipo de relación */}
                 <div className="flex flex-col gap-1">
                     <label className="text-sm font-semibold text-gray-700">Tipo de relación</label>
                     <select
@@ -195,13 +198,10 @@ export default function RegistroParentesco({ onClose }) {
                         className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
                     >
                         <option value="">-- Selecciona --</option>
-                        {TIPOS_RELACION.map((t) => (
-                            <option key={t} value={t}>{t}</option>
-                        ))}
+                        {TIPOS_RELACION.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
                 </div>
 
-                {/* Resumen */}
                 {origen && relacionado && tipoRelacion && (
                     <div className="bg-green-50 border border-green-200 rounded px-4 py-2 text-sm text-green-800">
                         <span className="font-semibold">{origen.nombres} {origen.apellidos}</span>
@@ -210,7 +210,6 @@ export default function RegistroParentesco({ onClose }) {
                     </div>
                 )}
 
-                {/* Botones */}
                 <div className="flex justify-end gap-3">
                     <button onClick={onClose} className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 text-sm">
                         Cancelar

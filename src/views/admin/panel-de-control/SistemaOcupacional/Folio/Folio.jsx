@@ -312,16 +312,47 @@ const ExamenesListLaboratorio = buildExamenesList([
     "INMUNOLOGIA_THEVENON",
 ]);
 
+const ExamenesListPSICOSENSOMETRICO_DE_BOROO = buildExamenesList([
+    "CERTIFICADO_VEHICULOS",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "FICHA_SAS",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "FICHA_AUDIOMETRIA",
+    "CUESTIONARIO_AUDIOMETRIA",
+    "TRABAJO_ESPECIFICOS",
+    "OFTALMOLOGIA",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+]);
+
+const ExamenesListTRABAJOS_EN_CALIENTE = buildExamenesList([
+    "APTITUD_TRABAJOS_CALIENTE",
+    "TRIAJE",
+    "ANTECEDENTES_PATOLOGICOS",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "LABORATORIO_ARCHIVO_EXTERNO",
+    "ELECTROCARDIOGRAMA",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "INFORME_PODEROSA_OPERAR_CALIENTE",
+    "OFTALMOLOGIA",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+]);
+
 export const ListaPorPlantilla = {
     //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     "COMPLETO MARSA": ExamenesListCOMPLETO_MARSA,
     "MANEJO ALIMENTOS GREEN": ExamenesListMANEJO_ALIMENTOS_GREEN,
-    "PSICOSENSOMETRICO ADMISION": ExamenesListPSICOSENSOMETRICO_ADMISION,
-    "TEST ALTURA ADMISION": ExamenesListTEST_ALTURA_ADMISION,
+    "PSICOSENSOMETRICO PODEROSA": ExamenesListPSICOSENSOMETRICO_ADMISION,
+    "TEST ALTURA PODEROSA": ExamenesListTEST_ALTURA_ADMISION,
     PSICOLOGIA: ExamenesListPsicologia,
     LABORATORIO: ExamenesListLaboratorio,
+    "PSICOSENSOMETRICO DE BOROO": ExamenesListPSICOSENSOMETRICO_DE_BOROO,
+    "TRABAJOS EN CALIENTE PODEROSA": ExamenesListTRABAJOS_EN_CALIENTE,
 };
 
 const Folio = () => {
@@ -578,53 +609,53 @@ const Folio = () => {
         }
     };
 
-    const toggleAllImprimir = () => {
-        setForm((prev) => {
-            if (!prev.listaExamenes) {
-                return prev;
-            }
-
-            const hasImprimibles = prev.listaExamenes.some((examen) => examen.resultado);
-
-            if (!hasImprimibles) {
-                return prev;
-            }
-
-            const shouldUncheckAll = prev.listaExamenes.some(
-                (examen) => examen.resultado && examen.imprimir
-            );
-
-            const updatedListaExamenes = prev.listaExamenes.map((examen) => {
-                if (!examen.resultado) {
-                    return examen;
-                }
-
-                return {
-                    ...examen,
-                    imprimir: !shouldUncheckAll,
-                };
-            });
-
-            return {
-                ...prev,
-                listaExamenes: updatedListaExamenes,
-            };
-        });
-    };
-
-    const handleGenerarFolio = async (comprimidoz = false, urlType = "azure") => {
-        // Cancelar petición anterior si existe
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
+const toggleAllImprimir = () => {
+    setForm((prev) => {
+        if (!prev.listaExamenes) {
+            return prev;
         }
 
-        const controller = new AbortController();
-        abortControllerRef.current = controller;
+        const hasImprimibles = prev.listaExamenes.some((examen) => examen.resultado);
 
-        // Mostrar alerta de carga con barra de progreso
-        Swal.fire({
-            title: 'Generando Folio',
-            html: `
+        if (!hasImprimibles) {
+            return prev;
+        }
+
+        const shouldUncheckAll = prev.listaExamenes.some(
+            (examen) => examen.resultado && examen.imprimir
+        );
+
+        const updatedListaExamenes = prev.listaExamenes.map((examen) => {
+            if (!examen.resultado) {
+                return examen;
+            }
+
+            return {
+                ...examen,
+                imprimir: !shouldUncheckAll,
+            };
+        });
+
+        return {
+            ...prev,
+            listaExamenes: updatedListaExamenes,
+        };
+    });
+};
+
+const handleGenerarFolio = async (comprimidoz = false, urlType = "azure") => {
+    // Cancelar petición anterior si existe
+    if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Mostrar alerta de carga con barra de progreso
+    Swal.fire({
+        title: 'Generando Folio',
+        html: `
                 <div class="mb-4">
                     <p class="text-gray-700 mb-2">Procesando reportes...</p>
                     <div class="w-full bg-gray-200 rounded-full h-6 mb-2">
@@ -636,145 +667,145 @@ const Folio = () => {
                     <p id="report-count" class="text-xs text-gray-500 mt-1">0 de 0 reportes completados</p>
                 </div>
             `,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            showCancelButton: true,
-            cancelButtonText: 'Cancelar',
-            cancelButtonColor: '#d33',
-            didOpen: () => {
-                Swal.showLoading();
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        cancelButtonColor: '#d33',
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.cancel) {
+            controller.abort();
+        }
+    });
+
+    try {
+        // Función callback para actualizar el progreso
+        const updateProgress = (current, total, percentage, reportName) => {
+            const progressBar = document.getElementById('progress-bar');
+            const currentReport = document.getElementById('current-report');
+            const reportCount = document.getElementById('report-count');
+
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+                progressBar.textContent = `${percentage}%`;
             }
-        }).then((result) => {
-            if (result.dismiss === Swal.DismissReason.cancel) {
-                controller.abort();
+
+            if (currentReport) {
+                currentReport.textContent = `Generando: ${reportName}`;
             }
-        });
 
-        try {
-            // Función callback para actualizar el progreso
-            const updateProgress = (current, total, percentage, reportName) => {
-                const progressBar = document.getElementById('progress-bar');
-                const currentReport = document.getElementById('current-report');
-                const reportCount = document.getElementById('report-count');
+            if (reportCount) {
+                reportCount.textContent = `${current} de ${total} reportes completados`;
+            }
+        };
 
-                if (progressBar) {
-                    progressBar.style.width = `${percentage}%`;
-                    progressBar.textContent = `${percentage}%`;
-                }
+        // Llamar a FolioJasper con el callback de progreso
+        const archivoGenerado = await FolioJasper(
+            form.norden,
+            token,
+            form.listaExamenes,
+            updateProgress,
+            selectedListType,
+            controller.signal,
+            form.nombres,
+            form.apellidos,
+            datosFooter,
+            comprimidoz,
+            urlType,
+            form.fechaPersonalizada,
+            form.diasVencimientoPersonalizado
+        );
 
-                if (currentReport) {
-                    currentReport.textContent = `Generando: ${reportName}`;
-                }
+        const normalizeKey = (value) =>
+            String(value ?? "")
+                .trim()
+                .toUpperCase()
+                .replace(/[_\s]+/g, "-")
+                .replace(/-+/g, "-");
 
-                if (reportCount) {
-                    reportCount.textContent = `${current} de ${total} reportes completados`;
-                }
-            };
+        const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+        const opciones = Object.keys(nombresExamen);
+        const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+        const defaultKey =
+            forcedDefaultKey ??
+            opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+            opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+            "ANUAL";
+        const nomenclaturaDefault = nombresExamen[defaultKey] ?? "";
+        const nombreArchivoDefault = buildNombreArchivo(nomenclaturaDefault);
 
-            // Llamar a FolioJasper con el callback de progreso
-            const archivoGenerado = await FolioJasper(
-                form.norden,
-                token,
-                form.listaExamenes,
-                updateProgress,
-                selectedListType,
-                controller.signal,
-                form.nombres,
-                form.apellidos,
-                datosFooter,
-                comprimidoz,
-                urlType,
-                form.fechaPersonalizada,
-                form.diasVencimientoPersonalizado
-            );
-
-            const normalizeKey = (value) =>
-                String(value ?? "")
-                    .trim()
-                    .toUpperCase()
-                    .replace(/[_\s]+/g, "-")
-                    .replace(/-+/g, "-");
-
-            const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
-            const opciones = Object.keys(nombresExamen);
-            const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
-            const defaultKey =
-                forcedDefaultKey ??
-                opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
-                opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
-                "ANUAL";
-            const nomenclaturaDefault = nombresExamen[defaultKey] ?? "";
-            const nombreArchivoDefault = buildNombreArchivo(nomenclaturaDefault);
-
-            const generado = await Swal.fire({
-                icon: "success",
-                title: "¡Folio Generado!",
-                html: `
+        const generado = await Swal.fire({
+            icon: "success",
+            title: "¡Folio Generado!",
+            html: `
                     <div class="text-gray-700">El folio se ha generado correctamente.</div>
                     <div class="mt-2 text-xs text-gray-500">Nombre por defecto:</div>
                     <div class="font-mono text-sm break-all">${nombreArchivoDefault}</div>
                 `,
-                showDenyButton: true,
-                confirmButtonText: "Descargar",
-                denyButtonText: "Continuar",
-            });
+            showDenyButton: true,
+            confirmButtonText: "Descargar",
+            denyButtonText: "Continuar",
+        });
 
-            if (generado.isConfirmed) {
-                descargarArchivoGenerado(archivoGenerado, nombreArchivoDefault);
-            }
+        if (generado.isConfirmed) {
+            descargarArchivoGenerado(archivoGenerado, nombreArchivoDefault);
+        }
 
-            const decision = await Swal.fire({
-                title: "¿Deseas subir el archivo?",
-                text: "El folio generado se subirá al sistema.",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Sí, subir",
-                cancelButtonText: "No",
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-            });
+        const decision = await Swal.fire({
+            title: "¿Deseas subir el archivo?",
+            text: "El folio generado se subirá al sistema.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Sí, subir",
+            cancelButtonText: "No",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+        });
 
-            if (!decision.isConfirmed) {
-                await fetchArchivosFolio(form.norden);
-                return;
-            }
+        if (!decision.isConfirmed) {
+            await fetchArchivosFolio(form.norden);
+            return;
+        }
 
-            const seleccion = await Swal.fire({
-                title: "Selecciona dónde se subirá el archivo",
-                width: '700px',
-                html: (() => {
-                    const normalizeKey = (value) =>
-                        String(value ?? "")
-                            .trim()
-                            .toUpperCase()
-                            .replace(/[_\s]+/g, "-")
-                            .replace(/-+/g, "-");
+        const seleccion = await Swal.fire({
+            title: "Selecciona dónde se subirá el archivo",
+            width: '700px',
+            html: (() => {
+                const normalizeKey = (value) =>
+                    String(value ?? "")
+                        .trim()
+                        .toUpperCase()
+                        .replace(/[_\s]+/g, "-")
+                        .replace(/-+/g, "-");
 
-                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
-                    const opciones = Object.keys(nombresExamen);
-                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
-                    const defaultKey =
-                        forcedDefaultKey ??
-                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
-                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
-                        "ANUAL";
-                    const defaultReason = forcedDefaultKey ? "según la plantilla seleccionada" : "según el tipo de examen del paciente";
+                const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                const opciones = Object.keys(nombresExamen);
+                const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+                const defaultKey =
+                    forcedDefaultKey ??
+                    opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                    opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                    "ANUAL";
+                const defaultReason = forcedDefaultKey ? "según la plantilla seleccionada" : "según el tipo de examen del paciente";
 
-                    const apellidosPreview = (form?.apellidos ?? "").trim();
-                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
-                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+                const apellidosPreview = (form?.apellidos ?? "").trim();
+                const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
 
-                    const buildNombreArchivoPreview = (selectedKey) => {
-                        const nomenclature = nombresExamen[selectedKey] ?? "";
-                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
-                    };
+                const buildNombreArchivoPreview = (selectedKey) => {
+                    const nomenclature = nombresExamen[selectedKey] ?? "";
+                    return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                };
 
-                    const htmlOpciones = opciones
-                        .map((key) => {
-                            const checked = key === defaultKey ? "checked" : "";
-                            const id = `folio-upload-${key.replace(/[^A-Za-z0-9_-]/g, "")}`;
-                            return `
+                const htmlOpciones = opciones
+                    .map((key) => {
+                        const checked = key === defaultKey ? "checked" : "";
+                        const id = `folio-upload-${key.replace(/[^A-Za-z0-9_-]/g, "")}`;
+                        return `
                                 <label for="${id}" class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-blue-300 cursor-pointer">
                                     <input id="${id}" type="radio" name="folioUploadDestino" value="${key}" ${checked} />
                                     <div class="flex flex-col leading-tight">
@@ -783,10 +814,10 @@ const Folio = () => {
                                     </div>
                                 </label>
                             `;
-                        })
-                        .join("");
+                    })
+                    .join("");
 
-                    return `
+                return `
                         <div class="flex flex-col gap-3 text-left">
                             <div class="text-sm text-gray-600">
                                 Valor por defecto: <b>${defaultKey}</b> (${defaultReason})
@@ -802,266 +833,266 @@ const Folio = () => {
                             </div>
                         </div>
                     `;
-                })(),
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: "Subir",
-                cancelButtonText: "Cancelar",
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                didOpen: () => {
-                    const normalizeKey = (value) =>
-                        String(value ?? "")
-                            .trim()
-                            .toUpperCase()
-                            .replace(/[_\s]+/g, "-")
-                            .replace(/-+/g, "-");
+            })(),
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: "Subir",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            didOpen: () => {
+                const normalizeKey = (value) =>
+                    String(value ?? "")
+                        .trim()
+                        .toUpperCase()
+                        .replace(/[_\s]+/g, "-")
+                        .replace(/-+/g, "-");
 
-                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
-                    const opciones = Object.keys(nombresExamen);
-                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
-                    const defaultKey =
-                        forcedDefaultKey ??
-                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
-                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
-                        "ANUAL";
+                const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                const opciones = Object.keys(nombresExamen);
+                const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+                const defaultKey =
+                    forcedDefaultKey ??
+                    opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                    opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                    "ANUAL";
 
-                    const apellidosPreview = (form?.apellidos ?? "").trim();
-                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
-                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+                const apellidosPreview = (form?.apellidos ?? "").trim();
+                const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
 
-                    const buildNombreArchivoPreview = (selectedKey) => {
-                        const nomenclature = nombresExamen[selectedKey] ?? "";
-                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
-                    };
+                const buildNombreArchivoPreview = (selectedKey) => {
+                    const nomenclature = nombresExamen[selectedKey] ?? "";
+                    return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                };
 
-                    const container = Swal.getHtmlContainer();
-                    const preview = container?.querySelector("#folio-upload-preview");
-                    const radios = Array.from(container?.querySelectorAll('input[name="folioUploadDestino"]') ?? []);
+                const container = Swal.getHtmlContainer();
+                const preview = container?.querySelector("#folio-upload-preview");
+                const radios = Array.from(container?.querySelectorAll('input[name="folioUploadDestino"]') ?? []);
 
-                    const updatePreview = () => {
-                        const selected = radios.find((r) => r.checked)?.value ?? defaultKey;
-                        if (preview) preview.textContent = buildNombreArchivoPreview(selected);
-                    };
+                const updatePreview = () => {
+                    const selected = radios.find((r) => r.checked)?.value ?? defaultKey;
+                    if (preview) preview.textContent = buildNombreArchivoPreview(selected);
+                };
 
-                    radios.forEach((r) => r.addEventListener("change", updatePreview));
-                    updatePreview();
-                },
-                preConfirm: () => {
-                    const container = Swal.getHtmlContainer();
-                    const selected = container?.querySelector('input[name="folioUploadDestino"]:checked')?.value;
-                    if (!selected) {
-                        Swal.showValidationMessage("Selecciona una opción");
-                        return;
-                    }
-                    return selected;
-                },
-            });
+                radios.forEach((r) => r.addEventListener("change", updatePreview));
+                updatePreview();
+            },
+            preConfirm: () => {
+                const container = Swal.getHtmlContainer();
+                const selected = container?.querySelector('input[name="folioUploadDestino"]:checked')?.value;
+                if (!selected) {
+                    Swal.showValidationMessage("Selecciona una opción");
+                    return;
+                }
+                return selected;
+            },
+        });
 
-            if (!seleccion.isConfirmed) {
-                await fetchArchivosFolio(form.norden);
-                return;
-            }
-
-            const nomenclature = nombresExamen[seleccion.value];
-            await subirArchivoFolio(archivoGenerado, {
-                form,
-                nomenclature,
-                selectedSede,
-                userlogued,
-                token,
-            });
+        if (!seleccion.isConfirmed) {
             await fetchArchivosFolio(form.norden);
-        } catch (error) {
-            if (error.name === 'AbortError' || error.message === 'Aborted') {
-                Swal.fire('Cancelado', 'La generación del folio ha sido cancelada.', 'info');
-                return;
-            }
-            console.error('Error generando folio:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al generar el folio. Por favor, intenta nuevamente.',
-                confirmButtonText: 'Aceptar'
-            });
+            return;
         }
-    };
 
-    const handlePrintCamoAnexo2 = () => {
-        PrintHojaRAnexo2(form.norden, token, datosFooter);
-    };
-    const handlePrintCamoAnexo16 = () => {
-        PrintHojaRAnexo16(form.norden, token, datosFooter);
-    };
-    const handlePrintCamoAdministrativos = () => {
-        PrintHojaRAnexo16(form.norden, token, datosFooter);
-    };
+        const nomenclature = nombresExamen[seleccion.value];
+        await subirArchivoFolio(archivoGenerado, {
+            form,
+            nomenclature,
+            selectedSede,
+            userlogued,
+            token,
+        });
+        await fetchArchivosFolio(form.norden);
+    } catch (error) {
+        if (error.name === 'AbortError' || error.message === 'Aborted') {
+            Swal.fire('Cancelado', 'La generación del folio ha sido cancelada.', 'info');
+            return;
+        }
+        console.error('Error generando folio:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al generar el folio. Por favor, intenta nuevamente.',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+};
 
-    const hasImprimibles = !!form.listaExamenes?.some((examen) => examen.resultado);
-    const allImprimiblesMarcados =
-        hasImprimibles &&
-        form.listaExamenes?.every((examen) => !examen.resultado || examen.imprimir);
+const handlePrintCamoAnexo2 = () => {
+    PrintHojaRAnexo2(form.norden, token, datosFooter);
+};
+const handlePrintCamoAnexo16 = () => {
+    PrintHojaRAnexo16(form.norden, token, datosFooter);
+};
+const handlePrintCamoAdministrativos = () => {
+    PrintHojaRAnexo16(form.norden, token, datosFooter);
+};
 
-    return (
-        <div className="w-full space-y-3 px-4">
-            <div className="flex justify-end">
-                <button
-                    type="button"
-                    onClick={() => setModalCargaMasiva(true)}
-                    className="verde-btn px-4 py-2 rounded flex items-center gap-2"
-                >
-                    <FontAwesomeIcon icon={faUpload} /> Carga Masiva
-                </button>
+const hasImprimibles = !!form.listaExamenes?.some((examen) => examen.resultado);
+const allImprimiblesMarcados =
+    hasImprimibles &&
+    form.listaExamenes?.every((examen) => !examen.resultado || examen.imprimir);
+
+return (
+    <div className="w-full space-y-3 px-4">
+        <div className="flex justify-end">
+            <button
+                type="button"
+                onClick={() => setModalCargaMasiva(true)}
+                className="verde-btn px-4 py-2 rounded flex items-center gap-2"
+            >
+                <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+            </button>
+        </div>
+        {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form.norden}
+                onKeyUp={handleSearch}
+                onChange={handleChangeNumber}
+                labelWidth="120px"
+            />
+            <InputTextOneLine
+                label="Nombre Examen"
+                name="nombreExamen"
+                value={form.nombreExamen}
+                disabled
+                labelWidth="120px"
+            />
+        </SectionFieldset>
+        {/* Contenido principal */}
+        <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Columna Izquierda */}
+            <div className="space-y-3">
+                <InputTextOneLine
+                    label="Nombres"
+                    name="nombres"
+                    value={form.nombres}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Apellidos"
+                    name="apellidos"
+                    value={form.apellidos}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha Nacimiento"
+                    name="fechaNacimiento"
+                    value={form.fechaNacimiento}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Lugar Nacimiento"
+                    name="lugarNacimiento"
+                    value={form.lugarNacimiento}
+                    disabled
+                    labelWidth="120px"
+                />
             </div>
-            {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Nombre Examen"
-                    name="nombreExamen"
-                    value={form.nombreExamen}
-                    disabled
-                    labelWidth="120px"
-                />
-            </SectionFieldset>
-            {/* Contenido principal */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Columna Izquierda */}
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Nombres"
-                        name="nombres"
-                        value={form.nombres}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Apellidos"
-                        name="apellidos"
-                        value={form.apellidos}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Fecha Nacimiento"
-                        name="fechaNacimiento"
-                        value={form.fechaNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Lugar Nacimiento"
-                        name="lugarNacimiento"
-                        value={form.lugarNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
 
-                {/* Columna Derecha */}
-                <div className="space-y-3">
+            {/* Columna Derecha */}
+            <div className="space-y-3">
+                <InputTextOneLine
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
+                    disabled
+                    labelWidth="120px"
+                />
+                <div className="grid md:grid-cols-2 gap-3">
                     <InputTextOneLine
-                        label="Domicilio Actual"
-                        name="domicilioActual"
-                        value={form.domicilioActual}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <div className="grid md:grid-cols-2 gap-3">
-                        <InputTextOneLine
-                            label="Edad (Años)"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Sexo"
-                            name="sexo"
-                            value={form.sexo}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                    <InputTextOneLine
-                        label="Estado Civil"
-                        name="estadoCivil"
-                        value={form.estadoCivil}
+                        label="Edad (Años)"
+                        name="edad"
+                        value={form.edad}
                         disabled
                         labelWidth="120px"
                     />
                     <InputTextOneLine
-                        label="Nivel Estudios"
-                        name="nivelEstudios"
-                        value={form.nivelEstudios}
+                        label="Sexo"
+                        name="sexo"
+                        value={form.sexo}
                         disabled
                         labelWidth="120px"
                     />
                 </div>
-            </SectionFieldset>
-            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
-                    value={form.empresa}
+                    label="Estado Civil"
+                    name="estadoCivil"
+                    value={form.estadoCivil}
                     disabled
                     labelWidth="120px"
                 />
                 <InputTextOneLine
-                    label="Contrata"
-                    name="contrata"
-                    value={form.contrata}
+                    label="Nivel Estudios"
+                    name="nivelEstudios"
+                    value={form.nivelEstudios}
                     disabled
                     labelWidth="120px"
                 />
-                <InputTextOneLine
-                    label="Ocupación"
-                    name="ocupacion"
-                    value={form.ocupacion}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Cargo Desempeñar"
-                    name="cargoDesempenar"
-                    value={form.cargoDesempenar}
-                    disabled
-                    labelWidth="120px"
-                />
-            </SectionFieldset>
+            </div>
+        </SectionFieldset>
+        {/* ===== SECCIÓN: DATOS LABORALES ===== */}
+        <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <InputTextOneLine
+                label="Empresa"
+                name="empresa"
+                value={form.empresa}
+                disabled
+                labelWidth="120px"
+            />
+            <InputTextOneLine
+                label="Contrata"
+                name="contrata"
+                value={form.contrata}
+                disabled
+                labelWidth="120px"
+            />
+            <InputTextOneLine
+                label="Ocupación"
+                name="ocupacion"
+                value={form.ocupacion}
+                disabled
+                labelWidth="120px"
+            />
+            <InputTextOneLine
+                label="Cargo Desempeñar"
+                name="cargoDesempenar"
+                value={form.cargoDesempenar}
+                disabled
+                labelWidth="120px"
+            />
+        </SectionFieldset>
 
-            {/* ===== SECCIÓN: CONFIGURACIÓN ===== */}
-            <SectionFieldset legend="Configuración" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="flex items-center gap-4">
-                    <label className="font-semibold" style={{ minWidth: "120px" }}>Plantilla Protoco:</label>
-                    <select
-                        className="border rounded px-2 py-1 w-full"
-                        value={selectedListType}
-                        onChange={handleListChange}
-                    >
-                        {Object.keys(ListaPorPlantilla).map(elemento => (
-                            <option value={elemento} key={elemento}>{elemento}</option>
-                        ))}
-                    </select>
-                </div>
-                {selectedSede && selectedSede == "CMPA" && <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="Fecha Personalizada"
-                        name="fechaPersonalizada"
-                        type="date"
-                        value={form.fechaPersonalizada}
-                        onChange={handleChangeSimple}
-                        labelWidth="150px"
-                    />
-                    {/* <InputTextOneLine
+        {/* ===== SECCIÓN: CONFIGURACIÓN ===== */}
+        <SectionFieldset legend="Configuración" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="flex items-center gap-4">
+                <label className="font-semibold" style={{ minWidth: "120px" }}>Plantilla Protoco:</label>
+                <select
+                    className="border rounded px-2 py-1 w-full"
+                    value={selectedListType}
+                    onChange={handleListChange}
+                >
+                    {Object.keys(ListaPorPlantilla).map(elemento => (
+                        <option value={elemento} key={elemento}>{elemento}</option>
+                    ))}
+                </select>
+            </div>
+            {selectedSede && selectedSede == "CMPA" && <div className="flex items-center gap-4">
+                <InputTextOneLine
+                    label="Fecha Personalizada"
+                    name="fechaPersonalizada"
+                    type="date"
+                    value={form.fechaPersonalizada}
+                    onChange={handleChangeSimple}
+                    labelWidth="150px"
+                />
+                {/* <InputTextOneLine
                         label="Vencimiento (días)"
                         name="diasVencimientoPersonalizado"
                         type="number"
@@ -1075,332 +1106,332 @@ const Folio = () => {
                             ? (form.diasVencimientoPersonalizado ? `Vence en ${form.diasVencimientoPersonalizado} día(s)` : "Vence en 1 año (por defecto)")
                             : "Opcional: reemplaza la fecha de todos los exámenes al generar el folio"}
                     </span> */}
-                </div>}
+            </div>}
 
-                <div className="w-full flex  justify-between items-center px-2">
+            <div className="w-full flex  justify-between items-center px-2">
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="showPassed"
+                        checked={showOnlyPassed}
+                        onChange={(e) => setShowOnlyPassed(e.target.checked)}
+                        disabled={!form.nombres}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
+                        Exámenes Pasados Por el Paciente
+                    </label>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
+                        No pasados: <span className="text-red-600 ml-1">{form.listaExamenes?.filter(e => !e.resultado).length || 0}</span>
+                    </div>
+                    <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                        Pasados: <span className="text-green-600 ml-1">{form.listaExamenes?.filter(e => e.resultado).length || 0}</span>
+                    </div>
+                    <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                        Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
+                    </div>
                     <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="showPassed"
-                            checked={showOnlyPassed}
-                            onChange={(e) => setShowOnlyPassed(e.target.checked)}
-                            disabled={!form.nombres}
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                        <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
-                            Exámenes Pasados Por el Paciente
-                        </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
-                            No pasados: <span className="text-red-600 ml-1">{form.listaExamenes?.filter(e => !e.resultado).length || 0}</span>
-                        </div>
-                        <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
-                            Pasados: <span className="text-green-600 ml-1">{form.listaExamenes?.filter(e => e.resultado).length || 0}</span>
-                        </div>
-                        <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
-                            Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
+                        <span
+                            className={`text-xs font-medium ${hasImprimibles ? "text-gray-700" : "text-gray-400"}`}
+                        >
+                            Imprimir todos
+                        </span>
+                        <button
+                            type="button"
+                            onClick={toggleAllImprimir}
+                            disabled={!hasImprimibles}
+                            className={`relative inline-flex items-center h-6 rounded-full w-12 transition-colors duration-200 focus:outline-none ${!hasImprimibles
+                                ? "bg-gray-200 cursor-not-allowed opacity-50"
+                                : allImprimiblesMarcados
+                                    ? "bg-green-500"
+                                    : "bg-gray-300"
+                                }`}
+                        >
                             <span
-                                className={`text-xs font-medium ${hasImprimibles ? "text-gray-700" : "text-gray-400"}`}
-                            >
-                                Imprimir todos
-                            </span>
-                            <button
-                                type="button"
-                                onClick={toggleAllImprimir}
-                                disabled={!hasImprimibles}
-                                className={`relative inline-flex items-center h-6 rounded-full w-12 transition-colors duration-200 focus:outline-none ${!hasImprimibles
-                                    ? "bg-gray-200 cursor-not-allowed opacity-50"
-                                    : allImprimiblesMarcados
-                                        ? "bg-green-500"
-                                        : "bg-gray-300"
+                                className={`inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform duration-200 ${allImprimiblesMarcados ? "translate-x-6" : "translate-x-1"
                                     }`}
+                            />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </SectionFieldset>
+        <SectionFieldset legend="Archivos del Folio" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" collapsible defaultOpen={false}>
+            {!form.norden ? (
+                <div className="text-sm text-gray-500 col-span-full">
+                    Ingresa un N° Orden y presiona Enter para ver el estado de los archivos.
+                </div>
+            ) : (
+                <>
+                    <div className="col-span-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="showUploadedFolio"
+                                checked={showOnlyUploadedFolio}
+                                onChange={(e) => setShowOnlyUploadedFolio(e.target.checked)}
+                                disabled={!form.norden}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                            <label
+                                htmlFor="showUploadedFolio"
+                                className={`text-sm font-medium ${!form.norden ? "text-gray-400" : "text-gray-700"} cursor-pointer select-none`}
                             >
-                                <span
-                                    className={`inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform duration-200 ${allImprimiblesMarcados ? "translate-x-6" : "translate-x-1"
-                                        }`}
-                                />
-                            </button>
+                                Solo subidos
+                            </label>
                         </div>
-                    </div>
-                </div>
-            </SectionFieldset>
-            <SectionFieldset legend="Archivos del Folio" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" collapsible defaultOpen={false}>
-                {!form.norden ? (
-                    <div className="text-sm text-gray-500 col-span-full">
-                        Ingresa un N° Orden y presiona Enter para ver el estado de los archivos.
-                    </div>
-                ) : (
-                    <>
-                        <div className="col-span-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="showUploadedFolio"
-                                    checked={showOnlyUploadedFolio}
-                                    onChange={(e) => setShowOnlyUploadedFolio(e.target.checked)}
-                                    disabled={!form.norden}
-                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                <label
-                                    htmlFor="showUploadedFolio"
-                                    className={`text-sm font-medium ${!form.norden ? "text-gray-400" : "text-gray-700"} cursor-pointer select-none`}
-                                >
-                                    Solo subidos
-                                </label>
+                        {!!expectedNomenclatura && (
+                            <div className="text-xs text-gray-600">
+                                Archivo esperado: <span className="font-semibold">{expectedTipoKey}</span> ({expectedNomenclatura})
                             </div>
-                            {!!expectedNomenclatura && (
-                                <div className="text-xs text-gray-600">
-                                    Archivo esperado: <span className="font-semibold">{expectedTipoKey}</span> ({expectedNomenclatura})
-                                </div>
-                            )}
-                        </div>
-                        {Object.entries(nombresExamen).map(([tipo, nomenclatura]) => {
-                            const match = archivosFolioIndex.get(`${tipo}||${nomenclatura}`);
-                            const existe = match?.existe ?? false;
-                            const isExpected = !!expectedTipoKey && tipo === expectedTipoKey;
+                        )}
+                    </div>
+                    {Object.entries(nombresExamen).map(([tipo, nomenclatura]) => {
+                        const match = archivosFolioIndex.get(`${tipo}||${nomenclatura}`);
+                        const existe = match?.existe ?? false;
+                        const isExpected = !!expectedTipoKey && tipo === expectedTipoKey;
 
-                            if (showOnlyUploadedFolio && !existe && !isExpected) return null;
-
-                            return (
-                                <div
-                                    key={`${tipo}-${nomenclatura}`}
-                                    className={`border rounded-xl p-4 flex flex-col gap-3 shadow-sm transition-colors ${isExpected
-                                        ? "border-green-400 bg-green-100"
-                                        : "bg-white"
-                                        }`}
-                                >
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="flex flex-col leading-tight">
-                                            <span className="font-semibold text-sm text-gray-800">{tipo}</span>
-                                            <span className="text-xs text-gray-500">Nomenclatura: {nomenclatura}</span>
-                                        </div>
-                                        <div className="flex  items-end gap-1">
-                                            <span
-                                                className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
-                                                    ? "bg-green-200 text-green-700"
-                                                    : "bg-red-100 text-red-700"
-                                                    }`}
-                                            >
-                                                {existe ? "SUBIDO" : "NO SUBIDO"}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleOpenArchivoFolio(nomenclatura)}
-                                            disabled={!existe}
-                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
-                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
-                                                : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
-                                                }`}
-                                        >
-                                            <FontAwesomeIcon icon={faDownload} />
-                                            Ver / Descargar
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDeleteArchivoFolio(nomenclatura)}
-                                            disabled={!existe || deletingFolioNomenclatura === nomenclatura}
-                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe || deletingFolioNomenclatura === nomenclatura
-                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
-                                                : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
-                                                }`}
-                                        >
-                                            <FontAwesomeIcon icon={faTrash} />
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </>
-                )}
-            </SectionFieldset>
-            <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <EmpleadoComboBox
-                    value={form.nombre_medico}
-                    label="Especialista"
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
-                <div className="flex mt-auto">
-                    <button type="button"
-                        className={`
-                                text-white text-base px-6 py-2 rounded
-                                flex items-center gap-2
-                                transition-all duration-150 ease-out
-                                ${!form.norden
-                                ? "bg-gray-400 cursor-not-allowed pointer-events-none"
-                                : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-95 active:shadow-inner"
-                            }
-                        `}
-                        onClick={handleRegisterFirma}
-                        disabled={!form.norden}
-                    >Registrar Firma</button>
-                </div>
-
-            </SectionFieldset>
-            {/* ===== SECCIÓN: EXAMENES ===== */}
-            <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
-
-                <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
-                    {form.listaExamenes?.map((examen, index) => {
-                        if (showOnlyPassed && !examen.resultado) return null;
-
-                        let cardClass = "break-inside-avoid mb-4 flex justify-between items-center border-2 p-3 rounded-md shadow-sm gap-2 h-24 transition-all duration-200";
-
-                        if (!examen.resultado) {
-                            // NO PASO -> ROJO FUERTE
-                            cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
-                        } else {
-                            // SI PASO -> POINTER
-                            cardClass += " cursor-pointer hover:shadow-md hover:scale-[1.01]";
-                            if (!examen.imprimir) {
-                                // PASO PERO DESACTIVADO -> GRIS VERDOSO
-                                cardClass += " bg-gray-300 border-green-600 border-dashed";
-                            } else {
-                                // PASO Y ACTIVADO -> VERDE FUERTE
-                                cardClass += " bg-green-200 border-green-500";
-                            }
-                        }
+                        if (showOnlyUploadedFolio && !existe && !isExpected) return null;
 
                         return (
                             <div
-                                key={index}
-                                className={cardClass}
-                                onClick={(e) => {
-                                    if (e.target.type !== 'checkbox') {
-                                        toggleExamen(index);
-                                    }
-                                }}
+                                key={`${tipo}-${nomenclatura}`}
+                                className={`border rounded-xl p-4 flex flex-col gap-3 shadow-sm transition-colors ${isExpected
+                                    ? "border-green-400 bg-green-100"
+                                    : "bg-white"
+                                    }`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={examen.imprimir || false}
-                                        onChange={() => toggleExamen(index)}
-                                        disabled={!examen.resultado}
-                                        className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
-                                    />
-                                    <span className="font-bold text-gray-800 text-sm whitespace-normal break-words max-w-[150px] line-clamp-3 leading-tight select-none">
-                                        {index + 1}.- {examen.nombre}
-                                    </span>
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex flex-col leading-tight">
+                                        <span className="font-semibold text-sm text-gray-800">{tipo}</span>
+                                        <span className="text-xs text-gray-500">Nomenclatura: {nomenclatura}</span>
+                                    </div>
+                                    <div className="flex  items-end gap-1">
+                                        <span
+                                            className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
+                                                ? "bg-green-200 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                                }`}
+                                        >
+                                            {existe ? "SUBIDO" : "NO SUBIDO"}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className="flex flex-col items-end justify-center min-w-fit gap-1">
-                                    <span className={`font-black text-sm whitespace-nowrap ${examen.resultado ? 'text-green-800' : 'text-red-800'} select-none`}>
-                                        {examen.resultado ? 'PASO' : 'NO PASO'}
-                                    </span>
-                                    {examen.esArchivo && (
-                                        <span className="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm select-none">
-                                            ARCHIVO
-                                        </span>
-                                    )}
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleOpenArchivoFolio(nomenclatura)}
+                                        disabled={!existe}
+                                        className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
+                                            ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                            : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                            }`}
+                                    >
+                                        <FontAwesomeIcon icon={faDownload} />
+                                        Ver / Descargar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteArchivoFolio(nomenclatura)}
+                                        disabled={!existe || deletingFolioNomenclatura === nomenclatura}
+                                        className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe || deletingFolioNomenclatura === nomenclatura
+                                            ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                            : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                            }`}
+                                    >
+                                        <FontAwesomeIcon icon={faTrash} />
+                                        Eliminar
+                                    </button>
                                 </div>
                             </div>
                         );
                     })}
-                </div>
-                <div className="grid md:grid-cols-3 w-full gap-4">
-                    <div />
-                    <div className="flex justify-center items-center w-full gap-4">
-                        <button
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => { handleClear(); setSelectedListType("COMPLETO"); setArchivosFolio([]); setVisualerOpen(null); }}
-                        >
-                            Limpiar
-                        </button>
-                        <button
-                            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => handleGenerarFolio(false)}
-                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
-                        >
-                            Generar Folio
-                        </button>
-                        <button
-                            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => handleGenerarFolio(true, "azure")}
-                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
-                        >
-                            Generar Folio Comprimido
-                        </button>
-                        <button
-                            className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => handleGenerarFolio(true, "respaldo")}
-                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
-                        >
-                            Generar Folio Comprimido Respaldo
-                        </button>
-                    </div>
-
-                    <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={handlePrintCamoAnexo2}
-                            disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "aptitud_medico_ocupacional_agro")}
-                        >
-                            Generar CAMO ANEXO 2
-                        </button>
-
-                        <button
-                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={handlePrintCamoAnexo16}
-                            disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "certificado_aptitud_medico_ocupacional")}
-                        >
-                            Generar CAMO ANEXO 16
-                        </button>
-
-                        <button
-                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={handlePrintCamoAdministrativos}
-                            disabled={!form.norden}
-                        >
-                            Generar CAMO ADMINISTRATIVOS
-                        </button>
-                    </div>
-
-                </div>
-
-            </SectionFieldset >
-            {visualerOpen && (
-                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-                        </div>
-                        <div className="px-6 py-4 overflow-y-auto flex h-auto justify-center items-center">
-                            <iframe
-                                src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}
-                                type="application/pdf"
-                                className="h-[500px] w-[500px] max-w-full"
-                            />
-                        </div>
-                        <div className="flex justify-center">
-                            <button type="button" onClick={handleDownloadVisualer} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                </>
             )}
-            {modalCargaMasiva && (
-                <CargaMasivaFolio
-                    onClose={() => setModalCargaMasiva(false)}
-                    token={token}
-                    userlogued={userlogued}
-                    selectedSede={selectedSede}
-                    datosFooter={datosFooter}
-                />
-            )}
-        </div >
-    );
+        </SectionFieldset>
+        <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <EmpleadoComboBox
+                value={form.nombre_medico}
+                label="Especialista"
+                form={form}
+                onChange={handleChangeSimple}
+            />
+            <div className="flex mt-auto">
+                <button type="button"
+                    className={`
+                                text-white text-base px-6 py-2 rounded
+                                flex items-center gap-2
+                                transition-all duration-150 ease-out
+                                ${!form.norden
+                            ? "bg-gray-400 cursor-not-allowed pointer-events-none"
+                            : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                        }
+                        `}
+                    onClick={handleRegisterFirma}
+                    disabled={!form.norden}
+                >Registrar Firma</button>
+            </div>
+
+        </SectionFieldset>
+        {/* ===== SECCIÓN: EXAMENES ===== */}
+        <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
+
+            <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
+                {form.listaExamenes?.map((examen, index) => {
+                    if (showOnlyPassed && !examen.resultado) return null;
+
+                    let cardClass = "break-inside-avoid mb-4 flex justify-between items-center border-2 p-3 rounded-md shadow-sm gap-2 h-24 transition-all duration-200";
+
+                    if (!examen.resultado) {
+                        // NO PASO -> ROJO FUERTE
+                        cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
+                    } else {
+                        // SI PASO -> POINTER
+                        cardClass += " cursor-pointer hover:shadow-md hover:scale-[1.01]";
+                        if (!examen.imprimir) {
+                            // PASO PERO DESACTIVADO -> GRIS VERDOSO
+                            cardClass += " bg-gray-300 border-green-600 border-dashed";
+                        } else {
+                            // PASO Y ACTIVADO -> VERDE FUERTE
+                            cardClass += " bg-green-200 border-green-500";
+                        }
+                    }
+
+                    return (
+                        <div
+                            key={index}
+                            className={cardClass}
+                            onClick={(e) => {
+                                if (e.target.type !== 'checkbox') {
+                                    toggleExamen(index);
+                                }
+                            }}
+                        >
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={examen.imprimir || false}
+                                    onChange={() => toggleExamen(index)}
+                                    disabled={!examen.resultado}
+                                    className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
+                                />
+                                <span className="font-bold text-gray-800 text-sm whitespace-normal break-words max-w-[150px] line-clamp-3 leading-tight select-none">
+                                    {index + 1}.- {examen.nombre}
+                                </span>
+                            </div>
+
+                            <div className="flex flex-col items-end justify-center min-w-fit gap-1">
+                                <span className={`font-black text-sm whitespace-nowrap ${examen.resultado ? 'text-green-800' : 'text-red-800'} select-none`}>
+                                    {examen.resultado ? 'PASO' : 'NO PASO'}
+                                </span>
+                                {examen.esArchivo && (
+                                    <span className="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm select-none">
+                                        ARCHIVO
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="grid md:grid-cols-3 w-full gap-4">
+                <div />
+                <div className="flex justify-center items-center w-full gap-4">
+                    <button
+                        className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => { handleClear(); setSelectedListType("COMPLETO"); setArchivosFolio([]); setVisualerOpen(null); }}
+                    >
+                        Limpiar
+                    </button>
+                    <button
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => handleGenerarFolio(false)}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                    >
+                        Generar Folio
+                    </button>
+                    <button
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => handleGenerarFolio(true, "azure")}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                    >
+                        Generar Folio Comprimido
+                    </button>
+                    <button
+                        className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => handleGenerarFolio(true, "respaldo")}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                    >
+                        Generar Folio Comprimido Respaldo
+                    </button>
+                </div>
+
+                <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={handlePrintCamoAnexo2}
+                        disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "aptitud_medico_ocupacional_agro")}
+                    >
+                        Generar CAMO ANEXO 2
+                    </button>
+
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={handlePrintCamoAnexo16}
+                        disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "certificado_aptitud_medico_ocupacional")}
+                    >
+                        Generar CAMO ANEXO 16
+                    </button>
+
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={handlePrintCamoAdministrativos}
+                        disabled={!form.norden}
+                    >
+                        Generar CAMO ADMINISTRATIVOS
+                    </button>
+                </div>
+
+            </div>
+
+        </SectionFieldset >
+        {visualerOpen && (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                    <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                        <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                        <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                    </div>
+                    <div className="px-6 py-4 overflow-y-auto flex h-auto justify-center items-center">
+                        <iframe
+                            src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}
+                            type="application/pdf"
+                            className="h-[500px] w-[500px] max-w-full"
+                        />
+                    </div>
+                    <div className="flex justify-center">
+                        <button type="button" onClick={handleDownloadVisualer} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                            <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        {modalCargaMasiva && (
+            <CargaMasivaFolio
+                onClose={() => setModalCargaMasiva(false)}
+                token={token}
+                userlogued={userlogued}
+                selectedSede={selectedSede}
+                datosFooter={datosFooter}
+            />
+        )}
+    </div >
+);
 };
 
 export default Folio;

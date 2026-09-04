@@ -56,7 +56,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     };
 
     setForm(formData);
-    SubmitRegistro(formData, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) });
+    SubmitRegistro(formData, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, autoPrint);
     onAutoRegistrado?.();
   }, [pacienteActivo, especialidades]);
 
@@ -95,7 +95,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   };
 
   const handleSubmit = () => {
-    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, askPrintAfterRegister);
+    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, autoPrint);
   }
 
   // ── Imprimir ticket ───────────────────────────────────────────────────────
@@ -116,17 +116,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     if (result.isConfirmed) fetchAndPrint(row.visitaId);
   };
 
-  const askPrintAfterRegister = async (res) => {
-    const result = await Swal.fire({
-      title: "Confirmar impresión",
-      text: `¿Deseas imprimir el ticket N° ${res.norden}?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, imprimir",
-      cancelButtonText: "No",
-    });
-    if (result.isConfirmed) fetchAndPrint(res.id);
-  };
+  const autoPrint = (res) => fetchAndPrint(res.id);
 
   // ── Búsqueda ──────────────────────────────────────────────────────────────
   const handleSearch = async (e, tipoBusqueda) => {
@@ -157,7 +147,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
       userlogued,
       () => setModalRegistrarVisita(false),
       () => setRefresh(refresh + 1),
-      askPrintAfterRegister
+      autoPrint
     );
   };
 
@@ -292,6 +282,27 @@ function Table({ data, tabla, set, token, clean, datosFooter, onRowClick, onPrin
       label: "Fecha Visita",
       accessor: "fechaVisita",
       render: (row) => formatearFechaCorta(row.fechaVisita),
+    },
+    {
+      label: "Parentesco",
+      accessor: "parentescos",
+      render: (row) => {
+        const lista = row.parentescos ?? row.paciente?.parentescos ?? [];
+        if (!lista.length) return null;
+        return (
+          <ul className="space-y-1">
+            {lista.map((p, i) => (
+              <li key={i} className="text-xs leading-tight">
+                <span className="font-semibold text-purple-700">{p.tipoRelacion}</span>
+                <span className="text-gray-700"> de: {p.nombreRelacionado}</span>
+                {p.dniRelacionado && (
+                  <span className="text-gray-400"> ({p.dniRelacionado})</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        );
+      },
     },
     {
       label: "Especialidades",

@@ -4,8 +4,8 @@ import drawColorBox from '../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import footerTR from "../components/footerTR.jsx";
 
-export default async function ReporteTriaje(datos) {
-    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function ReporteTriaje(datos = {}, docExistente = null) {
+    const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
 
     // === ANCHO DE TABLA REDUCIDO ===
@@ -208,6 +208,11 @@ export default async function ReporteTriaje(datos) {
 
     // === FOOTER ===
     footerTR(doc, datos);
+
+    // Si se recibió un documento existente (folio), solo se dibuja en él y se retorna.
+    if (docExistente) {
+        return doc;
+    }
 
     // === Imprimir ===
     const pdfBlob = doc.output("blob");

@@ -118,6 +118,7 @@ export const TABLA_FECHA_MAP = {
     "thevenon": { fechaField: "fecha", vencimientoField: null }, // INMUNOLOGIA - THEVENON
     "toxicologia": { fechaField: "fecha", vencimientoField: null }, // PANEL 5D
     "trastornos_personalidad": { fechaField: "fechaRegistro", vencimientoField: null }, // TRANSTORNO PERSONALIDAD PSICOLOGIA
+    "triaje": { fechaField: "fecha_triaje", vencimientoField: null }, // INFORME TRIAJE
     "vih": { fechaField: "fecha", vencimientoField: null }, // INMUNOLOGIA - VIH
 };
 
