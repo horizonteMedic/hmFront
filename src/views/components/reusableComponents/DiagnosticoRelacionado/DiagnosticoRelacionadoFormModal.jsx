@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { FloatingInput } from "../../../admin/panel-de-control/ModuloSalud/Inventario/ProductosEnInventario/components/FloatingField";
 import { useSessionData } from "../../../hooks/useSessionData";
-import Cie10MultiSelect from "../PlantillaDiagnostico/Cie10MultiSelect";
-import CreatableMultiSelect from "../PlantillaDiagnostico/CreatableMultiSelect";
+import Cie10MultiSelect from "./Cie10MultiSelect";
+import CreatableMultiSelect from "./CreatableMultiSelect";
 import {
     getRecomendaciones,
     guardarRecomendacion,
     getRestricciones,
     guardarRestriccion,
-} from "../PlantillaDiagnostico/model";
+} from "./model";
 import { registrarDiagnostico } from "./controllerDiagnosticoRelacionado";
 
 const initialForm = { titulo: "", diagnostico: "" };
@@ -21,8 +21,12 @@ const initialForm = { titulo: "", diagnostico: "" };
  * POST /api/v01/ct/diagnostico/registrar. Reutiliza los mismos selectores
  * (CIE10, recomendaciones, restricciones) y estilos de inputs que el
  * formulario de Plantillas de Diagnóstico. No pide código.
+ *
+ * `plantilla`: si se pasa un diagnóstico de la lista, al abrir el modal se
+ * precargan sus campos (título, diagnóstico, CIE10, recomendaciones y
+ * restricciones) para "clonarlo" y guardar uno nuevo.
  */
-export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCreated, token }) {
+export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCreated, token, plantilla = null }) {
     const { userlogued } = useSessionData();
     const usuario = userlogued || "";
 
@@ -35,7 +39,31 @@ export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCr
     // se escribe en "Diagnóstico". En cuanto lo edita, deja de espejarse.
     const [tituloEditado, setTituloEditado] = useState(false);
 
+    // Al abrir: precarga desde `plantilla` (clonar) o deja el form en blanco.
+    useEffect(() => {
+        if (!visible) return;
+        if (plantilla) {
+            setForm({
+                titulo: plantilla.titulo || "",
+                diagnostico: plantilla.diagnostico || "",
+            });
+            setCie10s((plantilla.cie10s || []).map((c) => ({ codigo: c.codigo, descripcion: c.descripcion })));
+            setRecomendaciones((plantilla.recomendaciones || []).map((r) => ({ id: r.id, descripcion: r.descripcion })));
+            setRestricciones((plantilla.restricciones || []).map((r) => ({ id: r.id, descripcion: r.descripcion })));
+            setTituloEditado(true);
+        } else {
+            setForm(initialForm);
+            setCie10s([]);
+            setRecomendaciones([]);
+            setRestricciones([]);
+            setTituloEditado(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visible, plantilla]);
+
     if (!visible) return null;
+
+    const clonando = !!plantilla;
 
     const onDiagnosticoChange = (e) => {
         const value = e.target.value.toUpperCase();
@@ -128,7 +156,9 @@ export default function DiagnosticoRelacionadoFormModal({ visible, onClose, onCr
         <div className="fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-30">
             <div className="bg-white rounded-md w-[min(600px,95vw)] flex flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b">
-                    <h2 className="text-lg font-bold">Nuevo Diagnóstico Relacionado</h2>
+                    <h2 className="text-lg font-bold">
+                        {clonando ? "Clonar Diagnóstico Relacionado" : "Nuevo Diagnóstico Relacionado"}
+                    </h2>
                     <button type="button" onClick={cerrar} className="text-gray-500 hover:text-gray-700">
                         <FontAwesomeIcon icon={faTimes} />
                     </button>

@@ -7,6 +7,7 @@ import {
   faMinusCircle,
   faTimes,
   faGripVertical,
+  faClone,
 } from "@fortawesome/free-solid-svg-icons";
 import DiagnosticoRelacionadoFormModal from "./DiagnosticoRelacionadoFormModal";
 
@@ -106,6 +107,7 @@ function FilaDx({
   dx,
   modo = "disponibles",
   onToggle,
+  onClonar,
   descripcion = "",
   onDescripcionChange,
   arrastrando = false,
@@ -135,6 +137,7 @@ function FilaDx({
       <td className="px-2 py-2">
         <FontAwesomeIcon
           icon={esSel ? faMinusCircle : faPlusCircle}
+          title={esSel ? "Quitar de seleccionados" : "Agregar a seleccionados"}
           className={`text-2xl cursor-pointer ${
             esSel
               ? "text-red-500 hover:text-red-600"
@@ -146,7 +149,22 @@ function FilaDx({
           }}
         />
       </td>
-      <td className="px-2 py-2 font-bold text-sky-700">{dx.id}</td>
+      <td className="px-2 py-2 font-bold text-sky-700">
+        <div className="flex items-center gap-1.5">
+          <span>{dx.id}</span>
+          <button
+            type="button"
+            title="Clonar para crear uno nuevo"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClonar(dx);
+            }}
+            className="text-gray-400 hover:text-emerald-600 text-xs font-normal"
+          >
+            <FontAwesomeIcon icon={faClone} />
+          </button>
+        </div>
+      </td>
       <td className="px-2 py-2 font-semibold text-gray-800 uppercase break-words">{dx.titulo}</td>
       <td className="px-2 py-2 text-gray-500 break-words">{dx.diagnostico}</td>
       <td className="px-2 py-2">
@@ -209,6 +227,23 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
   })
   const [loading, setLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+  // Diagnóstico de la lista que se está clonando (null = form en blanco).
+  const [plantillaClonar, setPlantillaClonar] = useState(null);
+
+  const abrirNuevo = () => {
+    setPlantillaClonar(null);
+    setFormVisible(true);
+  };
+
+  const abrirClon = (dx) => {
+    setPlantillaClonar(dx);
+    setFormVisible(true);
+  };
+
+  const cerrarForm = () => {
+    setFormVisible(false);
+    setPlantillaClonar(null);
+  };
 
   // Reordenamiento de la tabla de seleccionados (arrastre + flechas ▲▼).
   const [filaArrastrada, setFilaArrastrada] = useState(null);
@@ -287,7 +322,7 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
   const dragHandlersFila = (index) => ({
     draggable: true,
     onDragStart: (e) => {
-      if (e.target.closest("textarea")) { e.preventDefault(); return; }
+      if (e.target.closest("textarea, button")) { e.preventDefault(); return; }
       setFilaArrastrada(index);
       e.dataTransfer.effectAllowed = "move";
     },
@@ -382,7 +417,7 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
         <div className="w-full flex justify-end">
           <button
             type="button"
-            onClick={() => setFormVisible(true)}
+            onClick={abrirNuevo}
             className="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md text-white"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" /> Agregar Nuevo
@@ -391,9 +426,10 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
 
         <DiagnosticoRelacionadoFormModal
           visible={formVisible}
-          onClose={() => setFormVisible(false)}
+          onClose={cerrarForm}
           onCreated={() => obtenerDiagnósticosRelacionados()}
           token={token}
+          plantilla={plantillaClonar}
         />
 
         {/* Disponibles */}
@@ -404,7 +440,13 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
           <TablaDx modo="disponibles" maxH="max-h-[45vh]">
             {disponibles.length > 0 ? (
               disponibles.map((dx) => (
-                <FilaDx key={dx.id} dx={dx} modo="disponibles" onToggle={toggleSeleccion} />
+                <FilaDx
+                  key={dx.id}
+                  dx={dx}
+                  modo="disponibles"
+                  onToggle={toggleSeleccion}
+                  onClonar={abrirClon}
+                />
               ))
             ) : (
               <tr>
@@ -433,6 +475,7 @@ export default function DiagnosticoRelacionadoModal({ visible, onClose, diagnost
                   dx={dx}
                   modo="seleccionados"
                   onToggle={toggleSeleccion}
+                  onClonar={abrirClon}
                   descripcion={mapaSeleccion.get(dx.id)?.diagnosticoPersonalizado ?? ""}
                   onDescripcionChange={(t) => actualizarDescripcion(dx.id, t)}
                   arrastrando={filaArrastrada === index}
