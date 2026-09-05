@@ -541,12 +541,20 @@ const TabComponent = () => {
                     Audiometria
                   </button>
 
-                  <button
+                  {/* <button
                     className={`${styles.tabButton} ${subTab === 1 ? styles.active : ""
                       }`}
                     onClick={() => setSubTab(1)}
                   >
                     Audiometria Ohla
+                  </button> */}
+                
+                  <button
+                    className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
+                      }`}
+                    onClick={() => setSubTab(3)}
+                  >
+                    Audiometria OHLA
                   </button>
                   <button
                     className={`${styles.tabButton} ${subTab === 2 ? styles.active : ""
@@ -554,13 +562,6 @@ const TabComponent = () => {
                     onClick={() => setSubTab(2)}
                   >
                     Cuestionario de Audiometria
-                  </button>
-                  <button
-                    className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(3)}
-                  >
-                    Audiometria OHLA N
                   </button>
                 </div>
                 <div>
