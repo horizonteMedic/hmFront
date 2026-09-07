@@ -32,7 +32,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   const [modalRegistrarVisita, setModalRegistrarVisita] = useState(false)
 
 
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, campaniaActiva } = useSessionData();
   const autoSubmitRef = useRef(null);
 
   const { form, setForm, handleChange, handleChangeSimple, handleChangeNumberDecimals, handleClear } = useForm(initialFormState);
@@ -101,7 +101,11 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   // ── Imprimir ticket ───────────────────────────────────────────────────────
   const fetchAndPrint = async (visitaId) => {
     const datos = await getVisitaById(visitaId, token);
-    Ticket({ datos });
+    await Ticket({
+      datos,
+      titulo: campaniaActiva?.nombre ?? undefined,
+      logoUrl: campaniaActiva?.urlRuta ?? null,
+    });
   };
 
   const handlePrintConfirm = async (row) => {

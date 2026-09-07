@@ -2,10 +2,28 @@ import { jsPDF } from "jspdf";
 
 const TITULO_DEFAULT = "Campaña de Salud Integral - Caseríos José Carlos Mariátegui, Llaray, El Hospital, Las Pajillas y Quiruvilca";
 
-export default function Ticket({
+async function fetchImageBase64(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const blob = await res.blob();
+        const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
+        return { data: base64, format: blob.type.includes("png") ? "PNG" : "JPEG" };
+    } catch {
+        return null;
+    }
+}
+
+export default async function Ticket({
     datos = null,
     titulo = TITULO_DEFAULT,
+    logoUrl = null,
 }) {
+    const logoImg = logoUrl ? await fetchImageBase64(logoUrl) : null;
     // ── Desestructurar datos de la API ────────────────────────────────────────
     const visita = datos?.visita ?? {};
     const paciente = datos?.paciente ?? {};
@@ -39,7 +57,11 @@ export default function Ticket({
     try {
         const logoAncho = 38;
         const logoAlto = 18;
-        doc.addImage("/img/Ticket/Logo.png", "PNG", (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
+        if (logoImg) {
+            doc.addImage(logoImg.data, logoImg.format, (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
+        } else {
+            doc.addImage("/img/Ticket/Logo.png", "PNG", (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
+        }
         y += logoAlto + 3;
     } catch {
         y += 3;

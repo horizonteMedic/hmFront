@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCheck, faBoxesStacked, faStethoscope } from "@fortawesome/free-solid-svg-icons";
+import { faUserCheck, faBoxesStacked, faStethoscope, faGear } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import AdmisionTabSelector from "./Admision/AdmisionTabSelector";
 import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 import RegistroEspecialidades from "./RegistroEspecialidades/RegistroEspecialidades";
+import Configuracion from "./Configuracion/Configuracion";
 
 const sections = [
     { tab: 1, vista: "Admision Salud", label: "Admisión", icon: faUserCheck, component: AdmisionTabSelector },
     { tab: 2, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
     { tab: 3, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
+    { tab: 4, vista: "Configuracion", label: "Configuracion", icon: faGear, component: Configuracion },
 ];
 
 const ModuloSalud = () => {
@@ -73,6 +75,7 @@ const ModuloSalud = () => {
                         {activeSection.tab !== 1 && activeSection.tab !== 2 && (
                             <activeSection.component tieneVista={tieneVista} />
                         )}
+
                     </SectionWithBack>
                 )}
             </div>

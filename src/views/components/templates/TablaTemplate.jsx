@@ -4,6 +4,7 @@ export default function TablaTemplate({
     height = 600,
     onRowClick,
     onRowRightClick,
+    getRowClassName,
     emptyText = "No hay datos",
 }) {
     return (
@@ -31,7 +32,7 @@ export default function TablaTemplate({
                         data.map((row, i) => (
                             <tr
                                 key={i}
-                                className="hover:bg-[#233245] hover:text-white cursor-pointer text-lg"
+                                className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg ${getRowClassName?.(row) ?? ""}`}
                                 onClick={() => onRowClick?.(row)}
                                 onContextMenu={(e) => {
                                     e.preventDefault();
