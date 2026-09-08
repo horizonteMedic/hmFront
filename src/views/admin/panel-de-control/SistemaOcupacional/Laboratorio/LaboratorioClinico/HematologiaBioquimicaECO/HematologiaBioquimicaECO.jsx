@@ -10,7 +10,7 @@ import {
   CIE10List
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
@@ -22,7 +22,7 @@ import EmpleadoComboBox from "../../../../../../components/reusableComponents/Em
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "lab_clinico";
 
@@ -419,20 +419,14 @@ export default function HematologiaBioquimicaECO() {
 
   return (
     <div className="max-w-[95%] xl:max-w-[90%] mx-auto space-y-3">
-      <div className="sticky top-2 z-20 flex justify-end pointer-events-none px-4">
-        <RegistroEstadoPill
+      <div className="px-4">
+        <AccionesRegistroHeader
           tieneRegistro={form.tieneRegistro}
-          className={hayRegistroCargado ? "" : "invisible"}
+          hayRegistroCargado={hayRegistroCargado}
+          edicionHabilitada={edicionHabilitada}
+          onHabilitarEdicion={habilitarEdicion}
+          onLimpiar={handleClear}
         />
-        {hayRegistroCargado && form.tieneRegistro && !edicionHabilitada && (
-          <button
-            type="button"
-            onClick={habilitarEdicion}
-            className="pointer-events-auto inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-1.5 rounded-full shadow-sm transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
-          >
-            <FontAwesomeIcon icon={faEdit} /> Habilitar edición
-          </button>
-        )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="space-y-3 px-4 lg:col-span-3">
