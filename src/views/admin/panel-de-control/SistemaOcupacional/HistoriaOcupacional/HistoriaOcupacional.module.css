@@ -5,7 +5,7 @@
 
 .tituloPrincipal {
   color: #233245;
-  font-size: 2.3rem;
+  /* font-size: 2.3rem; */
   font-weight: 800;
   text-align: center;
   margin-bottom: 1.2rem;
@@ -24,7 +24,7 @@
 .fieldset legend {
   font-weight: bold;
   color: #233245;
-  font-size: 1.25em;
+  /* font-size: 1.25em; */
   padding: 0 0.5em;
   letter-spacing: 0.5px;
 }
@@ -42,7 +42,7 @@
   border: 1.5px solid #bfc9d1;
   border-radius: 6px;
   padding: 0.35em 0.6em;
-  font-size: 1em;
+  /* font-size: 1em; */
   color: #233245;
   transition: border 0.2s, box-shadow 0.2s;
 }
@@ -66,7 +66,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.2em;
+  /* font-size: 1.2em; */
   margin: 0 0.2em;
   color: #fc6b03;
   transition: color 0.2s;
@@ -79,7 +79,7 @@
 .historiaTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.98em;
+  /* font-size: 0.98em; */
   background: #fff;
 }
 
@@ -109,7 +109,7 @@
   border: none;
   background: #f8fafc;
   padding: 0.25em 0.4em;
-  font-size: 1em;
+  /* font-size: 1em; */
   border-radius: 4px;
   color: #233245;
   transition: background 0.2s, outline 0.2s;
@@ -124,7 +124,7 @@ label {
   font-weight: 600;
   color: #233245;
   margin-right: 0.3em;
-  font-size: 1em;
+  /* font-size: 1em; */
 }
 
 /* Responsive */
@@ -163,7 +163,7 @@ label {
   border: 1.5px solid #bfc9d1;
   border-radius: 6px;
   padding: 0.35em 0.6em;
-  font-size: 1em;
+  /* font-size: 1em; */
   color: #233245;
   transition: border 0.2s, box-shadow 0.2s;
 }

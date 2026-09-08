@@ -593,7 +593,7 @@ const TabComponent = () => {
               13: { title: "Electrocardiograma", child: <EKG /> },
               14: { title: "Espirometría", child: <Espirometria /> },
               16: {
-                title: undefined, child: (
+                title: "Historia Ocupacional", child: (
                   <HistoriaOcupacional
                     token={token}
                     userlogued={userlogued.sub}

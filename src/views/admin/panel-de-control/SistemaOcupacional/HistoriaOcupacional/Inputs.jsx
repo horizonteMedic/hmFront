@@ -1,6 +1,6 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
-const AutoGrowingTextarea = ({ value, onChange = null, maxWidth = 'max-w-xs', className = '', style = {}}) => {
+const AutoGrowingTextarea = ({ value, onChange = null, maxWidth = 'max-w-xs', className = '', style = {}, disabled = false }) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -15,8 +15,9 @@ const AutoGrowingTextarea = ({ value, onChange = null, maxWidth = 'max-w-xs', cl
       ref={textareaRef}
       value={value}
       onChange={onChange}
+      disabled={disabled}
       rows={5}
-      className={`resize-none overflow-hidden bg-transparent outline-none text-[13px] text-black w-full ${maxWidth} ${className} `}
+      className={`resize-none overflow-hidden bg-transparent outline-none text-[13px] text-black w-full ${maxWidth} ${className} ${disabled ? 'cursor-not-allowed opacity-70' : ''}`}
       style={style}
     />
   );

@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Swal from "sweetalert2";
 import styles from "./HistoriaOcupacional.module.css";
+import AutoResizeInput from "./Inputs";
 import {
   handleSearch,
   handleSelect,
@@ -7,18 +9,43 @@ import {
   SubmiteHistoriaOcupacionalController,
   VerifyTR,
 } from "./controller/controllerHO";
-import { getFetch } from "../../getFetch/getFetch";
-import Swal from "sweetalert2";
-import AutoResizeInput from "./Inputs";
-import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { useSessionData } from "../../../../hooks/useSessionData";
+import { useForm } from "../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 const tabla = "historia_oc_info";
+
+// Campos propios del formulario que el usuario puede editar en un registro existente
+// (para resaltar/revertir cambios). Los detalles de experiencia ocupacional se
+// gestionan aparte en su propia tabla.
+const CAMPOS_EDITABLES = ["fecha", "user_medicoFirma", "nombre_medico"];
+
+// Fila vacía de la tabla de experiencia ocupacional.
+const EMPTY_ROW = {
+  historiaDetalleId: null,
+  fecha: "",
+  empresa: "",
+  altitud: "",
+  actividad: "",
+  areaEmpresa: "",
+  ocupacion: "",
+  superficie: "",
+  socavon: "",
+  riesgo: "",
+  proteccion: "",
+  causaRetiro: "",
+};
 
 const riesgosOptions = [
   {
@@ -97,6 +124,7 @@ const riesgosOptions = [
     mensaje: "MOV. Y POSICIONES DISERGONOMICAS",
   },
 ];
+
 const proteccionOptions = [
   {
     id: 1,
@@ -107,8 +135,7 @@ const proteccionOptions = [
   { id: 3, mensaje: "CHALECO ANTIBALAS" },
   {
     id: 4,
-    mensaje:
-      "EPPS BASICOS : CASCO, LENTES, GUANTES,OVERAL,ZAPATOS DE SEGURIDAD",
+    mensaje: "EPPS BASICOS : CASCO, LENTES, GUANTES,OVERAL,ZAPATOS DE SEGURIDAD",
   },
   {
     id: 5,
@@ -123,52 +150,73 @@ const proteccionOptions = [
   },
 ];
 
-const HistoriaOcupacional = ({
-  token,
-  userlogued,
-  selectedSede,
-  listas,
-  userDatos,
-}) => {
-  function fixEncodingModern(str) {
-    const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
-    return new TextDecoder('utf-8').decode(bytes);
-  }
-  const { userName } =
-    useSessionData();
+const HistoriaOcupacional = ({ listas }) => {
+  const { token, userlogued, selectedSede, userName, userDNI } = useSessionData();
 
-  const [form, setForm] = useState({
+  const initialFormState = {
+    // Header
     norden: "",
     codHo: null,
-    nombres: "",
-    eliminados: [],
     fecha: today,
-    //Area de trabajo
-    areaO: "",
+    eliminados: [],
+    // Datos personales
+    nombres: "",
     dni: "",
-    dniUser: userDatos.datos.dni_user,
-    nombreUser: fixEncodingModern(userDatos.datos.nombres_user),
+    edad: "",
+    sexo: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+    // Datos laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+    // Área de trabajo (campo propio de Historia Ocupacional)
+    areaO: "",
+    // Responsable (usuario en sesión)
+    dniUser: userDNI,
+    nombreUser: userName,
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
-  });
-  const [rowData, setRowData] = useState({
-    fecha: "",
-    empresa: "",
-    altitud: "",
-    actividad: "",
-    areaEmpresa: "",
-    ocupacion: "",
-    superficie: "",
-    socavon: "",
-    riesgo: "",
-    proteccion: "",
-    causaRetiro: ""
+    // Control de UI: false = registro nuevo / true = registro existente
+    tieneRegistro: false,
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
+  };
+
+  const {
+    form,
+    setForm,
+    handleChangeSimple,
+    handleChangeNumber,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, {
+    tieneRegistro: form.tieneRegistro,
+    camposEditables: CAMPOS_EDITABLES,
   });
 
+  const [rowData, setRowData] = useState(EMPTY_ROW);
   const [registros, setRegistros] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  //AUTOCOMPLETABLES
+
+  // AUTOCOMPLETABLES
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const [searchCargoOcupacion, setSearchCargoOcupacion] = useState("");
   const [searchAltitud, setSearchAltitud] = useState("");
@@ -213,7 +261,7 @@ const HistoriaOcupacional = ({
   useEffect(() => autoResize(riesgoRef), [searchRiesgo]);
   useEffect(() => autoResize(protRef), [searchProt]);
 
-  //listas
+  // listas
   const { EmpresasMulti, AlturaMulti, AreaMulti, CargosMulti } = listas;
   const ActividadMulti = [
     { id: 1, mensaje: "AGROINDUSTRIA" },
@@ -222,8 +270,7 @@ const HistoriaOcupacional = ({
     { id: 4, mensaje: "RETAIL" },
     { id: 5, mensaje: "PETRÓLEO" },
   ];
-  // Opciones random de ejemplo para los selects
-  //ALGUNOS YA TREEN DATOS DE VERITAS
+
   const handleRowChange = (field, value) => {
     const numero = Number(value); // solo para lógica de control
 
@@ -262,8 +309,8 @@ const HistoriaOcupacional = ({
     if (field === "socavon") {
       setRowData((prev) => ({
         ...prev,
-        socavon: value, // se guarda como string
-        superficie: prev.superficie == "" && numero !== 0 ? "0" : prev.superficie, // se resetea si socavon no es 0
+        socavon: value,
+        superficie: prev.superficie == "" && numero !== 0 ? "0" : prev.superficie,
       }));
       return;
     }
@@ -281,12 +328,11 @@ const HistoriaOcupacional = ({
   };
 
   const getAñoInicial = (fecha) => {
-    const match = fecha.match(/\d{4}/); // Busca el primer año (4 dígitos)
+    const match = fecha.match(/\d{4}/);
     return match ? parseInt(match[0], 10) : Infinity;
   };
 
   const handleRegistrar = async () => {
-    // Validar que al menos año y empresa estén llenos (puedes ajustar la validación)
     if (!rowData.fecha || !rowData.empresa) {
       await Swal.fire("Error", "Faltan datos", "error");
       return;
@@ -295,161 +341,31 @@ const HistoriaOcupacional = ({
     nuevaLista.sort((a, b) => {
       const añoA = getAñoInicial(a.fecha);
       const añoB = getAñoInicial(b.fecha);
-
       if (añoA !== añoB) {
         return añoA - añoB;
       }
-
-      // Si tienen el mismo año, ordenar por longitud de fecha (más corta primero)
       return a.fecha.length - b.fecha.length;
     });
     setRegistros(nuevaLista);
-    setRowData({
-      historiaDetalleId: null,
-      fecha: "",
-      empresa: "",
-      altitud: "",
-      actividad: "",
-      areaEmpresa: "",
-      ocupacion: "",
-      superficie: "",
-      socavon: "",
-      riesgo: "",
-      proteccion: "",
-      causaRetiro: ""
-    });
-    setSearchEmpresa("");
-    setSearchCargoOcupacion("");
-    setSearchAltitud("");
-    setSearchArea("");
-    setSearchRiesgo("");
-    setSearchProt("");
-    setFilteredSuperficie([]);
-    setFilteredSocavon([]);
+    resetRowEntry();
     setShowModal(false);
   };
 
   const handleCancelModal = () => {
-    setRowData({
-      historiaDetalleId: null,
-      fecha: "",
-      empresa: "",
-      altitud: "",
-      actividad: "",
-      areaEmpresa: "",
-      ocupacion: "",
-      superficie: "",
-      socavon: "",
-      riesgo: "",
-      proteccion: "",
-      causaRetiro: "",
-    });
-    setSearchEmpresa("");
-    setSearchCargoOcupacion("");
-    setSearchAltitud("");
-    setSearchArea("");
-    setSearchRiesgo("");
-    setSearchProt("");
-    setFilteredSuperficie([]);
-    setFilteredSocavon([]);
+    resetRowEntry();
     setShowModal(false);
   };
 
-  const handleGuardar = () => {
-    if (registros.length === 0) {
-      Swal.fire({
-        title: "¿Está seguro?",
-        text: "Está por registrar una Historia Ocupacional sin ninguna fila. ¿Desea continuar?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, continuar",
-        cancelButtonText: "Cancelar",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          SubmiteHistoriaOcupacionalController(
-            form,
-            token,
-            userlogued,
-            handleClean,
-            tabla,
-            registros
-          );
-        }
-      });
-      return;
-    }
-    SubmiteHistoriaOcupacionalController(
-      form,
-      token,
-      userlogued,
-      handleClean,
-      tabla,
-      registros
-    );
-  };
-
-  const handleClean = () => {
-    setForm({
-      norden: "",
-      codHo: null,
-      eliminados: [],
-      nombres: "",
-      fecha: today,
-      dniUser: userDatos.datos.dni_user,
-      areaO: "",
-      dni: "",
-      // Médico que Certifica //BUSCADOR
-      nombre_medico: userName,
-      user_medicoFirma: userlogued,
-    });
-    setRowData({
-      fecha: "",
-      empresa: "",
-      altitud: "",
-      actividad: "",
-      areaEmpresa: "",
-      ocupacion: "",
-      superficie: "",
-      socavon: "",
-      riesgo: "",
-      proteccion: "",
-      causaRetiro: ""
-    });
-    setRegistros([]);
+  const resetRowEntry = () => {
+    setRowData(EMPTY_ROW);
     setSearchEmpresa("");
     setSearchCargoOcupacion("");
     setSearchAltitud("");
+    setSearchArea("");
     setSearchRiesgo("");
     setSearchProt("");
-    setSearchArea("");
     setFilteredSuperficie([]);
     setFilteredSocavon([]);
-  };
-
-  const handleset = () => {
-    setForm((f) => ({
-      ...f,
-      nombres: "",
-      areaO: "",
-      fecha: today,
-      // Médico que Certifica //BUSCADOR
-      nombre_medico: userName,
-      user_medicoFirma: userlogued,
-    }));
-    setRegistros([]);
-    setSearchEmpresa("");
-    setSearchCargoOcupacion("");
-    setSearchAltitud("");
-    setSearchArea("");
-  };
-
-  const handleChangeSimple = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
 
   const handleEditChange = (index, field, value) => {
@@ -458,29 +374,8 @@ const HistoriaOcupacional = ({
     );
   };
 
-  const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Historia Ocupacional?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
-    });
-  };
-
   const deleteRow = async (indexToRemove) => {
+    if (camposDeshabilitados) return;
     const confirm = await Swal.fire({
       title: "¿Eliminar fila?",
       text: "Esta acción no se puede deshacer",
@@ -494,95 +389,418 @@ const HistoriaOcupacional = ({
       if (registros[indexToRemove].historiaDetalleId != null) {
         setForm((prev) => ({
           ...prev,
-          eliminados: [...prev.eliminados, registros[indexToRemove].historiaDetalleId]
+          eliminados: [
+            ...prev.eliminados,
+            registros[indexToRemove].historiaDetalleId,
+          ],
         }));
       }
-      setRegistros((prev) =>
-        prev.filter((_, index) => index !== indexToRemove)
-      );
+      setRegistros((prev) => prev.filter((_, index) => index !== indexToRemove));
     }
   };
 
+  // ===== Búsqueda por N° Orden =====
+  const executeSearch = () => {
+    // Reinicia todo menos el N° Orden antes de consultar (comportamiento original).
+    handleClearnotO();
+    setRegistros([]);
+    resetRowEntry();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede, setRegistros);
+  };
+
+  const handleSearchNorden = (e) => {
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  // ===== Limpiar =====
+  const handleClearForm = () => {
+    handleClear();
+    setRegistros([]);
+    resetRowEntry();
+  };
+
+  // ===== Input N° Orden de la barra IMPRIMIR =====
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(
+      form.nombres || form.dni || form.tieneRegistro
+    );
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+      setRegistros([]);
+      resetRowEntry();
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  // ===== Guardar / Actualizar =====
+  const handleGuardar = () => {
+    const doSubmit = () =>
+      SubmiteHistoriaOcupacionalController(
+        form,
+        token,
+        userlogued,
+        handleClearForm,
+        tabla,
+        registros
+      );
+
+    if (registros.length === 0) {
+      Swal.fire({
+        title: "¿Está seguro?",
+        text: "Está por registrar una Historia Ocupacional sin ninguna fila. ¿Desea continuar?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) doSubmit();
+      });
+      return;
+    }
+    doSubmit();
+  };
+
+  // ===== Impresión =====
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla);
+    });
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div
-      className={styles.historiaOcupacionalContainer}
-      style={{ fontSize: 13, color: "#000" }}
+      className="px-4 max-w-[95%] xl:max-w-[90%] mx-auto space-y-3"
+      style={{ color: "#000" }}
     >
-      <h1
-        className={styles.tituloPrincipal}
-        style={{ fontSize: 15, color: "#000", fontWeight: "bold" }}
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClearForm}
+      />
+
+      {/* ===== SECCIÓN: DATOS HISTORIA OCUPACIONAL ===== */}
+      <SectionFieldset
+        legend="Datos Historia Ocupacional"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3"
       >
-        HISTORIAL OCUPACIONAL
-      </h1>
-      <fieldset className={styles.fieldset}>
-        <legend style={{ fontSize: 15, color: "#000" }}>
-          Datos Historia ocupacional
-        </legend>
-        <div className={styles.rowCampos}>
-          <div className={styles.campoGrupo}>
-            <label style={{ color: "#000" }}>N° Orden :</label>
-            <input
-              type="text"
-              name="norden"
-              className={styles.inputSmall}
-              value={form.norden}
-              onKeyUp={(event) => {
-                if (event.key === "Enter") {
-                  handleset();
-                  VerifyTR(
-                    form.norden,
-                    tabla,
-                    token,
-                    setForm,
-                    selectedSede,
-                    setRegistros
-                  );
-                }
-              }}
-              onChange={(e) => handleInputChange(e)}
-              placeholder=""
-              style={{ fontSize: 13, color: "#000" }}
-            />
-          </div>
-          <div className={styles.campoGrupo}>
-            <label style={{ color: "#000" }}>Nombres y Apellidos :</label>
-            <input
-              type="text"
-              className={styles.inputLarge}
-              value={form.nombres}
-              name="nombres"
-              disabled
-              placeholder="Nombre y Apellido"
-              style={{ fontSize: 13, color: "#000" }}
-            />
-          </div>
-          <div className={styles.campoGrupo}>
-            <label style={{ color: "#000" }}>Área de Trabajo :</label>
-            <input
-              type="text"
-              value={form.areaO}
-              name="areaO"
-              autoComplete="off"
-              // onChange={handleInputChange}
-              disabled
-              className={styles.inputXLarge}
-              style={{ fontSize: 13, color: "#000" }}
-            />
-          </div>
-          <div className={styles.campoGrupo}>
-            <label style={{ color: "#000" }}>Fecha :</label>
-            <input
-              type="date"
-              value={form.fecha}
-              onChange={handleInputChange}
-              name="fecha"
-              className={`${styles.inputSmall} w-auto`}
-              placeholder="dd/mm/aa"
-              style={{ fontSize: 13, color: "#000" }}
-            />
-          </div>
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearchNorden}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
         </div>
-      </fieldset>
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
+        />
+        <InputTextOneLine
+          label="Área de Trabajo"
+          name="areaO"
+          value={form.areaO}
+          disabled
+          labelWidth="120px"
+          className="lg:col-span-2"
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+      <DatosPersonalesLaborales form={form} />
+
+      {/* ===== SECCIÓN: EXPERIENCIA OCUPACIONAL ===== */}
+      <SectionFieldset legend="Experiencia Ocupacional" className="space-y-3">
+        {!camposDeshabilitados && (
+          <div className="flex justify-center py-2">
+                     <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center text-center gap-2 bg-[#233245] hover:bg-[#1c2836] text-white text-lg px-4 py-2 rounded transition-colors"
+          >
+            <i className="fas fa-plus" /> Agregar nuevo
+          </button>
+          </div>
+        )}
+
+        {registros.length === 0 ? (
+          <div className="border border-dashed border-gray-300 bg-gray-50 text-gray-400 rounded-md py-6 text-center text-sm">
+            Aquí se mostrarán los registros
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table
+              className={styles.historiaTable}
+              style={{ fontSize: 13, color: "#000" }}
+            >
+              <thead>
+                <tr>
+                  <th>Año</th>
+                  <th>Empresa - Lugar Geográfico</th>
+                  <th>Altitud</th>
+                  <th>Actividad</th>
+                  <th>Área Empresa</th>
+                  <th>Ocupación</th>
+                  <th>Superficie</th>
+                  <th>Socavón</th>
+                  <th>Riesgos</th>
+                  <th>Protección</th>
+                  <th>Causa de Retiro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registros.map((reg, idx) => (
+                  <tr
+                    key={idx}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      deleteRow(idx);
+                    }}
+                  >
+                    <td>
+                      <AutoResizeInput
+                        value={reg.fecha}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "fecha",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.empresa}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "empresa",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.altitud}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "altitud",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.actividad}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "actividad",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.areaEmpresa}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "areaEmpresa",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.ocupacion}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "ocupacion",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.superficie}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "superficie",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.socavon}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "socavon",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.riesgo}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "riesgo",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.proteccion}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "proteccion",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.causaRetiro}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "causaRetiro",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {registros.length > 0 && (
+          <p className="text-xs text-gray-500">
+            Clic derecho sobre una fila para eliminarla.
+          </p>
+        )}
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: RESPONSABLE Y MÉDICO ===== */}
+      <SectionFieldset
+        legend="Responsable y Médico que Certifica"
+        className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3"
+      >
+        <InputTextOneLine
+          label="DNI Responsable"
+          name="dniUser"
+          value={form.dniUser}
+          disabled
+          labelWidth="150px"
+        />
+        <InputTextOneLine
+          label="Nombres Responsable"
+          name="nombreUser"
+          value={form.nombreUser}
+          disabled
+          labelWidth="150px"
+        />
+        <div className="md:col-span-2">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("user_medicoFirma")}
+            onRevert={() => revertFields(["user_medicoFirma", "nombre_medico"])}
+          />
+        </div>
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={handleGuardar}
+        saveLabel={
+          form.tieneRegistro && edicionHabilitada
+            ? "Guardar Cambios"
+            : "Guardar/Actualizar"
+        }
+        handleEdit={habilitarEdicion}
+        handleClear={handleClearForm}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+      />
+
+      {/* ===== MODAL: AGREGAR REGISTRO OCUPACIONAL ===== */}
       {showModal && (
         <div
           style={{
@@ -617,7 +835,7 @@ const HistoriaOcupacional = ({
             >
               Agregar registro ocupacional
             </h3>
-            <div className={styles.tableWrapper}>
+            <div className="overflow-x-auto">
               <table
                 className={`${styles.historiaTable} mb-48`}
                 style={{ fontSize: 13, color: "#000" }}
@@ -653,10 +871,6 @@ const HistoriaOcupacional = ({
                       />
                     </td>
                     <td onClick={() => empresaRef.current?.focus()}>
-                      {/* <AutoResizeInput
-                  value={rowData.empresa}
-                  onChange={(e) => handleRowChange("empresa", e.target.value)}
-                /> */}
                       <div className="relative">
                         <div className="flex flex-col items-center justify-center">
                           <textarea
@@ -677,7 +891,10 @@ const HistoriaOcupacional = ({
                               );
                             }}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredEmpresa.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredEmpresa.length > 0
+                              ) {
                                 e.preventDefault();
                                 handleSelect(
                                   e,
@@ -721,10 +938,6 @@ const HistoriaOcupacional = ({
                       </div>
                     </td>
                     <td onClick={() => altitudRef.current?.focus()}>
-                      {/* <AutoResizeInput
-                  value={rowData.altitud}
-                  onChange={(e) => handleRowChange("altitud", e.target.value)}
-                /> */}
                       <div className="relative">
                         <div className="flex flex-col items-center justify-center">
                           <textarea
@@ -743,8 +956,10 @@ const HistoriaOcupacional = ({
                               handleRowChange("altitud", v);
                               const matches = v
                                 ? AlturaMulti.filter((m) =>
-                                  m.mensaje.toLowerCase().includes(v.toLowerCase())
-                                )
+                                    m.mensaje
+                                      .toLowerCase()
+                                      .includes(v.toLowerCase())
+                                  )
                                 : [];
                               const trimmed = v.trim();
                               if (/^\d+$/.test(trimmed)) {
@@ -756,7 +971,10 @@ const HistoriaOcupacional = ({
                               setFilteredAltitud(matches);
                             }}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredAltitud.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredAltitud.length > 0
+                              ) {
                                 e.preventDefault();
                                 handleSelect(
                                   e,
@@ -815,16 +1033,24 @@ const HistoriaOcupacional = ({
                               setFilteredActividad(
                                 v
                                   ? ActividadMulti.filter((m) =>
-                                    m.mensaje.toLowerCase().includes(v.toLowerCase())
-                                  )
+                                      m.mensaje
+                                        .toLowerCase()
+                                        .includes(v.toLowerCase())
+                                    )
                                   : []
                               );
                             }}
                             onFocus={() => setFilteredActividad(ActividadMulti)}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredActividad.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredActividad.length > 0
+                              ) {
                                 e.preventDefault();
-                                handleRowChange("actividad", filteredActividad[0].mensaje);
+                                handleRowChange(
+                                  "actividad",
+                                  filteredActividad[0].mensaje
+                                );
                                 setFilteredActividad([]);
                               }
                             }}
@@ -852,12 +1078,6 @@ const HistoriaOcupacional = ({
                       </div>
                     </td>
                     <td onClick={() => areaRef.current?.focus()}>
-                      {/* <AutoResizeInput
-                  value={rowData.areaEmpresa}
-                  onChange={(e) =>
-                    handleRowChange("areaEmpresa", e.target.value)
-                  }
-                /> */}
                       <div className="relative">
                         <div className="flex flex-col items-center justify-center">
                           <textarea
@@ -893,7 +1113,9 @@ const HistoriaOcupacional = ({
                                 document.getElementById("riesgo").focus();
                               }
                             }}
-                            onBlur={() => setTimeout(() => setFilteredArea([]), 100)}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredArea([]), 100)
+                            }
                           />
                           {filteredArea.length > 0 && (
                             <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-10">
@@ -922,10 +1144,6 @@ const HistoriaOcupacional = ({
                       </div>
                     </td>
                     <td onClick={() => ocupacionRef.current?.focus()}>
-                      {/* <AutoResizeInput
-                  value={rowData.ocupacion}
-                  onChange={(e) => handleRowChange("ocupacion", e.target.value)}
-                /> */}
                       <div className="relative">
                         <div className="flex flex-col items-center justify-center">
                           <textarea
@@ -935,7 +1153,9 @@ const HistoriaOcupacional = ({
                             className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                             value={searchCargoOcupacion}
                             name="ocupacion"
-                            onFocus={() => setFilteredCargoOcupacion(CargosMulti)}
+                            onFocus={() =>
+                              setFilteredCargoOcupacion(CargosMulti)
+                            }
                             onChange={(e) => {
                               handleSearch(
                                 e,
@@ -959,11 +1179,13 @@ const HistoriaOcupacional = ({
                                   handleRowChange,
                                   setFilteredCargoOcupacion
                                 );
-                                // document.getElementById("altitud")?.focus();
                               }
                             }}
                             onBlur={() =>
-                              setTimeout(() => setFilteredCargoOcupacion([]), 100)
+                              setTimeout(
+                                () => setFilteredCargoOcupacion([]),
+                                100
+                              )
                             }
                           />
                           {filteredCargoOcupacion.length > 0 && (
@@ -1008,21 +1230,27 @@ const HistoriaOcupacional = ({
                               let sugerencia = null;
                               if (/^\d+$/.test(trimmed)) {
                                 const n = parseInt(trimmed, 10);
-                                sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                                sugerencia = `${trimmed} ${
+                                  n === 1 ? "AÑO" : "AÑOS"
+                                }`;
                               } else {
                                 const match = trimmed.match(
                                   /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
                                 );
                                 if (match) {
                                   const meses = parseInt(match[2], 10);
-                                  sugerencia = `${trimmed} ${meses === 1 ? "MES" : "MESES"
-                                    }`;
+                                  sugerencia = `${trimmed} ${
+                                    meses === 1 ? "MES" : "MESES"
+                                  }`;
                                 }
                               }
                               setFilteredSocavon(sugerencia ? [sugerencia] : []);
                             }}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredSocavon.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredSocavon.length > 0
+                              ) {
                                 e.preventDefault();
                                 handleRowChange("socavon", filteredSocavon[0]);
                                 setFilteredSocavon([]);
@@ -1068,23 +1296,34 @@ const HistoriaOcupacional = ({
                               let sugerencia = null;
                               if (/^\d+$/.test(trimmed)) {
                                 const n = parseInt(trimmed, 10);
-                                sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                                sugerencia = `${trimmed} ${
+                                  n === 1 ? "AÑO" : "AÑOS"
+                                }`;
                               } else {
                                 const match = trimmed.match(
                                   /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
                                 );
                                 if (match) {
                                   const meses = parseInt(match[2], 10);
-                                  sugerencia = `${trimmed} ${meses === 1 ? "MES" : "MESES"
-                                    }`;
+                                  sugerencia = `${trimmed} ${
+                                    meses === 1 ? "MES" : "MESES"
+                                  }`;
                                 }
                               }
-                              setFilteredSuperficie(sugerencia ? [sugerencia] : []);
+                              setFilteredSuperficie(
+                                sugerencia ? [sugerencia] : []
+                              );
                             }}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredSuperficie.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredSuperficie.length > 0
+                              ) {
                                 e.preventDefault();
-                                handleRowChange("superficie", filteredSuperficie[0]);
+                                handleRowChange(
+                                  "superficie",
+                                  filteredSuperficie[0]
+                                );
                                 setFilteredSuperficie([]);
                               }
                             }}
@@ -1133,7 +1372,10 @@ const HistoriaOcupacional = ({
                               );
                             }}
                             onKeyUp={(e) => {
-                              if (e.key === "Enter" && filteredRiesgo.length > 0) {
+                              if (
+                                e.key === "Enter" &&
+                                filteredRiesgo.length > 0
+                              ) {
                                 e.preventDefault();
                                 handleSelect(
                                   e,
@@ -1244,7 +1486,10 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={rowData.causaRetiro}
                         onChange={(e) => {
-                          handleRowChange("causaRetiro", e.target.value.toUpperCase());
+                          handleRowChange(
+                            "causaRetiro",
+                            e.target.value.toUpperCase()
+                          );
                         }}
                       />
                     </td>
@@ -1301,527 +1546,6 @@ const HistoriaOcupacional = ({
           </div>
         </div>
       )}
-      <button
-        type="button"
-        style={{
-          height: 32,
-          margin: "auto",
-          background: "#233245",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          padding: "0 16px",
-          cursor: "pointer",
-          fontSize: 13,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-        onClick={() => setShowModal(true)}
-      >
-        <i className="fas fa-plus"></i> Agregar nuevo
-      </button>
-      {/* Buscadores debajo de la tabla */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "2em",
-          alignItems: "flex-end",
-        }}
-      >
-        {/*EMPRESA*/}
-        {/* <div className='relative'>
-          <div className='flex flex-col items-center justify-center'>
-              <label htmlFor="">Empresas</label>
-              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchEmpresa} name='empresa'
-                onChange={(e) => {handleSearch(e,setSearchEmpresa,handleRowChange,setFilteredEmpresa,EmpresasMulti)}}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter" && filteredEmpresa.length > 0) {
-                    e.preventDefault();
-                    handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
-                    document.getElementById('altitud').focus();
-                  }
-                }}
-                onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
-              {searchEmpresa && filteredEmpresa.length > 0 && (
-                <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                  {filteredEmpresa.map((opt) => (
-                    <li
-                      key={opt.id}
-                      className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                      onMouseDown={(e) => handleSelect(e,'empresa',opt.mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
-                    >
-                      {opt.mensaje}
-                    </li>
-                  ))}
-                </ul>
-              )}
-          </div>
-          
-        </div> */}
-        {/*ALTITUD*/}
-        {/* <div className="relative">
-          <div className="flex flex-col items-center justify-center">
-            <label htmlFor="">Altitud</label>
-            <input
-              type="text"
-              id="altitud"
-              autoComplete="off"
-              className={styles.inputLarge}
-              value={searchAltitud}
-              name="altitud"
-              onChange={(e) => {
-                handleSearch(
-                  e,
-                  setSearchAltitud,
-                  handleRowChange,
-                  setFilteredAltitud,
-                  AlturaMulti
-                );
-              }}
-              onKeyUp={(e) => {
-                if (e.key === "Enter" && filteredAltitud.length > 0) {
-                  e.preventDefault();
-                  handleSelect(
-                    e,
-                    e.target.name,
-                    filteredAltitud[0].mensaje,
-                    setSearchAltitud,
-                    handleRowChange,
-                    setFilteredAltitud
-                  );
-                  document.getElementById("areaEmpresa").focus();
-                }
-              }}
-              onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}
-            />
-            {searchAltitud && filteredAltitud.length > 0 && (
-              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
-                {filteredAltitud.map((opt) => (
-                  <li
-                    key={opt.id}
-                    name="altitud"
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) =>
-                      handleSelect(
-                        e,
-                        "altitud",
-                        opt.mensaje,
-                        setSearchAltitud,
-                        handleRowChange,
-                        setFilteredAltitud
-                      )
-                    }
-                  >
-                    {opt.mensaje}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div> */}
-        {/*AREAS*/}
-        {/* <div className="relative">
-          <div className="flex flex-col items-center justify-center">
-            <label htmlFor="">Areas</label>
-            <input
-              type="text"
-              id="areaEmpresa"
-              autoComplete="off"
-              className={styles.inputLarge}
-              value={searchArea}
-              name="areaEmpresa"
-              onChange={(e) => {
-                handleSearch(
-                  e,
-                  setSearchArea,
-                  handleRowChange,
-                  setFilteredArea,
-                  AreaMulti
-                );
-              }}
-              onKeyUp={(e) => {
-                if (e.key === "Enter" && filteredArea.length > 0) {
-                  e.preventDefault();
-                  handleSelect(
-                    e,
-                    e.target.name,
-                    filteredArea[0].mensaje,
-                    setSearchArea,
-                    handleRowChange,
-                    setFilteredArea
-                  );
-                  document.getElementById("riesgo").focus();
-                }
-              }}
-              onBlur={() => setTimeout(() => setFilteredArea([]), 100)}
-            />
-            {searchArea && filteredArea.length > 0 && (
-              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                {filteredArea.map((opt) => (
-                  <li
-                    key={opt.id}
-                    name="areaEmpresa"
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) =>
-                      handleSelect(
-                        e,
-                        "areaEmpresa",
-                        opt.mensaje,
-                        setSearchArea,
-                        handleRowChange,
-                        setFilteredArea
-                      )
-                    }
-                  >
-                    {opt.mensaje}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div> */}
-
-      </div>
-      {/* Preview de registros vacío */}
-      {registros.length === 0 && (
-        <div
-          style={{
-            border: "1px dashed #bbb",
-            background: "#f7f7f7",
-            color: "#888",
-            padding: 24,
-            margin: "24px 0",
-            borderRadius: 6,
-            textAlign: "center",
-            fontSize: 13,
-          }}
-        >
-          Aquí se mostrarán los registros
-        </div>
-      )}
-      {/* Tabla de registros */}
-      {registros.length > 0 && (
-        <div style={{ marginTop: 32 }}>
-          <h3 style={{ fontSize: 15, color: "#000", fontWeight: "bold", marginBottom: "1em" }}>
-            Lista de Registros
-          </h3>
-          <div className={styles.tableWrapper}>
-            <table
-              className={styles.historiaTable}
-              style={{ fontSize: 13, color: "#000" }}
-            >
-              <thead>
-                <tr>
-                  <th>Año</th>
-                  <th>Empresa - Lugar Geográfico</th>
-                  <th>Altitud</th>
-                  <th>Actividad</th>
-                  <th>Área Empresa</th>
-                  <th>Ocupación</th>
-                  <th>Superficie</th>
-                  <th>Socavón</th>
-                  <th>Riesgos</th>
-                  <th>Protección</th>
-                  <th>Causa de Retiro</th>
-                </tr>
-              </thead>
-              <tbody>
-                {registros.map((reg, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      deleteRow(idx);
-                    }}
-                  >
-                    <td>
-                      <AutoResizeInput
-                        value={reg.fecha}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "fecha",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.empresa}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "empresa",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.altitud}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "altitud",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.actividad}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "actividad",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.areaEmpresa}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "areaEmpresa",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.ocupacion}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "ocupacion",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.superficie}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "superficie",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.socavon}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "socavon",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.riesgo}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "riesgo",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.proteccion}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "proteccion",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.causaRetiro}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "causaRetiro",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Bloque EPP visual al final */}
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: 4,
-          marginTop: 40,
-          padding: 12,
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 16,
-          background: "#fafbfc",
-          fontSize: 13,
-          color: "#000",
-        }}
-      >
-        <div style={{ fontWeight: "bold", minWidth: 220, fontSize: 15 }}>
-          EPP: Equipo de Protección Personal
-          <div style={{ marginTop: 8, fontSize: 13 }}>
-            Imprimir N° Orden :
-            <input
-              type="text"
-              value={form.norden}
-              name="norden"
-              onChange={handleInputChange}
-              style={{
-                width: 80,
-                marginLeft: 8,
-                border: "1px solid #ccc",
-                borderRadius: 3,
-                padding: "2px 6px",
-                fontSize: 13,
-                color: "#000",
-              }}
-            />
-            <button
-              onClick={handlePrint}
-              style={{
-                marginLeft: 4,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#000",
-                fontSize: 16,
-              }}
-            >
-              <i className="fas fa-print"></i>
-            </button>
-          </div>
-        </div>
-        <fieldset
-          style={{
-            border: "1px solid #bbb",
-            borderRadius: 4,
-            padding: 8,
-            minWidth: 260,
-          }}
-        >
-          <button
-            onClick={handleGuardar}
-            style={{
-              height: 32,
-              background: "#059669",
-              color: "#fff",
-              border: "none",
-              borderRadius: 3,
-              padding: "0 16px",
-              marginRight: 8,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              fontSize: 13,
-            }}
-          >
-            <i className="fas fa-save" style={{ marginRight: 6 }}></i>{" "}
-            Guardar/Actualizar
-          </button>
-          <button
-            onClick={handleClean}
-            style={{
-              height: 32,
-              background: "#fc6b03",
-              color: "#fff",
-              border: "none",
-              borderRadius: 3,
-              padding: "0 16px",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              fontSize: 13,
-            }}
-          >
-            <i className="fas fa-broom" style={{ marginRight: 6 }}></i> Limpiar
-          </button>
-        </fieldset>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-            marginLeft: 16,
-            width: "50%",
-          }}
-        >
-          <div className="flex  items-center ">
-            <p className="min-w-[120px]">DNI Responsable :</p>
-            <input
-              type="text"
-              disabled
-              value={form.dniUser}
-              className="p-2 w-full"
-              style={{
-                marginLeft: 4,
-                fontSize: 13,
-                color: "#000",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-              }}
-            />
-          </div>
-          <div className="flex  items-center ">
-            <p className="min-w-[120px]"> Nombres :</p>
-            <input
-              type="text"
-              disabled
-              value={form.nombreUser}
-              className="p-2 w-full"
-              style={{
-                marginLeft: 4,
-                fontSize: 13,
-                color: "#000",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-              }}
-            />
-          </div>
-          <div className="flex items-center w-full">
-            <EmpleadoComboBox
-              className="flex w-full"
-              value={form.nombre_medico}
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
