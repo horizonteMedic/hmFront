@@ -10,7 +10,8 @@ export const useAuthStore = create(
     listAccesos: [],
     listaEmpleados: [],
     datosFooter: null,
-    selectedSede: null,              // 👈 NUEVO
+    selectedSede: null,
+    campaniaActiva: null,
     setSelectedSede: (sede) => set({ selectedSede: sede }),
     setdatosFooter: (datosFooter) => set({ datosFooter }),
     setlistView: (listView) => set({ listView }),
@@ -18,6 +19,7 @@ export const useAuthStore = create(
     setuserlogued: (userlogued) => set({ userlogued }),
     setListaEmpleados: (listaEmpleados) => set({ listaEmpleados }),
     setToken: (token) => set({ token }),
+    setCampaniaActiva: (campania) => set({ campaniaActiva: campania }),
   }),
     {
       name: 'auth'
