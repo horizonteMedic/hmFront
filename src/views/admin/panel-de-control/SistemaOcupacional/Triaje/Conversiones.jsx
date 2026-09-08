@@ -1,4 +1,39 @@
 import Swal from "sweetalert2"
+import {
+    DIAGNOSTICOS_RELACIONADOS,
+    GRUPO_DIAGNOSTICOS_IMC,
+    GRUPOS_DIAGNOSTICOS_RELACIONADOS_UNICOS,
+} from "../../../../../db/constants"
+
+// Agrega `idNuevo` a `formularios` respetando los grupos de diagnósticos
+// relacionados mutuamente excluyentes: si el diagnóstico entrante pertenece a
+// un grupo (ver GRUPOS_DIAGNOSTICOS_RELACIONADOS_UNICOS), se elimina cualquier
+// otro diagnóstico de ese mismo grupo antes de agregarlo. Si el grupo no tenía
+// ninguno, simplemente se agrega.
+// - `idNuevo`: id del diagnóstico a agregar; `null` para sólo limpiar el grupo.
+// - `grupo`: grupo a limpiar cuando `idNuevo` es `null` (no se puede deducir
+//   sin un id). Si se omite y `idNuevo` tiene valor, el grupo se busca solo.
+// Devuelve la lista renumerada por `ordenFila`.
+const setDiagnosticoRelacionadoUnico = (formularios, idNuevo, grupo = null) => {
+    const grupoObjetivo =
+        grupo ||
+        GRUPOS_DIAGNOSTICOS_RELACIONADOS_UNICOS.find(g => g.includes(idNuevo)) ||
+        []
+    const aRemover = grupoObjetivo.filter(id => id !== idNuevo)
+
+    const base = (formularios || []).filter(f => !aRemover.includes(f.id))
+
+    if (idNuevo && !base.some(f => f.id === idNuevo)) {
+        base.push({
+            id: idNuevo,
+            formularioId: null,
+            ordenFila: 0,
+            diagnosticoPersonalizado: '',
+            detalle: null,
+        })
+    }
+    return base.map((f, i) => ({ ...f, ordenFila: i + 1 }))
+}
 
 export const Convert = async (event, triaje, set, s) => {
     if (!triaje.talla) {
@@ -46,17 +81,41 @@ export const GetCintura = async (event, triaje, set, s) => {
         if (triaje.imc) {
             const imc = triaje.imc
             if (imc < 18.5) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: BAJO DE PESO.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: BAJO DE PESO.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, DIAGNOSTICOS_RELACIONADOS.BAJO_DE_PESO),
+                }))
             } else if (imc >= 18.5 && imc < 25) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: NORMAL.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: NORMAL.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, null, GRUPO_DIAGNOSTICOS_IMC),
+                }))
             } else if (imc >= 25 && imc < 30) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: SOBREPESO.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: SOBREPESO.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, null, GRUPO_DIAGNOSTICOS_IMC),
+                }))
             } else if (imc >= 30 && imc < 35) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, DIAGNOSTICOS_RELACIONADOS.OBESIDAD_TIPO_1),
+                }))
             } else if (imc >= 35 && imc < 40) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, DIAGNOSTICOS_RELACIONADOS.OBESIDAD_TIPO_2),
+                }))
             } else if (imc >= 40) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.' + "\n" }))
+                set(d => ({
+                    ...d,
+                    diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.' + "\n",
+                    formulariosDiagnostico: setDiagnosticoRelacionadoUnico(d.formulariosDiagnostico, DIAGNOSTICOS_RELACIONADOS.OBESIDAD_TIPO_3),
+                }))
             }
         }
 

@@ -2,6 +2,8 @@ import { useState } from "react";
 import DiagnosticoRelacionadoModal from "./DiagnosticoRelacionadoModal";
 import DiagnosticoRelacionadoSeleccionadosList from "./DiagnosticoRelacionadoSeleccionadosList";
 import { useDiagnosticoRelacionadoCatalogo } from "./useDiagnosticoRelacionadoCatalogo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 /**
  * Campo "todo en uno" de Diagnóstico Relacionado: botón que abre el
@@ -41,8 +43,8 @@ export default function DiagnosticoRelacionadoField({
 
   return (
     <div className="flex flex-col gap-2">
-      <button type="button" className={buttonClassName} onClick={() => setModalVisible(true)}>
-        {label}
+      <button type="button" className={`${buttonClassName} max-w-[170px] ml-auto -mb-6 `} onClick={() => setModalVisible(true)}>
+        <FontAwesomeIcon icon={faPlus} className="mr-1"/> {label}
       </button>
 
       <DiagnosticoRelacionadoModal

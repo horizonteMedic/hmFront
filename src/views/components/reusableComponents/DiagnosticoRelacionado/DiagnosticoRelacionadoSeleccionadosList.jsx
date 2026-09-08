@@ -55,8 +55,8 @@ export default function DiagnosticoRelacionadoSeleccionadosList({
 
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-sm font-semibold text-sky-700">
-        Diagnósticos Relacionados Seleccionados ({elegidos.length})
+      <span className=" font-semibold text-sky-700 text-base">
+        Diagnósticos Relacionados ({elegidos.length})
         {hint && elegidos.length > 0 && (
           <span className="ml-2 font-normal text-gray-400">
             — arrastra una fila para ordenar
