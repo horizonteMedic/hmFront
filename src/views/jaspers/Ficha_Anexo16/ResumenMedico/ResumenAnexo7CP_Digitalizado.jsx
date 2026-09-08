@@ -595,7 +595,7 @@ export default async function ResumenAnexo7CP_Digitalizado(data = {}, docExisten
 
   // Dibujar todas las filas dinámicamente
   yPos = dibujarFilaDinamica("EVALUACIÓN OFTALMOLÓGICA:", datosFinales.evaluaciones.oftalmologica, yPos);
-  yPos = dibujarFilaDinamica("EXAMEN  :", datosFinales.evaluaciones.auditiva, yPos);
+  yPos = dibujarFilaDinamica("AUDIOMETRIA:", datosFinales.evaluaciones.auditiva, yPos);
   yPos = dibujarFilaDinamica("RADIOGRAFÍA DE TÓRAX:", datosFinales.evaluaciones.radiografia, yPos);
   yPos = dibujarFilaDinamica("ESPIROMETRÍA:", datosFinales.evaluaciones.espirometria, yPos);
   yPos = dibujarFilaDinamica("ELECTROCARDIOGRAMA:", datosFinales.evaluaciones.electrocardiograma, yPos);
