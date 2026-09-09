@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import styles from "./HistoriaOcupacional.module.css";
 import AutoResizeInput from "./Inputs";
 import {
   handleSearch,
@@ -25,6 +24,20 @@ import BotonesForm from "../../../../components/templates/BotonesForm";
 
 const today = getToday();
 const tabla = "historia_oc_info";
+
+// Estilos de la tabla de experiencia ocupacional (antes en HistoriaOcupacional.module.css).
+// Se aplican a <th>/<td> con variantes arbitrarias para no depender de una hoja CSS.
+const historiaTableClass = [
+  "w-full border-collapse bg-white",
+  // Celdas (th + td): borde gris, padding en em y alineación a la izquierda.
+  "[&_th]:border [&_th]:border-gray-300 [&_th]:px-[0.7em] [&_th]:py-[0.5em] [&_th]:text-left",
+  "[&_td]:border [&_td]:border-gray-300 [&_td]:px-[0.7em] [&_td]:py-[0.5em] [&_td]:text-left",
+  // Encabezados: fondo gris, negrita, color primario y borde inferior grueso.
+  "[&_th]:bg-gray-100 [&_th]:font-bold [&_th]:text-primario [&_th]:tracking-[0.2px] [&_th]:border-b-[2.5px] [&_th]:border-b-primario",
+  // Primera columna (Año): ancho acotado y centrada.
+  "[&_th:first-child]:w-[70px] [&_th:first-child]:min-w-[60px] [&_th:first-child]:max-w-[90px] [&_th:first-child]:text-center",
+  "[&_td:first-child]:w-[70px] [&_td:first-child]:min-w-[60px] [&_td:first-child]:max-w-[90px] [&_td:first-child]:text-center",
+].join(" ");
 
 // Campos propios del formulario que el usuario puede editar en un registro existente
 // (para resaltar/revertir cambios). Los detalles de experiencia ocupacional se
@@ -481,10 +494,7 @@ const HistoriaOcupacional = ({ listas }) => {
   });
 
   return (
-    <div
-      className="px-4 max-w-[95%] xl:max-w-[90%] mx-auto space-y-3"
-      style={{ color: "#000" }}
-    >
+    <div className="px-4 max-w-[95%] xl:max-w-[90%] mx-auto space-y-3 text-black">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -555,10 +565,7 @@ const HistoriaOcupacional = ({ listas }) => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table
-              className={styles.historiaTable}
-              style={{ fontSize: 13, color: "#000" }}
-            >
+            <table className={`${historiaTableClass} text-[13px] text-black`}>
               <thead>
                 <tr>
                   <th>Año</th>
@@ -802,44 +809,13 @@ const HistoriaOcupacional = ({ listas }) => {
 
       {/* ===== MODAL: AGREGAR REGISTRO OCUPACIONAL ===== */}
       {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            zIndex: 1000,
-            overflowY: "auto",
-            padding: "40px 16px",
-          }}
-        >
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 8,
-              padding: 24,
-              width: "1200px",
-              maxWidth: "95vw",
-              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: 15,
-                fontWeight: "bold",
-                marginBottom: 16,
-                color: "#000",
-              }}
-            >
+        <div className="fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto bg-black/50 py-10 px-[16px]">
+          <div className="w-[1200px] max-w-[95vw] rounded-lg bg-white p-6 shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+            <h3 className="mb-[16px] text-[15px] font-bold text-black">
               Agregar registro ocupacional
             </h3>
             <div className="overflow-x-auto">
-              <table
-                className={`${styles.historiaTable} mb-48`}
-                style={{ fontSize: 13, color: "#000" }}
-              >
+              <table className={`${historiaTableClass} mb-48`}>
                 <thead>
                   <tr>
                     <th rowSpan={2}>Año</th>
@@ -848,7 +824,7 @@ const HistoriaOcupacional = ({ listas }) => {
                     <th rowSpan={2}>Actividad</th>
                     <th rowSpan={2}>Área Empresa</th>
                     <th rowSpan={2}>Ocupación</th>
-                    <th colSpan={2} style={{ textAlign: "center" }}>
+                    <th colSpan={2} className="!text-center">
                       Tiempo de Labor
                     </th>
                     <th rowSpan={2}>Riesgos</th>
@@ -1497,50 +1473,20 @@ const HistoriaOcupacional = ({ listas }) => {
                 </tbody>
               </table>
             </div>
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                justifyContent: "flex-end",
-                marginTop: 20,
-              }}
-            >
+            <div className="mt-[20px] flex justify-end gap-2">
               <button
                 type="button"
                 onClick={handleRegistrar}
-                style={{
-                  height: 32,
-                  background: "#059669",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 3,
-                  padding: "0 16px",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  fontSize: 13,
-                }}
+                className="inline-flex h-8 cursor-pointer items-center rounded-[3px] border-none bg-[#059669] px-[16px] text-[13px] text-white"
               >
-                <i className="fas fa-save" style={{ marginRight: 6 }}></i> Guardar
+                <i className="fas fa-save mr-1.5"></i> Guardar
               </button>
               <button
                 type="button"
                 onClick={handleCancelModal}
-                style={{
-                  height: 32,
-                  background: "#6b7280",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 3,
-                  padding: "0 16px",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  fontSize: 13,
-                }}
+                className="inline-flex h-8 cursor-pointer items-center rounded-[3px] border-none bg-[#6b7280] px-[16px] text-[13px] text-white"
               >
-                <i className="fas fa-times" style={{ marginRight: 6 }}></i>{" "}
-                Cancelar
+                <i className="fas fa-times mr-1.5"></i> Cancelar
               </button>
             </div>
           </div>
