@@ -625,7 +625,7 @@ const TabComponent = () => {
               },
               20: { title: "Módulo de Consentimientos", child: <ConsentimientosTabSelector tieneVista={tieneVista} /> },
               21: {
-                title: undefined, child: (
+                title: "Cuestionario Nórdico de Signos y Síntomas Osteomusculares", child: (
                   <Cuestionario_Nordico
                     token={token}
                     userlogued={userlogued.sub}

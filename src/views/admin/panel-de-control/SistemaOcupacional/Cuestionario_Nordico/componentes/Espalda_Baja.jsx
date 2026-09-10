@@ -1,4 +1,4 @@
-const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleChange, handleChangeNumber, handleClearnotO, handleInputChangeChecked}) => {
+const Espalda_Baja = ({ form, setForm }) => {
     
     const handleInputChangeCheckedEB = (e) => {
         const { name } = e.target;
@@ -64,7 +64,7 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
    
     return(
         <>
-            <div className="flex w-full text-xl border rounded p-4 mt-6">
+            <div className="flex w-full text-xl">
                 <div className="flex flex-col w-full">
                     <div className="flex">
                         <div className="flex flex-col w-[80%]">

@@ -1,4 +1,4 @@
-const Responder = ({token, selectedSede, userlogued, form, setForm, handleChange, handleChangeNumber, handleClearnotO, handleInputChangeChecked}) => {
+const Responder = ({ form, setForm }) => {
     
     const handleInputChangeCheckedGroup = (e, group) => {
         const { name } = e.target;
@@ -22,7 +22,7 @@ const Responder = ({token, selectedSede, userlogued, form, setForm, handleChange
     
     return(
         <>
-            <div className="flex w-full text-xl border rounded p-4 mt-6">
+            <div className="flex w-full text-xl">
                 <div className="flex flex-col">
 
                     <div className="flex w-full border rounded p-3 divide-x">

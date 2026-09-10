@@ -1,8 +1,4 @@
-import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-
-const Cuello = ({ token, userlogued, form, setForm, handleInputChangeChecked, handleChangeSimple, SubmitCuestionarioNordic, tabla, handleClear, handleChange, handlePrint }) => {
+const Cuello = ({ form, setForm }) => {
 
     const handleInputChangeChecked4 = (e) => {
         const { name } = e.target;
@@ -68,7 +64,7 @@ const Cuello = ({ token, userlogued, form, setForm, handleInputChangeChecked, ha
 
     return (
         <>
-            <div className="flex w-full text-xl border rounded p-4 mt-6">
+            <div className="flex w-full text-xl">
                 <div className="flex flex-col w-full">
                     <div className="flex">
                         <div className="flex flex-col w-[80%]">
@@ -180,52 +176,7 @@ const Cuello = ({ token, userlogued, form, setForm, handleInputChangeChecked, ha
                             <input disabled={form.pregunta1ProblemasCuelloNo} checked={form.pregunta8ProblemasCuelloSi} onChange={(e) => { handleInputChangeCheckedGroup(e, ["pregunta8ProblemasCuelloNo", "pregunta8ProblemasCuelloSi"]) }} type="checkbox" name="pregunta8ProblemasCuelloSi" id="" className=" mx-3" />
                         </div>
                     </div>
-                    <EmpleadoComboBox
-                        value={form.nombre_medico}
-                        form={form}
-                        onChange={handleChangeSimple}
-                    />
-                    <div className="flex justify-between my-3">
-                        <div className="flex items-center gap-1">
-                            <span className="font-bold italic text-base mb-1">Imprimir</span>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    name="norden"
-                                    value={form.norden}
-                                    onChange={handleChange}
-                                    className="border rounded px-2 py-1 text-base w-24"
-                                />
-
-                                <button
-                                    type="button"
-                                    onClick={handlePrint}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPrint} />
-                                </button>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <button
-                                type="button"
-                                onClick={() => { SubmitCuestionarioNordic(form, token, userlogued, handleClear, tabla) }}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleClear}
-                                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faBroom} /> Limpiar
-                            </button>
-                        </div>
-                    </div>
                 </div>
-
-
-
             </div>
         </>
     )

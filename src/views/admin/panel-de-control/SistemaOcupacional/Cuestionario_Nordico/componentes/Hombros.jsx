@@ -1,4 +1,4 @@
-const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, handleChangeNumber, handleClearnotO, handleInputChangeChecked}) => {
+const Hombros = ({ form, setForm }) => {
     
     const handleInputChangeChecked1 = (e) => {
         const { name } = e.target;
@@ -127,7 +127,7 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
     
     return(
         <>
-            <div className="flex w-full text-xl border rounded p-4 mt-6">
+            <div className="flex w-full text-xl">
                 <div className="flex flex-col w-full">
                     <div className="flex">
                         <div className="flex flex-col w-[80%]">
