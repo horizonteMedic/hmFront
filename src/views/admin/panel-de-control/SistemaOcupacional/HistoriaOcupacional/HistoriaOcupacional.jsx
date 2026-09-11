@@ -482,7 +482,7 @@ const HistoriaOcupacional = ({ listas }) => {
   // ===== Impresión =====
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla);
+      PrintHojaR(form.norden, token, tabla, selectedSede);
     });
   };
 
@@ -531,15 +531,7 @@ const HistoriaOcupacional = ({ listas }) => {
           labelWidth="120px"
           edited={isFieldEdited("fecha")}
           onRevert={() => revertField("fecha")}
-        />
-        <InputTextOneLine
-          label="Área de Trabajo"
-          name="areaO"
-          value={form.areaO}
-          disabled
-          labelWidth="120px"
-          className="lg:col-span-2"
-        />
+        /> 
       </SectionFieldset>
 
       {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
@@ -564,7 +556,10 @@ const HistoriaOcupacional = ({ listas }) => {
             Aquí se mostrarán los registros
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          // max-h fijado en px (no rem) porque :root tiene font-size:10px !important
+          // en este módulo, lo que rompería la escala de las utilidades max-h-* de Tailwind.
+          // 120px = encabezado + 3 filas (~29.5px c/u); desde la 4ta fila aparece scroll vertical.
+          <div className="overflow-auto max-h-[460px]">
             <table className={`${historiaTableClass} text-[13px] text-black`}>
               <thead>
                 <tr>
@@ -753,7 +748,7 @@ const HistoriaOcupacional = ({ listas }) => {
         legend="Responsable y Médico que Certifica"
         className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3"
       >
-        <InputTextOneLine
+        {/* <InputTextOneLine
           label="DNI Responsable"
           name="dniUser"
           value={form.dniUser}
@@ -766,7 +761,7 @@ const HistoriaOcupacional = ({ listas }) => {
           value={form.nombreUser}
           disabled
           labelWidth="150px"
-        />
+        /> */}
         <div className="md:col-span-2">
           <EmpleadoComboBox
             value={form.nombre_medico}

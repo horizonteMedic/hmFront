@@ -3,9 +3,12 @@ import { getFetch } from "../../../getFetch/getFetch.js";
 import { SubmitHistoriaOcupacional } from "../model/model.js";
 import { convertirGenero } from "../../../../../utils/helpers.js";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils.js";
+import {
+  verificarRegistro,
+  validarSede,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 // ===== Configuración =====
-const existenciaUrl = "/api/v01/ct/consentDigit/existenciaExamenes";
 const infoPacienteUrl = "/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros";
 const detallesPorNordenUrl =
   "/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden";
@@ -58,45 +61,27 @@ const ordenarDetalles = (detalles = []) =>
 // ===== Verificación por N° Orden =====
 // Decide si el N° Orden corresponde a un registro NUEVO o EXISTENTE y delega la
 // carga en el mapeo correspondiente. Mantiene el flujo original (id === 0 -> nuevo).
-export const VerifyTR = async (nro, tabla, token, set, sede, setTable) => {
-  if (!nro) {
-    await Swal.fire(
-      "Error",
-      "Debe Introducir un N° Orden válido",
-      "error"
-    );
-    return;
-  }
-
-  Loading("Validando datos");
-  const res = await getFetch(
-    `${existenciaUrl}?nOrden=${nro}&nomService=${tabla}`,
-    token
-  );
-
-  if (!res || res.error) {
-    Swal.fire(
-      "Norden no encontrado",
-      `No se encontraron registros para el N° Orden ${nro}.`,
-      "warning"
-    );
-    return;
-  }
-
-  if (res.id === 0) {
-    // Registro NUEVO: datos del paciente + historia ocupacional previa.
-    const dni = await GetInfoServicio(nro, set, token, sede);
-    GetInfoAnterior(dni, nro, token, setTable, sede);
-  } else {
-    // Registro EXISTENTE.
-    Swal.fire(
-      "Alerta",
-      "Este paciente ya cuenta con registros de Historia Ocupacional.",
-      "warning"
-    );
-    GetInfoServicioEditar(nro, tabla, set, token, setTable);
-  }
-};
+export const VerifyTR = (nro, tabla, token, set, sede, setTable) =>
+  verificarRegistro({
+    nro,
+    tabla,
+    token,
+    sede,
+    onNuevo: async () => {
+      // Registro NUEVO: datos del paciente + historia ocupacional previa.
+      const dni = await GetInfoServicio(nro, set, token, sede);
+      GetInfoAnterior(dni, nro, token, setTable, sede);
+    },
+    onExistente: () => {
+      // Registro EXISTENTE.
+      Swal.fire(
+        "Alerta",
+        "Este paciente ya cuenta con registros de Historia Ocupacional.",
+        "warning"
+      );
+      GetInfoServicioEditar(nro, tabla, set, token, setTable);
+    },
+  });
 
 // ===== Mapeo: Registro nuevo (datos del paciente) =====
 // Devuelve el DNI del paciente para poder buscar su historia previa.
@@ -288,36 +273,64 @@ export const SubmiteHistoriaOcupacionalController = async (
 };
 
 // ===== Impresión =====
-export const PrintHojaR = (nro, token, tabla) => {
+// El reporte Jasper de Historia Ocupacional se resuelve dinámicamente por
+// `res.nameJasper` (no por una ruta fija), por eso no usa el helper genérico
+// `imprimirReporteJasper`; en su lugar valida la sede con `validarSede` (mismo
+// criterio "Sede incorrecta" que los demás formularios) antes de imprimir.
+export const PrintHojaR = async (nro, token, tabla, sede) => {
   Loading("Cargando Formato a Imprimir");
-  getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
-    token
-  )
-    .then(async (res) => {
-      if (res && res.norden) {
-        const nombre = res.nameJasper;
-        const loader =
-          jasperModules[
-            `../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`
-          ];
-        if (!loader) {
-          console.error(`Jasper no encontrado: ${nombre}`);
-          Swal.fire("Error", "No se encontró el formato de impresión.", "error");
-          return;
-        }
-        const modulo = await loader();
-        if (typeof modulo.default === "function") {
-          modulo.default(res);
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
-        }
+
+  // Validar que la Orden pertenezca a la sede actual (solo en impresión manual).
+  if (sede) {
+    const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
+    if (estadoSede === "otraSede") {
+      Swal.fire(
+        "Sede incorrecta",
+        `El N° Orden ${nro} pertenece a la sede:${descripcionSede ? ` ${descripcionSede}` : ""}.`,
+        "warning"
+      );
+      return;
+    }
+    if (estadoSede !== "ok") {
+      // "noEncontrado" (inconsistente con existenciaExamenes) o "error".
+      Swal.fire(
+        "Error",
+        `Verifique el número de orden ${nro} e intente nuevamente.`,
+        "error"
+      );
+      return;
+    }
+  }
+
+  try {
+    const res = await getFetch(
+      `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
+      token
+    );
+    if (res && res.norden) {
+      const nombre = res.nameJasper;
+      const loader =
+        jasperModules[
+          `../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`
+        ];
+      if (!loader) {
+        console.error(`Jasper no encontrado: ${nombre}`);
+        Swal.fire("Error", "No se encontró el formato de impresión.", "error");
+        return;
       }
-      Swal.close();
-    })
-    .catch(() => Swal.close());
+      const modulo = await loader();
+      if (typeof modulo.default === "function") {
+        modulo.default(res);
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+    }
+    Swal.close();
+  } catch {
+    Swal.close();
+  }
 };
 
 // ===== Autocompletables (empresa, altitud, área, ocupación, riesgo, protección) =====
