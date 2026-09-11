@@ -33,7 +33,7 @@ export default function AccionesRegistroHeader({
     hayRegistroCargado && tieneRegistro && !edicionHabilitada;
 
   const mostrarLimpiar =
-    hayRegistroCargado && tieneRegistro ;
+    hayRegistroCargado;
 
   return (
     <div className="sticky top-2 z-20 my-4 flex justify-end items-center gap-3 pointer-events-none">

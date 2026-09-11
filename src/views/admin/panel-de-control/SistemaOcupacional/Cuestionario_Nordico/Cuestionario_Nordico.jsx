@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -24,6 +24,7 @@ import Responder from "./componentes/Responder";
 import Espalda_Baja from "./componentes/Espalda_Baja";
 import Hombros from "./componentes/Hombros";
 import Cuello from "./componentes/Cuello";
+import IndiceNordico from "./componentes/IndiceNordico";
 import {
   VerifyTR,
   SubmitCuestionarioNordic,
@@ -35,6 +36,19 @@ import {
 
 const today = getToday();
 const tabla = "cuestionario_nordico";
+
+// Entradas del índice lateral (nuevo formato). Cada `id` debe existir como
+// atributo id en el wrapper de su sección para que el scroll y el resaltado
+// activo funcionen.
+const SECCIONES_NORDICO = [
+  { id: "nordico-sec-1", num: "01", label: "Datos del trabajo" },
+  { id: "nordico-sec-2", num: "02", label: "Signos y síntomas" },
+  { id: "nordico-sec-2-guia", num: "02·A", label: "Guía corporal", sub: true },
+  { id: "nordico-sec-2-tabla", num: "02·B", label: "Síntomas por zona", sub: true },
+  { id: "nordico-sec-3", num: "03", label: "Espalda baja" },
+  { id: "nordico-sec-4", num: "04", label: "Hombros" },
+  { id: "nordico-sec-5", num: "05", label: "Cuello" },
+];
 
 // Campos propios que el usuario puede editar en un registro existente (resaltar/revertir).
 // Las ~180 preguntas del cuestionario respetan solo el bloqueo general (fieldset disabled).
@@ -283,6 +297,68 @@ const Cuestionario_Nordico = () => {
 
   const [visualerOpen, setVisualerOpen] = useState(null);
 
+  // ===== Índice horizontal =====
+  // `seccionActiva`  -> chip resaltado según el scroll.
+  // `indiceFijoVisible` -> la barra fija (position: fixed) solo se muestra
+  //   mientras el bloque del cuestionario ocupa la parte superior del viewport.
+  const [seccionActiva, setSeccionActiva] = useState(SECCIONES_NORDICO[0].id);
+  const [indiceFijoVisible, setIndiceFijoVisible] = useState(false);
+  const bloqueCuestionarioRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const els = SECCIONES_NORDICO.map((s) => document.getElementById(s.id)).filter(
+      Boolean
+    );
+    if (!els.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibles = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visibles[0]) setSeccionActiva(visibles[0].target.id);
+      },
+      // -72px arriba = alto aprox. de la barra fija.
+      { rootMargin: "-72px 0px -55% 0px", threshold: 0 }
+    );
+
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Mostrar/ocultar la barra fija según la posición del bloque del cuestionario.
+  useEffect(() => {
+    const el = bloqueCuestionarioRef.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      setIndiceFijoVisible(r.top <= 8 && r.bottom >= 120);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const irASeccion = (e, id) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setSeccionActiva(id);
+    }
+  };
+
   // ===== Búsqueda por N° Orden =====
   const executeSearch = () => {
     handleClearnotO();
@@ -335,7 +411,7 @@ const Cuestionario_Nordico = () => {
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
-      /> 
+      />
 
       {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
       <SectionFieldset
@@ -346,12 +422,14 @@ const Cuestionario_Nordico = () => {
           <InputTextOneLine
             label="N° Orden"
             name="norden"
+            type="text"
             value={form.norden}
             onChange={handleChangeNumber}
             onKeyUp={handleSearch}
             disabled={hayRegistroCargado}
             labelWidth="120px"
-            className="w-full"
+            className="flex-1"
+
           />
           <SearchButton onClick={executeSearch} className="lg:hidden" />
         </div>
@@ -376,17 +454,17 @@ const Cuestionario_Nordico = () => {
         <ButtonsPDF
           {...(form.SubirDoc
             ? {
-                handleSave: () => {
-                  handleSubirArchivo(form, selectedSede, userlogued, token);
-                },
-              }
+              handleSave: () => {
+                handleSubirArchivo(form, selectedSede, userlogued, token);
+              },
+            }
             : {})}
           {...(form.SubirDoc
             ? {
-                handleRead: () => {
-                  ReadArchivosForm(form, setVisualerOpen, token);
-                },
-              }
+              handleRead: () => {
+                ReadArchivosForm(form, setVisualerOpen, token);
+              },
+            }
             : {})}
           handleMasivo={() => {
             handleSubirArchivoMasivo(form, selectedSede, userlogued, token);
@@ -395,36 +473,64 @@ const Cuestionario_Nordico = () => {
       </SectionFieldset>
 
       {/* ===== SECCIONES DEL CUESTIONARIO =====
-          Se bloquean en conjunto cuando se ve un registro existente sin edición
-          habilitada (fieldset disabled nativo -> deshabilita todos los controles). */}
-      <fieldset
-        disabled={camposDeshabilitados}
-        className="m-0 p-0 border-0 space-y-3 disabled:opacity-70"
-      >
-        <SectionFieldset legend="1. Datos Personales del Trabajo">
-          <Cuestionario
-            form={form}
-            setForm={setForm}
-            handleChangeNumber={handleChangeNumber}
-          />
-        </SectionFieldset>
+          - Índice horizontal: uno en el flujo (inline) + una barra fija que
+            aparece al recorrer las secciones 1 → 5.
+          - El <fieldset disabled> bloquea en conjunto todas las preguntas cuando
+            se ve un registro existente sin edición habilitada. */}
+      <div ref={bloqueCuestionarioRef} className="space-y-3">
+        <IndiceNordico
+          secciones={SECCIONES_NORDICO}
+          activeId={seccionActiva}
+          onNavigate={irASeccion}
+          mode="inline"
+        />
+        <IndiceNordico
+          secciones={SECCIONES_NORDICO}
+          activeId={seccionActiva}
+          onNavigate={irASeccion}
+          mode="fixed"
+          visible={indiceFijoVisible}
+        />
 
-        <SectionFieldset legend="Signos y Síntomas Osteomusculares (últimos 12 meses)">
-          <Responder form={form} setForm={setForm} />
-        </SectionFieldset>
+        <fieldset
+          disabled={camposDeshabilitados}
+          className="m-0 p-0 border-0 space-y-3 disabled:opacity-70"
+        >
+          <div id="nordico-sec-1" className="scroll-mt-[70px]">
+            <SectionFieldset legend="1. Datos Personales del Trabajo">
+              <Cuestionario
+                form={form}
+                setForm={setForm}
+                handleChangeNumber={handleChangeNumber}
+              />
+            </SectionFieldset>
+          </div>
 
-        <SectionFieldset legend="3. Problemas con la Espalda Baja">
-          <Espalda_Baja form={form} setForm={setForm} />
-        </SectionFieldset>
+          <div id="nordico-sec-2" className="scroll-mt-[70px]">
+            <SectionFieldset legend="2. Problemas con los órganos de la locomoción">
+              <Responder form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
 
-        <SectionFieldset legend="4. Problemas con los Hombros">
-          <Hombros form={form} setForm={setForm} />
-        </SectionFieldset>
+          <div id="nordico-sec-3" className="scroll-mt-[70px]">
+            <SectionFieldset legend="3. Problemas con la Espalda Baja">
+              <Espalda_Baja form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
 
-        <SectionFieldset legend="5. Problemas con el Cuello">
-          <Cuello form={form} setForm={setForm} />
-        </SectionFieldset>
-      </fieldset>
+          <div id="nordico-sec-4" className="scroll-mt-[70px]">
+            <SectionFieldset legend="4. Problemas con los Hombros">
+              <Hombros form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+
+          <div id="nordico-sec-5" className="scroll-mt-[70px]">
+            <SectionFieldset legend="5. Problemas con el Cuello">
+              <Cuello form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+        </fieldset>
+      </div>
 
       {/* ===== SECCIÓN: ASIGNACIÓN DE MÉDICO ===== */}
       <SectionFieldset legend="Asignación de Médico">

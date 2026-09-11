@@ -1,332 +1,368 @@
+import { ComoResponder, Opt } from "./NordicoUI";
+
+/**
+ * Mapa de zonas del cuerpo. Cada entrada conserva EXACTAMENTE los nombres de
+ * campo del `form` original: la casilla de presencia (par No/Sí o las 4 opciones
+ * derecha/izquierda/ambos), la clave que deshabilita las sub-preguntas (`dis`)
+ * y los pares No/Sí de las dos sub-preguntas (q1 = impedimento de rutinas,
+ * q2 = molestias en los últimos 7 días).
+ */
+const ZONAS = [
+  {
+    label: "Cuello",
+    hint: "",
+    presencia: { tipo: "sino", grupo: ["cuelloNo", "cuelloSi"], no: "cuelloNo", si: "cuelloSi" },
+    dis: "cuelloNo",
+    q1: { no: "pregunta1CuelloNo", si: "pregunta1CuelloSi" },
+    q2: { no: "pregunta2CuelloNo", si: "pregunta2CuelloSi" },
+  },
+  {
+    label: "Hombros",
+    hint: "Derecho, izquierdo o ambos",
+    presencia: {
+      tipo: "multi",
+      grupo: ["hombrosNo", "hombroDerechoSi", "hombroIzquierdoSi", "ambosHombrosSi"],
+      opciones: [
+        { code: "hombrosNo", label: "No" },
+        { code: "hombroDerechoSi", label: "Sí, en el hombro derecho" },
+        { code: "hombroIzquierdoSi", label: "Sí, en el hombro izquierdo" },
+        { code: "ambosHombrosSi", label: "Sí, en ambos hombros" },
+      ],
+    },
+    dis: "hombrosNo",
+    q1: { no: "pregunta1HombrosNo", si: "pregunta1HombrosSi" },
+    q2: { no: "pregunta2HombrosNo", si: "pregunta2HombrosSi" },
+  },
+  {
+    label: "Codos",
+    hint: "Derecho, izquierdo o ambos",
+    presencia: {
+      tipo: "multi",
+      grupo: ["codosNo", "codoDerechoSi", "codoIzquierdoNo", "ambosCodosSi"],
+      opciones: [
+        { code: "codosNo", label: "No" },
+        { code: "codoDerechoSi", label: "Sí, en el codo derecho" },
+        { code: "codoIzquierdoNo", label: "Sí, en el codo izquierdo" },
+        { code: "ambosCodosSi", label: "Sí, en ambos codos" },
+      ],
+    },
+    dis: "codosNo",
+    q1: { no: "pregunta1CodosNo", si: "pregunta1CodosSi" },
+    q2: { no: "pregunta2CodosNo", si: "pregunta2CodosSi" },
+  },
+  {
+    label: "Muñeca / mano",
+    hint: "Derecha, izquierda o ambas",
+    presencia: {
+      tipo: "multi",
+      grupo: ["munecaNo", "munecaDerechaSi", "munecaIzquierdaSi", "ambasMunecasSi"],
+      opciones: [
+        { code: "munecaNo", label: "No" },
+        { code: "munecaDerechaSi", label: "Sí, en la muñeca/mano derecha" },
+        { code: "munecaIzquierdaSi", label: "Sí, en la muñeca/mano izquierda" },
+        { code: "ambasMunecasSi", label: "Sí, en ambas muñecas/manos" },
+      ],
+    },
+    dis: "munecaNo",
+    q1: { no: "pregunta1MunecasNo", si: "pregunta1MunecasSi" },
+    q2: { no: "pregunta2MunecasNo", si: "pregunta2MunecasSi" },
+  },
+  {
+    label: "Espalda alta (tórax)",
+    hint: "",
+    presencia: {
+      tipo: "sino",
+      grupo: ["espaldaAltaToraxNo", "espaldaAltaToraxSi"],
+      no: "espaldaAltaToraxNo",
+      si: "espaldaAltaToraxSi",
+    },
+    dis: "espaldaAltaToraxNo",
+    q1: { no: "pregunta1EspaldaAltaToraxNo", si: "pregunta1EspaldaAltaToraxSi" },
+    q2: { no: "pregunta2EspaldaAltaToraxNo", si: "pregunta2EspaldaAltaToraxSi" },
+  },
+  {
+    label: "Espalda baja (región lumbar)",
+    hint: "",
+    presencia: {
+      tipo: "sino",
+      grupo: ["espaldaBajaLumbarNo", "espaldaBajaLumbarSi"],
+      no: "espaldaBajaLumbarNo",
+      si: "espaldaBajaLumbarSi",
+    },
+    dis: "espaldaBajaLumbarNo",
+    q1: { no: "pregunta1EspaldaBajaLumbarNo", si: "pregunta1EspaldaBajaLumbarSi" },
+    q2: { no: "pregunta2EspaldaBajaLumbarNo", si: "pregunta2EspaldaBajaLumbarSi" },
+  },
+  {
+    label: "Una o ambas caderas / muslos",
+    hint: "",
+    presencia: {
+      tipo: "sino",
+      grupo: ["caderasOMuslosNo", "caderasOMuslosSi"],
+      no: "caderasOMuslosNo",
+      si: "caderasOMuslosSi",
+    },
+    dis: "caderasOMuslosNo",
+    q1: { no: "pregunta1CaderasOMuslosNo", si: "pregunta1CaderasOMuslosSi" },
+    q2: { no: "pregunta2CaderasOMuslosNo", si: "pregunta2CaderasOMuslosSi" },
+  },
+  {
+    label: "Una o ambas rodillas",
+    hint: "",
+    presencia: {
+      tipo: "sino",
+      grupo: ["rodillasNo", "rodillasSi"],
+      no: "rodillasNo",
+      si: "rodillasSi",
+    },
+    dis: "rodillasNo",
+    q1: { no: "pregunta1RodillasNo", si: "pregunta1RodillasSi" },
+    q2: { no: "pregunta2RodillasNo", si: "pregunta2RodillasSi" },
+  },
+  {
+    label: "Uno o ambos tobillos / pies",
+    hint: "",
+    presencia: {
+      tipo: "sino",
+      grupo: ["tobillosOPiesNo", "tobillosOPiesSi"],
+      no: "tobillosOPiesNo",
+      si: "tobillosOPiesSi",
+    },
+    dis: "tobillosOPiesNo",
+    q1: { no: "pregunta1TobillosOPiesNo", si: "pregunta1TobillosOPiesSi" },
+    q2: { no: "pregunta2TobillosOPiesNo", si: "pregunta2TobillosOPiesSi" },
+  },
+];
+
+// const GUIA_ZONAS = [
+//   "Cuello",
+//   "Hombros",
+//   "Codos",
+//   "Muñecas / manos",
+//   "Espalda alta",
+//   "Espalda baja",
+//   "Caderas / muslos",
+//   "Rodillas",
+//   "Tobillos / pies",
+// ];
+
+// Plantilla de columnas de la tabla: zona · últimos 12 meses · impedimento · últimos 7 días.
+// IMPORTANTE: las clases se escriben LITERALES y completas. Tailwind (build) solo
+// genera las clases que encuentra tal cual en el código; `md:${variable}` NO se
+// genera. Por eso hay dos constantes: una con prefijo `md:` (filas del cuerpo) y
+// otra sin prefijo (cabecera, que ya vive dentro de un contenedor `hidden md:block`).
+const COL_GRID =
+  "md:grid md:grid-cols-[1.1fr_1.9fr_1.25fr_1.25fr] md:items-center md:gap-x-[16px]";
+const HEADER_GRID = "grid grid-cols-[1.1fr_1.9fr_1.25fr_1.25fr] gap-x-[16px]";
+
 const Responder = ({ form, setForm }) => {
-    
-    const handleInputChangeCheckedGroup = (e, group) => {
-        const { name } = e.target;
-        setForm(prev => {
-            const newForm = { ...prev };
+  const handleInputChangeCheckedGroup = (e, group) => {
+    const { name } = e.target;
+    setForm((prev) => {
+      const newForm = { ...prev };
 
-            if (prev[name]) {
-                // Si ya estaba activo, lo desmarcamos
-                newForm[name] = false;
-            } else {
-                // Desmarcar todos los del grupo recibido
-                group.forEach(code => newForm[code] = false);
+      if (prev[name]) {
+        // Si ya estaba activo, lo desmarcamos
+        newForm[name] = false;
+      } else {
+        // Desmarcar todos los del grupo recibido
+        group.forEach((code) => (newForm[code] = false));
 
-                // Activar solo el seleccionado
-                newForm[name] = true;
-            }
+        // Activar solo el seleccionado
+        newForm[name] = true;
+      }
 
-            return newForm;
-        });
-    };
-    
-    return(
-        <>
-            <div className="flex w-full text-xl">
-                <div className="flex flex-col">
+      return newForm;
+    });
+  };
 
-                    <div className="flex w-full border rounded p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <h1 className="text-center font-bold mb-14">Para ser respondido por todos</h1>
-                            <p className="p-3">Ha tenido Ud. Durante cualquier tiempo en los ultimos 12 meses problemas (molestias, dolor o disconfort) en:</p>
-                        </div>
-                        
-                        <div className="w-[55%]">
-                            <h1 className="font-bold text-center">Para ser respondido únicamente por quienes han tenido problemas</h1>
-                            <div className="flex mt-6 justify-center items-center divide-x">
-                                <div className="w-1/2 rounded p-3 divide-x">
-                                    <p>Ha estado impedido en cualquier tiempo durante los pasados 12 meses para hacer sus rutinas habituales en el trabajo o su casa por este problema?</p>
-                                </div>
-                                <div className="w-1/2  p-3  divide-x">
-                                    <p>Ud. Ha tenido problemas durante los ultimos 7 días?</p>
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
-                    {/*Cuello */}
-                    <div className="flex w-full pt-4 border  p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <div className="flex justify-between">
-                                <label htmlFor="">Cuello: </label>
-                                <div className="flex">
-                                    <label htmlFor="">No</label>
-                                    <input checked={form.cuelloNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["cuelloNo","cuelloSi"])}} type="checkbox" name="cuelloNo" id="" className=" mx-3"/>
-                                    <label htmlFor="" className="ml-4">Si</label>
-                                    <input checked={form.cuelloSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["cuelloNo","cuelloSi"])}} type="checkbox" name="cuelloSi" id="" className=" mx-3"/>
-                                </div>
-                            </div>
-                        </div>
-                        
-                       <div className="w-[55%] flex flex-col">
-                            <div className="flex justify-center">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.cuelloNo} checked={form.pregunta1CuelloNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CuelloNo","pregunta1CuelloSi"])}} name="pregunta1CuelloNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.cuelloNo} checked={form.pregunta1CuelloSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CuelloNo","pregunta1CuelloSi"])}} name="pregunta1CuelloSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.cuelloNo} checked={form.pregunta2CuelloNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CuelloNo","pregunta2CuelloSi"])}} name="pregunta2CuelloNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.cuelloNo} checked={form.pregunta2CuelloSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CuelloNo","pregunta2CuelloSi"])}} name="pregunta2CuelloSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
-                    {/*Hombros */}
-                    <div className="flex w-full pt-4 items-center border  p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <div className="flex ">
-                                <label htmlFor="" className="w-60">Hombros: </label>
-                                <div className="flex flex-col">
-                                    <div className="flex gap-1">
-                                        <input checked={form.hombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["hombrosNo","hombroDerechoSi","hombroIzquierdoSi","ambosHombrosSi"])}} name="hombrosNo" type="checkbox" id="" className=" mx-3"/>
-                                        <label htmlFor="">No</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.hombroDerechoSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["hombrosNo","hombroDerechoSi","hombroIzquierdoSi","ambosHombrosSi"])}} type="checkbox" name="hombroDerechoSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en el hombro derecho</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.hombroIzquierdoSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["hombrosNo","hombroDerechoSi","hombroIzquierdoSi","ambosHombrosSi"])}} type="checkbox" name="hombroIzquierdoSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en el hombro izquierdo</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.ambosHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["hombrosNo","hombroDerechoSi","hombroIzquierdoSi","ambosHombrosSi"])}} type="checkbox" name="ambosHombrosSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en ambos hombros</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                       <div className="w-[55%] flex flex-col">
-                            <div className="flex justify-center">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.hombrosNo} checked={form.pregunta1HombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1HombrosNo","pregunta1HombrosSi"])}} name="pregunta1HombrosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.hombrosNo} checked={form.pregunta1HombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1HombrosNo","pregunta1HombrosSi"])}} name="pregunta1HombrosSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.hombrosNo} checked={form.pregunta2HombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2HombrosNo","pregunta2HombrosSi"])}} name="pregunta2HombrosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.hombrosNo} checked={form.pregunta2HombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2HombrosNo","pregunta2HombrosSi"])}} name="pregunta2HombrosSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
-                    {/*Codos */}
-                    <div className="flex w-full pt-4 items-center border  p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <div className="flex ">
-                                <label htmlFor="" className="w-60">Codos: </label>
-                                <div className="flex flex-col">
-                                    <div className="flex gap-1">
-                                        <input checked={form.codosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["codosNo","codoDerechoSi","codoIzquierdoNo","ambosCodosSi"])}} type="checkbox" name="codosNo" id="" className=" mx-3"/>
-                                        <label htmlFor="">No</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.codoDerechoSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["codosNo","codoDerechoSi","codoIzquierdoNo","ambosCodosSi"])}} type="checkbox" name="codoDerechoSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en el codo derecho</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.codoIzquierdoNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["codosNo","codoDerechoSi","codoIzquierdoNo","ambosCodosSi"])}} type="checkbox" name="codoIzquierdoNo" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en el codo izquierdo</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.ambosCodosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["codosNo","codoDerechoSi","codoIzquierdoNo","ambosCodosSi"])}} type="checkbox" name="ambosCodosSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en ambos codos</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                       <div className="w-[55%] flex flex-col">
-                            <div className="flex justify-center">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.codosNo} checked={form.pregunta1CodosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CodosNo","pregunta1CodosSi"])}} name="pregunta1CodosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.codosNo} checked={form.pregunta1CodosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CodosNo","pregunta1CodosSi"])}} name="pregunta1CodosSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.codosNo} checked={form.pregunta2CodosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CodosNo","pregunta2CodosSi"])}} name="pregunta2CodosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.codosNo} checked={form.pregunta2CodosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CodosNo","pregunta2CodosSi"])}} name="pregunta2CodosSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
-                    {/*Muñeca */}
-                    <div className="flex w-full pt-4 items-center border  p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <div className="flex ">
-                                <label htmlFor="" className="w-60">Muñeca: </label>
-                                <div className="flex flex-col">
-                                    <div className="flex gap-1">
-                                        <input checked={form.munecaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["munecaNo","munecaDerechaSi","munecaIzquierdaSi","ambasMunecasSi"])}}  type="checkbox" name="munecaNo" id="" className=" mx-3"/>
-                                        <label htmlFor="">No</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.munecaDerechaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["munecaNo","munecaDerechaSi","munecaIzquierdaSi","ambasMunecasSi"])}} type="checkbox" name="munecaDerechaSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en la muñeca/mano derecha</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.munecaIzquierdaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["munecaNo","munecaDerechaSi","munecaIzquierdaSi","ambasMunecasSi"])}} type="checkbox" name="munecaIzquierdaSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en el muñeca/mano izquierda</label>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <input checked={form.ambasMunecasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["munecaNo","munecaDerechaSi","munecaIzquierdaSi","ambasMunecasSi"])}} type="checkbox" name="ambasMunecasSi" id="" className=" mx-3"/>
-                                        <label htmlFor="" className="">Si, en ambos muñecas/manos</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                       <div className="w-[55%] flex flex-col">
-                            <div className="flex justify-center">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.munecaNo} checked={form.pregunta1MunecasNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1MunecasNo","pregunta1MunecasSi"])}} name="pregunta1MunecasNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.munecaNo} checked={form.pregunta1MunecasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1MunecasNo","pregunta1MunecasSi"])}} name="pregunta1MunecasSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.munecaNo} checked={form.pregunta2MunecasNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2MunecasNo","pregunta2MunecasSi"])}} name="pregunta2MunecasNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.munecaNo} checked={form.pregunta2MunecasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2MunecasNo","pregunta2MunecasSi"])}} name="pregunta2MunecasSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
-                    {/*Otros */}
-                    <div className="flex w-full pt-4 items-center border  p-3 divide-x">
-                        <div className="w-[45%] flex flex-col">
-                            <div className="flex items-center">
-                                <label htmlFor="" className="w-[60%] py-2">Espalda Alta (Tórax): </label>
-                                <label htmlFor="">No</label>
-                                <input checked={form.espaldaAltaToraxNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaAltaToraxNo","espaldaAltaToraxSi"])}} type="checkbox" name="espaldaAltaToraxNo" id="" className=" mx-3"/>
-                                <label htmlFor="">Si</label>
-                                <input checked={form.espaldaAltaToraxSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaAltaToraxNo","espaldaAltaToraxSi"])}} type="checkbox" name="espaldaAltaToraxSi" id="" className=" mx-3"/>
-                            </div>
-                            <div className="flex items-center">
-                                <label htmlFor="" className="w-[60%] py-2">Espalda Baja (Région Lumbar): </label>
-                                <label htmlFor="">No</label>
-                                <input checked={form.espaldaBajaLumbarNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaBajaLumbarNo","espaldaBajaLumbarSi"])}} type="checkbox" name="espaldaBajaLumbarNo" id="" className=" mx-3"/>
-                                <label htmlFor="">Si</label>
-                                <input checked={form.espaldaBajaLumbarSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaBajaLumbarNo","espaldaBajaLumbarSi"])}} type="checkbox" name="espaldaBajaLumbarSi" id="" className=" mx-3"/>
-                            </div>
-                            <div className="flex items-center">
-                                <label htmlFor="" className="w-[60%] py-2">Una o ambas caderas/muslos: </label>
-                                <label htmlFor="">No</label>
-                                <input checked={form.caderasOMuslosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["caderasOMuslosNo","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosNo" id="" className=" mx-3"/>
-                                <label htmlFor="">Si</label>
-                                <input checked={form.caderasOMuslosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["caderasOMuslosNo","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosSi" id="" className=" mx-3"/>
-                            </div>
-                            <div className="flex items-center">
-                                <label htmlFor="" className="w-[60%] py-2">Una o ambas rodillas: </label>
-                                <label htmlFor="">No</label>
-                                <input checked={form.rodillasNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["rodillasNo","rodillasSi"])}} type="checkbox" name="rodillasNo" id="" className=" mx-3"/>
-                                <label htmlFor="">Si</label>
-                                <input checked={form.rodillasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["rodillasNo","rodillasSi"])}} type="checkbox" name="rodillasSi" id="" className=" mx-3"/>
-                            </div>
-                            <div className="flex items-center">
-                                <label htmlFor="" className="w-[60%] py-2">Uno o ambos tobillos/Pies: </label>
-                                <label htmlFor="">No</label>
-                                <input checked={form.tobillosOPiesNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["tobillosOPiesNo","tobillosOPiesSi"])}} type="checkbox" name="tobillosOPiesNo" id="" className=" mx-3"/>
-                                <label htmlFor="">Si</label>
-                                <input checked={form.tobillosOPiesSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["tobillosOPiesNo","tobillosOPiesSi"])}} type="checkbox" name="tobillosOPiesSi" id="" className=" mx-3"/>
-                            </div>
-                        </div>
-                        
-                       <div className="w-[55%] flex flex-col">
-                            {/*Espalda Alta*/}
-                            <div className="flex justify-center py-2">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.espaldaAltaToraxNo} checked={form.pregunta1EspaldaAltaToraxNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaAltaToraxNo","pregunta1EspaldaAltaToraxSi"])}} name="pregunta1EspaldaAltaToraxNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.espaldaAltaToraxNo} checked={form.pregunta1EspaldaAltaToraxSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaAltaToraxNo","pregunta1EspaldaAltaToraxSi"])}} name="pregunta1EspaldaAltaToraxSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.espaldaAltaToraxNo} checked={form.pregunta2EspaldaAltaToraxNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaAltaToraxNo","pregunta2EspaldaAltaToraxSi"])}} name="pregunta2EspaldaAltaToraxNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.espaldaAltaToraxNo} checked={form.pregunta2EspaldaAltaToraxSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaAltaToraxNo","pregunta2EspaldaAltaToraxSi"])}} name="pregunta2EspaldaAltaToraxSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                            {/*Espalda Baja*/}
-                            <div className="flex justify-center py-2">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.espaldaBajaLumbarNo} checked={form.pregunta1EspaldaBajaLumbarNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaBajaLumbarNo","pregunta1EspaldaBajaLumbarSi"])}} name="pregunta1EspaldaBajaLumbarNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.espaldaBajaLumbarNo} checked={form.pregunta1EspaldaBajaLumbarSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaBajaLumbarNo","pregunta1EspaldaBajaLumbarSi"])}} name="pregunta1EspaldaBajaLumbarSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.espaldaBajaLumbarNo} checked={form.pregunta2EspaldaBajaLumbarNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaBajaLumbarNo","pregunta2EspaldaBajaLumbarSi"])}} name="pregunta2EspaldaBajaLumbarNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.espaldaBajaLumbarNo} checked={form.pregunta2EspaldaBajaLumbarSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaBajaLumbarNo","pregunta2EspaldaBajaLumbarSi"])}} name="pregunta2EspaldaBajaLumbarSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                            {/*Caderas*/}    
-                            <div className="flex justify-center py-2">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.caderasOMuslosNo} checked={form.pregunta1CaderasOMuslosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CaderasOMuslosNo","pregunta1CaderasOMuslosSi"])}} name="pregunta1CaderasOMuslosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.caderasOMuslosNo} checked={form.pregunta1CaderasOMuslosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1CaderasOMuslosNo","pregunta1CaderasOMuslosSi"])}} name="pregunta1CaderasOMuslosSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.caderasOMuslosNo} checked={form.pregunta2CaderasOMuslosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CaderasOMuslosNo","pregunta2CaderasOMuslosSi"])}} name="pregunta2CaderasOMuslosNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.caderasOMuslosNo} checked={form.pregunta2CaderasOMuslosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2CaderasOMuslosNo","pregunta2CaderasOMuslosSi"])}} name="pregunta2CaderasOMuslosSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                            {/*Rodillas*/}  
-                            <div className="flex justify-center py-2">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.rodillasNo} checked={form.pregunta1RodillasNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1RodillasNo","pregunta1RodillasSi"])}} name="pregunta1RodillasNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.rodillasNo} checked={form.pregunta1RodillasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1RodillasNo","pregunta1RodillasSi"])}} name="pregunta1RodillasSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.rodillasNo} checked={form.pregunta2RodillasNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2RodillasNo","pregunta2RodillasSi"])}} name="pregunta2RodillasNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.rodillasNo} checked={form.pregunta2RodillasSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2RodillasNo","pregunta2RodillasSi"])}} name="pregunta2RodillasSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                            {/*Tobillos*/}  
-                            <div className="flex justify-center py-2">
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.tobillosOPiesNo} checked={form.pregunta1TobillosOPiesNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1TobillosOPiesNo","pregunta1TobillosOPiesSi"])}} name="pregunta1TobillosOPiesNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.tobillosOPiesNo} checked={form.pregunta1TobillosOPiesSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1TobillosOPiesNo","pregunta1TobillosOPiesSi"])}} name="pregunta1TobillosOPiesSi" type="checkbox" className="mx-3" />
-                                </div>
-                                <div className="w-1/2 flex justify-center items-center">
-                                    <label>No</label>
-                                    <input disabled={form.tobillosOPiesNo} checked={form.pregunta2TobillosOPiesNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2TobillosOPiesNo","pregunta2TobillosOPiesSi"])}} name="pregunta2TobillosOPiesNo" type="checkbox" className="mx-3" />
-                                    <label className="ml-4">Si</label>
-                                    <input disabled={form.tobillosOPiesNo} checked={form.pregunta2TobillosOPiesSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2TobillosOPiesNo","pregunta2TobillosOPiesSi"])}} name="pregunta2TobillosOPiesSi" type="checkbox" className="mx-3" />
-                                </div>
-                            </div>
-                        </div> 
-                    </div>
+  const parNoSi = (par, disabled) => (
+    <>
+      <Opt
+        label="No"
+        name={par.no}
+        checked={form[par.no]}
+        disabled={disabled}
+        onChange={(e) => handleInputChangeCheckedGroup(e, [par.no, par.si])}
+      />
+      <Opt
+        label="Sí"
+        name={par.si}
+        checked={form[par.si]}
+        disabled={disabled}
+        onChange={(e) => handleInputChangeCheckedGroup(e, [par.no, par.si])}
+      />
+    </>
+  );
+
+  return (
+    <div className="text-xl text-gray-700">
+      {/* ===== 02-A · Guía corporal ===== */}
+      <div id="nordico-sec-2-guia" className="scroll-mt-[70px]">
+        <ComoResponder
+          titulo="¿Cómo responder este cuestionario?"
+          img="img/Nordico/nordico.png"
+          imgAlt="Mapa de las partes del cuerpo"
+        >
+          <p>
+            En este dibujo Ud. puede ver la posición aproximada de las partes
+            del cuerpo referidos en el cuestionario.
+          </p>
+          <p>
+            Ud. debe decidir cuál parte tiene o ha tenido molestias / problema
+            (si lo ha tenido), por favor responda poniendo una x en el
+            respectivo recuadro para cada pregunta.
+          </p>
+          {/* <p>
+            Ha tenido Ud. durante cualquier tiempo en los últimos 12 meses
+            problemas (molestias, dolor o disconfort). Use la figura para
+            identificar cada parte del cuerpo y, en la tabla siguiente, indique
+            si ha tenido molestias y cómo afectaron su actividad.
+          </p> */}
+          {/* <ol className="mt-[8px] grid grid-cols-2 gap-x-[16px] gap-y-[6px] sm:grid-cols-3">
+            {GUIA_ZONAS.map((z, i) => (
+              <li key={z} className="flex gap-[8px]">
+                <span className="font-bold tabular-nums text-primario">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span>{z}</span>
+              </li>
+            ))}
+          </ol> */}
+        </ComoResponder>
+      </div>
+
+      {/* Leyenda para móvil (en md+ va dentro de la cabecera de la tabla) */}
+      <div className="mb-[10px] flex flex-col gap-[4px] text-base text-gray-500 md:hidden">
+        <span>
+          <span className="font-semibold text-primario">
+            Para ser respondido por todos:
+          </span>{" "}
+          columna de los últimos 12 meses.
+        </span>
+        <span>
+          <span className="font-semibold text-primario">
+            Para ser respondido únicamente por quienes han tenido problemas:
+          </span>{" "}
+          columnas de rutinas habituales y últimos 7 días.
+        </span>
+      </div>
+
+      {/* ===== 02-B · Síntomas por zona ===== */}
+      <div
+        id="nordico-sec-2-tabla"
+        className="scroll-mt-[70px] overflow-hidden rounded-lg border border-gray-200"
+      >
+        {/* Encabezado de 2 niveles (solo md+) */}
+        <div className="hidden bg-primario text-white md:block">
+          {/* Nivel 1: a quién corresponde responder */}
+          <div
+            className={`${HEADER_GRID} px-[16px] pb-[6px] pt-[12px] text-[11px] font-bold uppercase tracking-[0.08em]`}
+          >
+            <span aria-hidden="true" />
+            <span className="text-center">Para ser respondido por todos</span>
+            <span className="col-span-2 text-center">
+              Para ser respondido únicamente por quienes han tenido problemas
+            </span>
+          </div>
+          {/* Nivel 2: la pregunta completa de cada columna */}
+          <div
+            className={`${HEADER_GRID} border-t border-white/20 px-[16px] py-[10px] text-[11px] leading-snug text-white/90`}
+          >
+            <span className="self-center font-semibold">Zona del cuerpo</span>
+            <span>
+              Ha tenido Ud. durante cualquier tiempo en los últimos 12 meses
+              problemas (molestias, dolor o disconfort) en:
+            </span>
+            <span>
+              Ha estado impedido en cualquier tiempo durante los pasados 12 meses
+              para hacer sus rutinas habituales en el trabajo o su casa por este
+              problema?
+            </span>
+            <span>Ud. ha tenido problemas durante los últimos 7 días?</span>
+          </div>
+        </div>
+
+        <div className="divide-y divide-gray-200">
+          {ZONAS.map((z) => (
+            <div
+              key={z.label}
+              className={`px-[16px] py-[14px] odd:bg-white even:bg-gray-50/60 ${COL_GRID}`}
+            >
+              {/* Zona */}
+              <div className="mb-[8px] md:mb-0">
+                <p className="font-semibold text-primario">{z.label}</p>
+                {z.hint && (
+                  <p className="text-base text-gray-400">{z.hint}</p>
+                )}
+              </div>
+
+              {/* Presencia (últimos 12 meses) */}
+              <div className="mb-[8px] md:mb-0">
+                <p className="mb-[4px] text-base font-medium text-gray-400 md:hidden">
+                  ¿Ha tenido problemas en los últimos 12 meses?
+                </p>
+                {z.presencia.tipo === "sino" ? (
+                  <div className="flex items-center gap-x-[20px]">
+                    <Opt
+                      label="No"
+                      name={z.presencia.no}
+                      checked={form[z.presencia.no]}
+                      onChange={(e) =>
+                        handleInputChangeCheckedGroup(e, z.presencia.grupo)
+                      }
+                    />
+                    <Opt
+                      label="Sí"
+                      name={z.presencia.si}
+                      checked={form[z.presencia.si]}
+                      onChange={(e) =>
+                        handleInputChangeCheckedGroup(e, z.presencia.grupo)
+                      }
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-[6px]">
+                    {z.presencia.opciones.map((o) => (
+                      <Opt
+                        key={o.code}
+                        label={o.label}
+                        name={o.code}
+                        checked={form[o.code]}
+                        onChange={(e) =>
+                          handleInputChangeCheckedGroup(e, z.presencia.grupo)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Impedimento de rutinas */}
+              <div className="mb-[8px] md:mb-0">
+                <p className="mb-[4px] text-base font-medium text-gray-400 md:hidden">
+                  ¿Le impidió hacer sus rutinas habituales?
+                </p>
+                <div className="flex items-center gap-x-[20px]">
+                  {parNoSi(z.q1, form[z.dis])}
                 </div>
-                
-                
-            </div>
-        </>
-    )
-}
+              </div>
 
-export default Responder
+              {/* Últimos 7 días */}
+              <div>
+                <p className="mb-[4px] text-base font-medium text-gray-400 md:hidden">
+                  ¿Ha tenido problemas en los últimos 7 días?
+                </p>
+                <div className="flex items-center gap-x-[20px]">
+                  {parNoSi(z.q2, form[z.dis])}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Responder;
