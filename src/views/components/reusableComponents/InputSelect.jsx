@@ -1,4 +1,4 @@
-export function SelectField({ label, name, value, onChange, options, placeholder = "Seleccionar...", inline = false, labelWidth = "120px" }) {
+export function SelectField({ label, name, value, onChange, options, placeholder = "Seleccionar...", hidePlaceHolder = false, inline = false, labelWidth = "120px" }) {
     if (inline) {
         return (
             <div className="flex items-center gap-4 flex-grow">
@@ -13,7 +13,7 @@ export function SelectField({ label, name, value, onChange, options, placeholder
                     onChange={onChange}
                     className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
                 >
-                    <option value="">{placeholder}</option>
+                    {!hidePlaceHolder && <option value="">{placeholder}</option>}
                     {options.map(({ value, label }) => (
                         <option key={value} value={value}>{label}</option>
                     ))}
