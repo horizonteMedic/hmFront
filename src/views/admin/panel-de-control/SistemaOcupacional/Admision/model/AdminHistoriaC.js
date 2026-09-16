@@ -68,6 +68,7 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     mercurioo: data.mercurioo,//13
     tmarihuana: data.tmarihuana,
     tcocaina: data.tcocaina,
+    pruebaEsfuerzo: data.pruebaEsfuerzo,
     espaciosConfinados: data.espaciosConfinados,
     user_registro: data.user_registro,
     idPreNorden: data.idPreNorden ? data.idPreNorden : null,

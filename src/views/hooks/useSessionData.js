@@ -4,12 +4,14 @@ import { fixEncodingModern } from "../utils/helpers";
 import useRealTime from "./useRealTime";
 
 export const useSessionData = () => {
-    const { token, userlogued, datosFooter, listaEmpleados, selectedSede } = useAuthStore((state) => ({
+    const { token, userlogued, datosFooter, listaEmpleados, selectedSede, campaniaActiva, setCampaniaActiva } = useAuthStore((state) => ({
         token: state.token,
         userlogued: state.userlogued,
         datosFooter: state.datosFooter,
         listaEmpleados: state.listaEmpleados,
-        selectedSede: state.selectedSede
+        selectedSede: state.selectedSede,
+        campaniaActiva: state.campaniaActiva,
+        setCampaniaActiva: state.setCampaniaActiva,
     }));
 
     const hora = useRealTime();
@@ -27,5 +29,7 @@ export const useSessionData = () => {
         datosFooter,
         listaEmpleados,
         hora,
+        campaniaActiva,
+        setCampaniaActiva,
     };
 };

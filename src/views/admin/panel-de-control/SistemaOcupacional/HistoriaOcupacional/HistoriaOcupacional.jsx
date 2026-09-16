@@ -167,6 +167,7 @@ const HistoriaOcupacional = ({
   });
 
   const [registros, setRegistros] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   //AUTOCOMPLETABLES
   const [searchEmpresa, setSearchEmpresa] = useState("");
   const [searchCargoOcupacion, setSearchCargoOcupacion] = useState("");
@@ -325,6 +326,66 @@ const HistoriaOcupacional = ({
     setSearchProt("");
     setFilteredSuperficie([]);
     setFilteredSocavon([]);
+    setShowModal(false);
+  };
+
+  const handleCancelModal = () => {
+    setRowData({
+      historiaDetalleId: null,
+      fecha: "",
+      empresa: "",
+      altitud: "",
+      actividad: "",
+      areaEmpresa: "",
+      ocupacion: "",
+      superficie: "",
+      socavon: "",
+      riesgo: "",
+      proteccion: "",
+      causaRetiro: "",
+    });
+    setSearchEmpresa("");
+    setSearchCargoOcupacion("");
+    setSearchAltitud("");
+    setSearchArea("");
+    setSearchRiesgo("");
+    setSearchProt("");
+    setFilteredSuperficie([]);
+    setFilteredSocavon([]);
+    setShowModal(false);
+  };
+
+  const handleGuardar = () => {
+    if (registros.length === 0) {
+      Swal.fire({
+        title: "¿Está seguro?",
+        text: "Está por registrar una Historia Ocupacional sin ninguna fila. ¿Desea continuar?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, continuar",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          SubmiteHistoriaOcupacionalController(
+            form,
+            token,
+            userlogued,
+            handleClean,
+            tabla,
+            registros
+          );
+        }
+      });
+      return;
+    }
+    SubmiteHistoriaOcupacionalController(
+      form,
+      token,
+      userlogued,
+      handleClean,
+      tabla,
+      registros
+    );
   };
 
   const handleClean = () => {
@@ -522,651 +583,750 @@ const HistoriaOcupacional = ({
           </div>
         </div>
       </fieldset>
-      <div className={styles.tableWrapper}>
-        <table
-          className={`${styles.historiaTable} mb-48`}
-          style={{ fontSize: 13, color: "#000" }}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            zIndex: 1000,
+            overflowY: "auto",
+            padding: "40px 16px",
+          }}
         >
-          <thead>
-            <tr>
-              <th rowSpan={2}>Año</th>
-              <th rowSpan={2}>Empresa - Lugar Geográfico</th>
-              <th rowSpan={2}>Altitud</th>
-              <th rowSpan={2}>Actividad</th>
-              <th rowSpan={2}>Área Empresa</th>
-              <th rowSpan={2}>Ocupación</th>
-              <th colSpan={2} style={{ textAlign: "center" }}>
-                Tiempo de Labor
-              </th>
-              <th rowSpan={2}>Riesgos</th>
-              <th rowSpan={2}>Protección</th>
-              <th rowSpan={2}>Causa de Retiro</th>
-            </tr>
-            <tr>
-              <th>Socavon</th>
-              <th>Superficie</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <AutoResizeInput
-                  value={rowData.fecha}
-                  onChange={(e) =>
-                    handleRowChange("fecha", e.target.value.toUpperCase())
-                  }
-                />
-              </td>
-              <td onClick={() => empresaRef.current?.focus()}>
-                {/* <AutoResizeInput
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 8,
+              padding: 24,
+              width: "1200px",
+              maxWidth: "95vw",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 15,
+                fontWeight: "bold",
+                marginBottom: 16,
+                color: "#000",
+              }}
+            >
+              Agregar registro ocupacional
+            </h3>
+            <div className={styles.tableWrapper}>
+              <table
+                className={`${styles.historiaTable} mb-48`}
+                style={{ fontSize: 13, color: "#000" }}
+              >
+                <thead>
+                  <tr>
+                    <th rowSpan={2}>Año</th>
+                    <th rowSpan={2}>Empresa - Lugar Geográfico</th>
+                    <th rowSpan={2}>Altitud</th>
+                    <th rowSpan={2}>Actividad</th>
+                    <th rowSpan={2}>Área Empresa</th>
+                    <th rowSpan={2}>Ocupación</th>
+                    <th colSpan={2} style={{ textAlign: "center" }}>
+                      Tiempo de Labor
+                    </th>
+                    <th rowSpan={2}>Riesgos</th>
+                    <th rowSpan={2}>Protección</th>
+                    <th rowSpan={2}>Causa de Retiro</th>
+                  </tr>
+                  <tr>
+                    <th>Socavon</th>
+                    <th>Superficie</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <AutoResizeInput
+                        value={rowData.fecha}
+                        onChange={(e) =>
+                          handleRowChange("fecha", e.target.value.toUpperCase())
+                        }
+                      />
+                    </td>
+                    <td onClick={() => empresaRef.current?.focus()}>
+                      {/* <AutoResizeInput
                   value={rowData.empresa}
                   onChange={(e) => handleRowChange("empresa", e.target.value)}
                 /> */}
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={empresaRef}
-                      autoComplete="off"
-                      rows={1}
-                      className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
-                      value={searchEmpresa}
-                      name="empresa"
-                      onFocus={() => setFilteredEmpresa(EmpresasMulti)}
-                      onChange={(e) => {
-                        handleSearch(
-                          e,
-                          setSearchEmpresa,
-                          handleRowChange,
-                          setFilteredEmpresa,
-                          EmpresasMulti
-                        );
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredEmpresa.length > 0) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredEmpresa[0].mensaje,
-                            setSearchEmpresa,
-                            handleRowChange,
-                            setFilteredEmpresa
-                          );
-                          document.getElementById("altitud")?.focus();
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredEmpresa([]), 100)
-                      }
-                    />
-                    {filteredEmpresa.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
-                        {filteredEmpresa.map((opt) => (
-                          <li
-                            key={opt.id}
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) => {
-                              handleSelect(
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={empresaRef}
+                            autoComplete="off"
+                            rows={1}
+                            className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
+                            value={searchEmpresa}
+                            name="empresa"
+                            onFocus={() => setFilteredEmpresa(EmpresasMulti)}
+                            onChange={(e) => {
+                              handleSearch(
                                 e,
-                                "empresa",
-                                opt.mensaje,
                                 setSearchEmpresa,
                                 handleRowChange,
-                                setFilteredEmpresa
+                                setFilteredEmpresa,
+                                EmpresasMulti
                               );
-                              document.getElementById("altitud")?.focus();
                             }}
-                          >
-                            {opt.mensaje}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => altitudRef.current?.focus()}>
-                {/* <AutoResizeInput
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredEmpresa.length > 0) {
+                                e.preventDefault();
+                                handleSelect(
+                                  e,
+                                  e.target.name,
+                                  filteredEmpresa[0].mensaje,
+                                  setSearchEmpresa,
+                                  handleRowChange,
+                                  setFilteredEmpresa
+                                );
+                                document.getElementById("altitud")?.focus();
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredEmpresa([]), 100)
+                            }
+                          />
+                          {filteredEmpresa.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
+                              {filteredEmpresa.map((opt) => (
+                                <li
+                                  key={opt.id}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) => {
+                                    handleSelect(
+                                      e,
+                                      "empresa",
+                                      opt.mensaje,
+                                      setSearchEmpresa,
+                                      handleRowChange,
+                                      setFilteredEmpresa
+                                    );
+                                    document.getElementById("altitud")?.focus();
+                                  }}
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => altitudRef.current?.focus()}>
+                      {/* <AutoResizeInput
                   value={rowData.altitud}
                   onChange={(e) => handleRowChange("altitud", e.target.value)}
                 /> */}
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={altitudRef}
-                      type="text"
-                      id="altitud"
-                      rows={1}
-                      autoComplete="off"
-                      className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
-                      value={searchAltitud}
-                      name="altitud"
-                      onFocus={() => setFilteredAltitud(AlturaMulti)}
-                      onChange={(e) => {
-                        const v = e.target.value.toUpperCase();
-                        setSearchAltitud(v);
-                        handleRowChange("altitud", v);
-                        const matches = v
-                          ? AlturaMulti.filter((m) =>
-                              m.mensaje.toLowerCase().includes(v.toLowerCase())
-                            )
-                          : [];
-                        const trimmed = v.trim();
-                        if (/^\d+$/.test(trimmed)) {
-                          matches.unshift({
-                            id: "sugerencia-msnm",
-                            mensaje: `${trimmed} M.S.N.M.`,
-                          });
-                        }
-                        setFilteredAltitud(matches);
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredAltitud.length > 0) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredAltitud[0].mensaje,
-                            setSearchAltitud,
-                            handleRowChange,
-                            setFilteredAltitud
-                          );
-                          document.getElementById("areaEmpresa").focus();
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredAltitud([]), 100)
-                      }
-                    />
-                    {filteredAltitud.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                        {filteredAltitud.map((opt) => (
-                          <li
-                            key={opt.id}
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={altitudRef}
+                            type="text"
+                            id="altitud"
+                            rows={1}
+                            autoComplete="off"
+                            className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
+                            value={searchAltitud}
                             name="altitud"
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) =>
-                              handleSelect(
-                                e,
-                                "altitud",
-                                opt.mensaje,
-                                setSearchAltitud,
-                                handleRowChange,
-                                setFilteredAltitud
-                              )
-                            }
-                          >
-                            {opt.mensaje}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => actividadRef.current?.focus()}>
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={actividadRef}
-                      rows={1}
-                      autoComplete="off"
-                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                      value={rowData.actividad}
-                      name="actividad"
-                      onChange={(e) => {
-                        const v = e.target.value.toUpperCase();
-                        handleRowChange("actividad", v);
-                        setFilteredActividad(
-                          v
-                            ? ActividadMulti.filter((m) =>
-                                m.mensaje.toLowerCase().includes(v.toLowerCase())
-                              )
-                            : []
-                        );
-                      }}
-                      onFocus={() => setFilteredActividad(ActividadMulti)}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredActividad.length > 0) {
-                          e.preventDefault();
-                          handleRowChange("actividad", filteredActividad[0].mensaje);
-                          setFilteredActividad([]);
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredActividad([]), 100)
-                      }
-                    />
-                    {filteredActividad.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                        {filteredActividad.map((opt) => (
-                          <li
-                            key={opt.id}
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={() => {
-                              handleRowChange("actividad", opt.mensaje);
-                              setFilteredActividad([]);
+                            onFocus={() => setFilteredAltitud(AlturaMulti)}
+                            onChange={(e) => {
+                              const v = e.target.value.toUpperCase();
+                              setSearchAltitud(v);
+                              handleRowChange("altitud", v);
+                              const matches = v
+                                ? AlturaMulti.filter((m) =>
+                                  m.mensaje.toLowerCase().includes(v.toLowerCase())
+                                )
+                                : [];
+                              const trimmed = v.trim();
+                              if (/^\d+$/.test(trimmed)) {
+                                matches.unshift({
+                                  id: "sugerencia-msnm",
+                                  mensaje: `${trimmed} M.S.N.M.`,
+                                });
+                              }
+                              setFilteredAltitud(matches);
                             }}
-                          >
-                            {opt.mensaje}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => areaRef.current?.focus()}>
-                {/* <AutoResizeInput
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredAltitud.length > 0) {
+                                e.preventDefault();
+                                handleSelect(
+                                  e,
+                                  e.target.name,
+                                  filteredAltitud[0].mensaje,
+                                  setSearchAltitud,
+                                  handleRowChange,
+                                  setFilteredAltitud
+                                );
+                                document.getElementById("areaEmpresa").focus();
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredAltitud([]), 100)
+                            }
+                          />
+                          {filteredAltitud.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredAltitud.map((opt) => (
+                                <li
+                                  key={opt.id}
+                                  name="altitud"
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) =>
+                                    handleSelect(
+                                      e,
+                                      "altitud",
+                                      opt.mensaje,
+                                      setSearchAltitud,
+                                      handleRowChange,
+                                      setFilteredAltitud
+                                    )
+                                  }
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => actividadRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={actividadRef}
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={rowData.actividad}
+                            name="actividad"
+                            onChange={(e) => {
+                              const v = e.target.value.toUpperCase();
+                              handleRowChange("actividad", v);
+                              setFilteredActividad(
+                                v
+                                  ? ActividadMulti.filter((m) =>
+                                    m.mensaje.toLowerCase().includes(v.toLowerCase())
+                                  )
+                                  : []
+                              );
+                            }}
+                            onFocus={() => setFilteredActividad(ActividadMulti)}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredActividad.length > 0) {
+                                e.preventDefault();
+                                handleRowChange("actividad", filteredActividad[0].mensaje);
+                                setFilteredActividad([]);
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredActividad([]), 100)
+                            }
+                          />
+                          {filteredActividad.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredActividad.map((opt) => (
+                                <li
+                                  key={opt.id}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={() => {
+                                    handleRowChange("actividad", opt.mensaje);
+                                    setFilteredActividad([]);
+                                  }}
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => areaRef.current?.focus()}>
+                      {/* <AutoResizeInput
                   value={rowData.areaEmpresa}
                   onChange={(e) =>
                     handleRowChange("areaEmpresa", e.target.value)
                   }
                 /> */}
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={areaRef}
-                      type="text"
-                      id="areaEmpresa"
-                      autoComplete="off"
-                      rows={1}
-                      className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
-                      value={searchArea}
-                      name="areaEmpresa"
-                      onFocus={() => setFilteredArea(AreaMulti)}
-                      onChange={(e) => {
-                        handleSearch(
-                          e,
-                          setSearchArea,
-                          handleRowChange,
-                          setFilteredArea,
-                          AreaMulti
-                        );
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredArea.length > 0) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredArea[0].mensaje,
-                            setSearchArea,
-                            handleRowChange,
-                            setFilteredArea
-                          );
-                          document.getElementById("riesgo").focus();
-                        }
-                      }}
-                      onBlur={() => setTimeout(() => setFilteredArea([]), 100)}
-                    />
-                    {filteredArea.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-10">
-                        {filteredArea.map((opt) => (
-                          <li
-                            key={opt.id}
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={areaRef}
+                            type="text"
+                            id="areaEmpresa"
+                            autoComplete="off"
+                            rows={1}
+                            className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
+                            value={searchArea}
                             name="areaEmpresa"
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) =>
-                              handleSelect(
+                            onFocus={() => setFilteredArea(AreaMulti)}
+                            onChange={(e) => {
+                              handleSearch(
                                 e,
-                                "areaEmpresa",
-                                opt.mensaje,
                                 setSearchArea,
                                 handleRowChange,
-                                setFilteredArea
-                              )
-                            }
-                          >
-                            {opt.mensaje}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => ocupacionRef.current?.focus()}>
-                {/* <AutoResizeInput
+                                setFilteredArea,
+                                AreaMulti
+                              );
+                            }}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredArea.length > 0) {
+                                e.preventDefault();
+                                handleSelect(
+                                  e,
+                                  e.target.name,
+                                  filteredArea[0].mensaje,
+                                  setSearchArea,
+                                  handleRowChange,
+                                  setFilteredArea
+                                );
+                                document.getElementById("riesgo").focus();
+                              }
+                            }}
+                            onBlur={() => setTimeout(() => setFilteredArea([]), 100)}
+                          />
+                          {filteredArea.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-10">
+                              {filteredArea.map((opt) => (
+                                <li
+                                  key={opt.id}
+                                  name="areaEmpresa"
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) =>
+                                    handleSelect(
+                                      e,
+                                      "areaEmpresa",
+                                      opt.mensaje,
+                                      setSearchArea,
+                                      handleRowChange,
+                                      setFilteredArea
+                                    )
+                                  }
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => ocupacionRef.current?.focus()}>
+                      {/* <AutoResizeInput
                   value={rowData.ocupacion}
                   onChange={(e) => handleRowChange("ocupacion", e.target.value)}
                 /> */}
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={ocupacionRef}
-                      autoComplete="off"
-                      rows={1}
-                      className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
-                      value={searchCargoOcupacion}
-                      name="ocupacion"
-                      onFocus={() => setFilteredCargoOcupacion(CargosMulti)}
-                      onChange={(e) => {
-                        handleSearch(
-                          e,
-                          setSearchCargoOcupacion,
-                          handleRowChange,
-                          setFilteredCargoOcupacion,
-                          CargosMulti
-                        );
-                      }}
-                      onKeyUp={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          filteredCargoOcupacion.length > 0
-                        ) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredCargoOcupacion[0].mensaje,
-                            setSearchCargoOcupacion,
-                            handleRowChange,
-                            setFilteredCargoOcupacion
-                          );
-                          // document.getElementById("altitud")?.focus();
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredCargoOcupacion([]), 100)
-                      }
-                    />
-                    {filteredCargoOcupacion.length > 0 && (
-                        <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
-                          {filteredCargoOcupacion.map((opt, index) => (
-                            <li
-                              key={index}
-                              className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                              onMouseDown={(e) =>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={ocupacionRef}
+                            autoComplete="off"
+                            rows={1}
+                            className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
+                            value={searchCargoOcupacion}
+                            name="ocupacion"
+                            onFocus={() => setFilteredCargoOcupacion(CargosMulti)}
+                            onChange={(e) => {
+                              handleSearch(
+                                e,
+                                setSearchCargoOcupacion,
+                                handleRowChange,
+                                setFilteredCargoOcupacion,
+                                CargosMulti
+                              );
+                            }}
+                            onKeyUp={(e) => {
+                              if (
+                                e.key === "Enter" &&
+                                filteredCargoOcupacion.length > 0
+                              ) {
+                                e.preventDefault();
                                 handleSelect(
                                   e,
-                                  "ocupacion",
-                                  opt.mensaje,
+                                  e.target.name,
+                                  filteredCargoOcupacion[0].mensaje,
                                   setSearchCargoOcupacion,
                                   handleRowChange,
                                   setFilteredCargoOcupacion
-                                )
+                                );
+                                // document.getElementById("altitud")?.focus();
                               }
-                            >
-                              {opt.mensaje}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => socavonRef.current?.focus()}>
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={socavonRef}
-                      rows={1}
-                      autoComplete="off"
-                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                      value={rowData.socavon}
-                      name="socavon"
-                      onChange={(e) => {
-                        const v = e.target.value.toUpperCase();
-                        handleRowChange("socavon", v);
-                        const trimmed = v.trim();
-                        let sugerencia = null;
-                        if (/^\d+$/.test(trimmed)) {
-                          const n = parseInt(trimmed, 10);
-                          sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
-                        } else {
-                          const match = trimmed.match(
-                            /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
-                          );
-                          if (match) {
-                            const meses = parseInt(match[2], 10);
-                            sugerencia = `${trimmed} ${
-                              meses === 1 ? "MES" : "MESES"
-                            }`;
-                          }
-                        }
-                        setFilteredSocavon(sugerencia ? [sugerencia] : []);
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredSocavon.length > 0) {
-                          e.preventDefault();
-                          handleRowChange("socavon", filteredSocavon[0]);
-                          setFilteredSocavon([]);
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredSocavon([]), 100)
-                      }
-                    />
-                    {filteredSocavon.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                        {filteredSocavon.map((sug, i) => (
-                          <li
-                            key={i}
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={() => {
-                              handleRowChange("socavon", sug);
-                              setFilteredSocavon([]);
                             }}
-                          >
-                            {sug}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => superficieRef.current?.focus()}>
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={superficieRef}
-                      rows={1}
-                      autoComplete="off"
-                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                      value={rowData.superficie}
-                      name="superficie"
-                      onChange={(e) => {
-                        const v = e.target.value.toUpperCase();
-                        handleRowChange("superficie", v);
-                        const trimmed = v.trim();
-                        let sugerencia = null;
-                        if (/^\d+$/.test(trimmed)) {
-                          const n = parseInt(trimmed, 10);
-                          sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
-                        } else {
-                          const match = trimmed.match(
-                            /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
-                          );
-                          if (match) {
-                            const meses = parseInt(match[2], 10);
-                            sugerencia = `${trimmed} ${
-                              meses === 1 ? "MES" : "MESES"
-                            }`;
-                          }
-                        }
-                        setFilteredSuperficie(sugerencia ? [sugerencia] : []);
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredSuperficie.length > 0) {
-                          e.preventDefault();
-                          handleRowChange("superficie", filteredSuperficie[0]);
-                          setFilteredSuperficie([]);
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredSuperficie([]), 100)
-                      }
-                    />
-                    {filteredSuperficie.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                        {filteredSuperficie.map((sug, i) => (
-                          <li
-                            key={i}
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={() => {
-                              handleRowChange("superficie", sug);
-                              setFilteredSuperficie([]);
+                            onBlur={() =>
+                              setTimeout(() => setFilteredCargoOcupacion([]), 100)
+                            }
+                          />
+                          {filteredCargoOcupacion.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
+                              {filteredCargoOcupacion.map((opt, index) => (
+                                <li
+                                  key={index}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) =>
+                                    handleSelect(
+                                      e,
+                                      "ocupacion",
+                                      opt.mensaje,
+                                      setSearchCargoOcupacion,
+                                      handleRowChange,
+                                      setFilteredCargoOcupacion
+                                    )
+                                  }
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => socavonRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={socavonRef}
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={rowData.socavon}
+                            name="socavon"
+                            onChange={(e) => {
+                              const v = e.target.value.toUpperCase();
+                              handleRowChange("socavon", v);
+                              const trimmed = v.trim();
+                              let sugerencia = null;
+                              if (/^\d+$/.test(trimmed)) {
+                                const n = parseInt(trimmed, 10);
+                                sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                              } else {
+                                const match = trimmed.match(
+                                  /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
+                                );
+                                if (match) {
+                                  const meses = parseInt(match[2], 10);
+                                  sugerencia = `${trimmed} ${meses === 1 ? "MES" : "MESES"
+                                    }`;
+                                }
+                              }
+                              setFilteredSocavon(sugerencia ? [sugerencia] : []);
                             }}
-                          >
-                            {sug}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => riesgoRef.current?.focus()}>
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={riesgoRef}
-                      id="riesgo"
-                      rows={1}
-                      autoComplete="off"
-                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                      value={searchRiesgo}
-                      name="riesgo"
-                      onFocus={() => setFilteredRiesgo(riesgosOptions)}
-                      onChange={(e) => {
-                        handleSearch(
-                          e,
-                          setSearchRiesgo,
-                          handleRowChange,
-                          setFilteredRiesgo,
-                          riesgosOptions
-                        );
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredRiesgo.length > 0) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredRiesgo[0].mensaje,
-                            setSearchRiesgo,
-                            handleRowChange,
-                            setFilteredRiesgo
-                          );
-                          document.getElementById("proteccion")?.focus();
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredRiesgo([]), 100)
-                      }
-                    />
-                    {filteredRiesgo.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                        {filteredRiesgo.map((opt, index) => (
-                          <li
-                            key={index}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredSocavon.length > 0) {
+                                e.preventDefault();
+                                handleRowChange("socavon", filteredSocavon[0]);
+                                setFilteredSocavon([]);
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredSocavon([]), 100)
+                            }
+                          />
+                          {filteredSocavon.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredSocavon.map((sug, i) => (
+                                <li
+                                  key={i}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={() => {
+                                    handleRowChange("socavon", sug);
+                                    setFilteredSocavon([]);
+                                  }}
+                                >
+                                  {sug}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => superficieRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={superficieRef}
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={rowData.superficie}
+                            name="superficie"
+                            onChange={(e) => {
+                              const v = e.target.value.toUpperCase();
+                              handleRowChange("superficie", v);
+                              const trimmed = v.trim();
+                              let sugerencia = null;
+                              if (/^\d+$/.test(trimmed)) {
+                                const n = parseInt(trimmed, 10);
+                                sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                              } else {
+                                const match = trimmed.match(
+                                  /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
+                                );
+                                if (match) {
+                                  const meses = parseInt(match[2], 10);
+                                  sugerencia = `${trimmed} ${meses === 1 ? "MES" : "MESES"
+                                    }`;
+                                }
+                              }
+                              setFilteredSuperficie(sugerencia ? [sugerencia] : []);
+                            }}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredSuperficie.length > 0) {
+                                e.preventDefault();
+                                handleRowChange("superficie", filteredSuperficie[0]);
+                                setFilteredSuperficie([]);
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredSuperficie([]), 100)
+                            }
+                          />
+                          {filteredSuperficie.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredSuperficie.map((sug, i) => (
+                                <li
+                                  key={i}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={() => {
+                                    handleRowChange("superficie", sug);
+                                    setFilteredSuperficie([]);
+                                  }}
+                                >
+                                  {sug}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => riesgoRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={riesgoRef}
+                            id="riesgo"
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={searchRiesgo}
                             name="riesgo"
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) =>
-                              handleSelect(
+                            onFocus={() => setFilteredRiesgo(riesgosOptions)}
+                            onChange={(e) => {
+                              handleSearch(
                                 e,
-                                "riesgo",
-                                opt.mensaje,
                                 setSearchRiesgo,
                                 handleRowChange,
-                                setFilteredRiesgo
-                              )
+                                setFilteredRiesgo,
+                                riesgosOptions
+                              );
+                            }}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredRiesgo.length > 0) {
+                                e.preventDefault();
+                                handleSelect(
+                                  e,
+                                  e.target.name,
+                                  filteredRiesgo[0].mensaje,
+                                  setSearchRiesgo,
+                                  handleRowChange,
+                                  setFilteredRiesgo
+                                );
+                                document.getElementById("proteccion")?.focus();
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredRiesgo([]), 100)
                             }
-                          >
-                            {opt.title}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td onClick={() => protRef.current?.focus()}>
-                <div className="relative">
-                  <div className="flex flex-col items-center justify-center">
-                    <textarea
-                      ref={protRef}
-                      id="proteccion"
-                      rows={1}
-                      autoComplete="off"
-                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                      value={searchProt}
-                      name="proteccion"
-                      onFocus={() => setFilteredProt(proteccionOptions)}
-                      onChange={(e) => {
-                        handleSearch(
-                          e,
-                          setSearchProt,
-                          handleRowChange,
-                          setFilteredProt,
-                          proteccionOptions
-                        );
-                      }}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && filteredProt.length > 0) {
-                          e.preventDefault();
-                          handleSelect(
-                            e,
-                            e.target.name,
-                            filteredProt[0].mensaje,
-                            setSearchProt,
-                            handleRowChange,
-                            setFilteredProt
-                          );
-                        }
-                      }}
-                      onBlur={() =>
-                        setTimeout(() => setFilteredProt([]), 100)
-                      }
-                    />
-                    {filteredProt.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-40">
-                        {filteredProt.map((opt) => (
-                          <li
-                            key={opt.id}
+                          />
+                          {filteredRiesgo.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredRiesgo.map((opt, index) => (
+                                <li
+                                  key={index}
+                                  name="riesgo"
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) =>
+                                    handleSelect(
+                                      e,
+                                      "riesgo",
+                                      opt.mensaje,
+                                      setSearchRiesgo,
+                                      handleRowChange,
+                                      setFilteredRiesgo
+                                    )
+                                  }
+                                >
+                                  {opt.title}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => protRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={protRef}
+                            id="proteccion"
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={searchProt}
                             name="proteccion"
-                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) =>
-                              handleSelect(
+                            onFocus={() => setFilteredProt(proteccionOptions)}
+                            onChange={(e) => {
+                              handleSearch(
                                 e,
-                                "proteccion",
-                                opt.mensaje,
                                 setSearchProt,
                                 handleRowChange,
-                                setFilteredProt
-                              )
+                                setFilteredProt,
+                                proteccionOptions
+                              );
+                            }}
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter" && filteredProt.length > 0) {
+                                e.preventDefault();
+                                handleSelect(
+                                  e,
+                                  e.target.name,
+                                  filteredProt[0].mensaje,
+                                  setSearchProt,
+                                  handleRowChange,
+                                  setFilteredProt
+                                );
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredProt([]), 100)
                             }
-                          >
-                            {opt.mensaje}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <AutoResizeInput
-                  value={rowData.causaRetiro}
-                  onChange={(e) => {
-                    handleRowChange("causaRetiro", e.target.value.toUpperCase());
-                  }}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+                          />
+                          {filteredProt.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-40">
+                              {filteredProt.map((opt) => (
+                                <li
+                                  key={opt.id}
+                                  name="proteccion"
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={(e) =>
+                                    handleSelect(
+                                      e,
+                                      "proteccion",
+                                      opt.mensaje,
+                                      setSearchProt,
+                                      handleRowChange,
+                                      setFilteredProt
+                                    )
+                                  }
+                                >
+                                  {opt.mensaje}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={rowData.causaRetiro}
+                        onChange={(e) => {
+                          handleRowChange("causaRetiro", e.target.value.toUpperCase());
+                        }}
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                justifyContent: "flex-end",
+                marginTop: 20,
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleRegistrar}
+                style={{
+                  height: 32,
+                  background: "#059669",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "0 16px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  fontSize: 13,
+                }}
+              >
+                <i className="fas fa-save" style={{ marginRight: 6 }}></i> Guardar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelModal}
+                style={{
+                  height: 32,
+                  background: "#6b7280",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 3,
+                  padding: "0 16px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  fontSize: 13,
+                }}
+              >
+                <i className="fas fa-times" style={{ marginRight: 6 }}></i>{" "}
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        style={{
+          height: 32,
+          margin: "auto",
+          background: "#233245",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          padding: "0 16px",
+          cursor: "pointer",
+          fontSize: 13,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+        onClick={() => setShowModal(true)}
+      >
+        <i className="fas fa-plus"></i> Agregar nuevo
+      </button>
       {/* Buscadores debajo de la tabla */}
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           gap: "2em",
-          marginTop: 24,
           alignItems: "flex-end",
         }}
       >
@@ -1322,26 +1482,7 @@ const HistoriaOcupacional = ({
             )}
           </div>
         </div> */}
-        <button
-          type="button"
-          style={{
-            height: 32,
-            marginLeft: "auto",
-            background: "#233245",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            padding: "0 16px",
-            cursor: "pointer",
-            fontSize: 13,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-          onClick={handleRegistrar}
-        >
-          <i className="fas fa-plus"></i> Registrar
-        </button>
+
       </div>
       {/* Preview de registros vacío */}
       {registros.length === 0 && (
@@ -1594,16 +1735,7 @@ const HistoriaOcupacional = ({
           }}
         >
           <button
-            onClick={() => {
-              SubmiteHistoriaOcupacionalController(
-                form,
-                token,
-                userlogued,
-                handleClean,
-                tabla,
-                registros
-              );
-            }}
+            onClick={handleGuardar}
             style={{
               height: 32,
               background: "#059669",
