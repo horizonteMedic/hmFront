@@ -6,14 +6,37 @@ import {
     RadioTable,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerExamenEspacioConfinado";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerExamenEspacioConfinado";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "psicologia_espacios_confinados";
+
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "esApto",
+    "razonamiento",
+    "memoria",
+    "atencionConcentracion",
+    "coordinacionVisoMotora",
+    "orientacionEspacial",
+    "estabilidadEmocional",
+    "nivelAnsiedadGeneral",
+    "ansiedadEspaciosConfinados",
+    "analisisResultados",
+    "recomendaciones",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 export default function ExamenEspacioConfinado() {
     const today = getToday();
@@ -64,12 +87,21 @@ export default function ExamenEspacioConfinado() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
         form,
         setForm,
         handleChange,
+        handleChangeNumber,
         handleChangeNumberDecimals,
         handleRadioButton,
         handleChangeSimple,
@@ -77,24 +109,67 @@ export default function ExamenEspacioConfinado() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "examenEspacioConfinadoPsicologia" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     // Arrays para RadioTable - Aspecto Intelectual
     const aspectoIntelectualItems = [
@@ -132,21 +207,37 @@ export default function ExamenEspacioConfinado() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="120px"
-                />
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha Entrevista"
                     name="fechaExamen"
                     type="date"
                     value={form.fechaExamen}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaExamen")}
+                    onRevert={() => revertField("fechaExamen")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -164,107 +255,24 @@ export default function ExamenEspacioConfinado() {
                     falseLabel="NO APTO"
                     labelWidth="120px"
                     onChange={handleRadioButtonBoolean}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("esApto")}
+                    onRevert={() => revertField("esApto")}
                 />
             </SectionFieldset>
-            <SectionFieldset legend="Datos Personales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Columna Izquierda */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Nombres"
-                            name="nombres"
-                            value={form.nombres}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Apellidos"
-                            name="apellidos"
-                            value={form.apellidos}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Fecha Nacimiento"
-                            name="fechaNacimiento"
-                            value={form.fechaNacimiento}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Lugar Nacimiento"
-                            name="lugarNacimiento"
-                            value={form.lugarNacimiento}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
 
-                    {/* Columna Derecha */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Domicilio Actual"
-                            name="domicilioActual"
-                            value={form.domicilioActual}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Estado Civil"
-                            name="estadoCivil"
-                            value={form.estadoCivil}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Nivel Estudios"
-                            name="nivelEstudios"
-                            value={form.nivelEstudios}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                </div>
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio Actual">
+                <InputTextOneLine
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
+                    disabled
+                    labelWidth="120px"
+                />
             </SectionFieldset>
-            <SectionFieldset legend="Datos Laborales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="Empresa"
-                        name="empresa"
-                        value={form.empresa}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Contrata"
-                        name="contrata"
-                        value={form.contrata}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Ocupación"
-                        name="ocupacion"
-                        value={form.ocupacion}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Cargo Desempeñar"
-                        name="cargoDesempenar"
-                        value={form.cargoDesempenar}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-            </SectionFieldset>
+ 
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <SectionFieldset legend="Aspecto Intelectual">
@@ -273,6 +281,9 @@ export default function ExamenEspacioConfinado() {
                         options={aspectoIntelectualOptions}
                         form={form}
                         handleRadioButton={handleRadioButton}
+                        disabled={camposDeshabilitados}
+                        isFieldEdited={isFieldEdited}
+                        onRevert={revertField}
                     />
                 </SectionFieldset>
 
@@ -285,6 +296,9 @@ export default function ExamenEspacioConfinado() {
                             value={form.estabilidadEmocional}
                             onChange={handleRadioButton}
                             options={estabilidadOptions}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("estabilidadEmocional")}
+                            onRevert={() => revertField("estabilidadEmocional")}
                         />
                         <InputsRadioGroup
                             label="2.- NIVEL DE ANSIEDAD GENERAL"
@@ -293,6 +307,9 @@ export default function ExamenEspacioConfinado() {
                             value={form.nivelAnsiedadGeneral}
                             onChange={handleRadioButton}
                             options={nivelAnsiedadOptions}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("nivelAnsiedadGeneral")}
+                            onRevert={() => revertField("nivelAnsiedadGeneral")}
                         />
                         <InputsRadioGroup
                             label="3.- ANSIEDAD A ESPACIOS CONFINADOS"
@@ -302,6 +319,9 @@ export default function ExamenEspacioConfinado() {
                             onChange={handleRadioButton}
                             options={ansiedadOptions}
                             vertical
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("ansiedadEspaciosConfinados")}
+                            onRevert={() => revertField("ansiedadEspaciosConfinados")}
                         />
                     </div>
                 </SectionFieldset>
@@ -314,6 +334,9 @@ export default function ExamenEspacioConfinado() {
                             value={form.analisisResultados}
                             onChange={handleChange}
                             rows={8}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("analisisResultados")}
+                            onRevert={() => revertField("analisisResultados")}
                         />
                         <div className="mt-4">
                             <InputTextArea
@@ -322,6 +345,9 @@ export default function ExamenEspacioConfinado() {
                                 value={form.recomendaciones}
                                 onChange={handleChange}
                                 rows={5}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("recomendaciones")}
+                                onRevert={() => revertField("recomendaciones")}
                             />
                         </div>
                     </div>
@@ -334,17 +360,36 @@ export default function ExamenEspacioConfinado() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
 
-            {/* Botones de acción */}
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
-        </div >
+        </div>
     );
 }

@@ -8,6 +8,9 @@ export default function TestDeCage({
   form,
   handleRadioButtonBoolean,
   handleChange,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => {},
 }) {
   const cageQuestions = [
     {
@@ -85,6 +88,10 @@ export default function TestDeCage({
                     value={form?.[question.name]}
                     onChange={handleRadioButtonBoolean}
                     labelWidth="200px"
+                    disabled={disabled}
+                    edited={isFieldEdited(question.name)}
+                    onRevert={() => revertField(question.name)}
+                    stackOnMobile
                   />
                   <InputTextOneLine
                     label="Puntaje"
@@ -92,6 +99,9 @@ export default function TestDeCage({
                     value={form?.[question.namePuntaje]}
                     onChange={handleChange}
                     className="w-full"
+                    disabled={disabled}
+                    edited={isFieldEdited(question.namePuntaje)}
+                    onRevert={() => revertField(question.namePuntaje)}
                   />
                 </div>
               </div>
@@ -103,7 +113,10 @@ export default function TestDeCage({
           name="anamnesisTestDeCage"
           value={form?.anamnesisTestDeCage}
           onChange={handleChange}
+          disabled={disabled}
           rows={4}
+          edited={isFieldEdited("anamnesisTestDeCage")}
+          onRevert={() => revertField("anamnesisTestDeCage")}
         />
       </section>
     </div>

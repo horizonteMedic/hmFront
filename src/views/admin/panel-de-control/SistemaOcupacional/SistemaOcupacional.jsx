@@ -593,7 +593,7 @@ const TabComponent = () => {
               13: { title: "Electrocardiograma", child: <EKG /> },
               14: { title: "Espirometría", child: <Espirometria /> },
               16: {
-                title: undefined, child: (
+                title: "Historia Ocupacional", child: (
                   <HistoriaOcupacional
                     token={token}
                     userlogued={userlogued.sub}
@@ -625,7 +625,7 @@ const TabComponent = () => {
               },
               20: { title: "Módulo de Consentimientos", child: <ConsentimientosTabSelector tieneVista={tieneVista} /> },
               21: {
-                title: undefined, child: (
+                title: "Cuestionario Nórdico de Signos y Síntomas Osteomusculares", child: (
                   <Cuestionario_Nordico
                     token={token}
                     userlogued={userlogued.sub}

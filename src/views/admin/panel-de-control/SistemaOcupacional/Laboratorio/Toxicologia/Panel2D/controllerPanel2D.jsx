@@ -2,25 +2,46 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
-  LoadingDefault,
   PrintHojaRDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../../../utils/registroOcupacionalUtils";
 
-const obtenerReporteUrl =
-  "/api/v01/ct/toxicologia/obtenerReportePanel2D";
-const registrarUrl =
-  "/api/v01/ct/toxicologia/registrarActualizarPanel2D";
+const obtenerReporteUrl = "/api/v01/ct/toxicologia/obtenerReportePanel2D";
+const registrarUrl = "/api/v01/ct/toxicologia/registrarActualizarPanel2D";
 
-export const GetInfoServicio = async (
-  nro,
-  tabla,
-  set,
-  token,
-  onFinish = () => { }
-) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      norden: res.norden ?? "",
+      nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      estadoCivil: res.estadoCivil ?? "",
+      nivelEstudios: res.nivelEstudios ?? "",
+      dni: res.dni ?? "",
+      edad: res.edad ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      tieneRegistro: false,
+    }));
+  }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
     nro,
     tabla,
@@ -56,48 +77,43 @@ export const GetInfoServicio = async (
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
+
+      // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+      fechaRegistro: res.fechaRegistro ?? "",
+      userRegistro: res.userRegistro ?? "",
+      fechaActualizacion: res.fechaActualizacion ?? "",
+      usuarioActualizacion: res.usuarioActualizacion ?? "",
+      tieneRegistro: true,
     }));
   }
 };
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+  norden: form.norden,
+  fechaExamen: form.fecha,
+  reMarihuana: form.valueM,
+  reCocaina: form.valueC,
+  txtMetodo: form.metodo,
+  userMedicoOcup: "",
 
-  const body = {
-    norden: form.norden,
-    fechaExamen: form.fecha,
-    reMarihuana: form.valueM,
-    reCocaina: form.valueC,
-    txtMetodo: form.metodo,
-    userMedicoOcup: "",
-    userRegistro: user,
+  usuarioFirma: form.user_medicoFirma,
+  doctorAsignado: form.user_doctorAsignado,
+});
 
-    usuarioFirma: form.user_medicoFirma,
-    doctorAsignado: form.user_doctorAsignado,
-  };
-
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). Este módulo espera la clave "userRegistro".
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro,
+    fechaRegistro: form.fechaRegistro,
   });
-};
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-  GetInfoServicio(nro, tabla, set, token, () => {
-    Swal.close();
-  });
-};
-
-export const PrintHojaR = (nro, token, tabla) => {
+// ===== Impresión =====
+// La carpeta "Toxicologia" agrupa varias plantillas Jasper compartidas entre todos los
+// exámenes de este módulo; se resuelve dinámicamente según el nombre que devuelva el backend.
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Toxicologia/*.jsx"
   );
@@ -105,55 +121,53 @@ export const PrintHojaR = (nro, token, tabla) => {
     nro,
     token,
     tabla,
-    null,
+    datosFooter,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Toxicologia"
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+  verificarRegistro({
     nro,
     tabla,
     token,
-    set,
     sede,
-    () => {
-      //NO Tiene registro
-      GetInfoPac(nro, set, token, sede);
-    },
-    () => {
-      //Tiene registro
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Panel 2D.",
-          "warning"
-        );
-      });
-    }
-  );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      nombres: res.nombresApellidos ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      ocupacion: res.areaO ?? "",
-      nombreExamen: res.nomExam ?? "",
-      cargoDesempenar: res.cargo ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-    }));
-  }
-};
-
-export const Loading = (mensaje) => {
-  LoadingDefault(mensaje);
-};
+    onNuevo: () => GetInfoServicio(nro, set, token, sede),
+    onExistente: () =>
+      GetInfoServicioEditar(nro, tabla, set, token, () => {
+        Swal.fire({
+          icon: "warning",
+          title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+          html: "Este paciente ya cuenta con registros de Panel 2D.",
+        });
+      }),
+  });

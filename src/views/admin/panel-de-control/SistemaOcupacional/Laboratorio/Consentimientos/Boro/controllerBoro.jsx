@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch';
-import { SubmitInfoLaboratioExBoro } from '../Controller/model';
+import { SubmitInfoLaboratioExBoro, registrarConsentimiento } from '../Controller/model';
 import { GetInfoPacDefault, LoadingDefault, VerifyTRDefault } from '../../../../../../utils/functionUtils';
 
 const tabla = 'consent_Boro';
@@ -12,23 +12,26 @@ export const VerifyTR = async (nro, token, setForm, selectedSede) => {
     token,
     setForm,
     selectedSede,
-    async () => {
-      const res = await GetInfoPacDefault(nro, token, selectedSede);
-      if (res) {
-        setForm(prev => ({
-          ...prev,
-          ...res,
-          nombres: res.nombresApellidos || '',
-        }));
-      }
-    },
-    async () => {
-      await GetInfoServicio(nro, token, setForm);
-    }
+    () => GetInfoServicio(nro, token, setForm, selectedSede),
+    () => GetInfoServicioEditar(nro, token, setForm)
   );
 };
 
-export const GetInfoServicio = async (nro, token, setForm) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, token, setForm, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    setForm(prev => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos || '',
+      tieneRegistro: false,
+    }));
+  }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (nro, token, setForm) => {
   LoadingDefault('Obteniendo datos');
   try {
     const res = await getFetch(
@@ -55,6 +58,12 @@ export const GetInfoServicio = async (nro, token, setForm) => {
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         user_doctorAsignado: res.doctorAsignado ?? "",
 
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        userRegistro: res.userRegistro ?? "",
+        fechaRegistro: res.fechaRegistro ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        tieneRegistro: true,
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
@@ -66,35 +75,31 @@ export const GetInfoServicio = async (nro, token, setForm) => {
   }
 };
 
-export const SubmitDataService = async (form, token, userlogued, limpiar) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos', 'error');
-    return;
-  }
-  LoadingDefault('Registrando Datos');
-  try {
-    const res = await SubmitInfoLaboratioExBoro(form, token, userlogued);
-    if (res.norden) {
-      Swal.fire({
-        title: 'Exito',
-        text: `Se completo el Registro Correctamente,\n¿Desea imprimir?`,
-        icon: 'success',
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form, token);
-        }
-      });
-    } else {
-      Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-    }
-  } catch (error) {
-    Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-  }
-};
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: false,
+    submitFn: (data, tk, usr, auditCtx) => SubmitInfoLaboratioExBoro(data, tk, usr, auditCtx),
+    esExito: (res) => Boolean(res?.norden),
+    onPrint: () => PrintHojaR(form, token),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar) =>
+  registrarConsentimiento({
+    form,
+    token,
+    user,
+    limpiar,
+    esActualizacion: true,
+    submitFn: (data, tk, usr, auditCtx) => SubmitInfoLaboratioExBoro(data, tk, usr, auditCtx),
+    esExito: (res) => Boolean(res?.norden),
+    onPrint: () => PrintHojaR(form, token),
+  });
 
 export const PrintHojaR = async (form, token) => {
   LoadingDefault('Cargando Formato a Imprimir');
@@ -124,4 +129,3 @@ export const PrintHojaR = async (form, token) => {
     Swal.close();
   }
 };
-

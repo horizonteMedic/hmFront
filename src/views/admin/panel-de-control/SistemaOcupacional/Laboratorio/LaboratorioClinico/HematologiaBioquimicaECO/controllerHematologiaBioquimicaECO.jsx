@@ -7,18 +7,53 @@ import {
   LoadingDefault,
   PrintHojaRDefault,
   ReadArchivosFormDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js";
 import { getFetch } from "../../../../../../utils/apiHelpers.js";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils.js";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../../../utils/registroOcupacionalUtils.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta";
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`;
 
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede, onFinish = () => { }) => {
+  try {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    if (res) {
+      set((prev) => ({
+        ...prev,
+        norden: res.norden ?? "",
+        nombres: res.nombresApellidos ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+        lugarNacimiento: res.lugarNacimiento ?? "",
+        estadoCivil: res.estadoCivil ?? "",
+        nivelEstudios: res.nivelEstudios ?? "",
+        dni: res.dni ?? "",
+        edad: res.edad ?? "",
+        sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+        empresa: res.empresa ?? "",
+        contrata: res.contrata ?? "",
+        cargoDesempenar: res.cargo ?? "",
+        ocupacion: res.areaO ?? "",
+        nombreExamen: res.nomExam ?? "",
+        tieneRegistro: false,
+      }));
+      onFinish();
+    }
+  } catch (error) {
+    console.error("Error al obtener información del paciente:", error);
+  }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
     nro,
     tabla,
@@ -108,93 +143,96 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
+
+      // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+      fechaRegistro: res.fechaRegistro ?? "",
+      userRegistro: res.userRegistro ?? "",
+      fechaActualizacion: res.fechaActualizacion ?? "",
+      usuarioActualizacion: res.usuarioActualizacion ?? "",
+      tieneRegistro: true,
     }));
   }
 };
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-  const body = {
-    codLabclinico: form.codLabclinico ? form.codLabclinico : null,
-    fechaLab: form.fechaExamen,
-    resLab: form.responsable,
-    chko: form.grupoSanguineo === "O" ? true : false,
-    chka: form.grupoSanguineo === "A" ? true : false,
-    chkb: form.grupoSanguineo === "B" ? true : false,
-    chkab: form.grupoSanguineo === "AB" ? true : false,
-    rbrhpositivo: form.factorRh === "RH(+)" ? true : false,
-    rbrhnegativo: form.factorRh === "RH(-)" ? true : false,
-    txtHemoglobina: form.hemoglobina,
-    txtHematocrito: form.hematocrito,
-    txtVsg: form.vsg,
-    txtPlaquetas: form.plaquetas,
-    txtLeucocitosHematologia: form.leucocitos,
-    txtHematiesHematologia: form.hematies,
-    txtNeutrofilos: form.neutrofilos,
-    txtAbastonados: form.abastonados,
-    txtSegmentadosHematologia: form.segmentados,
-    txtMonocitosHematologia: form.monocitos,
-    txtEosinofilosHematologia: form.eosinofilos,
-    txtBasofilosHematologia: form.basofilos,
-    txtLinfocitosHematologia: form.linfocitos,
-    txtGlucosaBio: form.glucosa,
-    txtCreatininaBio: form.creatinina,
-    chkPositivo: form.rpr === 'POSITIVO' ? true : false,
-    chkNegativo: form.rpr === 'NEGATIVO' ? true : false,
-    txtVih: form.vih,
-    //ORINA
-    txtColorEf: form.color,
-    txtDensidadEf: form.densidad,
-    txtAspectoEf: form.aspecto,
-    txtPhEf: form.ph,
-    //EXAMEN QUIMICO
-    txtNitritosEq: form.nitritos,
-    txtProteinasEq: form.proteinas,
-    txtCetonasEq: form.cetonas,
-    txtLeucocitosEq: form.leucocitosExamenQuimico,
-    txtAcAscorbico: form.acAscorbico,
-    txtUrobilinogenoEq: form.urobilinogeno,
-    txtBilirrubinaEq: form.bilirrubina,
-    txtGlucosaEq: form.glucosaExamenQuimico,
-    txtSangreEq: form.sangre,
-    //SEDIMIETNO
-    txtLeucocitosSu: form.leucocitosSedimentoUnitario,
-    txtCelEpitelialesSu: form.celEpiteliales,
-    txtCilindrosSu: form.cilindros,
-    txtBacteriasSu: form.bacterias,
-    txtHematiesSu: form.hematiesSedimentoUnitario,
-    txtCristalesSu: form.cristales,
-    txtPusSu: form.gramSc,
-    txtOtrosSu: form.otros,
-    //DROGAS
-    txtCocaina: form.cocaina,
-    txtMarihuana: form.marihuana,
-    txtObservacionesLb: form.observaciones,
-    observacionesCie10: form.observacionesCie10,
-    userRegistro: user,
-    userMedicoOcup: "",
-    norden: form.norden,
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+  norden: form.norden,
+  codLabclinico: form.codLabclinico ? form.codLabclinico : null,
+  fechaLab: form.fechaExamen,
+  resLab: form.responsable,
+  chko: form.grupoSanguineo === "O" ? true : false,
+  chka: form.grupoSanguineo === "A" ? true : false,
+  chkb: form.grupoSanguineo === "B" ? true : false,
+  chkab: form.grupoSanguineo === "AB" ? true : false,
+  rbrhpositivo: form.factorRh === "RH(+)" ? true : false,
+  rbrhnegativo: form.factorRh === "RH(-)" ? true : false,
+  txtHemoglobina: form.hemoglobina,
+  txtHematocrito: form.hematocrito,
+  txtVsg: form.vsg,
+  txtPlaquetas: form.plaquetas,
+  txtLeucocitosHematologia: form.leucocitos,
+  txtHematiesHematologia: form.hematies,
+  txtNeutrofilos: form.neutrofilos,
+  txtAbastonados: form.abastonados,
+  txtSegmentadosHematologia: form.segmentados,
+  txtMonocitosHematologia: form.monocitos,
+  txtEosinofilosHematologia: form.eosinofilos,
+  txtBasofilosHematologia: form.basofilos,
+  txtLinfocitosHematologia: form.linfocitos,
+  txtGlucosaBio: form.glucosa,
+  txtCreatininaBio: form.creatinina,
+  chkPositivo: form.rpr === 'POSITIVO' ? true : false,
+  chkNegativo: form.rpr === 'NEGATIVO' ? true : false,
+  txtVih: form.vih,
+  //ORINA
+  txtColorEf: form.color,
+  txtDensidadEf: form.densidad,
+  txtAspectoEf: form.aspecto,
+  txtPhEf: form.ph,
+  //EXAMEN QUIMICO
+  txtNitritosEq: form.nitritos,
+  txtProteinasEq: form.proteinas,
+  txtCetonasEq: form.cetonas,
+  txtLeucocitosEq: form.leucocitosExamenQuimico,
+  txtAcAscorbico: form.acAscorbico,
+  txtUrobilinogenoEq: form.urobilinogeno,
+  txtBilirrubinaEq: form.bilirrubina,
+  txtGlucosaEq: form.glucosaExamenQuimico,
+  txtSangreEq: form.sangre,
+  //SEDIMIETNO
+  txtLeucocitosSu: form.leucocitosSedimentoUnitario,
+  txtCelEpitelialesSu: form.celEpiteliales,
+  txtCilindrosSu: form.cilindros,
+  txtBacteriasSu: form.bacterias,
+  txtHematiesSu: form.hematiesSedimentoUnitario,
+  txtCristalesSu: form.cristales,
+  txtPusSu: form.gramSc,
+  txtOtrosSu: form.otros,
+  //DROGAS
+  txtCocaina: form.cocaina,
+  txtMarihuana: form.marihuana,
+  txtObservacionesLb: form.observaciones,
+  observacionesCie10: form.observacionesCie10,
 
-    notasDoctor: form.notasDoctor,
+  notasDoctor: form.notasDoctor,
 
-    usuarioFirma: form.user_medicoFirma,
-    doctorAsignado: form.user_doctorAsignado,
-  };
+  userMedicoOcup: "",
+  usuarioFirma: form.user_medicoFirma,
+  doctorAsignado: form.user_doctorAsignado,
+});
 
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla);
+// Body completo (creación / actualización). Este módulo espera la clave "userRegistro".
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro,
+    fechaRegistro: form.fechaRegistro,
   });
-};
 
+// ===== Impresión =====
+// La carpeta "AnalisisBioquimicos" agrupa varias plantillas Jasper (Lab. Clínico, Eco, perdido,
+// etc.); se resuelve dinámicamente según el nombre que devuelva el backend.
 export const PrintHojaR = async (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
@@ -210,92 +248,83 @@ export const PrintHojaR = async (nro, token, tabla) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
-  await VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+  });
+
+// ===== Búsqueda / verificación por N° Orden =====
+// Además de cargar los datos (nuevo o existente), refresca el checklist de exámenes
+// (GetExamenesLab) con el estado real de cada examen para ese N° Orden.
+export const VerifyTR = (nro, tabla, token, set, sede, ExamenesList) =>
+  verificarRegistro({
     nro,
     tabla,
     token,
-    set,
     sede,
-    () => {
-      GetInfoPac(nro, set, token, sede, async () => {
+    onNuevo: () =>
+      GetInfoServicio(nro, set, token, sede, async () => {
         await GetExamenesLab(nro, set, token, ExamenesList);
-      });
-    },
-    () => {
-      GetInfoServicio(nro, tabla, set, token, async () => {
+      }),
+    onExistente: () =>
+      GetInfoServicioEditar(nro, tabla, set, token, async () => {
         await GetExamenesLab(nro, set, token, ExamenesList);
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros en Laboratorio Clinico",
           "warning"
         );
-      });
-    }
-  );
-};
-
-const GetInfoPac = async (nro, set, token, sede, finallyOnFinish = () => {}) => {
-try {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      nombres: res.nombresApellidos ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      ocupacion: res.areaO ?? "",
-      nombreExamen: res.nomExam ?? "",
-      cargoDesempenar: res.cargo ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-      
-    }));
-    finallyOnFinish();
-  }
-} catch (error) {
-  console.error("Error al obtener información del paciente:", error);
-}
-  
-};
+      }),
+  });
 
 const GetExamenesLab = async (nro, set, token, ExamenesList) => {
-  console.log("ENTRANDO A GetExamenesLab");
-
   try {
     const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
-    console.log('respuesta', res)
 
-    const serviciosMap = Object.values(res|| {}).reduce((acc, item) => {
+    const serviciosMap = Object.values(res || {}).reduce((acc, item) => {
       acc[item.nameService] = item.existe;
       return acc;
     }, {});
-    console.log("servicios normalizados", {serviciosMap})
 
     const configActualizada = ExamenesList.map(section => ({
       ...section,
       items: section.items.map(item => ({
         ...item,
-        // items: sub.items.map(item => ({
-        //   ...item,
-          resultado: serviciosMap[item.tabla] ?? false
-        // }))
+        resultado: serviciosMap[item.tabla] ?? false
       }))
-    })); 
+    }));
 
-     set(prev => ({
-       ...prev,
-       listExamLab: configActualizada,
-     }));
-
+    set(prev => ({
+      ...prev,
+      listExamLab: configActualizada,
+    }));
 
   } catch (error) {
     console.error("Error al cargar exámenes:", error);
   } finally {
     Swal.close();
   }
-
 };
 
 export const Loading = (mensaje) => {

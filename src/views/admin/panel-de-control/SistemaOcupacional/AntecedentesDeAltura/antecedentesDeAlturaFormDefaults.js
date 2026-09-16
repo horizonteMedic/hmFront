@@ -66,4 +66,13 @@ export const getAntecedentesDeAlturaInitialFormState = ({
   // Médico que Certifica //BUSCADOR
   nombre_medico: userName,
   user_medicoFirma: userlogued,
+
+  // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+  tieneRegistro: false,
+
+  // Auditoría
+  userRegistro: "",
+  fechaRegistro: "",
+  usuarioActualizacion: "",
+  fechaActualizacion: "",
 });

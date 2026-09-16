@@ -1,14 +1,27 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faBroom, faPrint, faPen } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
 import { InputTextOneLine } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
-import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from './controllerMuestraDeSangre';
-import { getToday } from '../../../../../../utils/helpers';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
+import { PrintHojaR, SubmitConsentimientoLab, UpdateConsentimientoLab, VerifyTR } from './controllerMuestraDeSangre';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = 'consent_Muestra_Sangre';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+];
 
 const MuestraDeSangre = () => {
   const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -27,9 +40,32 @@ const MuestraDeSangre = () => {
 
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
-  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
+  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState, { storageKey: "consMuestraDeSangre" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   const handleset = () => {
     setForm(prev => ({
@@ -42,6 +78,15 @@ const MuestraDeSangre = () => {
       // Médico que Certifica //BUSCADOR
       nombre_medico: userName,
       user_medicoFirma: userlogued,
+
+      nombre_doctorAsignado: "",
+      user_doctorAsignado: "",
+
+      tieneRegistro: false,
+      userRegistro: "",
+      fechaRegistro: "",
+      usuarioActualizacion: "",
+      fechaActualizacion: "",
     }));
   };
 
@@ -51,12 +96,31 @@ const MuestraDeSangre = () => {
     }, '¿Desea Imprimir Consentimiento Muestra de Sangre?', form.norden);
   };
 
-  const handleSubmit = () => {
+  const handleSave = () => {
     SubmitConsentimientoLab(form, tabla, token, userlogued, handleClear);
   };
 
+  const handleEdit = () => {
+    UpdateConsentimientoLab(form, tabla, token, userlogued, handleClear);
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE</h2>
 
       <form className="space-y-6">
@@ -73,6 +137,7 @@ const MuestraDeSangre = () => {
                   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}
+              disabled={hayRegistroCargado}
               labelWidth="120px"
               className="flex-1"
             />
@@ -82,6 +147,9 @@ const MuestraDeSangre = () => {
               type="date"
               value={form.fecha}
               onChange={handleChange}
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("fecha")}
+              onRevert={() => revertField("fecha")}
               labelWidth="120px"
               className="flex-1"
             />
@@ -137,25 +205,53 @@ const MuestraDeSangre = () => {
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
           />
-        <EmpleadoComboBox
-          value={form.nombre_doctorAsignado}
-          label="Doctor Asignado"
-          form={form}
-          onChange={handleChangeSimple}
-          nameField="nombre_doctorAsignado"
-          idField="user_doctorAsignado"
-        />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
+            disabled={camposDeshabilitados}
+            edited={isDoctorEdited}
+            onRevert={revertDoctor}
+          />
         </SectionFieldset>
+
+        {hayRegistroCargado && (
+          <AuditoriaRegistro
+            mostrarEdicion={form.tieneRegistro}
+            fechaCreacion={auditoria.fechaCreacion}
+            fechaEdicion={auditoria.fechaActualizacion}
+            usuarioRegistro={auditoria.usuarioRegistro}
+            usuarioEdicion={auditoria.usuarioActualizacion}
+          />
+        )}
+
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
+            {(!form.tieneRegistro || edicionHabilitada) && (
+              <button
+                type="button"
+                onClick={form.tieneRegistro ? handleEdit : handleSave}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSave} /> {form.tieneRegistro ? "Guardar Cambios" : "Guardar"}
+              </button>
+            )}
+            {form.tieneRegistro && !edicionHabilitada && (
+              <button
+                type="button"
+                onClick={habilitarEdicion}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPen} /> Editar
+              </button>
+            )}
             <button
               type="button"
               className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"

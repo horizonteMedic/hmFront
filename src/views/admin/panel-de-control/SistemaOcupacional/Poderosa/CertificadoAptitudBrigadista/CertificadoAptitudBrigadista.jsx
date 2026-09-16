@@ -5,7 +5,7 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
-import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -173,11 +173,13 @@ const CertificadoAptitudBrigadista = () => {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {hayRegistroCargado && (
-                <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
-                    <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
-                </div>
-            )}
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClearForm}
+            />
 
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
@@ -212,7 +214,7 @@ const CertificadoAptitudBrigadista = () => {
             <DatosPersonalesLaborales form={form} />
 
             <div className="flex flex-col md:flex-row gap-3 items-start w-full ">
-                <div className="w-full md:w-[40%]">
+                <div className="w-full md:w-[40%] space-y-3">
                     <SectionFieldset legend="Aptitud" className="w-full">
                         <InputsRadioGroup
                             vertical

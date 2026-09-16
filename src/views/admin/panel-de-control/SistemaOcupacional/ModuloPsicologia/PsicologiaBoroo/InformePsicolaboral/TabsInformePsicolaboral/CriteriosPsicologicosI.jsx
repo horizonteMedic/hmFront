@@ -4,6 +4,9 @@ import SectionFieldset from "../../../../../../../components/reusableComponents/
 export default function CriteriosPsicologicosI({
   form,
   handleRadioButton,
+  disabled = false,
+  isFieldEdited,
+  revertField,
 }) {
 
   return (
@@ -29,6 +32,10 @@ export default function CriteriosPsicologicosI({
               ]}
               form={form}
               handleRadioButton={handleRadioButton}
+              disabled={disabled}
+              isFieldEdited={isFieldEdited}
+              onRevert={revertField}
+              stackOnMobile
             />
           </SectionFieldset>
         )}
@@ -52,6 +59,10 @@ export default function CriteriosPsicologicosI({
             ]}
             form={form}
             handleRadioButton={handleRadioButton}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
+            stackOnMobile
           />
         </SectionFieldset>
       </div>

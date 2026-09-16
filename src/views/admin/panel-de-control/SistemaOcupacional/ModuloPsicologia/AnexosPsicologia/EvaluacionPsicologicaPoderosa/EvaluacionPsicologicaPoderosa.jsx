@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -8,12 +6,18 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 // Áreas de Evaluación: Inteligencia
 const inteligenciaItems = [
@@ -35,13 +39,54 @@ const personalidadItems = [
     { name: "persRelaciones", label: "4. Relaciones interpersonales / Adaptación al medio" },
     { name: "persNormasReglas", label: "5. Disposición para acatar normas y reglas" },
 ];
-// Opciones estandarizadas S / NPS / NP / NPI
+// Opciones estandarizadas S / NPS / NP / NPI / I.
+// Las cabeceras usan el código corto (el largo no entra en la columna y se superpone);
+// el significado se muestra en la leyenda debajo de las tablas.
+// const evalOptions = [
+//     { value: "S", label: "S" },
+//     { value: "NPS", label: "NPS" },
+//     { value: "NP", label: "NP" },
+//     { value: "NPI", label: "NPI" },
+//     { value: "I", label: "I" },
+// ];
+
 const evalOptions = [
     { value: "S", label: "Superior" },
     { value: "NPS", label: "Nivel Promedio Superior" },
     { value: "NP", label: "Nivel Promedio" },
     { value: "NPI", label: "Nivel Promedio Inferior" },
     { value: "I", label: "Inferior" },
+];
+
+// const evalLeyenda = "S = Superior · NPS = Nivel Promedio Superior · NP = Nivel Promedio · NPI = Nivel Promedio Inferior · I = Inferior";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExam",
+    "aptitud",
+    "recomendaciones",
+    "user_medicoFirma",
+    "nombre_medico",
+    // Áreas de Evaluación - Inteligencia
+    "intelCoeficiente",
+    "intelComprension",
+    "intelAtencion",
+    "intelMemoria",
+    "intelVisomotora",
+    "intelOrientacionEspacial",
+    "intelDiscriminarDetalles",
+    "intelAprendizaje",
+    "intelAnalisisSintesis",
+    // Áreas de Evaluación - Personalidad
+    "persEstabilidad",
+    "persAfrontaEstres",
+    "persAfrontaRiesgo",
+    "persRelaciones",
+    "persNormasReglas",
+    // Campos de texto libres
+    "fortalezasOportunidades",
+    "amenazasDebilidades",
+    "observaciones",
 ];
 
 export default function EvaluacionPsicologicaPoderosa() {
@@ -57,12 +102,12 @@ export default function EvaluacionPsicologicaPoderosa() {
         codigoEvaluacionPsicologicaPoderosa: null,
         fechaExam: today,
         nombreExamen: "",
-        // tipoInforme: "NORMAL",
         aptitud: "",
 
         // Datos personales
         nombres: "",
         apellidos: "",
+        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
@@ -104,6 +149,14 @@ export default function EvaluacionPsicologicaPoderosa() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -116,7 +169,22 @@ export default function EvaluacionPsicologicaPoderosa() {
         handleChangeSimple,
         handleClear,
         handleRadioButton,
+        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "EvaluacionPsicologicaPoderosa" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     const handleRadioButtonTipoInforme = (e, value) => {
         const { name } = e.target;
@@ -139,37 +207,82 @@ export default function EvaluacionPsicologicaPoderosa() {
         SubmitDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.apellidos || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             {/* Header */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha Examen"
                     name="fechaExam"
                     type="date"
                     value={form.fechaExam}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaExam")}
+                    onRevert={() => revertField("fechaExam")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -184,6 +297,8 @@ export default function EvaluacionPsicologicaPoderosa() {
                     name="tipoInforme"
                     value={tipoInforme.tipoInforme}
                     labelWidth="120px"
+                    stackOnMobile
+                    groupClassName="flex-wrap"
                     options={[
                         { label: "NORMAL", value: "NORMAL" },
                         { label: "LICENCIA", value: "LICENCIA" },
@@ -196,6 +311,8 @@ export default function EvaluacionPsicologicaPoderosa() {
                     name="aptitud"
                     value={form.aptitud}
                     labelWidth="120px"
+                    stackOnMobile
+                    groupClassName="flex-wrap"
                     options={[
                         { label: "APTO", value: "APTO" },
                         { label: "NO APTO", value: "NO APTO" },
@@ -203,61 +320,58 @@ export default function EvaluacionPsicologicaPoderosa() {
                         { label: "AP O.", value: "AP O." },
                     ]}
                     onChange={handleRadioButton}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("aptitud")}
+                    onRevert={() => revertField("aptitud")}
                 />
             </SectionFieldset>
-            {/* Datos Necesarios */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Izquierda */}
-                <div className="space-y-3">
-                    <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                </div>
-                {/* Derecha */}
-                <div className="space-y-3">
-                    <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                        <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
-                    </div>
-                    <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                </div>
+
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio">
+                <InputTextOneLine
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
+                    disabled
+                    labelWidth="160px" />
             </SectionFieldset>
 
-            {/* Datos Laborales */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                </div>
-                <div className="space-y-3">
-                    <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                </div>
-            </SectionFieldset>
 
-            <div className="grid md:grid-cols-2 gap-4">
-                {/* Áreas de Evaluación - Inteligencia */}
-                <SectionFieldset legend="Áreas de Evaluación - Inteligencia" >
-                    <RadioTable
-                        items={inteligenciaItems}
-                        options={evalOptions}
-                        labelColumns={3}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                    />
-                </SectionFieldset>
-                {/* Áreas de Evaluación - Personalidad */}
-                <SectionFieldset legend="Áreas de Evaluación - Personalidad" >
-                    <RadioTable
-                        items={personalidadItems}
-                        options={evalOptions}
-                        form={form}
-                        labelColumns={3}
-                        handleRadioButton={handleRadioButton} />
-                </SectionFieldset>
+            <div className="space-y-2">
+                <div className="grid xl:grid-cols-2 gap-4">
+                    {/* Áreas de Evaluación - Inteligencia */}
+                    <SectionFieldset legend="Áreas de Evaluación - Inteligencia" >
+                        <RadioTable
+                            items={inteligenciaItems}
+                            options={evalOptions}
+                            labelColumns={3}
+                            form={form}
+                            handleRadioButton={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            isFieldEdited={isFieldEdited}
+                            onRevert={revertField}
+                            stackOnMobile
+                        />
+                    </SectionFieldset>
+                    {/* Áreas de Evaluación - Personalidad */}
+                    <SectionFieldset legend="Áreas de Evaluación - Personalidad" >
+                        <RadioTable
+                            items={personalidadItems}
+                            options={evalOptions}
+                            form={form}
+                            labelColumns={3}
+                            handleRadioButton={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            isFieldEdited={isFieldEdited}
+                            onRevert={revertField}
+                            stackOnMobile
+                        />
+                    </SectionFieldset>
+                </div>
+                {/* <p className="text-xs text-gray-500 px-1">
+                    <span className="font-semibold">Leyenda:</span> {evalLeyenda}
+                </p> */}
             </div>
             {/* Campos de texto libres */}
             <SectionFieldset legend="Conclusiones Finales" className="grid md:grid-cols-2 gap-4">
@@ -267,6 +381,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.fortalezasOportunidades}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fortalezasOportunidades")}
+                    onRevert={() => revertField("fortalezasOportunidades")}
                 />
                 <InputTextArea
                     label="Amenazas y Debilidades"
@@ -274,6 +391,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.amenazasDebilidades}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("amenazasDebilidades")}
+                    onRevert={() => revertField("amenazasDebilidades")}
                 />
                 <InputTextArea
                     label="Observaciones"
@@ -281,6 +401,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.observaciones}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("observaciones")}
+                    onRevert={() => revertField("observaciones")}
                 />
                 <InputTextArea
                     label="Recomendaciones"
@@ -288,6 +411,9 @@ export default function EvaluacionPsicologicaPoderosa() {
                     value={form.recomendaciones}
                     onChange={handleChange}
                     rows={5}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("recomendaciones")}
+                    onRevert={() => revertField("recomendaciones")}
                 />
             </SectionFieldset>
 
@@ -297,45 +423,36 @@ export default function EvaluacionPsicologicaPoderosa() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
-            <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">Imprimir</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
 
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </fieldset>
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
         </div>
     );
 }

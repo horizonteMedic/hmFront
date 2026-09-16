@@ -9,7 +9,30 @@ export default function Antecedentes({
   setForm,
   handleChange,
   handleRadioButtonBoolean,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => {},
 }) {
+  // Antecedentes psiconeurológicos: cada fila es un radio Sí/No + un input de descripción
+  // (habilitado solo si el radio está en "Sí"). Al cambiar el radio se limpia su descripción.
+  const psicoNeuro = [
+    { name: "tecModeradoGrave", desc: "tecModeradoGraveDescripcion", label: "TEC Moderado/ Grave" },
+    { name: "convulsiones", desc: "convulsionesDescripcion", label: "Convulsiones" },
+    { name: "mareosModosidadAcatisia", desc: "mareosModosidadAcatasiaDescripcion", label: "Mareos/ Modosidad/ Acatisia" },
+    { name: "problemasAudicion", desc: "problemasAudicionDescripcion", label: "Problemas de Audición" },
+    { name: "problemasEquilibrio", desc: "problemasEquilibrioDescripcion", label: "Problemas de Equilibrio" },
+    { name: "acrofobia", desc: "acrofobiaDescripcion", label: "Acrofobia" },
+    { name: "agarofobia", desc: "agarofobiaDescripcion", label: "Agarofobia" },
+  ];
+
+  const sustancias = [
+    { name: "tabaco", frec: "tabacoFrecuencia", label: "Tabaco" },
+    { name: "alcohol", frec: "alcoholFrecuencia", label: "Alcohol" },
+    { name: "drogas", frec: "drogasFrecuencia", label: "Drogas" },
+    { name: "hojaCoca", frec: "hojaCocaFrecuencia", label: "Hoja de Coca" },
+    { name: "cafe", frec: "cafeFrecuencia", label: "Café" },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Accidentes de Trabajo o Enfermedades Profesionales */}
@@ -23,14 +46,20 @@ export default function Antecedentes({
             name="accidentesTrabajoEnfermedades"
             value={form?.accidentesTrabajoEnfermedades}
             onChange={handleChange}
+            disabled={disabled}
             rows={6}
+            edited={isFieldEdited("accidentesTrabajoEnfermedades")}
+            onRevert={() => revertField("accidentesTrabajoEnfermedades")}
           />
           <InputTextArea
             label="Antecedentes Familiares"
             name="antecedentesFamiliares"
             value={form?.antecedentesFamiliares}
             onChange={handleChange}
+            disabled={disabled}
             rows={6}
+            edited={isFieldEdited("antecedentesFamiliares")}
+            onRevert={() => revertField("antecedentesFamiliares")}
           />
         </div>
       </fieldset>
@@ -39,152 +68,37 @@ export default function Antecedentes({
         <legend className="font-bold mb-2 text-gray-800 text-[10px]">
           Antecedentes Psiconeuroológicos
         </legend>
-        <div className="grid grid-cols-1 gap-3">
-          {/* TEC Moderado/Grave */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="TEC Moderado/ Grave"
-              name="tecModeradoGrave"
-              value={form?.tecModeradoGrave}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, tecModeradoGraveDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="tecModeradoGraveDescripcion"
-              value={form?.tecModeradoGraveDescripcion}
-              className="w-full my-auto"
-              disabled={!form?.tecModeradoGrave}
-              onChange={handleChange}
-            />
-          </div>
-          {/* Convulsiones */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Convulsiones"
-              name="convulsiones"
-              value={form?.convulsiones}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, convulsionesDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="convulsionesDescripcion"
-              value={form?.convulsionesDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.convulsiones}
-            />
-          </div>
-
-          {/* Mareos/Modosidad/Acatisia */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Mareos/ Modosidad/ Acatisia"
-              name="mareosModosidadAcatisia"
-              value={form?.mareosModosidadAcatisia}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, mareosModosidadAcatasiaDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="mareosModosidadAcatasiaDescripcion"
-              value={form?.mareosModosidadAcatasiaDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.mareosModosidadAcatisia}
-            />
-          </div>
-
-          {/* Problemas de Audición */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Problemas de Audición"
-              name="problemasAudicion"
-              value={form?.problemasAudicion}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, problemasAudicionDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="problemasAudicionDescripcion"
-              value={form?.problemasAudicionDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.problemasAudicion}
-            />
-          </div>
-
-          {/* Problemas de Equilibrio */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Problemas de Equilibrio"
-              name="problemasEquilibrio"
-              value={form?.problemasEquilibrio}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, problemasEquilibrioDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="problemasEquilibrioDescripcion"
-              value={form?.problemasEquilibrioDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.problemasEquilibrio}
-            />
-          </div>
-
-          {/* Acrofobia */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Acrofobia"
-              name="acrofobia"
-              value={form?.acrofobia}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, acrofobiaDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="acrofobiaDescripcion"
-              value={form?.acrofobiaDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.acrofobia}
-            />
-          </div>
-
-          {/* Agarofobia */}
-          <div className="flex gap-4">
-            <InputsBooleanRadioGroup
-              label="Agarofobia"
-              name="agarofobia"
-              value={form?.agarofobia}
-              onChange={(e, value) => {
-                handleRadioButtonBoolean(e, value);
-                setForm(prev => ({ ...prev, agarofobiaDescripcion: "" }))
-              }}
-              labelWidth="130px"
-            />
-            <InputTextOneLine
-              name="agarofobiaDescripcion"
-              value={form?.agarofobiaDescripcion}
-              onChange={handleChange}
-              className="w-full my-auto"
-              disabled={!form?.agarofobia}
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-4">
+          {psicoNeuro.map((row) => (
+            <div
+              key={row.name}
+              className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
+            >
+              <InputsBooleanRadioGroup
+                label={row.label}
+                name={row.name}
+                value={form?.[row.name]}
+                onChange={(e, value) => {
+                  handleRadioButtonBoolean(e, value);
+                  setForm((prev) => ({ ...prev, [row.desc]: "" }));
+                }}
+                labelWidth="130px"
+                className="shrink-0"
+                disabled={disabled}
+                edited={isFieldEdited(row.name)}
+                onRevert={() => revertField(row.name)}
+              />
+              <InputTextOneLine
+                name={row.desc}
+                value={form?.[row.desc]}
+                onChange={handleChange}
+                className="w-full md:my-auto"
+                disabled={disabled || !form?.[row.name]}
+                edited={isFieldEdited(row.desc)}
+                onRevert={() => revertField(row.desc)}
+              />
+            </div>
+          ))}
         </div>
       </fieldset>
 
@@ -201,96 +115,32 @@ export default function Antecedentes({
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  label="Tabaco"
-                  name="tabaco"
-                  value={form?.tabaco}
-                  onChange={handleChange}
-                  labelWidth="60px"
-                />
-              </td>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  name="tabacoFrecuencia"
-                  value={form?.tabacoFrecuencia}
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  label="Alcohol"
-                  name="alcohol"
-                  value={form?.alcohol}
-                  onChange={handleChange}
-                  labelWidth="60px"
-                />
-              </td>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  name="alcoholFrecuencia"
-                  value={form?.alcoholFrecuencia}
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  label="Drogas"
-                  name="drogas"
-                  value={form?.drogas}
-                  onChange={handleChange}
-                  labelWidth="60px"
-                />
-              </td>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  name="drogasFrecuencia"
-                  value={form?.drogasFrecuencia}
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  label="Hoja de Coca"
-                  name="hojaCoca"
-                  value={form?.hojaCoca}
-                  onChange={handleChange}
-                  labelWidth="60px"
-                />
-              </td>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  name="hojaCocaFrecuencia"
-                  value={form?.hojaCocaFrecuencia}
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  label="Café"
-                  name="cafe"
-                  value={form?.cafe}
-                  onChange={handleChange}
-                  labelWidth="60px"
-                />
-              </td>
-              <td className=" px-2 py-2">
-                <InputTextOneLine
-                  name="cafeFrecuencia"
-                  value={form?.cafeFrecuencia}
-                  onChange={handleChange}
-                />
-              </td>
-            </tr>
+            {sustancias.map((row) => (
+              <tr key={row.name}>
+                <td className=" px-2 py-2">
+                  <InputTextOneLine
+                    label={row.label}
+                    name={row.name}
+                    value={form?.[row.name]}
+                    onChange={handleChange}
+                    disabled={disabled}
+                    labelWidth="60px"
+                    edited={isFieldEdited(row.name)}
+                    onRevert={() => revertField(row.name)}
+                  />
+                </td>
+                <td className=" px-2 py-2">
+                  <InputTextOneLine
+                    name={row.frec}
+                    value={form?.[row.frec]}
+                    onChange={handleChange}
+                    disabled={disabled}
+                    edited={isFieldEdited(row.frec)}
+                    onRevert={() => revertField(row.frec)}
+                  />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </fieldset>

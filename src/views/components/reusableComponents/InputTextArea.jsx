@@ -33,15 +33,13 @@ export default function InputTextArea({
     <div className={`w-full ${className}`}>
       {(label || showRevert) && (
         <div className="flex items-center justify-between mb-1">
-          {label ? (
+          {label && (
             <label className={`block font-semibold ${classNameLabel}`} htmlFor={name}>
               {label}
               {required && <span className="text-red-500 ml-0.5">*</span>} :
             </label>
-          ) : (
-            <span />
           )}
-          {showRevert && <RevertButton onClick={onRevert} />}
+          {showRevert && <RevertButton onClick={onRevert} className="ml-auto" />}
         </div>
       )}
       <textarea

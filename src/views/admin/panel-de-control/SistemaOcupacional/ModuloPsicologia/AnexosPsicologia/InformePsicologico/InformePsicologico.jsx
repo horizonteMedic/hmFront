@@ -7,15 +7,32 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../../utils/helpers";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
+import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerInformePsicologico";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_psicologico";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaEntrevista",
+    "aproboTest",
+    "recomendaciones",
+    "areaIntelectual",
+    "areaOrganicidad",
+    "areaPersonalidad",
+    "areaPsicomotricidad",
+];
 
 export default function InformePsicologico() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
@@ -29,6 +46,7 @@ export default function InformePsicologico() {
         nombreExamen: "",
         nombres: "",
         apellidos: "",
+        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
@@ -101,7 +119,16 @@ export default function InformePsicologico() {
         aproboTest: undefined,
 
         SubirDoc: false,
-        nomenclatura: "INFORME PSICOLOGICO"
+        nomenclatura: "INFORME PSICOLOGICO",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -115,6 +142,14 @@ export default function InformePsicologico() {
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "informePsicologicoPsicologia" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
 
     // Estado para el select de recomendaciones predefinidas
     const [selectedRecomendacion, setSelectedRecomendacion] = useState("");
@@ -297,15 +332,38 @@ export default function InformePsicologico() {
     const handlePsicomotricidadCheckboxChange = handleAreaCheckboxChange('psicomotricidad');
 
 
-    // Funciones temporales sin funcionalidad del controller
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.apellidos || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -314,24 +372,46 @@ export default function InformePsicologico() {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha Entrevista"
                     name="fechaEntrevista"
                     type="date"
                     value={form.fechaEntrevista}
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fechaEntrevista")}
+                    onRevert={() => revertField("fechaEntrevista")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -346,6 +426,9 @@ export default function InformePsicologico() {
                     name="aproboTest"
                     value={form.aproboTest}
                     onChange={handleRadioButtonBoolean}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("aproboTest")}
+                    onRevert={() => revertField("aproboTest")}
                 />
 
                 <ButtonsPDF
@@ -354,113 +437,18 @@ export default function InformePsicologico() {
                     handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
                 />
             </SectionFieldset>
-            {/* Contenido principal */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Columna Izquierda */}
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Nombres"
-                        name="nombres"
-                        value={form.nombres}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Apellidos"
-                        name="apellidos"
-                        value={form.apellidos}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Fecha Nacimiento"
-                        name="fechaNacimiento"
-                        value={form.fechaNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Lugar Nacimiento"
-                        name="lugarNacimiento"
-                        value={form.lugarNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
 
-                {/* Columna Derecha */}
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Domicilio Actual"
-                        name="domicilioActual"
-                        value={form.domicilioActual}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <div className="grid md:grid-cols-2 gap-3">
-                        <InputTextOneLine
-                            label="Edad (Años)"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Sexo"
-                            name="sexo"
-                            value={form.sexo}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                    <InputTextOneLine
-                        label="Estado Civil"
-                        name="estadoCivil"
-                        value={form.estadoCivil}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Nivel Estudios"
-                        name="nivelEstudios"
-                        value={form.nivelEstudios}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-            </SectionFieldset>
-            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <DatosPersonalesLaborales form={form} />
+
+            <SectionFieldset legend="Domicilio">
                 <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
-                    value={form.empresa}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Contrata"
-                    name="contrata"
-                    value={form.contrata}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Ocupación"
-                    name="ocupacion"
-                    value={form.ocupacion}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Cargo Desempeñar"
-                    name="cargoDesempenar"
-                    value={form.cargoDesempenar}
+                    label="Domicilio Actual"
+                    name="domicilioActual"
+                    value={form.domicilioActual}
                     disabled
                     labelWidth="120px"
                 />
             </SectionFieldset>
-
 
             {/*==========================Área Intelectual Section==========================*/}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -475,6 +463,9 @@ export default function InformePsicologico() {
                                 name="areaIntelectual"
                                 value={form.areaIntelectual}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaIntelectual")}
+                                onRevert={() => revertField("areaIntelectual")}
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>
@@ -483,30 +474,35 @@ export default function InformePsicologico() {
                                         name="intelectualSuperior"
                                         checked={form.intelectualSuperior}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="PROMEDIO"
                                         name="intelectualPromedio"
                                         checked={form.intelectualPromedio}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="PROMEDIO SUPERIOR"
                                         name="intelectualPromedioSuperior"
                                         checked={form.intelectualPromedioSuperior}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="PROMEDIO BAJO"
                                         name="intelectualPromedioBajo"
                                         checked={form.intelectualPromedioBajo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="BAJO"
                                         name="intelectualBajo"
                                         checked={form.intelectualBajo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset >
@@ -515,18 +511,21 @@ export default function InformePsicologico() {
                                         name="infosencilla"
                                         checked={form.infosencilla}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="INFORMACION GENERAL"
                                         name="infogeneral"
                                         checked={form.infogeneral}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="DIFICULTAD"
                                         name="infodificultad"
                                         checked={form.infodificultad}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
@@ -535,30 +534,35 @@ export default function InformePsicologico() {
                                         name="supVerbalNum"
                                         checked={form.supVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.P.VERBAL Y NUMÉRICA"
                                         name="promVerbalNum"
                                         checked={form.promVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.P.S.VERBAL Y NUMÉRICA"
                                         name="promSupVerbalNum"
                                         checked={form.promSupVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.P.B.VERBAL Y NUMÉRICA"
                                         name="promBajoVerbalNum"
                                         checked={form.promBajoVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.B.VERBAL Y NUMÉRICA"
                                         name="bajoVerbalNum"
                                         checked={form.bajoVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
@@ -567,30 +571,35 @@ export default function InformePsicologico() {
                                         name="promSuperior"
                                         checked={form.promSuperior}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.P.VERBAL Y CÁLCULO"
                                         name="promedio"
                                         checked={form.promedio}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.S.VERBAL Y CÁLCULO"
                                         name="superior"
                                         checked={form.superior}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.P.B.VERBAL Y CÁLCULO"
                                         name="promBajo"
                                         checked={form.promBajo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="N.B.VERBAL Y CÁLCULO"
                                         name="bajo"
                                         checked={form.bajo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
@@ -599,6 +608,7 @@ export default function InformePsicologico() {
                                         name="compInfo"
                                         checked={form.compInfo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     {/* <InputCheckbox
                                         label="PROMEDIO BAJO"
@@ -613,18 +623,21 @@ export default function InformePsicologico() {
                                         name="adecuado"
                                         checked={form.adecuado}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="PROMEDIO BAJO DE RETENCIÓN"
                                         name="prmBajo"
                                         checked={form.prmBajo}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="INADECUADA"
                                         name="inadecuado"
                                         checked={form.inadecuado}
                                         onChange={handleIntellectualCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                             </div>
@@ -640,6 +653,9 @@ export default function InformePsicologico() {
                                 name="areaOrganicidad"
                                 value={form.areaOrganicidad}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaOrganicidad")}
+                                onRevert={() => revertField("areaOrganicidad")}
                             />
                             <fieldset className="grid grid-cols-2 gap-2">
                                 <SectionFieldset className="flex gap-3 flex-col" >
@@ -648,18 +664,21 @@ export default function InformePsicologico() {
                                         name="adecuadoManejo"
                                         checked={form.adecuadoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="PROMEDIO BAJO MANEJO DE FACULTADES MENTALES"
                                         name="promBajoManejo"
                                         checked={form.promBajoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="BAJO MANEJO DE FACULTADES MENTALES"
                                         name="bajoManejo"
                                         checked={form.bajoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <div className="space-y-3">
@@ -669,6 +688,7 @@ export default function InformePsicologico() {
                                             name="orientadoTiempo"
                                             checked={form.orientadoTiempo}
                                             onChange={handleOrganicidadCheckboxChange}
+                                            disabled={camposDeshabilitados}
                                         />
                                     </SectionFieldset>
                                     <SectionFieldset>
@@ -677,6 +697,7 @@ export default function InformePsicologico() {
                                             name="noEnvidencia"
                                             checked={form.noEnvidencia}
                                             onChange={handleOrganicidadCheckboxChange}
+                                            disabled={camposDeshabilitados}
                                         />
                                     </SectionFieldset>
                                 </div>
@@ -696,6 +717,9 @@ export default function InformePsicologico() {
                             name="areaPersonalidad"
                             value={form.areaPersonalidad}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("areaPersonalidad")}
+                            onRevert={() => revertField("areaPersonalidad")}
                         />
                     </SectionFieldset>
 
@@ -708,6 +732,9 @@ export default function InformePsicologico() {
                                 name="areaPsicomotricidad"
                                 value={form.areaPsicomotricidad}
                                 onChange={handleChange}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("areaPsicomotricidad")}
+                                onRevert={() => revertField("areaPsicomotricidad")}
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>
@@ -717,6 +744,7 @@ export default function InformePsicologico() {
                                         name="nivAdecuado"
                                         checked={form.nivAdecuado}
                                         onChange={handlePsicomotricidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
 
                                     <InputCheckbox
@@ -724,6 +752,7 @@ export default function InformePsicologico() {
                                         name="nivBajoPs"
                                         checked={form.nivBajoPs}
                                         onChange={handlePsicomotricidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
@@ -732,18 +761,21 @@ export default function InformePsicologico() {
                                         name="facilidad"
                                         checked={form.facilidad}
                                         onChange={handlePsicomotricidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="DIFICULTAD"
                                         name="dificultad"
                                         checked={form.dificultad}
                                         onChange={handlePsicomotricidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                     <InputCheckbox
                                         label="SENCILLA"
                                         name="sencilla"
                                         checked={form.sencilla}
                                         onChange={handlePsicomotricidadCheckboxChange}
+                                        disabled={camposDeshabilitados}
                                     />
                                 </SectionFieldset>
                             </div>
@@ -753,11 +785,12 @@ export default function InformePsicologico() {
                     {/* Recomendaciones */}
                     <SectionFieldset legend="Recomendaciones">
                         {/* Select y botón para agregar recomendaciones predefinidas */}
-                        <div className="flex gap-2 mb-3">
+                        <div className="flex flex-col sm:flex-row gap-2 mb-3">
                             <select
                                 value={selectedRecomendacion}
                                 onChange={(e) => setSelectedRecomendacion(e.target.value)}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                disabled={camposDeshabilitados}
+                                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                             >
                                 <option value="">Seleccionar recomendación predefinida...</option>
                                 {opcionesRecomendaciones.map((opcion, index) => (
@@ -769,8 +802,8 @@ export default function InformePsicologico() {
                             <button
                                 type="button"
                                 onClick={agregarRecomendacion}
-                                disabled={!selectedRecomendacion}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                                disabled={!selectedRecomendacion || camposDeshabilitados}
+                                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                             >
                                 Agregar
                             </button>
@@ -781,17 +814,37 @@ export default function InformePsicologico() {
                             name="recomendaciones"
                             value={form.recomendaciones}
                             onChange={handleChange}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("recomendaciones")}
+                            onRevert={() => revertField("recomendaciones")}
                         />
                     </SectionFieldset>
                 </div>
             </div>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">

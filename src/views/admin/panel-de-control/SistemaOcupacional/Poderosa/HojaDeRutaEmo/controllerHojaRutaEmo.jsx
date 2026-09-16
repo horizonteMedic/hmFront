@@ -1,235 +1,230 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoPacDefault,
     GetInfoServicioDefault,
+    VerifyTRPerzonalizadoDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    PrintHojaRJsReportDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
-import { getFetch } from "../../../../../utils/apiHelpers";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+    actualizarRegistro,
+    guardarRegistro,
+    validarSede,
+    imprimirReporteJasper,
+} from "../../../../../utils/registroOcupacionalUtils";
 
-const obtenerReporteUrl =
-    "/api/v01/ct/hojaRutaEmo/obtenerReporteHojaRuta";
-const obtenerReporteJsReportUrl = "/api/v01/ct/hojaRutaEmo/descargarReporteHojaRuta";
-const registrarUrl =
-    "/api/v01/ct/hojaRutaEmo/registrarActualizar";
+// ===== Configuración =====
+const obtenerReporteUrl = "/api/v01/ct/hojaRutaEmo/obtenerReporteHojaRuta";
+const registrarUrl = "/api/v01/ct/hojaRutaEmo/registrarActualizar";
 
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por
+// eso se declara aquí (en el controller) y no dentro del util de impresión.
+const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
+const rutaReporte = "../../../../../jaspers/Poderosa/HojaDeRutaEmo_Digitalizado.jsx";
 
-export const GetInfoServicio = async (
-    nro,
-    set,
-    token,
-    sede
-) => {
-    const res = await GetInfoPacDefault(
-        nro,
-        token,
-        sede
-    );
-    console.log(res)
-    if (res) {
-        console.log(res)
-        set((prev) => ({
-            ...prev,
-            norden: res.norden ?? "",
-            fechaExam: prev.fechaExam ?? "",
-            // Datos personales
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            estadoCivil: res.estadoCivil ?? "",
-            nivelEstudios: res.nivelEstudios ?? "",
-            dni: res.dni ?? "",
-            edad: res.edad ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargo ?? "",
-            ocupacion: res.areaO ?? "",
-            usuarioFirma: res.user_medicoFirma,
-
-        }));
-    }
+// ===== Mapeo del reporte (nuevo y edición usan el mismo origen de datos) =====
+// A diferencia de otros formularios Poderosa, la Hoja de Ruta no tiene un estado "en blanco":
+// el reporte agrega en vivo los datos de las distintas especialidades (medicina, psicología,
+// visual, audiometría, etc.) desde sus propias tablas, exista o no todavía una fila propia en
+// "hoja_ruta_emo". Por eso ambos casos (nuevo/existente) leen del mismo obtenerReporte; lo único
+// que cambia es `tieneRegistro` (que decide si se Guarda o se Edita al enviar).
+const mapReporte = async (nro, tabla, set, token, onFinish, tieneRegistro) => {
+    const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish, true);
+    if (!res) return;
+    set((prev) => ({
+        ...prev,
+        // Header
+        norden: res.norden ?? prev.norden,
+        tipoExamen: res.tipoExamen ?? prev.tipoExamen,
+        fechaExamen: res.fechaExamen ?? prev.fechaExamen,
+        horaSalida: res.horaSalida ?? prev.horaSalida,
+        horaEntrada: res.horaEntrada ?? prev.horaEntrada,
+        // Datos personales
+        nombres: res.nombreCompletoPaciente ?? "",
+        dni: res.dniPaciente ?? "",
+        edad: res.edadPaciente ?? "",
+        sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+        lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+        estadoCivil: res.estadoCivilPaciente ?? "",
+        nivelEstudios: res.nivelEstudioPaciente ?? "",
+        // Datos laborales
+        empresa: res.empresa ?? "",
+        contrata: res.contrata ?? "",
+        ocupacion: res.ocupacionPaciente ?? "",
+        cargoDesempenar: res.cargoPaciente ?? "",
+        // Vitales (solo lectura, provienen de Triaje)
+        peso: res.peso ?? "",
+        talla: res.talla ?? "",
+        pa: res.pa ?? "",
+        sat02: res.sat02 ?? "",
+        cintura: res.cintura ?? "",
+        cadera: res.cadera ?? "",
+        fc: res.fc ?? "",
+        fr: res.fr ?? "",
+        cuello: res.cuello ?? "",
+        // Especialistas por examen (solo lectura)
+        usuarioEvaluacionMedica: res.usuarioEvaluacionMedica ?? "",
+        usuarioInformeBrigadista: res.usuarioInformeBrigadista ?? "",
+        usuarioEvaluacionOftalmologica: res.usuarioEvaluacionOftalmologica ?? "",
+        usuarioAudiometria: res.usuarioAudiometria ?? "",
+        usuarioEspirometria: res.usuarioEspirometria ?? "",
+        usuarioToraxConvencional: res.usuarioToraxConvencional ?? "",
+        usuarioElectrocardiograma: res.usuarioElectrocardiograma ?? "",
+        usuarioExamenLaboratorio: res.usuarioExamenLaboratorio ?? "",
+        usuarioCertificadoAptitudBrigadista: res.usuarioCertificadoAptitudBrigadista ?? "",
+        // Observaciones por examen (editables)
+        observacionesEvaluacionMedica: res.observacionesEvaluacionMedica ?? "",
+        observacionInformeBrigadista: res.observacionInformeBrigadista ?? "",
+        observacionesEvaluacionVisual: res.observacionesEvaluacionVisual ?? "",
+        observacionAudiometria: res.observacionAudiometria ?? "",
+        observacionEspirometria: res.observacionEspirometria ?? "",
+        observacionRadiografiaTorax: res.observacionRadiografiaTorax ?? "",
+        observacionesElectrocardiograma: res.observacionesElectrocardiograma ?? "",
+        observacionesExamenLaboratorio: res.observacionesExamenLaboratorio ?? "",
+        observacionBrigadista: res.observacionBrigadista ?? "",
+        // Conclusiones generales
+        observacionesGenerales: res.observacionesGenerales ?? "",
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        // La creación se conserva para reenviarla al editar y que el backend no la borre.
+        fechaRegistro: res.fechaRegistro ?? "",
+        userRegistro: res.userRegistro ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        tieneRegistro,
+    }));
 };
 
-export const GetInfoServicioEditar = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
+export const GetInfoServicio = (nro, tabla, set, token, onFinish = () => { }) =>
+    mapReporte(nro, tabla, set, token, onFinish, false);
+
+export const GetInfoServicioEditar = (nro, tabla, set, token, onFinish = () => { }) =>
+    mapReporte(nro, tabla, set, token, onFinish, true);
+
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+    norden: form.norden,
+    fechaExamen: form.fechaExamen,
+    usuarioFirma: form.user_medicoFirma,
+    horaSalida: getHoraActual(),
+    observacionesGenerales: form.observacionesGenerales,
+    observacionesMedicina: form.observacionesEvaluacionMedica,
+    observacionesPsicologia: form.observacionInformeBrigadista,
+    observacionesVisual: form.observacionesEvaluacionVisual,
+    observacionesAudiometria: form.observacionAudiometria,
+    observacionesEspirometria: form.observacionEspirometria,
+    observacionesRadiografiaTorax: form.observacionRadiografiaTorax,
+    observacionesCardiologia: form.observacionesElectrocardiograma,
+    observacionesLaboratorio: form.observacionesExamenLaboratorio,
+    observacionesBrigadista: form.observacionBrigadista,
+});
+
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
+    });
+
+// ===== Impresión =====
+export const PrintHojaR = (nro, token, tabla, datosFooter, sede) =>
+    imprimirReporteJasper({
         nro,
+        token,
         tabla,
-        token,
+        datosFooter,
+        sede,
         obtenerReporteUrl,
-        onFinish,
-        true
-    );
-    if (res) {
-        console.log(res)
-        set((prev) => ({
-            ...prev,
-            ...res,
-            // Header
-            norden: res.norden ?? "",
-            fechaExamen: res.fechaExamen ?? prev.fechaExamen,
-            tipoExamen: res.nombreExamen ?? "",
-            // Datos personales
-            nombres: res.nombreCompletoPaciente ?? "",
-            dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargoPaciente ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
+        jasperModules,
+        rutaModulo: rutaReporte,
+    });
 
-            //EXAMEN MEDICO
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
 
-            // observacion
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-        }));
-    }
-};
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
 
-
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+// ===== Búsqueda / verificación por N° Orden =====
+// Igual que en TrabajosCaliente/LicenciaInterna: 3 estados (nuevo / existente / necesita
+// Triaje), con validación de sede previa. En ambos estados "nuevo" y "existente" se usa el
+// mismo obtenerReporte (ver mapReporte); solo cambia `tieneRegistro` y el aviso mostrado.
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
         return;
     }
 
-    const body = {
-        "norden": form.norden,
-        "fechaExamen": form.fechaExamen,
-        "userRegistro": form.userlogued,
-        usuarioFirma: form.user_medicoFirma,
+    LoadingDefault("Validando datos");
 
-        "observacionesGenerales": form.observacionesGenerales,
-        "horaSalida": getHoraActual(),
-        "observacionesMedicina": form.observacionesEvaluacionMedica,
-        "observacionesPsicologia": form.observacionInformeBrigadista,
-        "observacionesVisual": form.observacionesEvaluacionVisual,
-        "observacionesAudiometria": form.observacionAudiometria,
-        "observacionesEspirometria": form.observacionEspirometria,
-        "observacionesRadiografiaTorax": form.observacionRadiografiaTorax,
-        "observacionesCardiologia": form.observacionesElectrocardiograma,
-        "observacionesLaboratorio": form.observacionesExamenLaboratorio,
-        "observacionesBrigadista": form.observacionBrigadista,
-    };
-
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-    });
-};
-
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
-    });
-};
-
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    // const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
-    // PrintHojaRDefault(
-    //     nro,
-    //     token,
-    //     tabla,
-    //     datosFooter,
-    //     obtenerReporteUrl,
-    //     jasperModules,
-    //     "../../../../../jaspers/Poderosa"
-    // );
-    Loading('Cargando Formato a Imprimir')
-    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
-        .then(async (res) => {
-            if (res.norden) {
-                const nombre = "HojaDeRutaEmo_Digitalizado";
-                console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
-                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === 'function') {
-                    modulo.default(res);
-                } else {
-                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
-                }
-                Swal.close()
-            } else {
-                Swal.close()
-            }
-        })
-};
-
-export const PrintHojaRData = (datos, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
-    // Simulamos una respuesta del servidor con los datos proporcionados
-    const res = { ...datos, ...datosFooter, nameJasper: "HojaDeRutaEmo_Digitalizado", norden: datos.norden };
-
-    // Buscamos el módulo manualmente
-    const rutaCompleta = `../../../../../jaspers/Poderosa/HojaDeRutaEmo_Digitalizado.jsx`;
-    const moduloFunc = jasperModules[rutaCompleta];
-
-    if (moduloFunc) {
-        moduloFunc().then(modulo => {
-            if (typeof modulo.default === "function") {
-                modulo.default(res, null);
-            }
-        });
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
     }
-};
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+
+    VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
         token,
         set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoServicioEditar(nro, tabla, set, token, () => { Swal.close() });
-        },
-        () => {
-            //Tiene registro
+        () => GetInfoServicio(nro, tabla, set, token, () => Swal.close()),
+        () =>
             GetInfoServicioEditar(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Hoja Ruta EMO",
-                    "warning"
-                );
-            });
-        },
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de Hoja Ruta EMO",
+                });
+            }),
         () => {
-            //Necesita Agudeza visual 
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Triaje.",
-                "warning"
-            );
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-eye"></i>Alerta',
+                html: "El paciente necesita pasar por Triaje.",
+            });
         }
     );
-};
-
-
-export const Loading = (mensaje) => {
-    LoadingDefault(mensaje);
 };
