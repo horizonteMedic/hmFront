@@ -18,6 +18,7 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import SearchButton from "../../../../components/reusableComponents/SearchButton";
 import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesForm from "../../../../components/templates/BotonesForm";
@@ -43,6 +44,23 @@ const historiaTableClass = [
 // (para resaltar/revertir cambios). Los detalles de experiencia ocupacional se
 // gestionan aparte en su propia tabla.
 const CAMPOS_EDITABLES = ["fecha", "user_medicoFirma", "nombre_medico"];
+
+// Campos de una fila de experiencia ocupacional que, al diferir de su valor
+// original, marcan esa fila como editada (sombreado naranja) y son los que
+// `revertRow` restaura.
+const CAMPOS_FILA = [
+  "fecha",
+  "empresa",
+  "altitud",
+  "actividad",
+  "areaEmpresa",
+  "ocupacion",
+  "superficie",
+  "socavon",
+  "riesgo",
+  "proteccion",
+  "causaRetiro",
+];
 
 // Fila vacía de la tabla de experiencia ocupacional.
 const EMPTY_ROW = {
@@ -227,7 +245,30 @@ const HistoriaOcupacional = ({ listas }) => {
 
   const [rowData, setRowData] = useState(EMPTY_ROW);
   const [registros, setRegistros] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  // true mientras se está completando la fila nueva (primera fila, sombreado verde).
+  const [addingNew, setAddingNew] = useState(false);
+
+  // Id incremental para identificar cada fila de forma estable, independiente
+  // de su posición (que cambia al ordenar por año).
+  const uidCounterRef = useRef(0);
+  const generateUid = () => {
+    uidCounterRef.current += 1;
+    return `fila-${uidCounterRef.current}`;
+  };
+
+  // Envuelve el setter de registros que reciben las cargas desde el servidor
+  // (búsqueda por N° Orden) para anotar cada fila con su snapshot original:
+  // así se puede detectar si el usuario la editó (sombreado naranja) y revertirla.
+  const setRegistrosFromServer = (data) => {
+    setRegistros(
+      (data || []).map((reg) => ({
+        ...reg,
+        _uid: generateUid(),
+        _isNew: false,
+        _original: { ...reg },
+      }))
+    );
+  };
 
   // AUTOCOMPLETABLES
   const [searchEmpresa, setSearchEmpresa] = useState("");
@@ -345,12 +386,9 @@ const HistoriaOcupacional = ({ listas }) => {
     return match ? parseInt(match[0], 10) : Infinity;
   };
 
-  const handleRegistrar = async () => {
-    if (!rowData.fecha || !rowData.empresa) {
-      await Swal.fire("Error", "Faltan datos", "error");
-      return;
-    }
-    const nuevaLista = [...registros, rowData];
+  // Inserta una fila respetando el orden por año (mismo criterio que antes).
+  const insertarOrdenado = (lista, fila) => {
+    const nuevaLista = [...lista, fila];
     nuevaLista.sort((a, b) => {
       const añoA = getAñoInicial(a.fecha);
       const añoB = getAñoInicial(b.fecha);
@@ -359,14 +397,7 @@ const HistoriaOcupacional = ({ listas }) => {
       }
       return a.fecha.length - b.fecha.length;
     });
-    setRegistros(nuevaLista);
-    resetRowEntry();
-    setShowModal(false);
-  };
-
-  const handleCancelModal = () => {
-    resetRowEntry();
-    setShowModal(false);
+    return nuevaLista;
   };
 
   const resetRowEntry = () => {
@@ -381,9 +412,78 @@ const HistoriaOcupacional = ({ listas }) => {
     setFilteredSocavon([]);
   };
 
+  // ===== Botón "+ Agregar Nuevo" =====
+  // 1er click (sin fila activa): abre la fila nueva (verde) para completarla.
+  // Click siguiente (con la fila ya completada): esa fila pasa a formar parte
+  // de la lista de registros (ordenada por año, conservando el sombreado
+  // verde) y se abre una fila en blanco para seguir agregando.
+  const handleAgregarNuevoClick = async () => {
+    if (!addingNew) {
+      setAddingNew(true);
+      return;
+    }
+
+    const sinDatos = !rowData.fecha && !rowData.empresa;
+    if (sinDatos) return; // fila en blanco: nada que registrar todavía
+
+    if (!rowData.fecha || !rowData.empresa) {
+      await Swal.fire("Error", "Faltan datos", "error");
+      return;
+    }
+
+    setRegistros((prev) =>
+      insertarOrdenado(prev, { ...rowData, _uid: generateUid(), _isNew: true })
+    );
+    resetRowEntry();
+  };
+
+  // Cancela (clic derecho) la fila nueva en edición sin guardarla.
+  const handleCancelNuevaFila = async () => {
+    const confirm = await Swal.fire({
+      title: "¿Cancelar registro nuevo?",
+      text: "Se perderán los datos ingresados en esta fila.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cancelar",
+      cancelButtonText: "Seguir editando",
+    });
+    if (confirm.isConfirmed) {
+      resetRowEntry();
+      setAddingNew(false);
+    }
+  };
+
   const handleEditChange = (index, field, value) => {
     setRegistros((prev) =>
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  // ¿La fila difiere de su valor original cargado del servidor? Solo aplica a
+  // filas preexistentes: las nuevas añadidas esta sesión siempre van en verde.
+  const isRowEdited = (reg) =>
+    !reg._isNew &&
+    Boolean(reg._original) &&
+    CAMPOS_FILA.some((campo) => (reg[campo] ?? "") !== (reg._original[campo] ?? ""));
+
+  // Sombreado de la fila: verde = nueva (añadida esta sesión), naranja =
+  // editada, blanco/gris = registro previo sin cambios.
+  const rowClassFor = (reg) => {
+    if (reg._isNew) {
+      return "bg-green-50 hover:bg-green-100 border-l-4 border-green-500";
+    }
+    if (isRowEdited(reg)) {
+      return "bg-orange-50 hover:bg-orange-100 border-l-4 border-orange-500";
+    }
+    return "hover:bg-gray-50";
+  };
+
+  // Revierte todos los campos de una fila preexistente a su valor original.
+  const revertRow = (index) => {
+    setRegistros((prev) =>
+      prev.map((item, i) =>
+        i === index && item._original ? { ...item, ...item._original } : item
+      )
     );
   };
 
@@ -418,7 +518,8 @@ const HistoriaOcupacional = ({ listas }) => {
     handleClearnotO();
     setRegistros([]);
     resetRowEntry();
-    VerifyTR(form.norden, tabla, token, setForm, selectedSede, setRegistros);
+    setAddingNew(false);
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede, setRegistrosFromServer);
   };
 
   const handleSearchNorden = (e) => {
@@ -432,6 +533,7 @@ const HistoriaOcupacional = ({ listas }) => {
     handleClear();
     setRegistros([]);
     resetRowEntry();
+    setAddingNew(false);
   };
 
   // ===== Input N° Orden de la barra IMPRIMIR =====
@@ -446,6 +548,7 @@ const HistoriaOcupacional = ({ listas }) => {
       setForm({ ...initialFormState, norden: value });
       setRegistros([]);
       resetRowEntry();
+      setAddingNew(false);
     } else {
       setForm((f) => ({ ...f, norden: value }));
     }
@@ -453,6 +556,27 @@ const HistoriaOcupacional = ({ listas }) => {
 
   // ===== Guardar / Actualizar =====
   const handleGuardar = () => {
+    // Si hay una fila nueva en edición con datos, se confirma automáticamente
+    // para no perderla silenciosamente al guardar.
+    let listaFinal = registros;
+    if (addingNew && (rowData.fecha || rowData.empresa)) {
+      if (!rowData.fecha || !rowData.empresa) {
+        Swal.fire(
+          "Datos incompletos",
+          "Complete o cancele (clic derecho) la fila nueva antes de guardar.",
+          "warning"
+        );
+        return;
+      }
+      listaFinal = insertarOrdenado(registros, {
+        ...rowData,
+        _uid: generateUid(),
+        _isNew: true,
+      });
+      setRegistros(listaFinal);
+      resetRowEntry();
+    }
+
     const doSubmit = () =>
       SubmiteHistoriaOcupacionalController(
         form,
@@ -460,10 +584,10 @@ const HistoriaOcupacional = ({ listas }) => {
         userlogued,
         handleClearForm,
         tabla,
-        registros
+        listaFinal
       );
 
-    if (registros.length === 0) {
+    if (listaFinal.length === 0) {
       Swal.fire({
         title: "¿Está seguro?",
         text: "Está por registrar una Historia Ocupacional sin ninguna fila. ¿Desea continuar?",
@@ -540,18 +664,24 @@ const HistoriaOcupacional = ({ listas }) => {
       {/* ===== SECCIÓN: EXPERIENCIA OCUPACIONAL ===== */}
       <SectionFieldset legend="Experiencia Ocupacional" className="space-y-3">
         {!camposDeshabilitados && (
-          <div className="flex justify-center py-2">
-                     <button
-            type="button"
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center text-center gap-2 bg-[#233245] hover:bg-[#1c2836] text-white text-lg px-4 py-2 rounded transition-colors"
-          >
-            <i className="fas fa-plus" /> Agregar nuevo
-          </button>
+          <div className="flex flex-col items-center gap-1 py-2">
+            <button
+              type="button"
+              onClick={handleAgregarNuevoClick}
+              className="inline-flex items-center text-center gap-2 bg-[#233245] hover:bg-[#1c2836] text-white text-lg px-4 py-2 rounded transition-colors"
+            >
+              <i className="fas fa-plus" />{" "}
+              {addingNew ? "Guardar y agregar otro" : "Agregar nuevo"}
+            </button>
+            {addingNew && (
+              <p className="text-xs text-gray-500">
+                Complete la fila resaltada en verde y presione el botón para guardarla.
+              </p>
+            )}
           </div>
         )}
 
-        {registros.length === 0 ? (
+        {registros.length === 0 && !addingNew ? (
           <div className="border border-dashed border-gray-300 bg-gray-50 text-gray-400 rounded-md py-6 text-center text-sm">
             Aquí se mostrarán los registros
           </div>
@@ -577,262 +707,14 @@ const HistoriaOcupacional = ({ listas }) => {
                 </tr>
               </thead>
               <tbody>
-                {registros.map((reg, idx) => (
+                {addingNew && (
                   <tr
-                    key={idx}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="bg-green-50 hover:bg-green-100 border-l-4 border-green-500"
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      deleteRow(idx);
+                      handleCancelNuevaFila();
                     }}
                   >
-                    <td>
-                      <AutoResizeInput
-                        value={reg.fecha}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "fecha",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.empresa}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "empresa",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.altitud}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "altitud",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.actividad}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "actividad",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.areaEmpresa}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "areaEmpresa",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.ocupacion}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "ocupacion",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.superficie}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "superficie",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.socavon}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "socavon",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.riesgo}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "riesgo",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.proteccion}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "proteccion",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <AutoResizeInput
-                        value={reg.causaRetiro}
-                        disabled={camposDeshabilitados}
-                        onChange={(e) =>
-                          handleEditChange(
-                            idx,
-                            "causaRetiro",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {registros.length > 0 && (
-          <p className="text-xs text-gray-500">
-            Clic derecho sobre una fila para eliminarla.
-          </p>
-        )}
-      </SectionFieldset>
-
-      {/* ===== SECCIÓN: RESPONSABLE Y MÉDICO ===== */}
-      <SectionFieldset
-        legend="Responsable y Médico que Certifica"
-        className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3"
-      >
-        {/* <InputTextOneLine
-          label="DNI Responsable"
-          name="dniUser"
-          value={form.dniUser}
-          disabled
-          labelWidth="150px"
-        />
-        <InputTextOneLine
-          label="Nombres Responsable"
-          name="nombreUser"
-          value={form.nombreUser}
-          disabled
-          labelWidth="150px"
-        /> */}
-        <div className="md:col-span-2">
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            form={form}
-            onChange={handleChangeSimple}
-            disabled={camposDeshabilitados}
-            edited={isFieldEdited("user_medicoFirma")}
-            onRevert={() => revertFields(["user_medicoFirma", "nombre_medico"])}
-          />
-        </div>
-      </SectionFieldset>
-
-      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
-      {hayRegistroCargado && (
-        <AuditoriaRegistro
-          mostrarEdicion={form.tieneRegistro}
-          fechaCreacion={auditoria.fechaCreacion}
-          fechaEdicion={auditoria.fechaActualizacion}
-          usuarioRegistro={auditoria.usuarioRegistro}
-          usuarioEdicion={auditoria.usuarioActualizacion}
-        />
-      )}
-
-      {/* ===== BOTONES DE ACCIÓN ===== */}
-      <BotonesForm
-        form={form}
-        onNordenChange={handlePrintNordenChange}
-        handleSave={handleGuardar}
-        saveLabel={
-          form.tieneRegistro && edicionHabilitada
-            ? "Guardar Cambios"
-            : "Guardar/Actualizar"
-        }
-        handleEdit={habilitarEdicion}
-        handleClear={handleClearForm}
-        handlePrint={handlePrint}
-        hideSave={form.tieneRegistro && !edicionHabilitada}
-        hideEdit={!form.tieneRegistro || edicionHabilitada}
-      />
-
-      {/* ===== MODAL: AGREGAR REGISTRO OCUPACIONAL ===== */}
-      {showModal && (
-        <div className="fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto bg-black/50 py-10 px-[16px]">
-          <div className="w-[1200px] max-w-[95vw] rounded-lg bg-white p-6 shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-            <h3 className="mb-[16px] text-[15px] font-bold text-black">
-              Agregar registro ocupacional
-            </h3>
-            <div className="overflow-x-auto">
-              <table className={`${historiaTableClass} mb-48`}>
-                <thead>
-                  <tr>
-                    <th rowSpan={2}>Año</th>
-                    <th rowSpan={2}>Empresa - Lugar Geográfico</th>
-                    <th rowSpan={2}>Altitud</th>
-                    <th rowSpan={2}>Actividad</th>
-                    <th rowSpan={2}>Área Empresa</th>
-                    <th rowSpan={2}>Ocupación</th>
-                    <th colSpan={2} className="!text-center">
-                      Tiempo de Labor
-                    </th>
-                    <th rowSpan={2}>Riesgos</th>
-                    <th rowSpan={2}>Protección</th>
-                    <th rowSpan={2}>Causa de Retiro</th>
-                  </tr>
-                  <tr>
-                    <th>Socavon</th>
-                    <th>Superficie</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
                     <td>
                       <AutoResizeInput
                         value={rowData.fecha}
@@ -1184,72 +1066,6 @@ const HistoriaOcupacional = ({ listas }) => {
                         </div>
                       </div>
                     </td>
-                    <td onClick={() => socavonRef.current?.focus()}>
-                      <div className="relative">
-                        <div className="flex flex-col items-center justify-center">
-                          <textarea
-                            ref={socavonRef}
-                            rows={1}
-                            autoComplete="off"
-                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
-                            value={rowData.socavon}
-                            name="socavon"
-                            onChange={(e) => {
-                              const v = e.target.value.toUpperCase();
-                              handleRowChange("socavon", v);
-                              const trimmed = v.trim();
-                              let sugerencia = null;
-                              if (/^\d+$/.test(trimmed)) {
-                                const n = parseInt(trimmed, 10);
-                                sugerencia = `${trimmed} ${
-                                  n === 1 ? "AÑO" : "AÑOS"
-                                }`;
-                              } else {
-                                const match = trimmed.match(
-                                  /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
-                                );
-                                if (match) {
-                                  const meses = parseInt(match[2], 10);
-                                  sugerencia = `${trimmed} ${
-                                    meses === 1 ? "MES" : "MESES"
-                                  }`;
-                                }
-                              }
-                              setFilteredSocavon(sugerencia ? [sugerencia] : []);
-                            }}
-                            onKeyUp={(e) => {
-                              if (
-                                e.key === "Enter" &&
-                                filteredSocavon.length > 0
-                              ) {
-                                e.preventDefault();
-                                handleRowChange("socavon", filteredSocavon[0]);
-                                setFilteredSocavon([]);
-                              }
-                            }}
-                            onBlur={() =>
-                              setTimeout(() => setFilteredSocavon([]), 100)
-                            }
-                          />
-                          {filteredSocavon.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
-                              {filteredSocavon.map((sug, i) => (
-                                <li
-                                  key={i}
-                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                                  onMouseDown={() => {
-                                    handleRowChange("socavon", sug);
-                                    setFilteredSocavon([]);
-                                  }}
-                                >
-                                  {sug}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      </div>
-                    </td>
                     <td onClick={() => superficieRef.current?.focus()}>
                       <div className="relative">
                         <div className="flex flex-col items-center justify-center">
@@ -1311,6 +1127,72 @@ const HistoriaOcupacional = ({ listas }) => {
                                   onMouseDown={() => {
                                     handleRowChange("superficie", sug);
                                     setFilteredSuperficie([]);
+                                  }}
+                                >
+                                  {sug}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td onClick={() => socavonRef.current?.focus()}>
+                      <div className="relative">
+                        <div className="flex flex-col items-center justify-center">
+                          <textarea
+                            ref={socavonRef}
+                            rows={1}
+                            autoComplete="off"
+                            className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                            value={rowData.socavon}
+                            name="socavon"
+                            onChange={(e) => {
+                              const v = e.target.value.toUpperCase();
+                              handleRowChange("socavon", v);
+                              const trimmed = v.trim();
+                              let sugerencia = null;
+                              if (/^\d+$/.test(trimmed)) {
+                                const n = parseInt(trimmed, 10);
+                                sugerencia = `${trimmed} ${
+                                  n === 1 ? "AÑO" : "AÑOS"
+                                }`;
+                              } else {
+                                const match = trimmed.match(
+                                  /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
+                                );
+                                if (match) {
+                                  const meses = parseInt(match[2], 10);
+                                  sugerencia = `${trimmed} ${
+                                    meses === 1 ? "MES" : "MESES"
+                                  }`;
+                                }
+                              }
+                              setFilteredSocavon(sugerencia ? [sugerencia] : []);
+                            }}
+                            onKeyUp={(e) => {
+                              if (
+                                e.key === "Enter" &&
+                                filteredSocavon.length > 0
+                              ) {
+                                e.preventDefault();
+                                handleRowChange("socavon", filteredSocavon[0]);
+                                setFilteredSocavon([]);
+                              }
+                            }}
+                            onBlur={() =>
+                              setTimeout(() => setFilteredSocavon([]), 100)
+                            }
+                          />
+                          {filteredSocavon.length > 0 && (
+                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                              {filteredSocavon.map((sug, i) => (
+                                <li
+                                  key={i}
+                                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                                  onMouseDown={() => {
+                                    handleRowChange("socavon", sug);
+                                    setFilteredSocavon([]);
                                   }}
                                 >
                                   {sug}
@@ -1465,28 +1347,240 @@ const HistoriaOcupacional = ({ listas }) => {
                       />
                     </td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-[20px] flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={handleRegistrar}
-                className="inline-flex h-8 cursor-pointer items-center rounded-[3px] border-none bg-[#059669] px-[16px] text-[13px] text-white"
-              >
-                <i className="fas fa-save mr-1.5"></i> Guardar
-              </button>
-              <button
-                type="button"
-                onClick={handleCancelModal}
-                className="inline-flex h-8 cursor-pointer items-center rounded-[3px] border-none bg-[#6b7280] px-[16px] text-[13px] text-white"
-              >
-                <i className="fas fa-times mr-1.5"></i> Cancelar
-              </button>
-            </div>
+                )}
+                {registros.map((reg, idx) => (
+                  <tr
+                    key={reg._uid ?? idx}
+                    className={`${rowClassFor(reg)} cursor-pointer`}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      deleteRow(idx);
+                    }}
+                  >
+                    <td>
+                      <AutoResizeInput
+                        value={reg.fecha}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "fecha",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.empresa}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "empresa",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.altitud}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "altitud",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.actividad}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "actividad",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.areaEmpresa}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "areaEmpresa",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.ocupacion}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "ocupacion",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.superficie}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "superficie",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.socavon}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "socavon",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.riesgo}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "riesgo",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.proteccion}
+                        disabled={camposDeshabilitados}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "proteccion",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1.5">
+                        <AutoResizeInput
+                          value={reg.causaRetiro}
+                          disabled={camposDeshabilitados}
+                          onChange={(e) =>
+                            handleEditChange(
+                              idx,
+                              "causaRetiro",
+                              e.target.value.toUpperCase()
+                            )
+                          }
+                        />
+                        {!camposDeshabilitados && isRowEdited(reg) && (
+                          <RevertButton
+                            title="Revertir fila a su valor original"
+                            onClick={() => revertRow(idx)}
+                          />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        )}
+
+        {(registros.length > 0 || addingNew) && (
+          <p className="text-xs text-gray-500">
+            Clic derecho sobre una fila para eliminarla
+            {addingNew ? " (o cancelar la fila nueva)" : ""}.
+          </p>
+        )}
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: RESPONSABLE Y MÉDICO ===== */}
+      <SectionFieldset
+        legend="Responsable y Médico que Certifica"
+        className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3"
+      >
+        {/* <InputTextOneLine
+          label="DNI Responsable"
+          name="dniUser"
+          value={form.dniUser}
+          disabled
+          labelWidth="150px"
+        />
+        <InputTextOneLine
+          label="Nombres Responsable"
+          name="nombreUser"
+          value={form.nombreUser}
+          disabled
+          labelWidth="150px"
+        /> */}
+        <div className="md:col-span-2">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("user_medicoFirma")}
+            onRevert={() => revertFields(["user_medicoFirma", "nombre_medico"])}
+          />
         </div>
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
       )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={handleGuardar}
+        saveLabel={
+          form.tieneRegistro && edicionHabilitada
+            ? "Guardar Cambios"
+            : "Guardar/Actualizar"
+        }
+        handleEdit={habilitarEdicion}
+        handleClear={handleClearForm}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+      />
     </div>
   );
 };
