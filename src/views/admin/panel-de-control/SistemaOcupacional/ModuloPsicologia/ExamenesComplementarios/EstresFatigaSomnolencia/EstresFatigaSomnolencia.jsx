@@ -216,8 +216,8 @@ export default function EstresFatigaSomnolencia() {
                         <option value="INFORME PSICOLÓGICO - ESTRÉS">
                             INFORME PSICOLÓGICO - ESTRÉS
                         </option>
-                        <option value="INFORME PSICOLÓGICO - SOMNOLENCIA Y FATIGA">
-                            INFORME PSICOLÓGICO - SOMNOLENCIA Y FATIGA
+                        <option value="INFORME PSICOLÓGICO - FATIGA Y SOMNOLENCIA">
+                            INFORME PSICOLÓGICO - FATIGA Y SOMNOLENCIA
                         </option>
                     </select>
                 </div>
@@ -246,7 +246,7 @@ export default function EstresFatigaSomnolencia() {
                     labelWidth="120px"
                 />
             </SectionFieldset>
-             
+
             <SectionFieldset legend="Criterios Psicológicos">
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4">
