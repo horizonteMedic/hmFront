@@ -6,6 +6,7 @@ import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
+import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte } from "./controllerRegistroAsistencial";
 import {
     ComboboxProfesión,
     ComboboxDepartamentos,
@@ -159,10 +160,12 @@ export default function RegistroAsistencial() {
 
     const initialFormState = {
         // Datos básicos
+        idDatos: null,
+        codigoSinDni: null,
         tipoDocumento: "DNI",
         documentoIdentidad: "",
         nombreBuscador: "",
-        NHCL: "",
+        NHCL: null,
         fecha: today,
 
         nombres: "",
@@ -193,9 +196,9 @@ export default function RegistroAsistencial() {
         handleRadioButton,
         handleChangeSimple,
         handleClear,
-        handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "fichaAptitudAnexo2" });
+        handleFocusNext,
+    } = useForm(initialFormState, { storageKey: "registroPacienteAsistencial" });
 
     const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
 
@@ -234,14 +237,32 @@ export default function RegistroAsistencial() {
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            handleClearnotO();
-            // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            if (!form.documentoIdentidad) return;
+            if (form.tipoDocumento === "DNI") {
+                BuscarPorDni(form.documentoIdentidad, token, setForm);
+            } else if (form.tipoDocumento === "PASAPORTE") {
+                BuscarPorPasaporte(form.documentoIdentidad, token, setForm);
+            }
         }
+    };
+
+    const handleSave = () => {
+        SubmitDataService(form, token, handleClear, userlogued);
+    };
+
+    // Enter se comporta como Tab: salta al siguiente campo enfocable
+    const handleEnterAsTab = (e) => {
+        if (e.key !== "Enter" || e.shiftKey) return;
+        const el = e.target;
+        // No interferir con textareas, botones ni el buscador de impresión
+        if (el.tagName === "TEXTAREA" || el.tagName === "BUTTON") return;
+        if (el.name === "norden") return;
+        handleFocusNext(e);
     };
 
 
     return (
-        <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
+        <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4" >
             <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-2 gap-y-3 gap-x-4">
                 <InputsRadioGroup
                     name="tipoDocumento"
@@ -252,20 +273,20 @@ export default function RegistroAsistencial() {
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
-                        { label: "Sin DNI", value: "SIN DNI" },
+                        { label: "Sin Documento", value: "SIN_DOCUMENTO" },
                     ]}
                     className="col-span-3"
                 />
-                {form.tipoDocumento == "SIN DNI" ?
-                    <h1>sin dni</h1>
+                {form.tipoDocumento == "SIN_DOCUMENTO" ?
+                    <h1>Sin Documento</h1>
                     :
                     <InputTextOneLine
-                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Sin DNI"}`}
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "SIN_DOCUMENTO"}`}
                         name="documentoIdentidad"
                         value={form.documentoIdentidad}
-                        onChange={handleChangeNumberDecimals}
+                        onChange={handleChange}
                         onKeyUp={handleSearch}
-                        disabled={form.tipoDocumento === "SIN DNI"}
+                        disabled={form.tipoDocumento === "SIN_DOCUMENTO"}
                         labelWidth="120px"
                     />
                 }
@@ -448,7 +469,7 @@ export default function RegistroAsistencial() {
                 />
             </SectionFieldset>
 
-            <BotonesAccion form={form} handleClear={handleClear} handleChangeNumberDecimals={handleChangeNumberDecimals}
+            <BotonesAccion form={form} handleSave={handleSave} handleClear={handleClear} handleChangeNumberDecimals={handleChangeNumberDecimals}
             />
         </div>
     )

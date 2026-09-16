@@ -1,4 +1,5 @@
-import { faBroom, faCalendarDay, faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef, useState } from "react";
+import { faBroom, faCalendarDay, faPrint, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
@@ -7,20 +8,26 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import {getToday } from "../../../../../utils/helpers";
+import { getToday } from "../../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { BuscarPacientes, ObtenerPorId } from "./controllerTicketAsistencial";
 
 const METODOS_PAGO = [
     { value: "CONTADO", label: "CONTADO" },
-    { value: "TARJETA", label: "TARJETA" },
+    { value: "CREDITO", label: "CREDITO" },
+    { value: "TARJETA_DEBITO", label: "TARJETA DEBITO" },
+    { value: "TARJETA_CREDITO", label: "TARJETA CREDITO" },
     { value: "TRANSFERENCIA", label: "TRANSFERENCIA" },
     { value: "YAPE/PLIN", label: "YAPE / PLIN" },
 ];
 
 const AUTORIZADO_POR = [
-    { value: "PACIENTE", label: "PACIENTE" },
-    { value: "EMPRESA", label: "EMPRESA" },
-    { value: "ASEGURADORA", label: "ASEGURADORA" },
+    { value: "ARTEMIO", label: "DR. ARTEMIO" },
+    { value: "CARLOS", label: "CARLOS" },
+    { value: "LILIANA", label: "LILIANA" },
     { value: "CONVENIO", label: "CONVENIO" },
+    { value: "CORREO", label: "POR CORREO" },
+    { value: "OTROS", label: "OTROS" },
 ];
 
 const DESCUENTOS = [
@@ -33,6 +40,125 @@ const DESCUENTOS = [
     { value: "50", label: "50%" },
 ];
 
+// Buscador de pacientes sin DNI: autocompletado por nombres/apellidos contra
+// /buscarPacientes; al elegir un resultado se bloquea el input con el paciente elegido.
+function BuscadorPacienteSinDni({ token, locked, selectedLabel, onSelect, onClear }) {
+    const [query, setQuery] = useState("");
+    const [resultados, setResultados] = useState([]);
+    const [buscando, setBuscando] = useState(false);
+    const [show, setShow] = useState(false);
+    const boxRef = useRef(null);
+    const debounceRef = useRef(null);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (boxRef.current && !boxRef.current.contains(e.target)) setShow(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    useEffect(() => {
+        if (locked) return;
+        clearTimeout(debounceRef.current);
+        const texto = query.trim();
+        if (texto.length < 2) {
+            setResultados([]);
+            setBuscando(false);
+            return;
+        }
+        setBuscando(true);
+        debounceRef.current = setTimeout(async () => {
+            const lista = await BuscarPacientes(texto, token);
+            setResultados(lista);
+            setBuscando(false);
+        }, 350);
+        return () => clearTimeout(debounceRef.current);
+    }, [query, token, locked]);
+
+    const handlePick = (item) => {
+        setShow(false);
+        setResultados([]);
+        setQuery("");
+        onSelect(item);
+    };
+
+    if (locked) {
+        return (
+            <div className="flex items-center gap-4">
+                <label className="font-semibold" style={{ minWidth: "120px", maxWidth: "120px" }}>
+                    Paciente :
+                </label>
+                <div className="flex items-center gap-2 w-full">
+                    <input
+                        type="text"
+                        value={selectedLabel}
+                        disabled
+                        className="border rounded px-2 py-1 w-full bg-gray-300 font-semibold"
+                    />
+                    <button
+                        type="button"
+                        onClick={onClear}
+                        title="Cambiar paciente"
+                        className="text-red-600 hover:text-red-800 px-2"
+                    >
+                        <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center gap-4" ref={boxRef}>
+            <label className="font-semibold" style={{ minWidth: "120px", maxWidth: "120px" }}>
+                Buscar Paciente :
+            </label>
+            <div className="relative w-full">
+                <input
+                    type="text"
+                    autoComplete="off"
+                    value={query}
+                    placeholder="Escriba apellidos y/o nombres (mín. 2 letras)"
+                    style={{ textTransform: "uppercase" }}
+                    className="border rounded px-2 py-1 w-full"
+                    onChange={(e) => {
+                        setQuery(e.target.value);
+                        setShow(true);
+                    }}
+                    onFocus={() => setShow(true)}
+                />
+                {show && query.trim().length >= 2 && (
+                    <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-56 overflow-y-auto shadow-lg">
+                        {buscando ? (
+                            <div className="p-2 text-sm text-gray-500">Buscando...</div>
+                        ) : resultados.length === 0 ? (
+                            <div className="p-2 text-sm text-gray-500">Sin coincidencias</div>
+                        ) : (
+                            resultados.map((r) => (
+                                <div
+                                    key={r.idDatos}
+                                    className="cursor-pointer p-2 hover:bg-gray-200"
+                                    onClick={() => handlePick(r)}
+                                >
+                                    <div className="font-semibold">
+                                        {r.apellidos} {r.nombres}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        {r.dni ? `DNI: ${r.dni}` : "Sin DNI"}
+                                        {r.historiaClinica ? ` · HC: ${r.historiaClinica}` : ""}
+                                        {r.edad ? ` · ${r.edad} años` : ""}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function TicketAsistencial() {
 
     const today = getToday();
@@ -43,9 +169,15 @@ export default function TicketAsistencial() {
         // Datos básicos
         tipoDocumento: "DNI",
         documentoIdentidad: "",
+        idDatos: null,
+        dni: null,
         NHCL: "",
         nroTicket: "",
         codVendedor: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
 
         nombres: "",
         empresa: "",
@@ -79,11 +211,39 @@ export default function TicketAsistencial() {
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "fichaAptitudAnexo2" });
 
+    // Paciente elegido en el buscador de "Sin DNI" (bloquea el input tras seleccionarlo)
+    const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
+    // Al cambiar el tipo de documento se descarta cualquier selección previa del buscador
+    useEffect(() => {
+        if (form.tipoDocumento !== "SIN DNI" && pacienteSeleccionado) {
+            setPacienteSeleccionado(null);
+        }
+    }, [form.tipoDocumento]);
+
+    const handleSeleccionarPacienteSinDni = async (item) => {
+        setPacienteSeleccionado({
+            idDatos: item.idDatos,
+            label: `${item.apellidos ?? ""} ${item.nombres ?? ""}`.trim(),
+        });
+        await ObtenerPorId(item.idDatos, token, setForm);
+    };
+
+    const handleLimpiarPacienteSinDni = () => {
+        setPacienteSeleccionado(null);
+        setForm((f) => ({
+            ...f,
+            idDatos: null,
+            dni: null,
+            documentoIdentidad: "",
+            nombres: "",
+            NHCL: "",
+        }));
+    };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            handleClearnotO();
+            // handleClearnotO();
             // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
@@ -168,7 +328,13 @@ export default function TicketAsistencial() {
                     className="xl:col-span-4"
                 />
                 {form.tipoDocumento == "SIN DNI" ?
-                    <h1>sin dni</h1>
+                    <BuscadorPacienteSinDni
+                        token={token}
+                        locked={!!pacienteSeleccionado}
+                        selectedLabel={pacienteSeleccionado?.label ?? ""}
+                        onSelect={handleSeleccionarPacienteSinDni}
+                        onClear={handleLimpiarPacienteSinDni}
+                    />
                     :
                     <InputTextOneLine
                         label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Sin DNI"}`}
@@ -209,18 +375,13 @@ export default function TicketAsistencial() {
                     name="nombres"
                     value={form.nombres}
                     labelWidth="120px"
+                    disabled
                     className="xl:col-span-2"
                 />
                 <InputTextOneLine
                     label="Empresa"
                     name="empresa"
                     value={form.empresa}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Doctor"
-                    name="doctor"
-                    value={form.doctor}
                     labelWidth="120px"
                 />
                 <SelectField
@@ -274,6 +435,12 @@ export default function TicketAsistencial() {
                         className="opacity-60"
                     />
                 </div>
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Doctor"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
             </SectionFieldset>
 
             <SectionFieldset legend="Agregar Servicios Ticket" className="grid grid-cols-1 xl:grid-cols-[1fr_150px] gap-x-6 gap-y-3">
