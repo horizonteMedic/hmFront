@@ -2,207 +2,175 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
-    LoadingDefault,
-    PrintHojaRDefault,
-    PrintHojaRJsReportDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../../utils/apiHelpers";
-
-const obtenerReporteUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
-const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
-const registrarUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
-
-
-export const GetInfoServicio = async (
-    nro,
-    set,
-    token,
-    sede
-) => {
-    const res = await GetInfoPacDefault(
-        nro,
-        token,
-        sede
-    );
-    console.log(res)
-    if (res) {
-        console.log(res)
-        set((prev) => ({
-            ...prev,
-            norden: res.norden ?? "",
-            fechaExam: prev.fechaExam ?? "",
-            // Datos personales
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            estadoCivil: res.estadoCivil ?? "",
-            nivelEstudios: res.nivelEstudios ?? "",
-            dni: res.dni ?? "",
-            edad: res.edad ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargo ?? "",
-            ocupacion: res.areaO ?? "",
-            usuarioFirma: res.user_medicoFirma,
-
-        }));
-    }
-};
-
-export const GetInfoServicioEditar = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish,
-        true
-    );
-    if (res) {
-        console.log(res)
-        set((prev) => ({
-            ...prev,
-            // Header
-            norden: res.norden ?? "",
-            fechaExam: res.fechaExamen ?? "",
-            tipoExamen: res.nombreExamen ?? "",
-            // Datos personales
-            nombres: res.nombreCompletoPaciente ?? "",
-            dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargoPaciente ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
-
-            // observacion
-            aptitud: res.apto === true ? "APTO" : res.noApto === true ? "NOAPTO" : "",
-            conclusiones: res.conclusiones ?? "",
-            restricciones: res.restricciones ?? "",
-            recomendaciones: res.recomendaciones ?? "",
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-        }));
-    }
-};
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+    imprimirReporteJasper,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+// ===== Configuración =====
+const obtenerReporteUrl = "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
+const registrarUrl = "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
+
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por
+// eso se declara aquí (en el controller) y no dentro del util de impresión.
+const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
+const rutaReporte = "../../../../../jaspers/Poderosa/Certificado_Aptitud_Brigadista_Digitalizado.jsx";
+
+// ===== Mapeo Registro nuevo =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    // Norden inexistente / paciente no encontrado / error del backend.
+    if (!res || res.error || !res.norden) {
+        Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+            html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+        });
         return;
     }
-    const body = {
-        "norden": form.norden,
-        "fechaExamen": form.fechaExam,
-        "conclusiones": form.conclusiones,
-        "apto": form.aptitud === "APTO" ? true : false,
-        "noApto": form.aptitud === "NOAPTO" ? true : false,
-        "restricciones": form.restricciones,
-        "recomendaciones": form.recomendaciones,
-        "userRegistor": form.userlogued,
-        usuarioFirma: form.user_medicoFirma,
-    };
+    set((prev) => ({
+        ...prev,
+        norden: res.norden ?? "",
+        fechaExam: prev.fechaExam ?? "",
+        // Datos personales
+        nombres: res.nombresApellidos ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+        lugarNacimiento: res.lugarNacimiento ?? "",
+        estadoCivil: res.estadoCivil ?? "",
+        nivelEstudios: res.nivelEstudios ?? "",
+        dni: res.dni ?? "",
+        edad: res.edad ?? "",
+        sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+        empresa: res.empresa ?? "",
+        contrata: res.contrata ?? "",
+        // Datos laborales
+        cargoDesempenar: res.cargo ?? "",
+        ocupacion: res.areaO ?? "",
+        usuarioFirma: res.user_medicoFirma,
+        tieneRegistro: false,
+    }));
+};
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// ===== Mapeo Edición =====
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
+    const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish, true);
+    if (!res) return;
+    set((prev) => ({
+        ...prev,
+        // Header
+        norden: res.norden ?? "",
+        fechaExam: res.fechaExamen ?? "",
+        tipoExamen: res.nombreExamen ?? "",
+        // Datos personales
+        nombres: res.nombreCompletoPaciente ?? "",
+        dni: res.dniPaciente ?? "",
+        edad: res.edadPaciente ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+        lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+        estadoCivil: res.estadoCivilPaciente ?? "",
+        nivelEstudios: res.nivelEstudioPaciente ?? "",
+        sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+        empresa: res.empresa ?? "",
+        contrata: res.contrata ?? "",
+        // Datos laborales
+        cargoDesempenar: res.cargoPaciente ?? "",
+        ocupacion: res.ocupacionPaciente ?? "",
+        // Observación / aptitud
+        aptitud: res.apto === true ? "APTO" : res.noApto === true ? "NOAPTO" : "",
+        conclusiones: res.conclusiones ?? "",
+        restricciones: res.restricciones ?? "",
+        recomendaciones: res.recomendaciones ?? "",
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        // La creación se conserva para reenviarla al editar y que el backend no la borre.
+        fechaRegistro: res.fechaRegistro ?? "",
+        userRegistro: res.userRegistro ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        tieneRegistro: true,
+    }));
+};
+
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+    norden: form.norden,
+    fechaExamen: form.fechaExam,
+    conclusiones: form.conclusiones,
+    apto: form.aptitud === "APTO",
+    noApto: form.aptitud === "NOAPTO",
+    restricciones: form.restricciones,
+    recomendaciones: form.recomendaciones,
+    usuarioFirma: form.user_medicoFirma,
+});
+
+// Body completo (creación / actualización).
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
     });
-};
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
+// ===== Impresión =====
+export const PrintHojaR = (nro, token, tabla, datosFooter, sede) =>
+    imprimirReporteJasper({
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        sede,
+        obtenerReporteUrl,
+        jasperModules,
+        rutaModulo: rutaReporte,
     });
-};
 
-// export const PrintHojaR = (nro, token, tabla) => {
-//     PrintHojaRJsReportDefault(
-//         nro,
-//         token,
-//         tabla,
-//         obtenerReporteJsReportUrl
-//     );
-// };
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    Loading('Cargando Formato a Imprimir')
-    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
-        .then(async (res) => {
-            if (res.norden) {
-                const nombre = "Certificado_Aptitud_Brigadista_Digitalizado";
-                console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
-                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === 'function') {
-                    modulo.default({ ...res, ...datosFooter });
-                } else {
-                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
-                }
-                Swal.close()
-            } else {
-                Swal.close()
-            }
-        })
-};
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
+        onNuevo: () => GetInfoServicio(nro, set, token, sede),
+        onExistente: () =>
             GetInfoServicioEditar(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de C. de Aptitud Brigadista",
-                    "warning"
-                );
-            });
-        },
-        () => {
-            //Necesita Agudeza visual 
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Triaje.",
-                "warning"
-            );
-        }
-    );
-};
-
-
-export const Loading = (mensaje) => {
-    LoadingDefault(mensaje);
-};
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de C. de Aptitud Brigadista",
+                });
+            }),
+    });
