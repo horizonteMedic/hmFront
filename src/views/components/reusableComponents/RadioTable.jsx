@@ -21,7 +21,7 @@ export default function RadioTable({
                         border border-primario
                         cursor-pointer
                         disabled:cursor-not-allowed
-                        disabled:opacity-50 `
+                        disabled:!opacity-90 `
   const hasRevert = typeof onRevert === "function";
   // Calcular el número de columnas dinámicamente (labelColumns para texto + número de opciones
   // + 1 columna extra para el botón de revertir, si aplica).
