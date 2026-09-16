@@ -15,9 +15,10 @@ export default function TabSelector({ tieneVista, tabsConfig, activeTab: externa
             const navElement = navRef.current;
             const navRect = navElement.getBoundingClientRect();
             const tabRect = activeTabElement.getBoundingClientRect();
-            
+
             setIndicatorStyle({
-                left: tabRect.left - navRect.left,
+                // left: tabRect.left - navRect.left,
+                left: tabRect.left - navRect.left + navElement.scrollLeft,
                 width: tabRect.width
             });
         }
@@ -32,6 +33,13 @@ export default function TabSelector({ tieneVista, tabsConfig, activeTab: externa
     // Update indicator position when active tab changes
     useEffect(() => {
         updateIndicatorPosition();
+        if (activeTab !== -1 && tabRefs.current[activeTab]) {
+            tabRefs.current[activeTab].scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "nearest"
+            });
+        }
     }, [activeTab]);
 
     // Add window resize listener to recalculate indicator position
@@ -41,7 +49,7 @@ export default function TabSelector({ tieneVista, tabsConfig, activeTab: externa
         };
 
         window.addEventListener('resize', handleResize);
-        
+
         // Cleanup listener on component unmount
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -59,10 +67,13 @@ export default function TabSelector({ tieneVista, tabsConfig, activeTab: externa
     return (
         <div className="space-y-4">
             <div className="bg-white border-t border-gray-200 rounded-lg px-3">
-                {/* Tab Navigation */}  
-                <nav ref={navRef} className="flex bg-white border-b border-gray-200 mb-4 relative">
+                {/* Tab Navigation */}
+                <nav
+                    ref={navRef}
+                    className="flex bg-white border-b border-gray-200 mb-4 relative overflow-x-auto scrollbar-tabs"
+                >
                     {/* Animated sliding indicator */}
-                    <div 
+                    <div
                         className="absolute bottom-0 h-1 bg-[#233245] transition-all duration-300 ease-in-out"
                         style={{
                             left: `${indicatorStyle.left}px`,
@@ -74,7 +85,7 @@ export default function TabSelector({ tieneVista, tabsConfig, activeTab: externa
                             key={tab.id}
                             ref={el => tabRefs.current[tab.id] = el}
                             className={`flex-1 px-4 py-3 uppercase tracking-wider transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === tab.id
-                                ? "font-semibold text[#233245]"
+                                ? "font-semibold text-[#233245]"
                                 : "text-gray-600"
                                 }`}
                             onClick={() => setActiveTab(tab.id)}

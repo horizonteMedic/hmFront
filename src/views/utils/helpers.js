@@ -9,6 +9,12 @@ export function fixEncodingModern(str) {
 export function getToday() {
     return format(new Date(), "yyyy-MM-dd");
 }
+export function getFechaHoraActual() { // 18/07/2026 09:32:15 (fecha y hora actual para auditoría)
+    return format(new Date(), "dd/MM/yyyy HH:mm:ss");
+}
+export function getTimestampActual() { // 2026-07-18T09:32:15 (fecha-hora actual para enviar al backend)
+    return format(new Date(), "yyyy-MM-dd'T'HH:mm:ss");
+}
 export function getTodayPlusOneYear() {
     return format(addYears(new Date(), 1), "yyyy-MM-dd");
 }
