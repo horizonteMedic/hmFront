@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import { faPrint, faUpload } from "@fortawesome/free-solid-svg-icons";
 import {
   InputTextOneLine,
   InputTextArea,
@@ -14,6 +14,8 @@ import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controll
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import { useState } from "react";
+import CargaMasivaFA2 from "./CargaMasivaFA2/CargaMasivaFA2";
 
 const tabla = "aptitud_medico_ocupacional_agro"
 const tabla2 = "resumen_medico_poderosa_anexo02"
@@ -22,6 +24,7 @@ export default function FichaAptitudAnexo2() {
   const today = getToday();
 
   const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
+  const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
   const initialFormState = {
     // Datos básicos
@@ -192,6 +195,13 @@ export default function FichaAptitudAnexo2() {
           inputClassName="font-bold"
           disabled
         />
+        <button
+          type="button"
+          onClick={() => setModalCargaMasiva(true)}
+          className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
+        >
+          <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+        </button>
       </SectionFieldset>
 
       {/* Información del paciente */}
@@ -444,6 +454,13 @@ export default function FichaAptitudAnexo2() {
           Resumen Médico <FontAwesomeIcon icon={faPrint} />
         </button>
       </div>
+      {modalCargaMasiva && <CargaMasivaFA2
+        onClose={() => setModalCargaMasiva(false)}
+        token={token}
+        userlogued={userlogued}
+        userName={userName}
+        tabla={tabla}
+        sede={selectedSede} />}
     </div>
   );
 }

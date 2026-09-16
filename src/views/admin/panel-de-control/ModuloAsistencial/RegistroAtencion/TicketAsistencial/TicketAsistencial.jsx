@@ -5,10 +5,9 @@ import { SelectField } from "../../../../../components/reusableComponents/InputS
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
-import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
+import {getToday } from "../../../../../utils/helpers";
 
 const METODOS_PAGO = [
     { value: "CONTADO", label: "CONTADO" },
@@ -42,51 +41,18 @@ export default function TicketAsistencial() {
 
     const initialFormState = {
         // Datos básicos
-        norden: "",
-        tipoExamen: "",
+        tipoDocumento: "DNI",
+        documentoIdentidad: "",
         NHCL: "",
         nroTicket: "",
-        CodVendedor: "",
+        codVendedor: "",
 
-        dni: "",
         nombres: "",
-        fechaNacimiento: "",
-        lugarNacimiento: "",
-        edad: "",
-        sexo: "",
-        estadoCivil: "",
-        nivelEstudios: "",
-
-        // Datos Laborales
         empresa: "",
-        contrata: "",
-        ocupacion: "",
-        cargoDesempenar: "",
-
-        conclusiones: "",
-        apto: "APTO",
-        fechaValido: today,
-        fechaVencimiento: getDatePlus364Days(today),
-        recomendaciones: "",
-        restricciones: "NINGUNO.",
-
-        // Checkboxes de recomendaciones
-        corregirAgudezaVisualTotal: false,
-        corregirAgudezaVisual: false,
-        dietaHipocalorica: false,
-        evitarMovimientosDisergonomicos: false,
-        noHacerTrabajoAltoRiesgo: false,
-        noHacerTrabajoSobre18: false,
-        usoEppAuditivo: false,
-        usoLentesConducir: false,
-        usoLentesTrabajo: false,
-        usoLentesTrabajoSobre18: false,
-        ninguno: true,
-        noConducirVehiculos: false,
 
         menorCincoAños: false,
         adolescente: false,
-        adulto: false,
+        adulto: true,
         adultoMayor: false,
 
         // Agregar Servicios Ticket
@@ -94,12 +60,10 @@ export default function TicketAsistencial() {
         codServicio: "",
         precio: "",
         unidad: "",
-        descuento: "",
+        descuento: "0",
         ticketItems: [],
 
-        // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
+        fecha: today,
     };
 
     const {
@@ -189,65 +153,55 @@ export default function TicketAsistencial() {
 
     return (
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
-            <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-5 gap-y-3 gap-x-4">
+            <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-4 gap-y-3 gap-x-4">
                 <InputsRadioGroup
                     name="tipoDocumento"
                     value={form.tipoDocumento}
+                    label="Tipo de Documento"
+                    labelWidth="120px"
                     onChange={handleRadioButton}
                     options={[
-                        { label: "D.N.I", value: "dni" },
-                        { label: "Historia Clínica", value: "hClinica" },
-                        { label: "S/D", value: "SD" },
+                        { label: "DNI", value: "DNI" },
+                        { label: "Pasaporte", value: "PASAPORTE" },
+                        { label: "Sin DNI", value: "SIN DNI" },
                     ]}
+                    className="xl:col-span-4"
                 />
-                <InputTextOneLine
-                    label="Numero de documento"
-                    name="numeroDocumento"
-                    value={form.numeroDocumento}
-                    labelWidth="130px"
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                />
+                {form.tipoDocumento == "SIN DNI" ?
+                    <h1>sin dni</h1>
+                    :
+                    <InputTextOneLine
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Sin DNI"}`}
+                        name="documentoIdentidad"
+                        value={form.documentoIdentidad}
+                        onChange={handleChangeNumberDecimals}
+                        onKeyUp={handleSearch}
+                        disabled={form.tipoDocumento === "SIN DNI"}
+                        labelWidth="120px"
+                    />
+                }
                 <InputTextOneLine
                     label="NHCL"
                     name="NHCL"
                     value={form?.NHCL}
-                    onChange={handleChangeNumberDecimals}
+                    disabled
                     onKeyUp={handleSearch}
                 />
                 <InputTextOneLine
                     label="N° Ticket"
                     name="nroTicket"
                     value={form?.nroTicket}
-                    onChange={handleChangeNumberDecimals}
+                    disabled
                     onKeyUp={handleSearch}
                 />
                 <InputTextOneLine
                     label="Código Vendedor"
-                    name="CodVendedor"
-                    value={form?.CodVendedor}
+                    name="codVendedor"
+                    value={form?.codVendedor}
                     onChange={handleChangeNumberDecimals}
                     onKeyUp={handleSearch}
                 />
             </SectionFieldset>
-
-            <SectionFieldset legend="Fecha" className="grid xl:grid-cols-2 gap-y-3 gap-x-4"> 
-                <InputTextOneLine
-                    label="Fecha"
-                    name="fecha"
-                    value={form.fecha}
-                    type="Date"
-                    disabled
-                />
-                <InputTextOneLine
-                    label="Hora"
-                    name="hora"
-                    value={hora}
-                    inputClassName="font-bold"
-                    disabled
-                />
-            </SectionFieldset>
-
 
             <SectionFieldset legend="Datos" className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine
@@ -292,25 +246,32 @@ export default function TicketAsistencial() {
                         label="< 5 AÑOS"
                         name="menorCincoAños"
                         checked={form.menorCincoAños}
-                        onChange={handleCheckBoxChange}
+                        // onChange={handleCheckBoxChange}
+                        disabled
+                        className="opacity-60"
                     />
                     <InputCheckbox
                         label="ADOLESCENTE"
                         name="adolescente"
                         checked={form.adolescente}
-                        onChange={handleCheckBoxChange}
+                        // onChange={handleCheckBoxChange}
+                        disabled
+                        className="opacity-60"
                     />
                     <InputCheckbox
                         label="ADULTO"
                         name="adulto"
                         checked={form.adulto}
-                        onChange={handleCheckBoxChange}
+                        disabled
+                    // onChange={handleCheckBoxChange}
                     />
                     <InputCheckbox
                         label="ADULTO MAYOR"
                         name="adultoMayor"
                         checked={form.adultoMayor}
-                        onChange={handleCheckBoxChange}
+                        // onChange={handleCheckBoxChange}
+                        disabled
+                        className="opacity-60"
                     />
                 </div>
             </SectionFieldset>
@@ -328,25 +289,26 @@ export default function TicketAsistencial() {
                             label="Cod. Servicio"
                             name="codServicio"
                             value={form.codServicio}
-                            onChange={handleChangeSimple}
+                            disabled
                         />
                         <InputTextOneLine
                             label="Precio"
                             name="precio"
                             value={form.precio}
-                            onChange={handleChangeNumberDecimals}
+                            disabled
                         />
                         <InputTextOneLine
                             label="Unidad"
                             name="unidad"
                             value={form.unidad}
-                            onChange={handleChangeSimple}
+                            disabled
                         />
                         <SelectField
                             label="Descuento"
                             name="descuento"
                             value={form.descuento}
                             onChange={handleChangeSimple}
+                            hidePlaceHolder
                             options={DESCUENTOS}
                             inline
                             labelWidth="80px"
@@ -416,7 +378,26 @@ export default function TicketAsistencial() {
                         )}
                     </tbody>
                 </table>
+
             </SectionFieldset>
+
+            <SectionFieldset legend="Fecha" className="grid xl:grid-cols-3 gap-y-3 gap-x-4">
+                <InputTextOneLine
+                    label="Fecha"
+                    name="fecha"
+                    value={form.fecha}
+                    type="Date"
+                    disabled
+                />
+                <InputTextOneLine
+                    label="Hora"
+                    name="hora"
+                    value={hora}
+                    inputClassName="font-bold"
+                    disabled
+                />
+            </SectionFieldset>
+
 
             <div className="flex flex-col md:flex-row justify-center items-center gap-4">
                 <button

@@ -4,6 +4,7 @@ import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import dibujarCuadroTextoDinamico from '../../components/CuadroTextoDinamico.jsx';
 
 export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -520,81 +521,6 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
     return Math.max(alturaCalculada, 15);
   };
 
-  // Función específica para calcular altura de hallazgos y recomendaciones con altura mínima de 55mm
-  const calcularAlturaTextoEspecial = (texto, anchoMaximo) => {
-    // Validar que el texto no sea undefined, null o vacío
-    if (!texto || texto === null || texto === undefined) {
-      return 55; // Altura mínima
-    }
-
-    let lineas = 0;
-
-    // Dividir por saltos de línea explícitos (\n)
-    const lineasTexto = String(texto).split('\n');
-
-    lineasTexto.forEach((linea, index) => {
-      // Verificar si la línea comienza con un número seguido de punto (lista numerada)
-      const esListaNumerada = /^\d+\./.test(linea.trim());
-
-      if (esListaNumerada) {
-        // Agregar espacio extra entre elementos de lista (excepto el primero)
-        if (index > 0) {
-          lineas += 0.2; // Espacio adicional entre elementos
-        }
-
-        // Para listas numeradas, calcular líneas considerando el ancho
-        const palabras = linea.split(' ');
-        let lineaActual = '';
-        let lineasEnEstaSeccion = 1;
-
-        palabras.forEach(palabra => {
-          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-          const anchoTexto = doc.getTextWidth(textoPrueba);
-
-          if (anchoTexto <= anchoMaximo) {
-            lineaActual = textoPrueba;
-          } else {
-            if (lineaActual) {
-              lineasEnEstaSeccion++;
-              lineaActual = palabra;
-            } else {
-              lineasEnEstaSeccion++;
-            }
-          }
-        });
-
-        lineas += lineasEnEstaSeccion;
-      } else {
-        // Para texto normal, usar el método original
-        const palabras = linea.split(' ');
-        let lineaActual = '';
-        let lineasEnEstaSeccion = 1;
-
-        palabras.forEach(palabra => {
-          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-          const anchoTexto = doc.getTextWidth(textoPrueba);
-
-          if (anchoTexto <= anchoMaximo) {
-            lineaActual = textoPrueba;
-          } else {
-            if (lineaActual) {
-              lineasEnEstaSeccion++;
-              lineaActual = palabra;
-            } else {
-              lineasEnEstaSeccion++;
-            }
-          }
-        });
-
-        lineas += lineasEnEstaSeccion;
-      }
-    });
-
-    // Altura mínima de 55mm para hallazgos y recomendaciones, altura por línea de 3mm
-    const alturaCalculada = lineas * 3 + 2;
-    return Math.max(alturaCalculada, 55);
-  };
-
   // Subheader celeste: Antecedentes Personales Importantes
   yPos = dibujarSubHeaderCeleste("Antecedentes Personales Importantes", yPos, filaAltura);
 
@@ -914,18 +840,16 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.text("En la presente evaluación médica se encontró lo siguiente:", tablaInicioX + 2, yPos + 3);
   yPos += alturaFilaDescriptiva;
 
-  // Fila de datos creciente para Hallazgos
+  // Fila de datos creciente para Hallazgos (cuadro reutilizable: crece con el texto y respeta saltos de línea)
   const hallazgosTexto = datosFinales.hallazgos || "-";
-  const alturaHallazgos = calcularAlturaTextoEspecial(hallazgosTexto, tablaAncho - 9);
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHallazgos);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHallazgos);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaHallazgos, tablaInicioX + tablaAncho, yPos + alturaHallazgos);
-
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(hallazgosTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
-  yPos += alturaHallazgos;
+  yPos = await dibujarCuadroTextoDinamico(doc, {
+    x: tablaInicioX, y: yPos, ancho: tablaAncho,
+    texto: hallazgosTexto,
+    fontSize: 7,
+    minHeight: 55,
+    paddingTop: 6,
+    paddingX: 3,
+  });
 
   // === SECCIÓN: RECOMENDACIONES ===
   // Fila gris: RECOMENDACIONES
@@ -942,18 +866,16 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.text("Las recomendaciones al respecto son las siguientes:", tablaInicioX + 2, yPos + 3);
   yPos += alturaFilaDescriptivaRecomendaciones;
 
-  // Fila de datos creciente para Recomendaciones
+  // Fila de datos creciente para Recomendaciones (cuadro reutilizable: crece con el texto y respeta saltos de línea)
   const recomendacionesTexto = datosFinales.recomendaciones || "-";
-  const alturaRecomendaciones = calcularAlturaTextoEspecial(recomendacionesTexto, tablaAncho - 9);
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
-
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(recomendacionesTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
-  yPos += alturaRecomendaciones;
+  yPos = await dibujarCuadroTextoDinamico(doc, {
+    x: tablaInicioX, y: yPos, ancho: tablaAncho,
+    texto: recomendacionesTexto,
+    fontSize: 7,
+    minHeight: 55,
+    paddingTop: 6,
+    paddingX: 3,
+  });
 
   // === SECCIÓN: NOTA ===
   // Fila celeste: NOTA

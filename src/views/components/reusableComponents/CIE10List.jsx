@@ -5,16 +5,17 @@ import { useEffect, useState } from "react";
 
 /**
  * Componente para mostrar y gestionar una lista de diagnósticos CIE10.
- * @param {Object} props - Propiedades del componente
- * @param {string} props.value - Cadena con los diagnósticos separados por " | " o saltos de línea
- * @param {function} props.onChange - Función para actualizar el valor en el formulario
- * @param {string} [props.label="Diagnósticos CIE10"] - Etiqueta para el campo
- * @param {string} [props.delimiter="\n"] - Separador de los diagnósticos en la cadena
- * @param {string} [props.additionalValue] - Valor adicional para concatenar diagnósticos
- * @param {function} [props.onAdditionalChange] - Función para actualizar el valor adicional
- * @param {function} [props.setAdditionalForm] - Función para actualizar el formulario adicional
- * @param {string} [props.additionalFieldName] - Nombre del campo adicional en el formulario
- * @param {string} [props.additionalDelimiter=" "] - Separador para el valor adicional (" " para espacios, "\n" para textarea)
+ *
+ * Props opcionales de sincronización con un campo externo (ej. textarea "diagnostico"):
+ *   setAdditionalForm      – setForm del formulario externo (puede ser el mismo setForm)
+ *   additionalFieldName    – nombre del campo externo ("diagnostico")
+ *   additionalDelimiter    – separador usado al agregar al campo externo (default "\n")
+ *
+ * Cuando estas props están presentes:
+ *   - Al agregar un CIE10 → se añade la línea al campo externo.
+ *   - Al eliminar un CIE10 → se elimina la línea correspondiente del campo externo.
+ *   - La sincronización inversa (externo → lista) debe manejarse en el padre
+ *     (ver handleDiagnosticoChange en Triaje).
  */
 const CIE10List = ({
   value,
@@ -35,89 +36,53 @@ const CIE10List = ({
 }) => {
   const handleChange = onChange || ((nuevoValor) => {
     if (setForm && fieldName) {
-      setForm(prev => ({
-        ...prev,
-        [fieldName]: nuevoValor
-      }));
+      setForm(prev => ({ ...prev, [fieldName]: nuevoValor }));
     }
   });
 
-  const handleAdditionalChange = onAdditionalChange || ((nuevoValor) => {
-    if (setAdditionalForm && additionalFieldName) {
-      setAdditionalForm(prev => ({
-        ...prev,
-        [additionalFieldName]: nuevoValor
-      }));
-    }
-  });
-
-  const stringifyAdditional = (arr) => {
-    return arr
-      .map(item => `${item.codigo} - ${item.descripcion}`)
-      .join(additionalDelimiter);
-  };
   // Función para parsear la cadena en un array de objetos { codigo, descripcion }
   const parseDiagnosticos = (str) => {
     if (!str || str.trim() === "") return [];
-
-    // Primero normalizamos los saltos de línea al delimitador
     const normalized = str.replace(/\n/g, delimiter);
     const items = normalized.split(delimiter).filter(item => item.trim() !== "");
-
     return items.map(item => {
       const match = item.match(/CIE 10: ([A-Za-z0-9.]+) - (.+)/i);
-      if (match) {
-        return {
-          codigo: match[1],
-          descripcion: match[2]
-        };
-      }
-      // Si no coincide el patrón, tratamos de extraer código y descripción
+      if (match) return { codigo: match[1], descripcion: match[2] };
       const parts = item.split(" - ");
       if (parts.length >= 2) {
         return {
           codigo: parts[0].replace(/CIE 10:\s*/i, ""),
-          descripcion: parts.slice(1).join(" - ")
+          descripcion: parts.slice(1).join(" - "),
         };
       }
-      return {
-        codigo: item,
-        descripcion: item
-      };
+      return { codigo: item, descripcion: item };
     });
   };
 
-  // Estado para mantener la lista de diagnósticos y el valor anterior
   const [diagnosticos, setDiagnosticos] = useState(() => parseDiagnosticos(value));
   const [valorAnterior, setValorAnterior] = useState(value);
 
-  // Función para manejar la confirmación de diagnósticos
-  const handleConfirmCIE10 = (newValue, selectedList) => {
+  // Función para manejar la confirmación de diagnósticos (al agregar)
+  const handleConfirmCIE10 = (newValue) => {
     const lista = parseDiagnosticos(newValue);
     setDiagnosticos(lista);
 
-    // Solo actualizar la variable adicional si el valor ha cambiado y tenemos la configuración
     if (newValue !== valorAnterior && setAdditionalForm && additionalFieldName) {
-      // Obtener la lista anterior para comparar
       const listaAnterior = parseDiagnosticos(valorAnterior);
       const codigosAnteriores = new Set(listaAnterior.map(d => d.codigo));
-
-      // Encontrar diagnósticos nuevos
       const nuevosDiagnosticos = lista.filter(d => !codigosAnteriores.has(d.codigo));
 
-      if (nuevosDiagnosticos.length > 0) {
-        // Agregar cada nuevo diagnóstico al final
-        nuevosDiagnosticos.forEach(item => {
-          setAdditionalForm(prev => {
-            const valorActual = prev[additionalFieldName] || "";
-            const separador = valorActual.trim() === "" ? "" : additionalDelimiter;
-            return {
-              ...prev,
-              [additionalFieldName]: valorActual + separador + "CIE 10: " + `${item.codigo} - ${item.descripcion}`
-            };
-          });
+      nuevosDiagnosticos.forEach(item => {
+        setAdditionalForm(prev => {
+          const valorActual = prev[additionalFieldName] || "";
+          const separador = valorActual.trim() === "" ? "" : additionalDelimiter;
+          const linea = `CIE 10: ${item.codigo} - ${item.descripcion}`;
+          return {
+            ...prev,
+            [additionalFieldName]: valorActual + separador + linea,
+          };
         });
-      }
+      });
     }
 
     setValorAnterior(newValue);
@@ -131,17 +96,14 @@ const CIE10List = ({
   }, [value]);
 
   // Función para convertir el array de vuelta a una cadena
-  const stringifyDiagnosticos = (arr) => {
-    return arr
-      .map(item => `CIE 10: ${item.codigo} - ${item.descripcion}`)
-      .join(delimiter);
-  };
+  const stringifyDiagnosticos = (arr) =>
+    arr.map(item => `CIE 10: ${item.codigo} - ${item.descripcion}`).join(delimiter);
 
   const copiarDiagnostico = async (item) => {
     const texto = `CIE 10: ${item.codigo} - ${item.descripcion}`;
     try {
       await navigator.clipboard.writeText(texto);
-    } catch (err) {
+    } catch {
       const textarea = document.createElement("textarea");
       textarea.value = texto;
       document.body.appendChild(textarea);
@@ -151,24 +113,31 @@ const CIE10List = ({
     }
   };
 
-  // Función para eliminar un diagnóstico
+  // Elimina de la lista y también del campo externo si está configurado
   const eliminarDiagnostico = (index) => {
+    const item = diagnosticos[index];
     const nuevosDiagnosticos = diagnosticos.filter((_, i) => i !== index);
     handleChange(stringifyDiagnosticos(nuevosDiagnosticos));
-    // No hacemos nada en la variable adicional al eliminar
+
+    if (setAdditionalForm && additionalFieldName) {
+      setAdditionalForm(prev => {
+        const valorActual = prev[additionalFieldName] || "";
+        const patronBusqueda = `CIE 10: ${item.codigo} - ${item.descripcion}`;
+        const lineas = valorActual
+          .split("\n")
+          .filter(linea => linea.trim().toUpperCase() !== patronBusqueda.toUpperCase());
+        return { ...prev, [additionalFieldName]: lineas.join("\n") };
+      });
+    }
   };
 
   const isAddDisabled = disabled || !allowAdd;
   const isRemoveDisabled = disabled || !allowRemove;
 
-
-
   return (
     <div className="space-y-2">
       <div className="flex justify-between w-full">
-        <label className="block font-semibold ">
-          {label} :
-        </label>
+        <label className="block font-semibold">{label} :</label>
         {!isAddDisabled && (
           <CIE10
             token={token}
@@ -196,12 +165,16 @@ const CIE10List = ({
               <span className="text-sm font-mono font-bold text-green-700 bg-green-100 px-2 py-1 rounded shrink-0">
                 {item.codigo}
               </span>
-              <span className="text-sm text-green-800 flex-1 break-words whitespace-normal leading-tight" title={item.descripcion}>
+              <span
+                className="text-sm text-green-800 flex-1 break-words whitespace-normal leading-tight"
+                title={item.descripcion}
+              >
                 {item.descripcion}
               </span>
               {!isRemoveDisabled && (
                 <>
                   <button
+                    type="button"
                     onClick={() => copiarDiagnostico(item)}
                     className="text-blue-500 hover:text-blue-700 shrink-0 pr-1"
                     title="Copiar diagnóstico"
@@ -209,6 +182,7 @@ const CIE10List = ({
                     <FontAwesomeIcon icon={faCopy} />
                   </button>
                   <button
+                    type="button"
                     onClick={() => eliminarDiagnostico(index)}
                     className="text-red-500 hover:text-red-700 shrink-0 pr-2"
                     title="Eliminar diagnóstico"

@@ -2,6 +2,7 @@ import { useState } from "react";
 import Audiometria from "./Audiometria/Audiometria";
 import AudiometriaCuestionario from "./AudiometriaCuestionario/AudiometriaCuestionario";
 import AudiometriaOhlaTabSelector from "./AudiometriaOhla/AudiometriaOhlaTabSelector";
+import AudiometriaOhlaN from "./AudiometriaOhlaN/AudiometriaOhlaN";
 import { useSessionData } from "../../../../hooks/useSessionData";
 
 const date = new Date();
@@ -110,6 +111,9 @@ export default function AudiometriaTabSelector({
           form={formCuestionarioAudio}
           setForm={setFormCuestionarioAudio}
         />
+      )}
+      {subTab === 3 && (
+        <AudiometriaOhlaN />
       )}
     </>
   );

@@ -1247,14 +1247,14 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
     doc.addImage(
       huellaDigital,
       'PNG',
-      x + 20, y - 5, 15, 21
+      x + 20, y - 3, 15, 21
     );
   } catch (error) {
     console.log("Error cargando huella:", error);
   }
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Indice Derecho", tablaInicioX + 155, yPos + 16.5, { align: "center" });
+  doc.text("Indice Derecho", tablaInicioX + 155, yPos + 18, { align: "center" });
 
   yPos += alturaSeccionFirma;
 
@@ -1756,12 +1756,13 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   yTextoCriterios += alturaFilaRiesgoBajo;
 
   // === SECCIÓN DE FIRMA MÉDICA (CONTINUANDO DESDE RIESGO BAJO) ===
-  const alturaSeccionFirmaMedica = 20; // Altura para la sección de firma médica (reducida 2 puntos)
+  const alturaSeccionFirmaMedica = 14; // Altura para la sección de firma médica (reducida 2 puntos)
   const yFirmaMedica = yCriterios; // Continuar directamente desde donde terminó RIESGO BAJO
 
   // Calcular altura total de la tabla (firma + observaciones)
+  
   const textoObservacionesCompleto = `Observaciones: ${datosFinales.observaciones || ""}`;
-  const alturaObservaciones = Math.max(6, calcularAlturaDinamica(textoObservacionesCompleto, tablaCriteriosAncho - 4));
+  const alturaObservaciones = Math.max(13, calcularAlturaDinamica(textoObservacionesCompleto, tablaCriteriosAncho - 4));
   const alturaTotalTabla = alturaSeccionFirmaMedica + alturaObservaciones;
 
   // Dibujar tabla completa (una sola tabla con dos filas)
@@ -1777,10 +1778,10 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
 
   // Fila 1: Información del médico y firma (2 columnas)
   // Columna 1: Información del médico
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(6);
   doc.text("Nombre y Apellidos del Médico - N° de Colegiatura", tablaCriteriosInicioX + 2, yFirmaMedica + 5);
-  doc.text("Firma y Sello", tablaCriteriosInicioX + 2, yFirmaMedica + 9);
-  doc.text("CMP", tablaCriteriosInicioX + 2, yFirmaMedica + 13);
+  doc.text("Firma y Sello", tablaCriteriosInicioX + 2, yFirmaMedica + 7);
+  doc.text("CMP", tablaCriteriosInicioX + 2, yFirmaMedica + 9); 
 
   // Columna 2: Firma del médico
   try {
@@ -1790,7 +1791,7 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
     doc.addImage(
       firmaMedicoUrl,
       'PNG',
-      x + 7, y - 5, 34, 25
+      x + 22, y - 4, 30, 15
     );
   } catch (error) {
     console.log("Error cargando firma del médico:", error);
@@ -1800,12 +1801,12 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   const yObservaciones = yFirmaMedica + alturaSeccionFirmaMedica;
 
   // Dibujar texto de observaciones
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(6);
   dibujarTextoConSaltoLinea(textoObservacionesCompleto, tablaCriteriosInicioX + 2, yObservaciones + 4, tablaCriteriosAncho - 4);
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA (PÁGINA 2) ===
   const yDeclaracion = yFirmaMedica + alturaTotalTabla; // Sin espacio, continuar directamente
-  const alturaSeccionDeclaracion = 20; // Altura para la sección de declaración
+  const alturaSeccionDeclaracion = 26; // Altura para la sección de declaración
 
   // Dibujar las líneas de la sección de declaración (3 columnas)
   doc.line(tablaCriteriosInicioX, yDeclaracion, tablaCriteriosInicioX, yDeclaracion + alturaSeccionDeclaracion); // Línea izquierda
@@ -1828,7 +1829,7 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
     doc.addImage(
       firmaPaciente,
       'PNG',
-      x + 7, y - 5, 34, 25
+      x + 7, y - 2, 32, 23
     );
   } catch (error) {
     console.log("Error cargando firma:", error);
@@ -1837,8 +1838,8 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
 
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma del trabajador o postulante", tablaCriteriosInicioX + 90, yDeclaracion + 16.5, { align: "center" });
-  doc.text("DNI : " + datosFinales.documentoIdentidad, tablaCriteriosInicioX + 90, yDeclaracion + 19, { align: "center" });
+  doc.text("Firma del trabajador o postulante", tablaCriteriosInicioX + 90, yDeclaracion + 19.5, { align: "center" });
+  doc.text("DNI : " + datosFinales.documentoIdentidad, tablaCriteriosInicioX + 90, yDeclaracion + 22, { align: "center" });
 
   // Columna 3: Huella digital
   try {
@@ -1848,7 +1849,7 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
     doc.addImage(
       huellaDigital,
       'PNG',
-      x + 20, y - 5, 15, 21
+      x + 18, y - 2, 15, 21
     );
   } catch (error) {
     console.log("Error cargando huella:", error);
@@ -1857,7 +1858,7 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
 
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Indice Derecho", tablaCriteriosInicioX + 155, yDeclaracion + 16.5, { align: "center" });
+  doc.text("Indice Derecho", tablaCriteriosInicioX + 155, yDeclaracion + 22, { align: "center" });
 
   // === FOOTER ===
   // Llamar al footer (los datos de prueba están dentro del componente)

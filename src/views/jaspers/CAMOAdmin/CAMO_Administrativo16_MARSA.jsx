@@ -3,6 +3,7 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import dibujarCuadroTextoDinamico from '../components/CuadroTextoDinamico.jsx';
 
 export default async function CAMO_Administrativo16_MARSA(data = {}, docExistente = null, numeroPaginaInicial = 1) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -69,37 +70,6 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
   };
 
   // === Helpers de texto ===
-  const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 9) => {
-    const filaAltura = 6;
-    if (!texto || texto.trim() === '') return filaAltura;
-
-    doc.setFontSize(fontSize);
-    const lineHeight = fontSize * 0.5;
-    const palabras = texto.split(' ');
-    let lineas = 1;
-    let lineaActual = '';
-
-    for (let palabra of palabras) {
-      const textoPrueba = lineaActual + (lineaActual ? ' ' : '') + palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-
-      if (anchoTexto > anchoMaximo) {
-        if (lineaActual) {
-          lineas++;
-          lineaActual = palabra;
-        } else {
-          lineas++;
-          lineaActual = '';
-        }
-      } else {
-        lineaActual = textoPrueba;
-      }
-    }
-
-    const alturaNecesaria = lineas * lineHeight + 1;
-    return Math.max(filaAltura, alturaNecesaria);
-  };
-
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     if (!texto || texto.trim() === '') return;
 
@@ -269,6 +239,8 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
     numeroPagina++;
   }
   await drawHeader(numeroPagina);
+
+  const numeroPaginaRef = { value: numeroPagina };
 
   let yPos2 = 40;
   const x2 = 15;
@@ -445,24 +417,24 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
   yPos2 += filaDP;
 
   // --- Antecedentes Personales ---
-  const antecedentesPersonales = String(data.antecedentesPersonales ?? "");
-  const alturaAntPersonales = Math.max(filaDP * 1.5, calcularAlturaTexto(antecedentesPersonales || " ", 174, 8) + 5);
-  doc.rect(x2, yPos2, ancho2, alturaAntPersonales);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Antecedentes Personales", x2 + 2, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  if (antecedentesPersonales) dibujarTextoConSaltoLinea(antecedentesPersonales, x2 + 4, yPos2 + 9, 174);
-  yPos2 += alturaAntPersonales;
+  yPos2 = await dibujarCuadroTextoDinamico(doc, {
+    x: x2, y: yPos2, ancho: ancho2,
+    titulo: "Antecedentes Personales",
+    texto: data.antecedentesPersonales,
+    fontSize: 8,
+    minHeight: filaDP * 1.5,
+    maxLineas: 4,
+  });
 
   // --- Antecedentes Familiares ---
-  const antecedentesFamiliares = String(data.antecedentesFamiliares ?? "");
-  const alturaAntFamiliares = Math.max(filaDP * 1.5, calcularAlturaTexto(antecedentesFamiliares || " ", 174, 8) + 5);
-  doc.rect(x2, yPos2, ancho2, alturaAntFamiliares);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Antecedentes Familiares", x2 + 2, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  if (antecedentesFamiliares) dibujarTextoConSaltoLinea(antecedentesFamiliares, x2 + 4, yPos2 + 9, 174);
-  yPos2 += alturaAntFamiliares;
+  yPos2 = await dibujarCuadroTextoDinamico(doc, {
+    x: x2, y: yPos2, ancho: ancho2,
+    titulo: "Antecedentes Familiares",
+    texto: data.antecedentesFamiliares,
+    fontSize: 8,
+    minHeight: filaDP * 1.5,
+    maxLineas: 1,
+  });
 
   // --- Talla | Peso | Índice de masa corporal ---
   const altTallaPeso = 6;
@@ -578,7 +550,7 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
 
   yPos2 += 3;
 
-  const numeroPaginaRef = { value: numeroPagina };
+  numeroPagina = numeroPaginaRef.value;
   const paginaAntesObs = numeroPaginaRef.value;
   // --- Observaciones ---
   yPos2 = await dibujarSeccionPaginada(

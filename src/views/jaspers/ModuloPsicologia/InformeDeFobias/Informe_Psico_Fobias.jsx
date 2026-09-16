@@ -12,7 +12,7 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
 
   const datosReales = {
     apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaRegistro ?? ""),
+    fechaExamen: formatearFechaCorta(data.fechaExamen ?? ""),
     tipoExamen: String(data.tipoExamen ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
     documentoIdentidad: String(data.dniPaciente ?? ""),

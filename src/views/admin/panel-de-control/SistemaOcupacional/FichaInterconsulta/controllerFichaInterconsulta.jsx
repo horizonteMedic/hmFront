@@ -201,6 +201,7 @@ export const GetInfoServicioEditar = async (
             SubirDoc: true,
             user_medicoFirma: res.userRegistro ? res.userRegistro : prev.user_medicoFirma,
             fechaReevaluacion: res.fechaReevaluacion ?? "",
+            conclusionesCie10: res.conclusionesCie10
         }));
     }
 };
@@ -276,6 +277,7 @@ export const SubmitDataService = async (
         "orden": null,
         "userRegistro": form.user_medicoFirma,
         "fechaReevaluacion": form.fechaReevaluacion || null,
+        conclusionesCie10: form.conclusionesCie10
         //"usuarioFirma": form.user_medicoFirma
         // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };

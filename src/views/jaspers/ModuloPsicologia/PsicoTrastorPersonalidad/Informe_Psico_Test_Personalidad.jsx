@@ -6,7 +6,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export  default async function InformeDeTestPersonalidad(data = {}, docExistente = null) {
+export default async function InformeDeTestPersonalidad(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -17,7 +17,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -85,7 +85,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
@@ -313,17 +313,17 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'S');
-  
+
   // Columna Bajo (Rojo)
   doc.setFillColor(255, 0, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'F');
   doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'S');
-  
+
   // Columna Medio (Amarillo)
   doc.setFillColor(255, 255, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'F');
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'S');
-  
+
   // Columna Alto (Verde)
   doc.setFillColor(0, 255, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'F');
@@ -342,7 +342,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
   const dibujarGrupo = (tituloGrupo, aspectos, y) => {
     const numFilas = aspectos.length;
     const alturaGrupo = filaAltura * numFilas;
-    
+
     // Celda del grupo que se extiende verticalmente
     doc.rect(tablaInicioX, y, colGrupo, alturaGrupo, 'S');
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -352,10 +352,10 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
     lineas.forEach((linea, idx) => {
       doc.text(linea, tablaInicioX + colGrupo / 2, yTexto + idx * 3, { align: "center" });
     });
-    
-      // Dibujar cada aspecto del grupo
-      let currentY = y;
-      aspectos.forEach((aspecto) => {
+
+    // Dibujar cada aspecto del grupo
+    let currentY = y;
+    aspectos.forEach((aspecto) => {
       // Celda aspecto
       doc.rect(tablaInicioX + colGrupo, currentY, colAspecto, filaAltura, 'S');
       doc.setFont("helvetica", "normal").setFontSize(8);
@@ -369,12 +369,12 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
           doc.text(linea, tablaInicioX + colGrupo + 2, currentY + 2 + (idx * 3));
         });
       }
-      
+
       // Celdas Bajo, Medio, Alto
       doc.rect(tablaInicioX + colGrupo + colAspecto, currentY, colBajo, filaAltura, 'S');
       doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, currentY, colMedio, filaAltura, 'S');
       doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, currentY, colAlto, filaAltura, 'S');
-      
+
       // Marcar X según valor - mapear desde los campos del backend
       let valor = '';
       if (aspecto.campo === 'paranoide') {
@@ -400,7 +400,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
       } else if (aspecto.campo === 'ansioso') {
         valor = data.ansiosoBajo ? 'BAJO' : data.ansiosoMedio ? 'MEDIO' : data.ansiosoAlto ? 'ALTO' : '';
       }
-      
+
       const valorLower = String(valor).toLowerCase();
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.setTextColor(0, 51, 204); // #0033cc
@@ -413,10 +413,10 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
       }
       doc.setTextColor(0, 0, 0); // Volver a negro
       doc.setFont("helvetica", "normal").setFontSize(8);
-      
+
       currentY += filaAltura;
     });
-    
+
     return currentY;
   };
 
@@ -443,7 +443,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
     { nombre: "ANSIOSO", campo: "ansioso" }
   ], yPos);
 
-  
+
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
@@ -461,20 +461,20 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
 
     const padding = 2;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Dividir texto en líneas
     const lineas = doc.splitTextToSize(String(texto), anchoMaximo - 4);
     const alturaTexto = lineas.length * 3.2 + padding * 2;
     const alturaFinal = Math.max(alturaMinima, alturaTexto);
-    
+
     // Dibujar borde
     doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
-    
+
     // Dibujar texto
     lineas.forEach((linea, idx) => {
       doc.text(linea, x + 2, y + padding + 1.5 + (idx * 3.2));
     });
-    
+
     return y + alturaFinal;
   };
 
@@ -517,7 +517,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
   // Estructura: CUMPLE CON EL PERFIL | (vacía) | NO CUMPLE CON EL PERFIL | (vacía)
   const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
   const colVaciaW = 15; // Ancho para columnas vacías
-  
+
   // Dibujar las 4 columnas
   doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: CUMPLE CON EL PERFIL
   doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
@@ -541,7 +541,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
     // Marcar X en la columna vacía después de NO CUMPLE (columna 4)
     doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, centroVertical, { align: "center" });
   }
-  
+
   yPos += filaAltura;
 
   // === SECCIÓN 7: FIRMAS ===
@@ -553,7 +553,7 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
     yPos = 40;
     drawHeader(numeroPagina);
   }
-  
+
   const alturaSeccionFirmas = 32; // Altura ajustada para que quepa el texto completo dentro
   const baseY = yPos;
 
@@ -564,17 +564,17 @@ export  default async function InformeDeTestPersonalidad(data = {}, docExistente
 
   // Usar helper para dibujar firmas (solo las que vengan en la data)
   await dibujarFirmas({ doc, datos: datosFinales, y: baseY + 2, pageW }).then(() => {
-   
+
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
   });
-  
-  if (docExistente) { 
+
+  if (docExistente) {
     return doc;
   } else {
     imprimir(doc);
   }
-} 
+}
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);

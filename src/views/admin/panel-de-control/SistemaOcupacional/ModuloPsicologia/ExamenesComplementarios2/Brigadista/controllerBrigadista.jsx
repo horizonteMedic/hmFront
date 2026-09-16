@@ -32,7 +32,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaRegistro,
+            fecha: res.fechaExamen,
 
             esApto: res.cumplePerfil,
 
@@ -88,7 +88,7 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
-        fechaRegistro: form.fecha,
+        fechaExamen: form.fecha,
         afronTdd: form.afrontamientoTomaDecisiones,
         estiloConflicto: form.estiloDeConflicto,
         afronSitRiesgo: form.afrontamientoSituacionesRiesgo,
@@ -151,6 +151,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            fechaExamen: prev.fechaExamen,
             nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad,

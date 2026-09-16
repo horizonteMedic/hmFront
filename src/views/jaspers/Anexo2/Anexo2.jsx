@@ -39,6 +39,24 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
+  // Footer que sólo se dibuja si NO se superpone con el contenido de la hoja.
+  // Si el contenido llega hasta la zona del footer (línea divisoria púrpura),
+  // se omite el footer de esa página para evitar que se pise con el texto.
+  const footerTRSiCabe = (yPosContenido, opts = { footerOffsetY: 8 }) => {
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginBottom = 25; // mismo valor usado en footerTR
+    const offsetY = Number(opts?.footerOffsetY ?? 0);
+    // Inicio de la línea divisoria del footer (baseY - 3.6 en footerTR)
+    const footerTopY = pageHeight - marginBottom + offsetY - 3.6;
+
+    if (typeof yPosContenido === "number" && yPosContenido > footerTopY) {
+      return false; // el footer se superpondría con el contenido: no se dibuja
+    }
+
+    footerTR(doc, opts);
+    return true;
+  };
+
   const datosReales = {
     apellidosNombres: String((data.datosPaciente.apellidos_apellidos_pa || "") + " " + (data.datosPaciente.nombres_nombres_pa || "")).trim(),
     fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha || ""),
@@ -158,6 +176,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     presionArterialSistolica: (data.sistolica_sistolica === null || data.sistolica_sistolica === undefined || data.sistolica_sistolica === "") ? "" : data.sistolica_sistolica,
     presionArterialDiastolica: (data.diastolica_diastolica === null || data.diastolica_diastolica === undefined || data.diastolica_diastolica === "") ? "" : data.diastolica_diastolica,
     temperatura: (data.temperatura_temperatura === null || data.temperatura_temperatura === undefined || data.temperatura_temperatura === "") ? "" : data.temperatura_temperatura,
+    cintura: data.cintura_cintura ?? "",
     // Datos de evaluación médica
     anamnesis: (data.anamnesis_txtanamnesis === null || data.anamnesis_txtanamnesis === undefined || data.anamnesis_txtanamnesis === "") ? "" : data.anamnesis_txtanamnesis,
     otrosExamenClinico: (data.sat02_sat_02 === null || data.sat02_sat_02 === undefined || data.sat02_sat_02 === "") ? "" : data.sat02_sat_02,
@@ -778,7 +797,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
           doc.setFont("helvetica", "normal").setFontSize(8);
           // Mostrar descripción al costado si existe
           if (ant.descripcion && ant.descripcion.trim() !== "") {
-            doc.setFont("helvetica", "normal").setFontSize(5);
+            doc.setFont("helvetica", "normal").setFontSize(ant.descripcion.length > 50 ? 3 : 5);
+
             // Ajustar posición según el antecedente (ajustado para colAnteWidth de 54mm o 50mm)
             let xTexto = xSi - (colAnteWidthActual + 5); // Posición base ajustada
             const maxWidthTexto = colAnteWidthActual - 12; // Ancho máximo ajustado
@@ -1315,6 +1335,10 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     {
       label: "Temperatura:",
       value: datosFinales.temperatura ? `${datosFinales.temperatura} °C` : ''
+    },
+    {
+      label: "Perímetro Abdominal:",
+      value: datosFinales.cintura ? `${datosFinales.cintura} cm` : ''
     }
   ];
 
@@ -1378,14 +1402,30 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
   yPos += filaAltura;
 
-  // === FILA: OTROS ===
+  // === FILA: PERÍMETRO ABDOMINAL (IZQUIERDA) / OTROS (DERECHA) ===
+  const perimetroAbdominal = vitales[8];
+  const mitadTablaAncho = tablaAncho / 2;
+
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + mitadTablaAncho, yPos, tablaInicioX + mitadTablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
 
+  // Perímetro Abdominal (mitad izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
+  doc.setTextColor(0, 0, 0);
+  doc.text(perimetroAbdominal.label, tablaInicioX + 2, yPos + 3.5);
+  if (perimetroAbdominal.value) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    const labelWidth = doc.getTextWidth(perimetroAbdominal.label);
+    doc.text(perimetroAbdominal.value, tablaInicioX + labelWidth + 5, yPos + 3.5);
+  }
+
+  // Otros (mitad derecha)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Otros:", tablaInicioX + mitadTablaAncho + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.otrosExamenClinico) {
     // Agregar % si no está presente
@@ -1393,7 +1433,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     const valorConPorcentaje = valorSatO2.endsWith('%') ? valorSatO2 : `${valorSatO2}%`;
     const otrosTexto = `SAT O2: ${valorConPorcentaje}`;
     const labelWidth = doc.getTextWidth("Otros:");
-    doc.text(otrosTexto, tablaInicioX + labelWidth + 5, yPos + 3.5);
+    doc.text(otrosTexto, tablaInicioX + mitadTablaAncho + labelWidth + 5, yPos + 3.5);
   }
   yPos += filaAltura;
 
@@ -1431,8 +1471,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const alturaMaximaPag1 = doc.internal.pageSize.getHeight() - 25; // Margen inferior para footer
 
   if (yPos > alturaMaximaPag1) {
-    // === FOOTER PÁGINA 1 ===
-    footerTR(doc, { footerOffsetY: 8 });
+    // === FOOTER PÁGINA 1 (sólo si no se superpone con el contenido) ===
+    footerTRSiCabe(yPos);
 
     // === CREAR PÁGINA INTERMEDIA ===
     doc.addPage();
@@ -1440,8 +1480,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     await drawHeader(numeroPagina);
     yPos = 35.5;
   } else {
-    // === FOOTER PÁGINA 1 ===
-    footerTR(doc, { footerOffsetY: 8 });
+    // === FOOTER PÁGINA 1 (sólo si no se superpone con el contenido) ===
+    footerTRSiCabe(yPos);
 
     // === CREAR PÁGINA 2 ===
     doc.addPage();
@@ -1904,8 +1944,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
   yPos = yPosInicial + filaAltura + alturaDinamica;
 
-  // === FOOTER PÁGINA 2 ===
-  footerTR(doc, { footerOffsetY: 8 });
+  // === FOOTER PÁGINA 2 (sólo si no se superpone con el contenido) ===
+  footerTRSiCabe(yPos);
 
   // === CREAR PÁGINA 3 ===
   doc.addPage();
@@ -2163,7 +2203,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const alturaMaximaPag3 = doc.internal.pageSize.getHeight() - 25; // Margen inferior para footer
   if (yPos > alturaMaximaPag3 - 30) {
     // No hay espacio suficiente, crear nueva página
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTRSiCabe(yPos);
     doc.addPage();
     numeroPagina++;
     await drawHeader(numeroPagina);
@@ -2242,8 +2282,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.text("Sello y Firma del Médico", centroColumna2X, yPos + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna2X, yPos + 28.5, { align: "center" });
 
-  // === FOOTER PÁGINA 3 ===
-  footerTR(doc, { footerOffsetY: 8 });
+  // === FOOTER PÁGINA 3 (sólo si no se superpone con las firmas) ===
+  footerTRSiCabe(yPos + alturaSeccionFirmas);
 
   // === Imprimir ===
   if (docExistente) {

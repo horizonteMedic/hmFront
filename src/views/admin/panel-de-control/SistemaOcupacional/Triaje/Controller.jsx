@@ -336,6 +336,7 @@ export const GetListTriajeMult = async (nro, set, get, token, jasper, setHTR) =>
                     diastolica: res.diastolica,
                     fRespiratoria: res.f_respiratoria,
                     diagnostico: res.conclusion,
+                    conclusionesCie10: res.conclusionesCie10
                 }));
             } else {
                 Swal.fire('Error', 'No se Encontro un Registro de Triaje para esta Historia Clinica', 'error');

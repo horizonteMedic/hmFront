@@ -325,7 +325,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     clasificacionNeumoconiosis: {
       clasificaciones: {
         "0/-": data.examenRadiografico1_ex_1 ?? false,
-        "1/1": data.examenRadiografico11_ex_11 ?? false,
+        "0/0": data.examenRadiografico0_ex_0 ?? false,
         "0/1": data.examenRadiografico01_ex_01 ?? false,
         "1/0": data.examenRadiografico10_ex_10 ?? false,
         "1/1": data.examenRadiografico11_ex_11 ?? false,
@@ -1232,14 +1232,32 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Columna derecha: Espacio para completar (mostrar datos si existen)
   if (datosFinales.antecedentesPersonales) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
     const textoAntecedentes = String(datosFinales.antecedentesPersonales).trim();
-    // Dividir texto en líneas si es muy largo
     const maxWidth = tablaAncho - anchoColAntecedentes - 4;
-    const lineas = doc.splitTextToSize(textoAntecedentes, maxWidth);
-    lineas.forEach((linea, index) => {
-      if (yPos + 3.5 + (index * 3) + 3 <= yPos + alturaFilaAntecedentes - 1) {
-        doc.text(linea, divAntecedentes + 2, yPos + 3.5 + (index * 3));
+    const alturaDisponible = alturaFilaAntecedentes - 5; // margen superior 3.5 + margen inferior 1.5
+
+    // Reducir la fuente hasta que el texto completo entre en la fila (altura fija),
+    // en vez de cortar las líneas que sobran.
+    const fontSizeMaximo = 7;
+    const fontSizeMinimo = 5;
+    let fontSizeAntecedentes = fontSizeMaximo;
+    let lineasAntecedentes = [];
+    let interlineadoAntecedentes = fontSizeMaximo * 0.43;
+
+    while (fontSizeAntecedentes >= fontSizeMinimo) {
+      doc.setFont("helvetica", "normal").setFontSize(fontSizeAntecedentes);
+      lineasAntecedentes = doc.splitTextToSize(textoAntecedentes, maxWidth);
+      interlineadoAntecedentes = fontSizeAntecedentes * 0.43;
+      const alturaNecesaria = (lineasAntecedentes.length - 1) * interlineadoAntecedentes + 3;
+      if (alturaNecesaria <= alturaDisponible) break;
+      fontSizeAntecedentes -= 0.5;
+    }
+
+    doc.setFont("helvetica", "normal").setFontSize(fontSizeAntecedentes);
+    lineasAntecedentes.forEach((linea, index) => {
+      // Resguardo final: si ni con la fuente mínima entra todo, no dibujar fuera de la celda
+      if ((index * interlineadoAntecedentes) + 3 <= alturaDisponible) {
+        doc.text(linea, divAntecedentes + 2, yPos + 3.5 + (index * interlineadoAntecedentes));
       }
     });
   }
@@ -2603,7 +2621,12 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const anchoMarcha = (tablaInicioX + tablaAncho) - (divColEvaluacion + 20) - 2;
   const alturaFila1Evaluacion = Math.max(alturaFilaEvaluacion, Math.max(calcularAlturaTextoConSalto(textoReflejos, anchoReflejos), calcularAlturaTextoConSalto(textoMarcha, anchoMarcha)) + 2);
 
-  const alturaTotalEvaluacion = alturaFila1Evaluacion + alturaFilaEvaluacion * 3; // 1 dinámica + 3 fijas
+  // Altura dinámica fila Abdomen (según texto con salto de línea)
+  const textoAbdomen = datosFinales.evaluacionColumnaAbdomen?.abdomen || "";
+  const anchoAbdomen = (tablaInicioX + tablaAncho) - (tablaInicioX + 25) - 2;
+  const alturaFilaAbdomen = Math.max(alturaFilaEvaluacion, calcularAlturaTextoConSalto(textoAbdomen, anchoAbdomen) + 2);
+
+  const alturaTotalEvaluacion = alturaFila1Evaluacion + alturaFilaEvaluacion * 2 + alturaFilaAbdomen; // 1 dinámica + 2 fijas + abdomen dinámica
   if (yPos + alturaTotalEvaluacion > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
@@ -2644,18 +2667,18 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   yPos += alturaFilaEvaluacion;
 
-  // FILA 3: Abdomen (columna completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  // FILA 3: Abdomen (columna completa, altura dinámica)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAbdomen);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaAbdomen);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaEvaluacion, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  doc.line(tablaInicioX, yPos + alturaFilaAbdomen, tablaInicioX + tablaAncho, yPos + alturaFilaAbdomen);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("ABDOMEN", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionColumnaAbdomen?.abdomen || "", tablaInicioX + 25, yPos + 3.5);
+  dibujarTextoConSaltoLinea(textoAbdomen, tablaInicioX + 25, yPos + 3.5, anchoAbdomen);
 
-  yPos += alturaFilaEvaluacion;
+  yPos += alturaFilaAbdomen;
 
   // FILA 4: Tacto rectal (columna completa con checkboxes)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);

@@ -14,6 +14,7 @@ export default function InputTextOneLine({
   className = "",
   labelClassName = "",
   inputClassName = "",
+  autocomplete = "on",
   edited = false,
   onRevert,
 }) {
@@ -31,6 +32,7 @@ export default function InputTextOneLine({
       onChange={onChange}
       onBlur={onBlur}
       disabled={disabled}
+      autoComplete={autocomplete}
     />
   );
 

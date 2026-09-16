@@ -80,6 +80,10 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           oi_o_8000: res.oi1_8000,
           diagnostico: res.diagnostico,
           diagnosticoCie10: res.diagnosticoCie10 ?? "",
+
+          nivelEstudios: res.nivelEstudioPaciente ?? "",
+          estadoCivil: res.estadoCivilPaciente ?? "",
+          ocupacion: res.ocupacionPaciente ?? "",
           // user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           // user_doctorAsignado: res.doctorAsignado,
           // user_doctorExtra: res.doctorExtra,
@@ -288,7 +292,8 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
         genero: res.genero == "M" ? "Masculino" : "Femenino",
-        nombres: res.nombresApellidos,
+        nombres: res.nombresApellidos,  
+        ocupacion: res.areaO
       }));
     })
     .catch((error) => {

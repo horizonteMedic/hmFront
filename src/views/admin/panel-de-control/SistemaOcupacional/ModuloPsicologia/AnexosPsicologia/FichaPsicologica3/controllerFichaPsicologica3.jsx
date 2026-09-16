@@ -13,7 +13,7 @@ const obtenerReporteUrl =
     "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03";
 const registrarUrl =
     "/api/v01/ct/psicologia/registrarActualizarFichaPsicologiaAnexo03";
-    
+
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -301,6 +301,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+            fechaExamen: prev.fechaExamen,
             edad: res.edad,
             area: res.areaO ?? "",
             puesto: res.cargo ?? "",

@@ -49,6 +49,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
         esJasper: true,
         nomenclaturaSubida: "CAMO",
+        masivo: true,
     },
 
     CERTIFICADO_ANEXO_02_ADMINISTRATIVO: {
@@ -57,6 +58,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2Camo",
         esJasper: true,
         nomenclaturaSubida: "CAMO ADM",
+        masivo: true,
     },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
@@ -74,6 +76,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16CamoAdministrativo",
         esJasper: true,
         nomenclaturaSubida: "CAMO ADM",
+        masivo: true,
     },
 
     CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE: {
@@ -1040,6 +1043,14 @@ export const EXAMENES_CATALOGO = {
         tabla: "certificado_manipuladores_barrick",
         url: "/api/v01/ct/certificadoManipuladoresAlimentos/obtenerReporteCertificadoManipuladoresAlimentos",
         esJasper: true,
+    },
+
+    TRIAJE: {
+        nombre: "TRIAJE",
+        tabla: "triaje",
+        // El nOrden va como segmento de ruta, no como query param (ver urlNordenPath en FolioJasper).
+        url: "/api/v01/ct/triaje/listarFormatoTriaje/",
+        urlNordenPath: true,
     },
 };
 

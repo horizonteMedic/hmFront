@@ -17,7 +17,8 @@ export const SubmitDataService = async (
   user,
   limpiar,
   tabla,
-  datosFooter
+  datosFooter,
+  SinReestricciones
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -129,6 +130,10 @@ export const SubmitDataService = async (
     })),
 
     observacionesGeneralesCie10: form.observacionesGeneralesCie10,
+    ...(form.codigoAnexo == null
+      ? { registrado_sin_restriccion: SinReestricciones }
+      : { registrado_sin_restriccion: form.registrado_sin_restriccion }),
+
   };
   console.log(body);
 
@@ -780,6 +785,10 @@ export const GetInfoServicio = (
             data.totalHijos = (hv + hm).toString();
           }
 
+          //Riesgo cardiovascular
+          data.riesgoCoronarioValor = res.riesgoCoronarioValor ?? "";
+
+
 
 
           // IMC
@@ -1065,13 +1074,32 @@ export const GetInfoServicio = (
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
           data.resultadoAcidoUrico = res.resultadoAcidoUrico
 
+          data.cirugiasDescripcion = res.antecedentesPatologicosQuirurjicosAnexo2 ?? "";
+          data.cirugias = !!data.cirugiasDescripcion?.trim();
+
+          //
+          if (
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales = agregarObservacion(
+              data.observacionesGenerales,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgoCoronarioValor}. CONTROL ANUAL\n`
+            );
+          }
+
+
           //ordenamiento
 
           data.observacionesGeneralesCie10 = limpiarObservaciones(data.observacionesGeneralesCie10);
 
 
           console.log("DATAAA", data);
-          set((prev) => ({ ...prev, ...data }));
+          set((prev) => ({
+            ...prev,
+            ...data,
+          }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -1703,6 +1731,10 @@ export const GetInfoServicioEditar = (
 
           //FIN==============
 
+          //Riesgo cardiovascular
+          data.riesgoCoronarioValor = res.riesgoCoronarioValor ?? "";
+
+
           // cargarAnalisisB();=======================
           data.colesterolTotal = res.colesterolAnalisisBioquimico_txtcolesterol ?? "";
           data.LDLColesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "";
@@ -1819,6 +1851,18 @@ export const GetInfoServicioEditar = (
           data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
 
+          if (
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales2 = agregarObservacion(
+              data.observacionesGenerales2,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgoCoronarioValor}. CONTROL ANUAL\n`
+            );
+          }
+
+
           console.log("DATA EDITAR", data);
 
           data.observacionesGenerales2Cie10 = limpiarObservaciones(data.observacionesGenerales2Cie10);
@@ -1845,3 +1889,8 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
 export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
   handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
+
+const agregarObservacion = (base, texto) => {
+  if (!texto) return base;
+  return base ? `${base}\n${texto}` : texto;
+};

@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-export default function TabSelector({ tieneVista, tabsConfig }) {
-    const [activeTab, setActiveTab] = useState(0);
+export default function TabSelector({ tieneVista, tabsConfig, activeTab: externalActiveTab, onTabChange }) {
+    const [internalActiveTab, setInternalActiveTab] = useState(0);
+    const activeTab = externalActiveTab ?? internalActiveTab;
+    const setActiveTab = (id) => { setInternalActiveTab(id); onTabChange?.(id); };
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
     const tabRefs = useRef({});
     const navRef = useRef(null);
@@ -58,7 +60,9 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
     const availableTabs = tabsConfig.filter(tab => tieneVista(tab.permission));
 
     // Get active tab component
-    const ActiveComponent = tabsConfig.find(tab => tab.id === activeTab)?.component;
+    const activeTabConfig = tabsConfig.find(tab => tab.id === activeTab);
+    const ActiveComponent = activeTabConfig?.component;
+    const extraProps = activeTabConfig?.props ?? {};
 
     return (
         <div className="space-y-4">
@@ -95,7 +99,7 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
                 </nav>
                 {/* Tab Content */}
                 <div className="max-w-full">
-                    {ActiveComponent && <ActiveComponent tieneVista={tieneVista} />}
+                    {ActiveComponent && <ActiveComponent tieneVista={tieneVista} {...extraProps}/>}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.

@@ -1,4 +1,6 @@
 import Swal from "sweetalert2";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import { GetInfoPacDefault, LoadingDefault, ReadArchivosFormDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { deleteArchivoPorOrdenNomenclatura, getFetch, SubmitData } from "../../../../utils/apiHelpers";
@@ -43,7 +45,7 @@ const descargarArchivoGenerado = (archivoData, nombreArchivo) => {
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
+    if (res.norden) {
         set((prev) => ({
             ...prev,
             ...res,
@@ -59,8 +61,10 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
         }));
         await GetExamenesCheck(nro, set, token, ExamenesList);
-
+    } else {
+        Swal.fire("Error", "Sede Equivocada", "error")
     }
+
 };
 
 const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
@@ -111,7 +115,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 // Obtiene los datos del paciente sin React state (para uso en carga masiva)
 export const obtenerInfoPacParaMasivo = async (nro, token, sede) => {
     const res = await GetInfoPacDefault(nro, token, sede);
-    if (!res) return null;
+    if (!res.norden) return null;
     return {
         norden: nro,
         nombres: res.nombresApellidos ?? "",
@@ -130,6 +134,29 @@ export const obtenerInfoPacParaMasivo = async (nro, token, sede) => {
         estadoCivil: res.estadoCivil ?? "",
         nivelEstudios: res.nivelEstudios ?? "",
     };
+};
+
+// Descarga una plantilla Excel (solo columna NORDEN) para la generación masiva de un examen
+export const descargarPlantillaGeneracionMasiva = async (examen) => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("PLANTILLA");
+
+    sheet.addRow(["NORDEN"]);
+    sheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
+    });
+
+    for (let i = 0; i < 10; i++) {
+        sheet.addRow([""]);
+    }
+
+    sheet.columns = [{ width: 18 }];
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const nombrePlantilla = sanitizeNombreArchivo(examen?.nombre || "GeneracionMasiva");
+    saveAs(new Blob([buffer]), `Plantilla_${nombrePlantilla}.xlsx`);
 };
 
 // Verifica si un examen específico existe para un norden
@@ -238,7 +265,11 @@ export const handleImprimirYSubirMasivo = async (examenes, form, token, selected
                     form.nombres,
                     form.apellidos,
                     datosFooter,
-                    true
+                    true,    // comprimidoz
+                    "azure", // urlType
+                    "",      // fechaPersonalizada
+                    "",      // diasVencimientoPersonalizado
+                    true     // omitirImpresion: no abrir visor ni impresora en generación masiva
                 );
 
                 generados += 1;

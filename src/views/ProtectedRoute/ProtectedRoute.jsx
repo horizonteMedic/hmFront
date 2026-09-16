@@ -53,6 +53,7 @@ const protectedRoutes = {
   '/consentimiento-informado': "Consentimiento Informado",
   '/valorizacion': "Valorizacion",
   '/ModuloAsistencial': "Modulo Asistencial",
+  '/ModuloSalud': "Modulo Salud",
 };
 
 export function ProtectedRoute() {

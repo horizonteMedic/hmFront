@@ -15,6 +15,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
     const [data, setData] = useState([]);
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
+    const [reemplazar, setReemplazar] = useState(false);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
 
@@ -38,7 +39,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                 row.norden === resultado.norden
                     ? {
                         ...row,
-                        estado: resultado.omitido ? "omitido" : resultado.ok ? "success" : "error",
+                        estado: resultado.omitido ? "omitido" : resultado.ok ? (resultado.editado ? "editado" : "success") : "error",
                         mensaje: resultado.mensaje,
                     }
                     : row
@@ -54,7 +55,10 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
 
         const confirm = await Swal.fire({
             title: "¿Procesar y guardar los registros?",
-            html: `Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+            html: `${reemplazar
+                    ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
+                    : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
+                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -76,6 +80,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                 medicoNombre: medico.nombre_medico,
                 medicoUsername: medico.user_medicoFirma,
                 sede,
+                reemplazar,
             },
             actualizarFila
         );
@@ -83,14 +88,15 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
         setProcesando(false);
         setResultadosFinales(resultados);
 
-        const okCount = resultados.filter((r) => r.ok).length;
+        const creadosCount = resultados.filter((r) => r.ok && !r.editado).length;
+        const editadosCount = resultados.filter((r) => r.ok && r.editado).length;
         const omitidosCount = resultados.filter((r) => r.omitido).length;
         const failCount = resultados.filter((r) => !r.ok && !r.omitido).length;
 
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro o falta examen): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Creados: <b>${creadosCount}</b><br/>✏️ Actualizados: <b>${editadosCount}</b><br/>⊘ Omitidos: <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
@@ -99,12 +105,14 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
+    const totalEditado = data.filter((r) => r.estado === "editado").length;
     const totalError = data.filter((r) => r.estado === "error").length;
     const totalOmitido = data.filter((r) => r.estado === "omitido").length;
     const totalPendiente = data.filter((r) => r.estado === "pendiente" || r.estado === "procesando").length;
 
     const rowColor = (estado) => {
         if (estado === "success") return "bg-green-50";
+        if (estado === "editado") return "bg-purple-50";
         if (estado === "error") return "bg-red-50";
         if (estado === "omitido") return "bg-orange-50";
         if (estado === "procesando") return "bg-blue-50";
@@ -112,7 +120,8 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
     };
 
     const estadoLabel = (estado) => {
-        if (estado === "success") return "✔ Guardado";
+        if (estado === "success") return "✔ Creado";
+        if (estado === "editado") return "✏ Actualizado";
         if (estado === "error") return "✖ Error";
         if (estado === "omitido") return "⊘ Omitido";
         if (estado === "procesando") return "⏳ Procesando";
@@ -132,7 +141,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                     />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 border border-gray-200 rounded p-3">
+                <div className="grid md:grid-cols-3 gap-4 border border-gray-200 rounded p-3 items-end">
                     <EmpleadoComboBox
                         value={medico.nombre_medico}
                         form={medico}
@@ -141,7 +150,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                         disabled={procesando}
                     />
                     <div>
-                        <label className="block font-semibold mb-1">Fecha de validez para todos :</label>
+                        <label className="block font-semibold mb-1">Fecha de validez por defecto (si el Excel no trae fecha) :</label>
                         <input
                             type="date"
                             value={fecha}
@@ -150,7 +159,20 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                             className="border rounded px-2 py-1 w-full"
                         />
                     </div>
+                    <label className="flex items-center gap-2 font-semibold">
+                        <input
+                            type="checkbox"
+                            checked={reemplazar}
+                            disabled={procesando}
+                            onChange={(e) => setReemplazar(e.target.checked)}
+                        />
+                        Reemplazar los que ya tengan registro
+                    </label>
                 </div>
+                <p className="text-xs text-gray-500 -mt-2">
+                    La plantilla incluye una columna "FECHA (DD/MM/AAAA)" para asignar una fecha distinta a cada N° de Orden.
+                    Si una fila trae una fecha con formato inválido, esa fila no se registrará.
+                </p>
 
                 <div className="flex gap-3">
                     <button
@@ -178,8 +200,12 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                             <p className="text-xl font-bold">{data.length}</p>
                         </div>
                         <div className="bg-green-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-green-700">Guardados</p>
+                            <p className="text-sm text-green-700">Creados</p>
                             <p className="text-xl font-bold text-green-800">{totalOk}</p>
+                        </div>
+                        <div className="bg-purple-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-purple-700">Actualizados</p>
+                            <p className="text-xl font-bold text-purple-800">{totalEditado}</p>
                         </div>
                         <div className="bg-orange-100 rounded px-4 py-2 shadow-sm">
                             <p className="text-sm text-orange-700">Omitidos</p>
@@ -202,6 +228,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                             <thead>
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
+                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">FECHA</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
@@ -210,6 +237,9 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                                 {data.map((row, i) => (
                                     <tr key={`${row.norden}-${i}`} className={rowColor(row.estado)}>
                                         <td className="border px-4 py-2 whitespace-nowrap">{row.norden}</td>
+                                        <td className="border px-4 py-2 whitespace-nowrap">
+                                            {row.estado === "error" && !row.fecha ? "—" : (row.fecha || fecha)}
+                                        </td>
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>

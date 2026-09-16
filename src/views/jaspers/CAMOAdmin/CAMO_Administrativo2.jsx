@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign } from "../../utils/helpers.js";
+import { getSign, getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
-// import footerTR from '../components/footerTR.jsx';
+import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 

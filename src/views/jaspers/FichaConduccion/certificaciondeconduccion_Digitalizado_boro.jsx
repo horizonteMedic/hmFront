@@ -328,8 +328,8 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.anosExperiencia, tablaInicioX + 45, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(datosFinales.anosExperiencia, tablaInicioX + 33, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);

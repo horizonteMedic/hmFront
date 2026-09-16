@@ -1,8 +1,10 @@
-export const getAnexo16InitialFormState = ({ today, userlogued, userName }) => ({
+export const getAnexo16InitialFormState = ({ today, userlogued, userName, SinReestricciones }) => ({
   norden: "",
   nomExamen: "",
   fechaExam: today,
   codigoAnexo: null,
+  conclusionesCie10: "",
+  observacionesGenerales2Cie10: "",
   //Info personal
   dni: "",
   nombres: "",
@@ -324,4 +326,5 @@ export const getAnexo16InitialFormState = ({ today, userlogued, userName }) => (
   chkS4: false,
   chkS5: false,
   chkS6: false,
+  registrado_sin_restriccion: false
 });

@@ -269,10 +269,10 @@ export default async function Espirometria_OHLA_Digitalizado(datos = {}, docExis
   const datosFirmas = {
     ...datos,
     digitalizacion: (datos.digitalizacion || []).filter((item) =>
-      ["SELLOFIRMA", "SELLOFIRMADOCASIG"].includes(item.nombreDigitalizacion)
+      ["FIRMAP", "HUELLA","SELLOFIRMA"].includes(item.nombreDigitalizacion)
     ),
   };
-  await dibujarFirmas({ doc, datos: datosFirmas, y: y - 7, pageW, mostrarFirmaPaciente: false });
+  await dibujarFirmas({ doc, datos: datosFirmas, y: y - 7, pageW, mostrarFirmaPaciente: true });
   footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
   if (docExistente) {

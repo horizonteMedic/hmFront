@@ -15,6 +15,8 @@ import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
 import { SubmitData } from "../../../../utils/apiHelpers";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import CIE10List from "../../../../components/reusableComponents/CIE10List";
+import InputTextAreaUpper from "../../../../components/reusableComponents/InputTextAreaUpper";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
@@ -71,6 +73,7 @@ export default function FichaInterconsulta() {
         nombreExamen: "",
         especialidad: "",
         cargoPaciente: "",
+        conclusionesCie10: "",
         //Datos Usuario
         dniPaciente: "",
         dniUser: userCompleto?.datos?.dni_user,
@@ -469,7 +472,7 @@ export default function FichaInterconsulta() {
                 <section className="bg-white rounded-lg my-2 w-full">
                     <div className="w-full flex justify-around items-start gap-4">
                         <div className="flex flex-col items-start w-full">
-                            <InputTextArea
+                            {/*<InputTextArea
                                 label="Diagnostico"
                                 value={form.diagnostico}
                                 onChange={handleChange}
@@ -477,7 +480,38 @@ export default function FichaInterconsulta() {
                                 classNameLabel="text-blue-600"
                                 name="diagnostico"
                                 classNameArea="bg-[#99FFFF]"
+                            />*/}
+                            <InputTextAreaUpper
+                                label="Diagnóstico"
+                                name="diagnostico"
+                                classNameLabel="text-blue-600"
+                                classNameArea="bg-[#99FFFF]"
+                                value={form.diagnostico}
+                                rows={6}
+                                onChange={(upper) => {
+                                    const cie10Lines = upper
+                                        .split("\n")
+                                        .filter(l => /^CIE 10:/i.test(l.trim()));
+                                    const nuevoCie10 = cie10Lines.join("\n");
+                                    setForm((d) => ({
+                                        ...d,
+                                        diagnostico: upper,
+                                        ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                                    }));
+                                }}
                             />
+                            <div className="bg-green-200 p-3 rounded-xl col-span-3 w-full">
+                                <CIE10List
+                                    value={form.conclusionesCie10}
+                                    fieldName="conclusionesCie10"
+                                    label="Conclusiones CIE10"
+                                    token={token}
+                                    setForm={setForm}
+                                    setAdditionalForm={setForm}
+                                    additionalFieldName="diagnostico"
+                                    additionalDelimiter={"\n"}
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col w-full">

@@ -29,7 +29,7 @@ export default function Anexo16({ SinReestricciones = false }) {
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
-  const initialFormState = getAnexo16InitialFormState({ today, userlogued, userName });
+  const initialFormState = getAnexo16InitialFormState({ today, userlogued, userName, SinReestricciones });
 
   const {
     form,
@@ -65,7 +65,7 @@ export default function Anexo16({ SinReestricciones = false }) {
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter, SinReestricciones);
   };
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {
@@ -172,6 +172,8 @@ export default function Anexo16({ SinReestricciones = false }) {
             handleChange={handleChange}
             setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
             abrirCargaMasiva={() => setModalCargaMasiva(true)}
+            setForm={setForm}
+            token={token}
           />
         </div>
         {visualerOpen && (

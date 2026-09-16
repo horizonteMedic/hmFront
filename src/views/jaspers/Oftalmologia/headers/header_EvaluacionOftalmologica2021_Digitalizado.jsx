@@ -244,18 +244,22 @@ const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) 
     });
 
     // Cargo
+    doc.setFont("helvetica", "normal").setFontSize(datos.ocupacion.length > 30 ? 5 : 8);
     const xCargo = margin + 104;
     doc.text(String(datos.ocupacion || ""), xCargo, yterceraFila, {
-        maxWidth: 50,
+        maxWidth: 80,
     });
+    doc.setFont("helvetica", "normal").setFontSize(8);
 
     //CUARTA=================================================
 
     // Empresa
     const xEmpresa = margin + 30;
+    doc.setFont("helvetica", "normal").setFontSize(empresaTexto.length > 50 ? 5 : 8);
     doc.text(String(empresaTexto || ""), xEmpresa, ycuartaFila, {
         maxWidth: 70,
     });
+    doc.setFont("helvetica", "normal").setFontSize(8);
 
     // Contrata
     const xContrata = margin + 119;

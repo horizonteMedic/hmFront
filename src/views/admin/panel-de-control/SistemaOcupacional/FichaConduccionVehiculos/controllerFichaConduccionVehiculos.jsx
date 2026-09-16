@@ -124,8 +124,8 @@ export const GetInfoServicio = async (
         }
 
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
-                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
+            (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
         const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
 
         set((prev) => ({
@@ -177,6 +177,7 @@ export const GetInfoServicio = async (
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
             observacionesRecomendaciones: nuevasObservaciones,
+            conclusionesCie10: res.conclusionesCie10 ?? "",
             imcRed: imcRed,
 
             medicinasTomando: res.medicamentosAnexo16A ?? "",
@@ -260,8 +261,8 @@ export const GetInfoServicioEditar = async (
             }
         }
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
-                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
+            (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
 
         const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
         const aptoDesde = res.fechaDesde_f_desde ?? prev.aptoDesde;
@@ -370,6 +371,7 @@ export const GetInfoServicioEditar = async (
                             (res.observado_chk_observado ? "OBSERVADO" :
                                 (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" : null))),
             observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
+            conclusionesCie10: res.conclusionesCie10 ?? "",
             // nombreMedicoColegiatura:"",
             // Recomendaciones - 
             sobrepesoDietaHipocalorica: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."),
@@ -409,7 +411,8 @@ export const SubmitDataService = async (
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
-    }
+    } 
+
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado_cod_certificado,
@@ -478,6 +481,7 @@ export const SubmitDataService = async (
         observado: form.conclusion === "OBSERVADO",
         dniUsuario: form.dniUsuario,
         observacionesRecomendaciones: form.observacionesRecomendaciones,
+        conclusionesCie10: form.conclusionesCie10 ?? "",
         detalleMedicinas: form.medicinasTomando,
         detalleInformacion: form.detalleInformacionExamenMedico,
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",

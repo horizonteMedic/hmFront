@@ -130,6 +130,7 @@ import Aptitud_Trabajos_EnCaliente_Digitalizado from "../AptitudCertificadoCalie
 import ficha_antecedente_patologico_boro_nuevo from "../Poderosa/CertificadoMedicoManipuladores_Barrick_Digitalizado";
 import CAMO_Administrativo16_MARSA from "../CAMOAdmin/CAMO_Administrativo16_MARSA";
 import CAMO_Administrativo16_Simple from "../CAMOAdmin/CAMO_Administrativo16_Simple";
+import ReporteTriaje from "../Triaje/ReporteTriaje";
 
 export const reportesMap = {
    /* =========================
@@ -420,5 +421,7 @@ export const reportesMap = {
    certificado_exposicion_al_calor: CertificadoExposicionAlCalor,
    riesgo_electrico: CertificadoRiesgoElectrico,
    certificado_manipuladores_barrick: ficha_antecedente_patologico_boro_nuevo,
+
+   triaje: ReporteTriaje,
 
 };

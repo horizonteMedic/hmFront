@@ -21,7 +21,7 @@ export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}, do
   const datos = {
     // Datos personales
     apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaRegistro ?? ""),
+    fechaExamen: formatearFechaCorta(data.fechaExamen ?? ""),
     tipoExamen: String(data.nombreExamen ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
     documentoIdentidad: String(data.dniPaciente ?? ""),
@@ -440,7 +440,7 @@ export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}, do
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-  
+
   if (docExistente) {
     return doc;
   } else {

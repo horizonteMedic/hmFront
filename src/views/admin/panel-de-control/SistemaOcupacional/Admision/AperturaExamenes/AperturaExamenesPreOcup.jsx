@@ -90,6 +90,7 @@ const AperturaExamenesPreOcup = (props) => {
     espaciosConfinados: false,
     tmarihuana: false,
     tcocaina: false,
+    pruebaEsfuerzo: false,
 
     nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: ""
@@ -1561,6 +1562,10 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center mr-4 mb-2">
                 <input type="checkbox" title='COCAINA' disabled={habilitar} checked={datos.tcocaina} onChange={handleCheack} id="examenAdicional18" name="tcocaina" className="mr-2" />
                 <label htmlFor="examenAdicional18" title='COCAINA'>COCAINA</label>
+              </div>
+              <div className="flex items-center mr-4 mb-2 ">
+                <input type="checkbox" title='P. DE ESFUERZO' disabled={habilitar} checked={datos.pruebaEsfuerzo} onChange={handleCheack} id="examenAdicional19" name="pruebaEsfuerzo" className="mr-2" />
+                <label className='font-bold text-lg' htmlFor="examenAdicional19" title='P. DE ESFUERZO'>P. DE ESFUERZO</label>
               </div>
 
             </div>

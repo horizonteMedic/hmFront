@@ -26,6 +26,7 @@ export default function CargaMasivaAntecedentesDeAltura({
     const [data, setData] = useState([]);
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
+    const [reemplazar, setReemplazar] = useState(false);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
 
@@ -65,7 +66,10 @@ export default function CargaMasivaAntecedentesDeAltura({
 
         const confirm = await Swal.fire({
             title: "¿Procesar y guardar los registros?",
-            html: `Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+            html: `${reemplazar
+                    ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
+                    : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
+                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -92,6 +96,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                 medicoNombre: medico.nombre_medico,
                 medicoUsername: medico.user_medicoFirma,
                 sede,
+                reemplazar,
             },
             actualizarFila
         );
@@ -148,7 +153,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                     />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 border border-gray-200 rounded p-3">
+                <div className="grid md:grid-cols-3 gap-4 border border-gray-200 rounded p-3 items-end">
                     <EmpleadoComboBox
                         value={medico.nombre_medico}
                         form={medico}
@@ -166,6 +171,15 @@ export default function CargaMasivaAntecedentesDeAltura({
                             className="border rounded px-2 py-1 w-full"
                         />
                     </div>
+                    <label className="flex items-center gap-2 font-semibold">
+                        <input
+                            type="checkbox"
+                            checked={reemplazar}
+                            disabled={procesando}
+                            onChange={(e) => setReemplazar(e.target.checked)}
+                        />
+                        Reemplazar los que ya tengan registro
+                    </label>
                 </div>
 
                 <div className="flex gap-3">

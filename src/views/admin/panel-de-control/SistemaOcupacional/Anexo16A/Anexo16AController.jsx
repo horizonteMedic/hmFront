@@ -196,23 +196,23 @@ function evaluarObservacionesEditar(res, set) {
     // Evaluación del IMC - Convertido desde Java
     //let imc = res.imcTriaje_imc || "";
     // if (imc) {
-       // let imcValue = parseFloat(imc);
-        
-        // if (!isNaN(imcValue) && imcValue > 25) {
-        //     imcRed = true;
+    // let imcValue = parseFloat(imc);
 
-        //     if (imcValue >= 25 && imcValue < 29.91) {
-        //         nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     } else if (imcValue >= 29.91 && imcValue < 35) {
-        //         // obesidadMorbida = true;
-        //         // obesidadMorbidaRed = true;
-        //         nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     } else if (imcValue >= 35) {
-        //         obesidadMorbida = true;
-        //         obesidadMorbidaRed = true;
-        //         nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     }
-        // }
+    // if (!isNaN(imcValue) && imcValue > 25) {
+    //     imcRed = true;
+
+    //     if (imcValue >= 25 && imcValue < 29.91) {
+    //         nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+    //     } else if (imcValue >= 29.91 && imcValue < 35) {
+    //         // obesidadMorbida = true;
+    //         // obesidadMorbidaRed = true;
+    //         nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+    //     } else if (imcValue >= 35) {
+    //         obesidadMorbida = true;
+    //         obesidadMorbidaRed = true;
+    //         nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+    //     }
+    // }
     //}
 
     // Evaluación oftalmológica - Convertido desde Java
@@ -332,7 +332,7 @@ export const GetInfoServicioEditar = async (
             vlCorregidaOI: res.oilcOftalmologia_oilc,
             enfermedadesOculares: res.enfermedadesOcularesOftalmo_e_oculares,
             medicacionActual: res.medicacionActualAnexo16a_m_actual,
-
+            conclusionesCie10: res.conclusionesCie10,
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
@@ -382,7 +382,7 @@ export const construirBodyAnexo16A = (form, user) => ({
     usoMedicacionActualSi: form.usoMedicacion,
     medicacionActual: form.medicacionActual,
     observaciones: form.observaciones,
-
+    conclusionesCie10: form.conclusionesCie10,
     usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
 });
