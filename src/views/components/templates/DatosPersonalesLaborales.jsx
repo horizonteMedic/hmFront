@@ -2,10 +2,21 @@ import InputTextOneLine from "../reusableComponents/InputTextOneLine";
 import SectionFieldset from "../reusableComponents/SectionFieldset";
 
 export default function DatosPersonalesLaborales({ form, personales = true, laborales = true, minSizePrincipal = "lg", minSizeSecundario = "lg" }) {
+    // minSizePrincipal / minSizeSecundario === "none" => nunca se divide en 2 columnas.
+    // Útil en paneles angostos (p. ej. formularios con layout a 2 columnas como EKG),
+    // donde partir el grid deja los inputs sin espacio.
+    const gridPrincipal =
+        minSizePrincipal === "none"
+            ? "grid grid-cols-1 gap-x-4 gap-y-3"
+            : `grid grid-cols-1 ${minSizePrincipal}:grid-cols-2 gap-x-4 gap-y-3`;
+    const gridSecundario =
+        minSizeSecundario === "none"
+            ? "grid grid-cols-1 gap-x-4 gap-y-3"
+            : `grid ${minSizeSecundario}:grid-cols-2 gap-x-4 gap-y-3`;
     return (
         <>
             {personales &&
-                (<SectionFieldset legend="Datos Personales" collapsible className={`grid grid-cols-1 ${minSizePrincipal}:grid-cols-2 gap-x-4 gap-y-3`}>
+                (<SectionFieldset legend="Datos Personales" collapsible className={gridPrincipal}>
                     <InputTextOneLine
                         label="Nombres"
                         name="nombres"
@@ -13,7 +24,7 @@ export default function DatosPersonalesLaborales({ form, personales = true, labo
                         disabled
                         labelWidth="120px"
                     />
-                    <div className={`grid ${minSizeSecundario}:grid-cols-2 gap-x-4 gap-y-3`}>
+                    <div className={gridSecundario}>
                         <InputTextOneLine
                             label="Edad (Años)"
                             name="edad"
@@ -29,7 +40,7 @@ export default function DatosPersonalesLaborales({ form, personales = true, labo
                             labelWidth="120px"
                         />
                     </div>
-                    <div className={`grid ${minSizeSecundario}:grid-cols-2 gap-x-4 gap-y-3`}>
+                    <div className={gridSecundario}>
                         <InputTextOneLine
                             label="DNI"
                             name="dni"
@@ -69,7 +80,7 @@ export default function DatosPersonalesLaborales({ form, personales = true, labo
                 </SectionFieldset>)
             }
             {laborales &&
-                (<SectionFieldset legend="Datos Laborales" collapsible className={`grid grid-cols-1 ${minSizePrincipal}:grid-cols-2 gap-x-4 gap-y-3`}>
+                (<SectionFieldset legend="Datos Laborales" collapsible className={gridPrincipal}>
                     <InputTextOneLine
                         label="Empresa"
                         name="empresa"

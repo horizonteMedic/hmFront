@@ -4,17 +4,42 @@ import {
   GetInfoServicioDefault,
   LoadingDefault,
   PrintHojaRDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../../../utils/registroOcupacionalUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico";
 const registrarUrl =
   "/api/v01/ct/manipuladores/registrarActualizarManipuladoresCoproparasitologico";
 
-export const GetInfoServicio = async (
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+      tieneRegistro: false,
+    }));
+  }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (
   nro,
   tabla,
   set,
@@ -82,66 +107,66 @@ export const GetInfoServicio = async (
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
+
+      // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+      fechaRegistro: res.fechaRegistro ?? "",
+      userRegistro: res.userRegistro ?? "",
+      fechaActualizacion: res.fechaActualizacion ?? "",
+      usuarioActualizacion: res.usuarioActualizacion ?? "",
+      tieneRegistro: true,
     }));
   }
 };
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+  norden: form.norden,
+  fecha: form.fecha,
+  txtcolor: form.heces1_color,
+  txtaspecto: form.heces1_aspecto,
+  txtmocoFecal: form.heces1_moco,
+  txtsangrev: form.heces1_sangre,
+  txtrestosa: form.heces1_restos,
+  txtgrasa: form.heces1_grasa,
+  txtleucocitos: form.micro1_leucocitos,
+  txthematies: form.micro1_hematies,
+  txtlugol: form.micro1_parasitos,
+  txtcolor1: form.heces2_color,
+  txtaspecto1: form.heces2_aspecto,
+  txtmocoFecal1: form.heces2_moco,
+  txtsangrev1: form.heces2_sangre,
+  txtrestosa1: form.heces2_restos,
+  txtgrasa1: form.heces2_grasa,
+  txtleucocitos1: form.micro2_leucocitos,
+  txthematies1: form.micro2_hematies,
+  txtlugol1: form.micro2_parasitos,
+  txtcolor2: form.heces3_color,
+  txtaspecto2: form.heces3_aspecto,
+  txtmocoFecal2: form.heces3_moco,
+  txtsangrev2: form.heces3_sangre,
+  txtrestosa2: form.heces3_restos,
+  txtgrasa2: form.heces3_grasa,
+  txtleucocitos2: form.micro3_leucocitos,
+  txthematies2: form.micro3_hematies,
+  txtlugol2: form.micro3_parasitos,
+  tipoCoproparasitologico: form.tipoCoproparasitologico,
+  sinHecesTres: form.sinHecesTres,
+  userMedicoOcup: "",
 
-  const body = {
-    norden: form.norden,
-    fecha: form.fecha,
-    txtcolor: form.heces1_color,
-    txtaspecto: form.heces1_aspecto,
-    txtmocoFecal: form.heces1_moco,
-    txtsangrev: form.heces1_sangre,
-    txtrestosa: form.heces1_restos,
-    txtgrasa: form.heces1_grasa,
-    txtleucocitos: form.micro1_leucocitos,
-    txthematies: form.micro1_hematies,
-    txtlugol: form.micro1_parasitos,
-    txtcolor1: form.heces2_color,
-    txtaspecto1: form.heces2_aspecto,
-    txtmocoFecal1: form.heces2_moco,
-    txtsangrev1: form.heces2_sangre,
-    txtrestosa1: form.heces2_restos,
-    txtgrasa1: form.heces2_grasa,
-    txtleucocitos1: form.micro2_leucocitos,
-    txthematies1: form.micro2_hematies,
-    txtlugol1: form.micro2_parasitos,
-    txtcolor2: form.heces3_color,
-    txtaspecto2: form.heces3_aspecto,
-    txtmocoFecal2: form.heces3_moco,
-    txtsangrev2: form.heces3_sangre,
-    txtrestosa2: form.heces3_restos,
-    txtgrasa2: form.heces3_grasa,
-    txtleucocitos2: form.micro3_leucocitos,
-    txthematies2: form.micro3_hematies,
-    txtlugol2: form.micro3_parasitos,
-    tipoCoproparasitologico: form.tipoCoproparasitologico,
-    sinHecesTres: form.sinHecesTres,
-    userRegistro: user,
-    userMedicoOcup: "",
+  usuarioFirma: form.user_medicoFirma,
+  doctorAsignado: form.user_doctorAsignado,
+});
 
-    usuarioFirma: form.user_medicoFirma,
-    doctorAsignado: form.user_doctorAsignado,
-  };
-
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla);
+// Body completo (creación / actualización). Este módulo espera la clave "userRegistro".
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro,
+    fechaRegistro: form.fechaRegistro,
   });
-};
 
+// ===== Impresión =====
 export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Manipuladores/*.jsx"
@@ -157,45 +182,49 @@ export const PrintHojaR = (nro, token, tabla) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+  });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+  verificarRegistro({
     nro,
     tabla,
     token,
-    set,
     sede,
-    () => {
-      GetInfoPac(nro, set, token, sede);
-    },
-    () => {
-      GetInfoServicio(nro, tabla, set, token, () => {
+    onNuevo: () => GetInfoServicio(nro, set, token, sede),
+    onExistente: () =>
+      GetInfoServicioEditar(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Parasitología.",
           "warning"
         );
-      });
-    }
-  );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      nombres: res.nombresApellidos ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      ocupacion: res.areaO ?? "",
-      nombreExamen: res.nomExam ?? "",
-      cargoDesempenar: res.cargo ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-    }));
-  }
-};
+      }),
+  });
 
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);

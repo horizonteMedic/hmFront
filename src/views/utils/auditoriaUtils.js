@@ -44,14 +44,17 @@ export const buildAuditoria = (form, { usuarioActual, fechaHoraActual }) =>
  * @param {boolean} ctx.esActualizacion        true = edición, false = registro nuevo.
  * @param {string=} ctx.userRegistro           Creación original (solo se reenvía en edición).
  * @param {string=} ctx.fechaRegistro          Fecha de creación original (solo edición).
+ * @param {string=} ctx.campoUserRegistro      Nombre de la clave esperada por el backend en el
+ *                                              REQUEST (algunos endpoints, ej. HojaConsultaExterna,
+ *                                              usan "usuarioRegistro" en vez de "userRegistro").
  * @returns {object} body completo con auditoría.
  */
 export const sellarAuditoria = (
   base,
-  { user, esActualizacion, userRegistro, fechaRegistro }
+  { user, esActualizacion, userRegistro, fechaRegistro, campoUserRegistro = "userRegistro" }
 ) => {
   const ahora = getTimestampActual();
- 
+
   return esActualizacion
     ? {
         ...base,
@@ -59,12 +62,12 @@ export const sellarAuditoria = (
         fechaActualizacion: ahora,
         // Reenvía la creación original: en el UPDATE el backend pone userRegistro en null
         // si no se incluye (fechaRegistro la conserva, pero la mandamos igual).
-        userRegistro: userRegistro || null,
+        [campoUserRegistro]: userRegistro || null,
         fechaRegistro: fechaRegistro || null,
       }
     : {
         ...base,
-        userRegistro: user,
+        [campoUserRegistro]: user,
         fechaRegistro: ahora,
         usuarioActualizacion: null,
         fechaActualizacion: null,

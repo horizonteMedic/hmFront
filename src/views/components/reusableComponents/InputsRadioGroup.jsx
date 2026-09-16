@@ -1,3 +1,5 @@
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RevertButton from "./RevertButton";
 
 export default function InputsRadioGroup({
@@ -11,13 +13,18 @@ export default function InputsRadioGroup({
   //nuevo opcional - parámetros de label como InputsBooleanRadioGroup
   label = "",
   labelOnTop = false,
+  // En mobile apila la etiqueta sobre los radios; desde sm: vuelve a fila (igual que
+  // InputsBooleanRadioGroup). Opt-in: sin pasarlo el render no cambia.
+  stackOnMobile = false,
   labelWidth = "80px",
   labelClassName = "",
   groupClassName = "",
   allowUncheck = false,
   edited = false,
   onRevert,
+  error = "",
 }) {
+  const hasError = Boolean(error);
   const styleButton = ` w-5 h-5
                         rounded-md
                         accent-primario
@@ -59,25 +66,40 @@ export default function InputsRadioGroup({
     </div>
   );
 
-  return (
-    <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>
-      {label && (
-        <label
-          className={`font-semibold ${labelClassName}`}
-          style={labelOnTop ? {} : { minWidth: labelWidth, maxWidth: labelWidth }}
-          htmlFor={firstOptionId}
-        >
-          {label} :
-        </label>
-      )}
+  const wrapperClass = labelOnTop
+    ? "flex flex-col gap-2"
+    : stackOnMobile
+    ? "flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4"
+    : "flex items-center gap-4";
 
-      {showRevert ? (
+  return (
+    <div className={`${className}`}>
+      <div className={wrapperClass}>
+        {label && (
+          <label
+            className={`font-semibold ${labelClassName}`}
+            style={labelOnTop ? {} : { minWidth: labelWidth, maxWidth: labelWidth }}
+            htmlFor={firstOptionId}
+          >
+            {label} :
+          </label>
+        )}
+
+        {/* El contenedor se renderiza siempre igual (nunca condicionalmente) para que React no
+            desmonte/remonte el grupo -y pierda el foco/estado- cuando `showRevert` cambia. */}
         <div className="flex items-start gap-2">
           {grupo}
-          <RevertButton onClick={onRevert} title="Revertir selección" />
+          {showRevert && <RevertButton onClick={onRevert} title="Revertir selección" />}
         </div>
-      ) : (
-        grupo
+      </div>
+      {hasError && (
+        <p
+          id={`${name}-error`}
+          className="flex items-center gap-1.5 mt-1 text-sm text-red-600 animate-field-error"
+        >
+          <FontAwesomeIcon icon={faCircleExclamation} className="shrink-0" />
+          <span>{error}</span>
+        </p>
       )}
     </div>
   );

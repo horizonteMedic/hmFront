@@ -1,42 +1,84 @@
+import { useEffect, useRef, useState } from "react";
+// import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMicroscope,
-  faTint,
-  faHeartbeat,
-  faDownload,
-} from "@fortawesome/free-solid-svg-icons";
-import PropTypes from "prop-types";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
-import Swal from "sweetalert2";
-import Cuestionario from "./Cuestionario/Cuestionario";
-import Responder from "./Responder/Responder";
-import Espalda_Baja from "./Espalda_Baja/Espalda_Baja";
-import Hombros from "./Hombros/Hombros";
-import Cuello from "./Cuello/Cuello";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import { VerifyTR, SubmitCuestionarioNordic, PrintHojaR, handleSubirArchivo, ReadArchivosForm, handleSubirArchivoMasivo } from "./controller/ControllerCN"
-import { useState } from "react";
-import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-const tabla = "cuestionario_nordico"
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+
+import Cuestionario from "./componentes/Cuestionario";
+import Responder from "./componentes/Responder";
+import Espalda_Baja from "./componentes/Espalda_Baja";
+import Hombros from "./componentes/Hombros";
+import Cuello from "./componentes/Cuello";
+import IndiceNordico from "./componentes/IndiceNordico";
+import {
+  VerifyTR,
+  SubmitCuestionarioNordic,
+  PrintHojaR,
+  handleSubirArchivo,
+  ReadArchivosForm,
+  handleSubirArchivoMasivo,
+} from "./ControllerCN";
+
+const today = getToday();
+const tabla = "cuestionario_nordico";
+
+// Entradas del índice lateral (nuevo formato). Cada `id` debe existir como
+// atributo id en el wrapper de su sección para que el scroll y el resaltado
+// activo funcionen.
+const SECCIONES_NORDICO = [
+  { id: "nordico-sec-1", num: "01", label: "Datos del trabajo" },
+  { id: "nordico-sec-2", num: "02", label: "Signos y síntomas" },
+  { id: "nordico-sec-2-guia", num: "02·A", label: "Guía corporal", sub: true },
+  { id: "nordico-sec-2-tabla", num: "02·B", label: "Síntomas por zona", sub: true },
+  { id: "nordico-sec-3", num: "03", label: "Espalda baja" },
+  { id: "nordico-sec-4", num: "04", label: "Hombros" },
+  { id: "nordico-sec-5", num: "05", label: "Cuello" },
+];
+
+// Campos propios que el usuario puede editar en un registro existente (resaltar/revertir).
+// Las ~180 preguntas del cuestionario respetan solo el bloqueo general (fieldset disabled).
+const CAMPOS_EDITABLES = ["fechaCuestionario", "user_medicoFirma", "nombre_medico"];
 
 const Cuestionario_Nordico = () => {
-  const { token, selectedSede, datosFooter, userlogued, userCompleto, userName } =
-    useSessionData();
+  const { token, selectedSede, userlogued, userName } = useSessionData();
+
   const initialFormState = {
     norden: "",
     codigoCuestionario: null,
     fechaCuestionario: today,
+
+    // Datos personales
     nombres: "",
     edad: "",
     sexo: "",
     dni: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+
+    // Datos del trabajo (cuestionario)
     anios: "",
     meses: "",
     horasTrabajadas: "",
@@ -67,15 +109,6 @@ const Cuestionario_Nordico = () => {
     pregunta1CodosSi: false,
     pregunta2CodosNo: false,
     pregunta2CodosSi: false,
-    //Muñeca
-    munecaNo: true,
-    munecaDerechaSi: false,
-    munecaIzquierdaSi: false,
-    ambasMunecasSi: false,
-    pregunta1MunecasNo: false,
-    pregunta1MunecasSi: false,
-    pregunta2MunecasNo: false,
-    pregunta2MunecasSi: false,
     //Otros
     //Espalda Alta
     espaldaAltaToraxNo: true,
@@ -112,6 +145,15 @@ const Cuestionario_Nordico = () => {
     pregunta1TobillosOPiesSi: false,
     pregunta2TobillosOPiesNo: false,
     pregunta2TobillosOPiesSi: false,
+    //Muñeca
+    munecaNo: true,
+    munecaDerechaSi: false,
+    munecaIzquierdaSi: false,
+    ambasMunecasSi: false,
+    pregunta1MunecasNo: false,
+    pregunta1MunecasSi: false,
+    pregunta2MunecasNo: false,
+    pregunta2MunecasSi: false,
     //Espalda Baja form
     pregunta1EspaldaBajaNo: true,
     pregunta1EspaldaBajaSi: false,
@@ -219,132 +261,356 @@ const Cuestionario_Nordico = () => {
     user_medicoFirma: userlogued,
 
     SubirDoc: false,
-    nomenclatura: "PRUEBA DE ESFUERZO"
+    nomenclatura: "PRUEBA DE ESFUERZO",
+
+    // Control de UI: false = registro nuevo / true = registro existente
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
-  const [visualerOpen, setVisualerOpen] = useState(null)
+  const {
+    form,
+    setForm,
+    handleChangeNumber,
+    handleChangeSimple,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, {
+    tieneRegistro: form.tieneRegistro,
+    camposEditables: CAMPOS_EDITABLES,
+  });
 
-  const { form, setForm, handleChange, handleChangeNumber, handleClear, handleChangeSimple, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
+  const [visualerOpen, setVisualerOpen] = useState(null);
 
-  const handlePrint = () => {
-    if (!form.norden) return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Cuestionario Nordico?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
+  // ===== Índice horizontal =====
+  // `seccionActiva`  -> chip resaltado según el scroll.
+  // `indiceFijoVisible` -> la barra fija (position: fixed) solo se muestra
+  //   mientras el bloque del cuestionario ocupa la parte superior del viewport.
+  const [seccionActiva, setSeccionActiva] = useState(SECCIONES_NORDICO[0].id);
+  const [indiceFijoVisible, setIndiceFijoVisible] = useState(false);
+  const bloqueCuestionarioRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const els = SECCIONES_NORDICO.map((s) => document.getElementById(s.id)).filter(
+      Boolean
+    );
+    if (!els.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibles = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visibles[0]) setSeccionActiva(visibles[0].target.id);
       },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
+      // -72px arriba = alto aprox. de la barra fija.
+      { rootMargin: "-72px 0px -55% 0px", threshold: 0 }
+    );
+
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Mostrar/ocultar la barra fija según la posición del bloque del cuestionario.
+  useEffect(() => {
+    const el = bloqueCuestionarioRef.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      setIndiceFijoVisible(r.top <= 8 && r.bottom >= 120);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const irASeccion = (e, id) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setSeccionActiva(id);
+    }
+  };
+
+  // ===== Búsqueda por N° Orden =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  const handleSearch = (e) => {
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  // ===== Guardar / Actualizar =====
+  const handleGuardar = () => {
+    SubmitCuestionarioNordic(form, token, userlogued, handleClear, tabla);
+  };
+
+  // ===== Impresión =====
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
-  return (
-    <div className="">
-      <div className="max-w-[70%] mx-auto">
-        <h1 className="text-3xl font-bold mb-4 text-center">Cuestionario Nórdico de Signos y Síntomas Osteomusculares</h1>
-        {/* Tabs */}
-        <div className="flex flex-col space-x-1 mt-4 border shadow p-8 mx-auto">
-          <ButtonsPDF
-            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-          />
-          <Cuestionario
-            token={token}
-            selectedSede={selectedSede}
-            userlogued={userlogued}
-            form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
-            handleClearnotO={handleClearnotO}
-            handleInputChangeChecked={handleInputChangeChecked}
-            tabla={tabla}
-            VerifyTR={VerifyTR}
-          />
-          <Responder
-            token={token}
-            selectedSede={selectedSede}
-            userlogued={userlogued}
-            form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
-            handleClearnotO={handleClearnotO}
-            handleInputChangeChecked={handleInputChangeChecked}
-          />
-          <Espalda_Baja
-            token={token}
-            selectedSede={selectedSede}
-            userlogued={userlogued}
-            form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
-            handleClearnotO={handleClearnotO}
-            handleInputChangeChecked={handleInputChangeChecked}
-          />
-          <Hombros
-            token={token}
-            selectedSede={selectedSede}
-            userlogued={userlogued}
-            form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
-            handleClearnotO={handleClearnotO}
-            handleInputChangeChecked={handleInputChangeChecked}
-          />
-          <Cuello
-            token={token}
-            userlogued={userlogued}
-            form={form}
-            setForm={setForm}
-            handleInputChangeChecked={handleInputChangeChecked}
-            SubmitCuestionarioNordic={SubmitCuestionarioNordic}
-            tabla={tabla}
-            handleClear={handleClear}
-            handleChange={handleChange}
-            handlePrint={handlePrint}
-            handleChangeSimple={handleChangeSimple}
-          />
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+    const hayDatosCargados = Boolean(
+      form.nombres || form.dni || form.tieneRegistro
+    );
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
 
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
+  return (
+    <div className="px-4 max-w-[95%] xl:max-w-[85%] mx-auto space-y-3">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
+      {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
+      <SectionFieldset
+        legend="Información del Cuestionario"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3"
+      >
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            type="text"
+            value={form.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="flex-1"
+
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
         </div>
-        {visualerOpen && (
-          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-              <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-              </div>
-              <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-              </div>
-              <div className="flex justify-center">
-                <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                  <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                </a>
-              </div>
+        <InputTextOneLine
+          label="Fecha"
+          name="fechaCuestionario"
+          type="date"
+          value={form.fechaCuestionario}
+          onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          edited={isFieldEdited("fechaCuestionario")}
+          onRevert={() => revertField("fechaCuestionario")}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+      <DatosPersonalesLaborales form={form} />
+
+      {/* ===== SECCIÓN: DOCUMENTO ESCANEADO ===== */}
+      <SectionFieldset legend="Documento Escaneado del Cuestionario">
+        <ButtonsPDF
+          {...(form.SubirDoc
+            ? {
+              handleSave: () => {
+                handleSubirArchivo(form, selectedSede, userlogued, token);
+              },
+            }
+            : {})}
+          {...(form.SubirDoc
+            ? {
+              handleRead: () => {
+                ReadArchivosForm(form, setVisualerOpen, token);
+              },
+            }
+            : {})}
+          handleMasivo={() => {
+            handleSubirArchivoMasivo(form, selectedSede, userlogued, token);
+          }}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIONES DEL CUESTIONARIO =====
+          - Índice horizontal: uno en el flujo (inline) + una barra fija que
+            aparece al recorrer las secciones 1 → 5.
+          - El <fieldset disabled> bloquea en conjunto todas las preguntas cuando
+            se ve un registro existente sin edición habilitada. */}
+      <div ref={bloqueCuestionarioRef} className="space-y-3">
+        <IndiceNordico
+          secciones={SECCIONES_NORDICO}
+          activeId={seccionActiva}
+          onNavigate={irASeccion}
+          mode="inline"
+        />
+        <IndiceNordico
+          secciones={SECCIONES_NORDICO}
+          activeId={seccionActiva}
+          onNavigate={irASeccion}
+          mode="fixed"
+          visible={indiceFijoVisible}
+        />
+
+        <fieldset
+          disabled={camposDeshabilitados}
+          className="m-0 p-0 border-0 space-y-3 disabled:opacity-70"
+        >
+          <div id="nordico-sec-1" className="scroll-mt-[70px]">
+            <SectionFieldset legend="1. Datos Personales del Trabajo">
+              <Cuestionario
+                form={form}
+                setForm={setForm}
+                handleChangeNumber={handleChangeNumber}
+              />
+            </SectionFieldset>
+          </div>
+
+          <div id="nordico-sec-2" className="scroll-mt-[70px]">
+            <SectionFieldset legend="2. Problemas con los órganos de la locomoción">
+              <Responder form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+
+          <div id="nordico-sec-3" className="scroll-mt-[70px]">
+            <SectionFieldset legend="3. Problemas con la Espalda Baja">
+              <Espalda_Baja form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+
+          <div id="nordico-sec-4" className="scroll-mt-[70px]">
+            <SectionFieldset legend="4. Problemas con los Hombros">
+              <Hombros form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+
+          <div id="nordico-sec-5" className="scroll-mt-[70px]">
+            <SectionFieldset legend="5. Problemas con el Cuello">
+              <Cuello form={form} setForm={setForm} />
+            </SectionFieldset>
+          </div>
+        </fieldset>
+      </div>
+
+      {/* ===== SECCIÓN: ASIGNACIÓN DE MÉDICO ===== */}
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("user_medicoFirma")}
+          onRevert={() => revertFields(["user_medicoFirma", "nombre_medico"])}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={handleGuardar}
+        saveLabel={
+          form.tieneRegistro && edicionHabilitada
+            ? "Guardar Cambios"
+            : "Guardar/Actualizar"
+        }
+        handleEdit={habilitarEdicion}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+      />
+
+      {visualerOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+              <h2 className="text-lg font-bold color-blanco">
+                {visualerOpen.nombreArchivo}
+              </h2>
+              <button
+                onClick={() => setVisualerOpen(null)}
+                className="text-xl text-white"
+                style={{ fontSize: "23px" }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  `${visualerOpen.mensaje}`
+                )}&embedded=true`}
+                type="application/pdf"
+                className="h-[500px] w-[500px] max-w-full"
+              />
+            </div>
+            <div className="flex justify-center">
+              <a
+                href={visualerOpen.mensaje}
+                download={visualerOpen.nombreArchivo}
+                className="azul-btn font-bold py-2 px-4 rounded mb-4"
+              >
+                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+              </a>
             </div>
           </div>
-        )}
-
-
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Cuestionario_Nordico;
-
-

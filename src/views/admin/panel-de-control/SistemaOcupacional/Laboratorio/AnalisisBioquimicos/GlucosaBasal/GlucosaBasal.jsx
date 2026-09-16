@@ -1,17 +1,39 @@
+import { useEffect } from 'react';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerGlucosaBasal';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerGlucosaBasal';
 import {
     InputCheckbox,
     InputTextOneLine, SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import { useEffect } from 'react';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const tabla = 'analisis_bioquimicos_glucosa_basal';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "muestra",
+    "examenDirecto",
+    "glucosaBasal",
+    "colesterolTotal",
+    "trigliceridos",
+    "hdl",
+    "ldl",
+    "vldl",
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 export default function GlucosaBasal() {
     const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -56,31 +78,78 @@ export default function GlucosaBasal() {
 
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
-        // nombre_medico_extra: userName,
-        // user_medicoFirmaExtra: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
-    console.log(userName)
-    console.log(userlogued)
+
     const {
         form,
         setForm,
         handleChange,
+        handleChangeNumber,
         handleChangeNumberDecimals,
         handleFocusNext,
         handleChangeSimple,
         handleClearnotO,
         handleClear,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "glucosaBasal" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+    // el cambio por el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === 'Enter') {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === 'Enter') {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -89,6 +158,11 @@ export default function GlucosaBasal() {
             PrintHojaR(form.norden, token, tabla);
         });
     };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     useEffect(() => {
         const ct = form.colesterolTotal;
@@ -123,21 +197,37 @@ export default function GlucosaBasal() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumber}
+                        onKeyUp={handleSearch}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     name="fecha"
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -158,11 +248,15 @@ export default function GlucosaBasal() {
                     value={form.muestra}
                     labelWidth='120px'
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("muestra")}
+                    onRevert={() => revertField("muestra")}
                 />
                 <InputCheckbox
                     label="Examen Completo"
                     checked={form.examenDirecto}
                     name="examenDirecto"
+                    disabled={camposDeshabilitados}
                     onChange={(e) => {
                         const checked = e.target.checked;
                         setForm(prev => {
@@ -190,6 +284,9 @@ export default function GlucosaBasal() {
                         onChange={(e) => handleChangeNumberDecimals(e, 1)}
                         onKeyUp={handleFocusNext}
                         className='w-[85%]'
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("glucosaBasal")}
+                        onRevert={() => revertField("glucosaBasal")}
                     />
                     <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal 70 - 110 mg/dl)"}</span>
                 </div>
@@ -203,8 +300,10 @@ export default function GlucosaBasal() {
                                 labelWidth="120px"
                                 onChange={(e) => handleChangeNumberDecimals(e, 1)}
                                 onKeyUp={handleFocusNext}
-                                disabled={!form.examenDirecto}
+                                disabled={!form.examenDirecto || camposDeshabilitados}
                                 className='w-[85%]'
+                                edited={isFieldEdited("colesterolTotal")}
+                                onRevert={() => revertField("colesterolTotal")}
                             />
                             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
                         </div>
@@ -216,8 +315,10 @@ export default function GlucosaBasal() {
                                 labelWidth="120px"
                                 onChange={(e) => handleChangeNumberDecimals(e, 1)}
                                 onKeyUp={handleFocusNext}
-                                disabled={!form.examenDirecto}
+                                disabled={!form.examenDirecto || camposDeshabilitados}
                                 className='w-[85%]'
+                                edited={isFieldEdited("trigliceridos")}
+                                onRevert={() => revertField("trigliceridos")}
                             />
                             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
                         </div>
@@ -229,8 +330,10 @@ export default function GlucosaBasal() {
                                 labelWidth="120px"
                                 onChange={(e) => handleChangeNumberDecimals(e, 1)}
                                 onKeyUp={handleFocusNext}
-                                disabled={!form.examenDirecto}
+                                disabled={!form.examenDirecto || camposDeshabilitados}
                                 className='w-[85%]'
+                                edited={isFieldEdited("hdl")}
+                                onRevert={() => revertField("hdl")}
                             />
                             <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
                         </div>
@@ -242,8 +345,10 @@ export default function GlucosaBasal() {
                                 labelWidth="120px"
                                 onChange={(e) => handleChangeNumberDecimals(e, 1)}
                                 onKeyUp={handleFocusNext}
-                                disabled={!form.examenDirecto}
+                                disabled={!form.examenDirecto || camposDeshabilitados}
                                 className='w-[85%]'
+                                edited={isFieldEdited("ldl")}
+                                onRevert={() => revertField("ldl")}
                             />
                             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
                         </div>
@@ -254,8 +359,10 @@ export default function GlucosaBasal() {
                                 value={form.vldl}
                                 labelWidth="120px"
                                 onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                                disabled={!form.examenDirecto}
+                                disabled={!form.examenDirecto || camposDeshabilitados}
                                 className='w-[85%]'
+                                edited={isFieldEdited("vldl")}
+                                onRevert={() => revertField("vldl")}
                             />
                             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
                         </div>
@@ -269,6 +376,9 @@ export default function GlucosaBasal() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
                 <EmpleadoComboBox
                     value={form.nombre_doctorAsignado}
@@ -277,23 +387,35 @@ export default function GlucosaBasal() {
                     onChange={handleChangeSimple}
                     nameField="nombre_doctorAsignado"
                     idField="user_doctorAsignado"
+                    disabled={camposDeshabilitados}
+                    edited={isDoctorEdited}
+                    onRevert={revertDoctor}
                 />
-                {/* <EmpleadoComboBox
-                    value={form.nombre_medico_extra}
-                    label="Especialista Extra"
-                    form={form}
-                    onChange={handleChangeSimple}
-                    nameField="nombre_medico_extra"
-                    idField="user_medicoFirmaExtra"
-                /> */}
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

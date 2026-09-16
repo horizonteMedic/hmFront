@@ -3,20 +3,47 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
-
 import { getFetch } from "../../../../../../utils/apiHelpers";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+} from "../../../../../../utils/registroOcupacionalUtils";
 
-// CAMBIAR SOLO LAS URL
 const obtenerReporteUrl = "/api/v01/ct/colinesterasa/reporte";
-const obtenerReporteJsReportUrl = "/api/v01/ct/colinesterasa/descargar";
 const registrarUrl = "/api/v01/ct/colinesterasa/registrar";
 
-// ===================== GET INFO SERVICIO =====================
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    if (res) {
+        set((prev) => ({
+            ...prev,
+            norden: res.norden ?? "",
+            nombres: res.nombresApellidos ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            estadoCivil: res.estadoCivil ?? "",
+            nivelEstudios: res.nivelEstudios ?? "",
+            dni: res.dni ?? "",
+            edad: res.edad ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            ocupacion: res.areaO ?? "",
+            tipoExamen: res.nomExam ?? "",
+            tieneRegistro: false,
+        }));
+    }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+// El backend de este examen devuelve el registro anidado en la clave "resultado".
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -25,7 +52,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         onFinish
     );
     if (res?.resultado) {
-        const rese = res.resultado
+        const rese = res.resultado;
         set((prev) => ({
             ...prev,
 
@@ -57,105 +84,115 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             tipoExamen: rese.tipoExamen ?? "",
 
             // USUARIOS
-            user_medicoFirma: rese.usuarioFirma ?? "",
+            user_medicoFirma: rese.usuarioFirma || prev.user_medicoFirma,
             user_doctorAsignado: rese.doctorAsignado ?? "",
 
+            // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+            fechaRegistro: rese.fechaRegistro ?? "",
+            userRegistro: rese.userRegistro ?? "",
+            fechaActualizacion: rese.fechaActualizacion ?? "",
+            usuarioActualizacion: rese.usuarioActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
 
-// ===================== SUBMIT =====================
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+    norden: form.norden,
+    muestra: form.muestra,
+    resultado: form.resultado,
 
-    const body = {
-        norden: form.norden,
-        fechaRegistro: form.fecha,
-        muestra: form.muestra,
-        resultado: form.resultado,
-        userRegistro: user,
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
+});
 
-        usuarioFirma: form.user_medicoFirma,
-        doctorAsignado: form.user_doctorAsignado,
-    };
-
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla);
+// Body completo (creación / actualización). Este módulo espera la clave "userRegistro".
+//
+// OJO: este backend usa la clave "fechaRegistro" del body para la FECHA DEL EXAMEN, no para
+// la auditoría de creación. Por eso, tras sellar la auditoría (que sí necesita
+// "usuarioActualizacion"/"fechaActualizacion"/"userRegistro"), se vuelve a forzar
+// "fechaRegistro" al valor de `form.fecha` para no romper el contrato ya funcional.
+const construirBody = (form, user, esActualizacion) => {
+    const sellado = sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
     });
+    return {
+        ...sellado,
+        fechaRegistro: form.fecha,
+    };
 };
 
-// ===================== PRINT =====================
+// ===== Impresión =====
+// Este examen no usa el buscador dinámico de reportes: siempre imprime la misma plantilla fija.
 export const PrintHojaR = (nro, token, tabla) => {
-    Loading('Cargando Formato a Imprimir')
+    Loading('Cargando Formato a Imprimir');
     getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
         .then(async (res) => {
             if (res?.resultado?.norden) {
                 const nombre = "COLINESTERASA";
-                console.log(nombre)
                 const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
                 const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
-                // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === 'function') {
                     modulo.default(res.resultado);
                 } else {
                     console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
                 }
-                Swal.close()
+                Swal.close();
             } else {
-                Swal.close()
+                Swal.close();
             }
-        })
-}
+        });
+};
 
-// ===================== VERIFY (CORREGIDO PARA PCR ULTRASENSIBLE) =====================
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla),
+    });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla),
+    });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Colinesterasa",
-                    "warning"
-                );
-            });
-        }
-    );
-};
+        onNuevo: () => GetInfoServicio(nro, set, token, sede),
+        onExistente: () =>
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de Colinesterasa.",
+                });
+            }),
+    });
 
-// ===================== GET INFO PAC =====================
-const GetInfoPac = async (nro, set, token, sede) => {
-    const res = await GetInfoPacDefault(nro, token, sede);
-
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad,
-            ocupacion: res.areaO ?? "",
-            tipoExamen: res.nomExam ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-        }));
-    }
-};
-
-// ===================== LOADING =====================
+// ===== Loading =====
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };

@@ -1,15 +1,32 @@
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerRiesgoCoronario';
+import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
+import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
+import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerRiesgoCoronario';
 import {
     InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
-import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
+import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
 const tabla = 'riesgocoronario';
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "muestra",
+    "resultado",
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 export default function RiesgoCoronario() {
     const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -43,30 +60,80 @@ export default function RiesgoCoronario() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-        
+
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
         form,
         setForm,
         handleChange,
+        handleChangeNumber,
         handleChangeNumberDecimals,
         handleChangeSimple,
         handleClearnotO,
         handleClear,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "riesgoCoronario" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico y el doctor asignado se componen de 2 campos (id de firma + nombre): se detecta
+    // el cambio por el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla);
     };
 
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla);
+    };
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === 'Enter') {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === 'Enter') {
+            executeSearch();
+        }
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres);
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -76,23 +143,44 @@ export default function RiesgoCoronario() {
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumber}
+                        onKeyUp={handleSearch}
+                        disabled={hayRegistroCargado}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     name="fecha"
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -104,98 +192,7 @@ export default function RiesgoCoronario() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-                <InputTextOneLine
-                    label="Nombres"
-                    name="nombres"
-                    value={form.nombres}
-                    disabled
-                    labelWidth="120px"
-                />
-                <div className="grid lg:grid-cols-2 gap-3">
-                    <InputTextOneLine
-                        label="Edad (Años)"
-                        name="edad"
-                        value={form.edad}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Sexo"
-                        name="sexo"
-                        value={form.sexo}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-                <div className="grid lg:grid-cols-2 gap-3">
-                    <InputTextOneLine
-                        label="DNI"
-                        name="dni"
-                        value={form.dni}
-                        labelWidth="120px"
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Fecha Nacimiento"
-                        name="fechaNacimiento"
-                        value={form.fechaNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
-                <InputTextOneLine
-                    label="Lugar Nacimiento"
-                    name="lugarNacimiento"
-                    value={form.lugarNacimiento}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Estado Civil"
-                    name="estadoCivil"
-                    value={form.estadoCivil}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Nivel Estudios"
-                    name="nivelEstudios"
-                    value={form.nivelEstudios}
-                    disabled
-                    labelWidth="120px"
-                />
-            </SectionFieldset>
-            <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
-                    value={form.empresa}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Contrata"
-                    name="contrata"
-                    value={form.contrata}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Ocupación"
-                    name="ocupacion"
-                    value={form.ocupacion}
-                    disabled
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Cargo Desempeñar"
-                    name="cargoDesempenar"
-                    value={form.cargoDesempenar}
-                    disabled
-                    labelWidth="120px"
-                />
-            </SectionFieldset>
+            <DatosPersonalesLaborales form={form} />
 
             <SectionFieldset legend="Tipo Muestra y Resultados" className='grid gap-y-3'>
                 <InputTextOneLine
@@ -204,6 +201,9 @@ export default function RiesgoCoronario() {
                     value={form.muestra}
                     labelWidth='120px'
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("muestra")}
+                    onRevert={() => revertField("muestra")}
                 />
                 <div className="flex items-center gap-4">
                     <InputTextOneLine
@@ -213,6 +213,9 @@ export default function RiesgoCoronario() {
                         labelWidth='120px'
                         className='w-[90%]'
                         onChange={(e) => handleChangeNumberDecimals(e, 2)}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("resultado")}
+                        onRevert={() => revertField("resultado")}
                     />
                     <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium min-w-[130px]'>
                         <span>{"Nivel Bajo: 3.3 - 4.3"}</span>
@@ -229,6 +232,9 @@ export default function RiesgoCoronario() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
                 <EmpleadoComboBox
                     value={form.nombre_doctorAsignado}
@@ -237,15 +243,35 @@ export default function RiesgoCoronario() {
                     onChange={handleChangeSimple}
                     nameField="nombre_doctorAsignado"
                     idField="user_doctorAsignado"
-                />               
+                    disabled={camposDeshabilitados}
+                    edited={isDoctorEdited}
+                    onRevert={revertDoctor}
+                />
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

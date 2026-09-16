@@ -4,15 +4,40 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+} from "../../../../../../utils/registroOcupacionalUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteOrina";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
 
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+// ===== Mapeo Registro nuevo (datos del paciente) =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    if (res) {
+        set((prev) => ({
+            ...prev,
+            ...res,
+            nombres: res.nombresApellidos ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+            edad: res.edad,
+            ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            tieneRegistro: false,
+        }));
+    }
+};
+
+// ===== Mapeo Edición (registro existente) =====
+export const GetInfoServicioEditar = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -44,7 +69,6 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacion,
             cargoDesempenar: res.cargo,
 
-            //AGREGAR
             color: res.colorUrina ?? '',
             aspecto: res.aspecto ?? '',
             densidad: res.densidad ?? "",
@@ -71,63 +95,71 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
+
+            // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+            fechaRegistro: res.fechaRegistro ?? "",
+            userRegistro: res.userRegistro ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
+// ===== Mapeo: Body base =====
+const construirBase = (form) => ({
+    norden: form.norden,
+    codLabclinico: form.codLabclinico,
+    tipoServicio: "",
+    numTicket: 0,
+    fechaLab: form.fecha,
 
-    const body = {
-        norden: form.norden,
-        fechaRegistro: form.fecha,
-        codLabclinico: form.codLabclinico,
-        tipoServicio: "",
-        numTicket: 0,
-        fechaLab: form.fecha,
+    //ORINA
+    txtColorEf: form.color,
+    txtDensidadEf: form.densidad,
+    txtAspectoEf: form.aspecto,
+    txtPhEf: form.ph,
+    //EXAMEN QUIMICO
+    txtNitritosEq: form.nitritos,
+    txtProteinasEq: form.proteinas,
+    txtCetonasEq: form.cetonas,
+    txtLeucocitosEq: form.leucocitosExamenQuimico,
+    txtAcAscorbico: form.acAscorbico,
+    txtUrobilinogenoEq: form.urobilinogeno,
+    txtBilirrubinaEq: form.bilirrubina,
+    txtGlucosaEq: form.glucosaExamenQuimico,
+    txtSangreEq: form.sangre,
+    //SEDIMIENTO
+    txtLeucocitosSu: form.leucocitosSedimentoUnitario,
+    txtCelEpitelialesSu: form.celEpiteliales,
+    txtCilindrosSu: form.cilindros,
+    txtBacteriasSu: form.bacterias,
+    txtHematiesSu: form.hematiesSedimentoUnitario,
+    txtCristalesSu: form.cristales,
+    txtPusSu: form.gramSc,
+    txtOtrosSu: form.otros,
 
-        //ORINA
-        txtColorEf: form.color,
-        txtDensidadEf: form.densidad,
-        txtAspectoEf: form.aspecto,
-        txtPhEf: form.ph,
-        //EXAMEN QUIMICO
-        txtNitritosEq: form.nitritos,
-        txtProteinasEq: form.proteinas,
-        txtCetonasEq: form.cetonas,
-        txtLeucocitosEq: form.leucocitosExamenQuimico,
-        txtAcAscorbico: form.acAscorbico,
-        txtUrobilinogenoEq: form.urobilinogeno,
-        txtBilirrubinaEq: form.bilirrubina,
-        txtGlucosaEq: form.glucosaExamenQuimico,
-        txtSangreEq: form.sangre,
-        //SEDIMIETNO
-        txtLeucocitosSu: form.leucocitosSedimentoUnitario,
-        txtCelEpitelialesSu: form.celEpiteliales,
-        txtCilindrosSu: form.cilindros,
-        txtBacteriasSu: form.bacterias,
-        txtHematiesSu: form.hematiesSedimentoUnitario,
-        txtCristalesSu: form.cristales,
-        txtPusSu: form.gramSc,
-        txtOtrosSu: form.otros,
+    esOrina: true,
 
-        esOrina: true,
+    userMedicoOcup: "",
 
-        userMedicoOcup: "",
-        userRegistro: user,
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
+});
 
-        usuarioFirma: form.user_medicoFirma,
-        doctorAsignado: form.user_doctorAsignado,
-    };
-
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla);
+// Body completo (creación / actualización). Este backend reutiliza la clave "fechaRegistro" para
+// la fecha del examen (no es un campo de auditoría aquí), por eso se sobrescribe después de sellar.
+const construirBody = (form, user, esActualizacion) => {
+    const sellado = sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
     });
+    return { ...sellado, fechaRegistro: form.fecha };
 };
 
+// ===== Impresión =====
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
         "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
@@ -143,47 +175,49 @@ export const PrintHojaR = (nro, token, tabla) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla),
+    });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla),
+    });
+
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => {
+        onNuevo: () => GetInfoServicio(nro, set, token, sede),
+        onExistente: () =>
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Examen de Orina",
                     "warning"
                 );
-            });
-        }
-    );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-    const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad,
-            ocupacion: res.areaO ?? "",
-            nombreExamen: res.nomExam ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-        }));
-    }
-};
+            }),
+    });
 
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);

@@ -10,6 +10,9 @@ export default function CriteriosPsicologicosII({
   form,
   handleRadioButton,
   handleChange,
+  disabled = false,
+  isFieldEdited,
+  revertField,
 }) {
   const aspectosConductualesOptions = [
     { value: "BAJO", label: "BAJO" },
@@ -27,6 +30,9 @@ export default function CriteriosPsicologicosII({
               name="nivelAlerta"
               value={form?.nivelAlerta}
               onChange={handleChange}
+              disabled={disabled}
+              edited={isFieldEdited("nivelAlerta")}
+              onRevert={() => revertField("nivelAlerta")}
             />
             <InputTextOneLine
               label="2. Tipo de hostigamiento sexual"
@@ -34,6 +40,9 @@ export default function CriteriosPsicologicosII({
               name="hostigamientoSexual"
               value={form?.hostigamientoSexual}
               onChange={handleChange}
+              disabled={disabled}
+              edited={isFieldEdited("hostigamientoSexual")}
+              onRevert={() => revertField("hostigamientoSexual")}
             />
             <InputTextOneLine
               label="3. Tipo de consecuencia encontrada"
@@ -41,6 +50,9 @@ export default function CriteriosPsicologicosII({
               name="consecuencia"
               value={form?.consecuencia}
               onChange={handleChange}
+              disabled={disabled}
+              edited={isFieldEdited("consecuencia")}
+              onRevert={() => revertField("consecuencia")}
             />
           </div>
         </SectionFieldset>
@@ -66,6 +78,10 @@ export default function CriteriosPsicologicosII({
             ]}
             form={form}
             handleRadioButton={handleRadioButton}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
+            stackOnMobile
           />
         </SectionFieldset>
       </div>
