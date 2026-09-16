@@ -29,8 +29,8 @@ export default function InputTextOneLine({
   const stateClasses = hasError
     ? "border-red-500 bg-red-50"
     : edited
-    ? "border-orange-400 bg-orange-100"
-    : "";
+      ? "border-orange-400 bg-orange-100"
+      : "";
 
   return (
     <div className={className}>
