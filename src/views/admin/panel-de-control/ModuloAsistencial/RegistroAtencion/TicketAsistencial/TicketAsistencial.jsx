@@ -549,6 +549,7 @@ export default function TicketAsistencial() {
             descuento: 0,
             fechaTicket: form.fecha,
             horaTicket,
+            serieTicket: selectedSede || "",
             operador: userlogued || null,
             modoPago: form.metodoPago || null,
             empresa: form.empresa || null,
