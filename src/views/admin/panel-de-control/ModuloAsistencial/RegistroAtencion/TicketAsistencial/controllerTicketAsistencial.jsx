@@ -127,10 +127,11 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
   );
 };
 
-// Registra el ticket con todas sus líneas. El backend recalcula el total a partir de los
-// "contenidos" (nunca se toma el total del payload), así que el descuento por línea ya
-// aplicado en cada precioTotal es lo que determina el total final; el descuento a nivel
-// de ticket se envía en 0 para no restarlo dos veces.
+// Registra el ticket con todas sus líneas. El backend calcula precioTotal/total a partir
+// de cantidad, precioUnitario y descuentoLinea de cada contenido (no se envían id,
+// descripcion, unidad ni precioTotal por línea, ni id/serieTicket/numeroTicket/total del
+// ticket). "descuento" es un descuento adicional a nivel de ticket que esta pantalla no
+// gestiona, así que siempre se envía en 0.
 export const RegistrarTicket = async (body, token, usuario) => {
   const query = new URLSearchParams({ usuario: usuario ?? "" });
   const res = await SubmitData(body, `${ticketsUrl}?${query.toString()}`, token);
