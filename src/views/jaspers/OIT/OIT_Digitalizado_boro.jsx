@@ -818,17 +818,24 @@ export default async function OIT_Digitalizado(datos = {}) {
   });
 
   if (s1) {
-    // Helper para obtener dimensiones de la imagen en base64
-    const getImageDims = (src) => new Promise((resolve) => {
+    // Cargar la imagen del sello y convertirla a base64 vía canvas (addImage no acepta una URL remota directamente)
+    const loadImg = (src) => new Promise((resolve) => {
       const img = new Image();
-      img.onload = () => resolve({ width: img.width, height: img.height });
-      img.onerror = () => resolve({ width: 0, height: 0 });
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
       img.src = src;
     });
 
-    const dims = await getImageDims(s1);
+    const imgEl = await loadImg(s1);
 
-    if (dims.width > 0 && dims.height > 0) {
+    if (imgEl && imgEl.width > 0 && imgEl.height > 0) {
+      const canvas = document.createElement('canvas');
+      canvas.width = imgEl.width;
+      canvas.height = imgEl.height;
+      canvas.getContext('2d').drawImage(imgEl, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+
       // Dimensiones deseadas del sello
       const sigW = 40; // ancho del sello
       const sigH = 40; // alto del sello
@@ -844,8 +851,8 @@ export default async function OIT_Digitalizado(datos = {}) {
       const maxImgW = sigW - 5;
       const maxImgH = sigH - 5;
 
-      let imgW = dims.width;
-      let imgH = dims.height;
+      let imgW = imgEl.width;
+      let imgH = imgEl.height;
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
@@ -857,7 +864,7 @@ export default async function OIT_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      doc.addImage(s1, 'JPEG', imgX, imgY, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
   }
 
