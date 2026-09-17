@@ -30,6 +30,8 @@ import EmpleadoComboBox from "../../../../components/reusableComponents/Empleado
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { getOITInitialFormState } from "./oitFormDefaults";
 import CargaMasivaOIT from "./CargaMasivaOIT/CargaMasivaOIT";
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import { useForm } from "../../../../hooks/useForm";
 const tabla = "oit";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -43,9 +45,18 @@ const OIT = () => {
 
   const [activeTab, setActiveTab] = useState(0);
   //const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
-  const [form, setForm] = useState(
-    getOITInitialFormState({ today, userlogued, userName, userDNI })
-  );
+  // const [form, setForm] = useState(
+  //   getOITInitialFormState({ today, userlogued, userName, userDNI })
+  // );
+
+  const {
+          form,
+          setForm,
+          handleChangeNumber,
+          handleChangeSimple,
+      } = useForm(getOITInitialFormState({ today, userlogued, userName, userDNI }));
+
+
   const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
   const handleClean = () => {
@@ -98,10 +109,10 @@ const OIT = () => {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
 
-  const handleChangeSimple = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+  // const handleChangeSimple = (e) => {
+  //   const { name, value } = e.target;
+  //   setForm((f) => ({ ...f, [name]: value }));
+  // };
 
 
   const handleset = () => {
@@ -115,6 +126,12 @@ const OIT = () => {
       nombre_medico: prev.nombre_medico,
       user_medicoFirma: prev.user_medicoFirma,
     }));
+  };
+
+  const handleSearch = (event) => {
+    if (event.key !== "Enter") return;
+    handleset();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
   };
 
   const handlePrint = () => {
@@ -179,30 +196,15 @@ const OIT = () => {
             {/*1ra fila*/}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
               {/*Norden*/}
-              <div className="flex items-center gap-4 ">
-                <label className="font-semibold max-w-[65px] min-w-[65px]">
-                  N° Orden:
-                </label>
-                <input
-                  type="text"
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleInputChange}
-                  id="norden"
-                  className="border rounded px-2 py-1 w-full"
-                  onKeyUp={(event) => {
-                    if (event.key === "Enter")
-                      handleset(),
-                        VerifyTR(
-                          form.norden,
-                          tabla,
-                          token,
-                          setForm,
-                          selectedSede
-                        );
-                  }}
-                />
-              </div>
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form.norden}
+                onChange={handleChangeNumber}
+                onKeyUp={handleSearch}
+                labelWidth="65px"
+                className="flex items-center gap-4"
+              />
               {/*Lector*/}
               <div className="flex items-center gap-4 lg:col-span-2">
                 <label className="font-semibold max-w-[65px] min-w-[65px]">
