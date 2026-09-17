@@ -534,37 +534,31 @@ export default function TicketAsistencial() {
             Swal.fire("Error", "Agregue al menos un servicio al ticket.", "error");
             return;
         }
+        if (!form.autorizadoPor) {
+            Swal.fire("Error", "Debe seleccionar quién autoriza el ticket.", "error");
+            return;
+        }
 
         const ahora = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const horaTicket = `${pad(ahora.getHours())}:${pad(ahora.getMinutes())}:${pad(ahora.getSeconds())}`;
+
         const body = {
-            id: null,
-            serieTicket: null,
-            numeroTicket: null,
             pacienteId: form.idDatos,
             medico: form.nombre_medico || null,
-            total: null,
             descuento: 0,
             fechaTicket: form.fecha,
-            horaTicket: {
-                hour: ahora.getHours(),
-                minute: ahora.getMinutes(),
-                second: ahora.getSeconds(),
-                nano: 0,
-            },
+            horaTicket,
             operador: userlogued || null,
             modoPago: form.metodoPago || null,
             empresa: form.empresa || null,
             codigoVendedor: form.codVendedor ? Number(form.codVendedor) : null,
             autoriza: form.autorizadoPor || null,
             contenidos: form.ticketItems.map((item) => ({
-                id: null,
                 codigoServicio: item.cod || null,
-                descripcion: item.descripcion || null,
-                unidad: item.unidad || null,
                 cantidad: Number(item.cantidad) || 0,
                 precioUnitario: Number(item.precio) || 0,
-                precioTotal: Number(item.total) || 0,
-                detalleAdicional: null,
+                descuentoLinea: Number(item.descuento) || 0,
             })),
         };
 
