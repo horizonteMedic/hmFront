@@ -55,6 +55,8 @@ export const GetInfoServicio = async (nro, set, token, sede) => {
         ocupacion: res.areaO ?? "",
         cargoDesempenar: res.cargo ?? "",
         nombreExamen: res.nomExam ?? "",
+        peso: res.peso ?? "",
+        talla: res.talla ?? "",
         sistolica: res.sistolica ?? "",
         diastolica: res.diastolica ?? "",
         tieneRegistro: false,
