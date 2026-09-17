@@ -2,12 +2,12 @@ import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 
-const registrarActualizarUrl =
-  "/api/v01/ct/datosPacienteAsistencial/registrarActualizar";
-const buscarPorDniUrl =
-  "/api/v01/ct/datosPacienteAsistencial/buscarPorDni";
-const buscarPorPasaporteUrl =
-  "/api/v01/ct/datosPacienteAsistencial/buscarPorPasaporte";
+const guardarPacienteUrl =
+  "/api/pacientes-asistencial";
+const buscarReniecUrl =
+  "/api/pacientes-asistencial/reniec";
+const buscarDocumentoUrl =
+  "/api/pacientes-asistencial/documento";
 
 // dd-MM-yyyy -> yyyy-MM-dd ("" si la fecha es incompleta / inválida)
 const toIsoDate = (fechaStr) => {
@@ -26,37 +26,40 @@ const toInputDate = (fechaStr) => {
 };
 
 
+// "MASCULINO" / "FEMENINO" (o ya "M" / "F") -> código esperado por el backend
+const toSexoCode = (sexo) => {
+  if (!sexo) return null;
+  const s = String(sexo).toUpperCase();
+  if (s === "MASCULINO" || s === "M") return "M";
+  if (s === "FEMENINO" || s === "F") return "F";
+  return s;
+};
+
+// Guardar paciente (alta o edición): POST /api/pacientes-asistencial?usuario=...
+// Es un upsert en el backend (busca por id y luego por documento), así que siempre se
+// envía el mismo payload. En edición, tipoDocumento/numeroDocumento/numeroHistoriaClinica
+// se ignoran ahí -- para corregir el documento hay que usar PUT /{id}/documento.
 export const SubmitDataService = async (form, token, limpiar = () => { }, userlogued = "") => {
   if (!form.nombres || !form.apellidos) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
 
-  const esActualizacion = Boolean(form.idDatos);
-
   const body = {
-    origenDatos: form.origenDatos ?? "",
-    idDatos: form.idDatos,
-    dni: form.tipoDocumento === "DNI" ? parseInt(form.documentoIdentidad) : null,
+    id: form.idDatos ?? null,
+    numeroHistoriaClinica: form.NHCL ?? null,
+    tipoDocumento: form.tipoDocumento,
+    numeroDocumento: form.tipoDocumento === "SIN_DOCUMENTO" ? null : (form.documentoIdentidad ?? ""),
     nombres: form.nombres ?? "",
     apellidos: form.apellidos ?? "",
-    sexo: form.sexo ?? "",
+    sexo: toSexoCode(form.sexo),
     estadoCivil: form.estadoCivil ?? "",
+    fechaNacimiento: toIsoDate(form.fechaNacimiento),
     direccion: form.domicilioActual ?? "",
     celular: form.telefono ?? "",
-    fechaRegistro: new Date().toISOString(),
-    userRegistro: userlogued ?? "",
-    usuarioActualizacion: esActualizacion ? (userlogued ?? "") : null,
-    historiaClinica: form.NHCL ?? null,
-    edad: form.edad ?? "",
-    fechaNacimiento: toIsoDate(form.fechaNacimiento),
-    codigoSinDni: form.codigoSinDni,
     departamento: form.departamento ?? "",
     provincia: form.provincia ?? "",
     distrito: form.distrito ?? "",
-    tipoDocumento: form.tipoDocumento,
-    numDocumento: form.tipoDocumento === "PASAPORTE" ? (form.documentoIdentidad ?? "") : "",
-
     nivelEstudios: form.nivelEstudios ?? "",
     lugarNacimiento: form.lugarNacimiento ?? "",
     ocupacion: form.ocupacion ?? "",
@@ -64,15 +67,20 @@ export const SubmitDataService = async (form, token, limpiar = () => { }, userlo
 
   LoadingDefault("Registrando Datos");
 
-  SubmitData(body, registrarActualizarUrl, token).then((res) => {
-    console.log(res);
-    if (res?.id === 1 || res?.nOrden || res?.codigo == "201" || res?.idDatos) {
-      Swal.fire("Éxito", res?.mensaje ?? "Datos registrados correctamente", "success");
-      limpiar();
-    } else {
-      Swal.fire("Error", res?.mensaje ?? "Ocurrió un error al registrar", "error");
-    }
-  });
+  const query = new URLSearchParams({ usuario: userlogued ?? "" });
+  const res = await SubmitData(body, `${guardarPacienteUrl}?${query.toString()}`, token);
+
+  Swal.close();
+
+  console.log("guardarPaciente ->", res);
+
+  if (!res || res.error || !res.resultado) {
+    Swal.fire("Error", res?.mensaje ?? "Ocurrió un error al registrar", "error");
+    return;
+  }
+
+  Swal.fire("Éxito", "Datos registrados correctamente", "success");
+  limpiar();
 };
 
 // "M" / "F" (o ya "MASCULINO" / "FEMENINO") -> valor usado por el <select> de Sexo
@@ -84,45 +92,20 @@ const toSexoOption = (sexo) => {
   return s;
 };
 
-export const BuscarPorDni = async (dni, token, setForm) => {
-  if (!dni) return;
-
-  LoadingDefault("Buscando Paciente");
-
-  const res = await getFetch(`${buscarPorDniUrl}/${dni}`, token);
-
-  Swal.close();
-
-  console.log("buscarPorDni ->", res);
-
-  // Acepta tanto la respuesta envuelta { codigo, resultado } como el objeto plano directo
-  const data = res?.resultado ?? (res && !res.error ? res : null);
-
-  const encontrado = data && (data.dni || data.nombres || data.apellidos);
-
-  if (!res || res.error || !encontrado) {
-    Swal.fire(
-      "Sin registro",
-      "No se encontró un paciente con ese DNI. Complete sus datos para registrarlo.",
-      "info"
-    );
-    return;
-  }
-
+// Vuelca en el form los datos de un paciente ya registrado localmente (schema "paciente").
+const setFormFromPaciente = (setForm, data) => {
   setForm((prev) => ({
     ...prev,
-    idDatos: data.idDatos,
-    documentoIdentidad: data.dni ? String(data.dni) : prev.documentoIdentidad,
+    idDatos: data.id ?? null,
+    documentoIdentidad: data.numeroDocumento ? String(data.numeroDocumento) : prev.documentoIdentidad,
     nombres: data.nombres ?? "",
     apellidos: data.apellidos ?? "",
     sexo: toSexoOption(data.sexo),
     estadoCivil: data.estadoCivil ?? "",
     domicilioActual: data.direccion ?? "",
     telefono: data.celular ?? "",
-    NHCL: data.historiaClinica ? parseInt(data.historiaClinica) : null,
-    edad: data.edad ?? "",
+    NHCL: data.numeroHistoriaClinica ? parseInt(data.numeroHistoriaClinica) : null,
     fechaNacimiento: toInputDate(data.fechaNacimiento),
-    codigoSinDni: data.codigoSinDni,
     departamento: data.departamento ?? "",
     provincia: data.provincia ?? "",
     distrito: data.distrito ?? "",
@@ -131,39 +114,101 @@ export const BuscarPorDni = async (dni, token, setForm) => {
     lugarNacimiento: data.lugarNacimiento ?? "",
     ocupacion: data.ocupacion ?? "",
   }));
+};
 
-  const origen = data.origenDatos ? String(data.origenDatos).toUpperCase() : "";
-  if (origen === "RENIEC") {
+// Consulta por DNI (local o RENIEC) para autocompletar el alta.
+// Si el DNI ya existe localmente (yaRegistrado=true) se usa tal cual, sin volver a
+// consultar RENIEC. Si no existe, se autocompleta con RENIEC pero no se guarda nada
+// hasta que el usuario confirme con SubmitDataService (POST /api/pacientes).
+export const BuscarPorDni = async (dni, token, setForm) => {
+  if (!dni) return;
+
+  LoadingDefault("Buscando Paciente");
+
+  const res = await getFetch(`${buscarReniecUrl}/${dni}`, token);
+
+  Swal.close();
+
+  console.log("buscarPorDni (reniec) ->", res);
+
+  const resultado = res?.resultado;
+
+  if (!res || res.error || !resultado) {
     Swal.fire(
-      "Consulta a RENIEC",
-      "No se encontró en el sistema, pero se consultó a RENIEC y se completó el formulario con esos datos.",
-      "success"
+      "Sin registro",
+      "No se encontró un paciente con ese DNI. Complete sus datos para registrarlo.",
+      "info"
     );
-  } else {
+    return;
+  }
+
+  if (resultado.yaRegistrado) {
+    setFormFromPaciente(setForm, resultado.paciente ?? {});
     Swal.fire(
       "Paciente encontrado",
       "Se completó el formulario con los datos registrados en el sistema.",
       "success"
     );
+    return;
   }
+
+  const reniec = resultado.datosReniec;
+
+  if (!reniec) {
+    Swal.fire(
+      "Sin registro",
+      "No se encontró un paciente con ese DNI. Complete sus datos para registrarlo.",
+      "info"
+    );
+    return;
+  }
+
+  const apellidos = [reniec.apellidoPaterno, reniec.apellidoMaterno].filter(Boolean).join(" ");
+
+  setForm((prev) => ({
+    ...prev,
+    idDatos: null,
+    documentoIdentidad: reniec.dni ? String(reniec.dni) : prev.documentoIdentidad,
+    nombres: reniec.nombres ?? "",
+    apellidos,
+    sexo: toSexoOption(reniec.sexo),
+    estadoCivil: "",
+    domicilioActual: reniec.direccion ?? "",
+    telefono: "",
+    NHCL: null,
+    fechaNacimiento: toInputDate(reniec.fechaNacimiento),
+    departamento: reniec.departamento ?? "",
+    provincia: reniec.provincia ?? "",
+    distrito: reniec.distrito ?? "",
+
+    nivelEstudios: "",
+    lugarNacimiento: "",
+    ocupacion: "",
+  }));
+
+  Swal.fire(
+    "Consulta a RENIEC",
+    "No se encontró en el sistema, pero se consultó a RENIEC y se completó el formulario con esos datos. Confirme el registro para guardarlo.",
+    "success"
+  );
 };
 
-// Busca en el sistema por tipoDocumento = PASAPORTE. No consulta RENIEC (solo tiene DNI peruano).
+// Búsqueda exacta por documento (PASAPORTE). No consulta RENIEC (solo tiene DNI peruano).
 export const BuscarPorPasaporte = async (numero, token, setForm) => {
   if (!numero) return;
 
   LoadingDefault("Buscando Paciente");
 
-  const res = await getFetch(`${buscarPorPasaporteUrl}/${numero}`, token);
+  const query = new URLSearchParams({ tipoDocumento: "PASAPORTE", numeroDocumento: numero });
+  const res = await getFetch(`${buscarDocumentoUrl}?${query.toString()}`, token);
 
   Swal.close();
 
-  console.log("buscarPorPasaporte ->", res);
+  console.log("buscarPorPasaporte (documento) ->", res);
 
-  // Acepta tanto la respuesta envuelta { codigo, resultado } como el objeto plano directo
-  const data = res?.resultado ?? (res && !res.error ? res : null);
+  const data = res?.resultado;
 
-  const encontrado = data && (data.numDocumento || data.nombres || data.apellidos);
+  const encontrado = data && (data.numeroDocumento || data.nombres || data.apellidos);
 
   if (!res || res.error || !encontrado) {
     Swal.fire(
@@ -174,28 +219,7 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
     return;
   }
 
-  setForm((prev) => ({
-    ...prev,
-    idDatos: data.idDatos,
-    documentoIdentidad: data.numDocumento ?? prev.documentoIdentidad,
-    nombres: data.nombres ?? "",
-    apellidos: data.apellidos ?? "",
-    sexo: toSexoOption(data.sexo),
-    estadoCivil: data.estadoCivil ?? "",
-    domicilioActual: data.direccion ?? "",
-    telefono: data.celular ?? "",
-    NHCL: data.historiaClinica ? parseInt(data.historiaClinica) : null,
-    edad: data.edad ?? "",
-    fechaNacimiento: toInputDate(data.fechaNacimiento),
-    codigoSinDni: data.codigoSinDni,
-    departamento: data.departamento ?? "",
-    provincia: data.provincia ?? "",
-    distrito: data.distrito ?? "",
-
-    nivelEstudios: data.nivelEstudios ?? "",
-    lugarNacimiento: data.lugarNacimiento ?? "",
-    ocupacion: data.ocupacion ?? "",
-  }));
+  setFormFromPaciente(setForm, data);
 
   Swal.fire(
     "Paciente encontrado",
