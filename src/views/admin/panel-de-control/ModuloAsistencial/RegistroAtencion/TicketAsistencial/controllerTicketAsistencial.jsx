@@ -51,6 +51,7 @@ export const CrearServicio = async (body, token) => {
 
 // Vuelca en el form del ticket los datos de un paciente (schema "paciente" de
 // pacientes-asistencial): junta apellidos+nombres para el campo único "nombres".
+// fechaNacimiento se guarda para calcular la edad al imprimir el ticket.
 const setFormFromPaciente = (setForm, data) => {
   setForm((prev) => ({
     ...prev,
@@ -59,6 +60,7 @@ const setFormFromPaciente = (setForm, data) => {
     documentoIdentidad: data.numeroDocumento ? String(data.numeroDocumento) : prev.documentoIdentidad,
     nombres: `${data.apellidos ?? ""} ${data.nombres ?? ""}`.trim(),
     NHCL: data.numeroHistoriaClinica ? parseInt(data.numeroHistoriaClinica) : null,
+    fechaNacimiento: data.fechaNacimiento ?? null,
   }));
 };
 
@@ -135,6 +137,23 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
 export const RegistrarTicket = async (body, token, usuario) => {
   const query = new URLSearchParams({ usuario: usuario ?? "" });
   const res = await SubmitData(body, `${ticketsUrl}?${query.toString()}`, token);
+
+  if (!res || res.error || !res.resultado) return null;
+
+  return res.resultado;
+};
+
+// Obtiene el ticket ya persistido (con sus líneas y montos reales) por su número único.
+// Es la fuente de verdad para imprimir: así el recibo siempre refleja lo guardado en el
+// backend y no el estado del formulario en pantalla.
+export const ObtenerTicketPorNumero = async (numeroTicket, token) => {
+  if (!numeroTicket) return null;
+
+  LoadingDefault("Cargando Ticket");
+
+  const res = await getFetch(`${ticketsUrl}/numero/${numeroTicket}`, token);
+
+  Swal.close();
 
   if (!res || res.error || !res.resultado) return null;
 
