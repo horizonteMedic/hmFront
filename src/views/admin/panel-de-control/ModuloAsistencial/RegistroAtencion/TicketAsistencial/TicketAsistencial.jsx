@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import { faBroom, faCalendarDay, faPlus, faPrint, faSave, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faCalendarDay, faPlus, faPrint, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
@@ -292,7 +293,7 @@ export default function TicketAsistencial() {
 
     const today = getToday();
 
-    const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
+    const { token, userlogued, selectedSede, userName } = useSessionData();
 
     const initialFormState = {
         // Datos básicos
@@ -332,23 +333,23 @@ export default function TicketAsistencial() {
         setForm,
         handleChange,
         handleChangeNumberDecimals,
-        handleRadioButton,
         handleChangeSimple,
-        handleCheckBoxChange,
         handleClear,
-        handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "ticketAsistencial" });
+
+    const [errors, setErrors] = useState({});
 
     // Paciente elegido en el buscador de "Sin DNI" (bloquea el input tras seleccionarlo)
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
-    // Al cambiar el tipo de documento se descarta cualquier selección previa del buscador
-    useEffect(() => {
-        if (form.tipoDocumento !== "SIN DNI" && pacienteSeleccionado) {
-            setPacienteSeleccionado(null);
-        }
-    }, [form.tipoDocumento]);
+    // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado, así que el
+    // formulario se limpia por completo y solo conserva el nuevo tipo elegido.
+    const handleTipoDocumentoChange = (e, value) => {
+        setPacienteSeleccionado(null);
+        setErrors({});
+        setForm({ ...initialFormState, tipoDocumento: value });
+    };
 
     const handleSeleccionarPacienteSinDni = (item) => {
         setPacienteSeleccionado({
@@ -479,7 +480,19 @@ export default function TicketAsistencial() {
             codServicio: "",
             precio: "",
             unidad: "",
-            descuento: "",
+            descuento: "0",
+        }));
+    };
+
+    // Limpia los inputs de "Agregar Servicios" sin necesidad de agregar el ítem a la tabla.
+    const handleLimpiarServicioInputs = () => {
+        setForm((f) => ({
+            ...f,
+            servicio: "",
+            codServicio: "",
+            precio: "",
+            unidad: "",
+            descuento: "0",
         }));
     };
 
@@ -525,17 +538,33 @@ export default function TicketAsistencial() {
         0
     );
 
+    // Todos los campos son obligatorios, excepto los de la sección "Agregar Servicios
+    // Ticket" (esos solo alimentan la tabla; lo obligatorio ahí es tener al menos un ítem).
+    const validateForm = () => {
+        const next = {};
+        if (!form.empresa?.trim()) next.empresa = "La empresa es obligatoria.";
+        if (!form.metodoPago) next.metodoPago = "El método de pago es obligatorio.";
+        if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
+        if (!form.user_medicoFirma) next.nombre_medico = "Debe asignar un doctor.";
+        if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
+        setErrors(next);
+        return Object.keys(next).length === 0;
+    };
+
+    const handleClearForm = () => {
+        setErrors({});
+        setPacienteSeleccionado(null);
+        handleClear();
+    };
+
     const handleRegistrarTicket = async () => {
         if (!form.idDatos) {
             Swal.fire("Error", "Debe buscar y seleccionar un paciente antes de registrar el ticket.", "error");
             return;
         }
+        if (!validateForm()) return;
         if (!form.ticketItems?.length) {
             Swal.fire("Error", "Agregue al menos un servicio al ticket.", "error");
-            return;
-        }
-        if (!form.autorizadoPor) {
-            Swal.fire("Error", "Debe seleccionar quién autoriza el ticket.", "error");
             return;
         }
 
@@ -571,12 +600,16 @@ export default function TicketAsistencial() {
         }
 
         setForm((f) => ({ ...f, nroTicket: creado.numeroTicket ?? f.nroTicket }));
-        Swal.fire("Éxito", "Ticket registrado correctamente", "success");
-    };
-
-    const handleImprimirFecha = () => {
-        handlePrintDefault(() => {
-            window.print();
+        Swal.fire({
+            title: "Éxito",
+            icon: "success",
+            html: `
+                <p style="margin:0 0 10px;">Ticket registrado correctamente.</p>
+                <p style="margin:0; font-size:1.2em; font-weight:600;">N° de Ticket</p>
+                <p style="margin:0; font-size:1.8em; font-weight:800; color:#16a34a;">
+                    ${creado.numeroTicket ?? form.nroTicket ?? ""}
+                </p>
+            `,
         });
     };
 
@@ -586,6 +619,16 @@ export default function TicketAsistencial() {
         });
     };
 
+    const handleImprimirFecha = () => {
+        handlePrintDefault(() => {
+            window.print();
+        });
+    };
+
+    // Un registro cargado se detecta por los datos de resultado (nombres/dni), nunca por
+    // el documento que el usuario está tipeando.
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+
     return (
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
             <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-4 gap-y-3 gap-x-4">
@@ -594,7 +637,7 @@ export default function TicketAsistencial() {
                     value={form.tipoDocumento}
                     label="Tipo de Documento"
                     labelWidth="120px"
-                    onChange={handleRadioButton}
+                    onChange={handleTipoDocumentoChange}
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
@@ -612,12 +655,13 @@ export default function TicketAsistencial() {
                     />
                     :
                     <InputTextOneLine
-                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Sin DNI"}`}
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : "Pasaporte"}`}
                         name="documentoIdentidad"
                         value={form.documentoIdentidad}
                         onChange={handleChange}
                         onKeyUp={handleSearch}
-                        disabled={form.tipoDocumento === "SIN DNI"}
+                        disabled={hayRegistroCargado}
+                        required
                         labelWidth="120px"
                     />
                 }
@@ -641,6 +685,8 @@ export default function TicketAsistencial() {
                     value={form?.codVendedor}
                     onChange={handleChangeNumberDecimals}
                     onKeyUp={handleSearch}
+                    required
+                    error={errors.codVendedor}
                 />
             </SectionFieldset>
 
@@ -659,6 +705,8 @@ export default function TicketAsistencial() {
                     value={form.empresa}
                     onChange={handleChange}
                     labelWidth="120px"
+                    required
+                    error={errors.empresa}
                 />
                 <SelectField
                     label="Método de pago"
@@ -668,6 +716,8 @@ export default function TicketAsistencial() {
                     options={METODOS_PAGO}
                     inline
                     labelWidth="120px"
+                    required
+                    error={errors.metodoPago}
                 />
                 <SelectField
                     label="Autorizado por"
@@ -677,6 +727,8 @@ export default function TicketAsistencial() {
                     options={AUTORIZADO_POR}
                     inline
                     labelWidth="120px"
+                    required
+                    error={errors.autorizadoPor}
                 />
                 <div className="flex flex-wrap items-center gap-6">
                     <InputCheckbox
@@ -716,6 +768,8 @@ export default function TicketAsistencial() {
                     label="Doctor"
                     form={form}
                     onChange={handleChangeSimple}
+                    required
+                    error={errors.nombre_medico}
                 />
             </SectionFieldset>
 
@@ -738,6 +792,14 @@ export default function TicketAsistencial() {
                             className="text-blue-600 hover:text-blue-800 px-2"
                         >
                             <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleLimpiarServicioInputs}
+                            title="Limpiar campos de servicio"
+                            className="text-amber-600 hover:text-amber-800 px-2"
+                        >
+                            <FontAwesomeIcon icon={faBroom} />
                         </button>
                     </div>
                     <div className="grid grid-cols-1 xl:grid-cols-4 gap-x-4 gap-y-3">
@@ -856,54 +918,31 @@ export default function TicketAsistencial() {
 
             </SectionFieldset>
 
-            <SectionFieldset legend="Fecha" className="grid xl:grid-cols-3 gap-y-3 gap-x-4">
-                <InputTextOneLine
-                    label="Fecha"
-                    name="fecha"
-                    value={form.fecha}
-                    type="Date"
-                    disabled
-                />
-                <InputTextOneLine
-                    label="Hora"
-                    name="hora"
-                    value={hora}
-                    inputClassName="font-bold"
-                    disabled
-                />
-            </SectionFieldset>
 
-
-            <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-                <button
-                    type="button"
-                    onClick={handleRegistrarTicket}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
-                >
-                    <FontAwesomeIcon icon={faSave} /> Registrar Ticket
-                </button>
+            <BotonesForm
+                form={form}
+                handleSave={handleRegistrarTicket}
+                saveLabel="Guardar"
+                handleClear={handleClearForm}
+                hideEdit
+                printSlot={
+                    <button
+                        type="button"
+                        onClick={handleImprimirTicket}
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
+                    >
+                        <FontAwesomeIcon icon={faPrint} /> Imprimir
+                    </button>
+                }
+            >
                 <button
                     type="button"
                     onClick={handleImprimirFecha}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
+                    className="bg-purple-600 hover:bg-purple-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
                 >
                     <FontAwesomeIcon icon={faCalendarDay} /> Imprimir Fecha
                 </button>
-                <button
-                    type="button"
-                    onClick={handleImprimirTicket}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
-                >
-                    <FontAwesomeIcon icon={faPrint} /> Imprimir Ticket
-                </button>
-                <button
-                    type="button"
-                    onClick={handleClear}
-                    className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
-                >
-                    <FontAwesomeIcon icon={faBroom} /> Limpiar
-                </button>
-            </div>
+            </BotonesForm>
 
             <ModalNuevoServicio
                 open={modalServicioOpen}

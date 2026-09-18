@@ -2,10 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte } from "./controllerRegistroAsistencial";
 import {
     ComboboxProfesión,
@@ -35,6 +40,26 @@ const ESTADO_CIVIL_OPTIONS = [
 ];
 
 const SEXO_OPTIONS = ["MASCULINO", "FEMENINO"];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios
+// cuando se edita un paciente ya registrado). El documento de identidad y el N° de Historia
+// Clínica quedan fuera: no se editan aquí (ver nota en controllerRegistroAsistencial).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "nombres",
+    "apellidos",
+    "fechaNacimiento",
+    "sexo",
+    "estadoCivil",
+    "nivelEstudios",
+    "lugarNacimiento",
+    "departamento",
+    "provincia",
+    "distrito",
+    "domicilioActual",
+    "telefono",
+    "ocupacion",
+];
 
 // dd-MM-yyyy -> edad en años (string). "" si la fecha es inválida / incompleta.
 function calcularEdad(fechaStr) {
@@ -75,6 +100,8 @@ function AutocompleteOneLine({
     onSelect,
     labelWidth = "120px",
     disabled = false,
+    edited = false,
+    onRevert,
     placeholder = "Escribe para buscar...",
 }) {
     const [show, setShow] = useState(false);
@@ -93,6 +120,8 @@ function AutocompleteOneLine({
         .filter((o) => getOptionLabel(o).toLowerCase().includes(text.toLowerCase()))
         .slice(0, 50);
 
+    const showRevert = edited && typeof onRevert === "function";
+
     return (
         <div className="flex items-center gap-4" ref={boxRef}>
             <label
@@ -102,45 +131,48 @@ function AutocompleteOneLine({
             >
                 {label} :
             </label>
-            <div className="relative w-full">
-                <input
-                    id={name}
-                    name={name}
-                    type="text"
-                    autoComplete="off"
-                    disabled={disabled}
-                    value={text}
-                    placeholder={placeholder}
-                    style={{ textTransform: "uppercase" }}
-                    className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""}`}
-                    onChange={(e) => onType(e.target.value.toUpperCase())}
-                    onFocus={() => setShow(true)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (filtered.length > 0) {
-                                onSelect(filtered[0]);
-                                setShow(false);
-                            }
-                        }
-                    }}
-                />
-                {show && filtered.length > 0 && (
-                    <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
-                        {filtered.map((opt, i) => (
-                            <div
-                                key={i}
-                                className="cursor-pointer p-2 hover:bg-gray-200"
-                                onClick={() => {
-                                    onSelect(opt);
+            <div className="w-full flex items-center gap-1.5">
+                <div className="relative w-full">
+                    <input
+                        id={name}
+                        name={name}
+                        type="text"
+                        autoComplete="off"
+                        disabled={disabled}
+                        value={text}
+                        placeholder={placeholder}
+                        style={{ textTransform: "uppercase" }}
+                        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""} ${edited ? "border-orange-400 bg-orange-100" : ""}`}
+                        onChange={(e) => onType(e.target.value.toUpperCase())}
+                        onFocus={() => !disabled && setShow(true)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (filtered.length > 0) {
+                                    onSelect(filtered[0]);
                                     setShow(false);
-                                }}
-                            >
-                                {getOptionLabel(opt)}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                }
+                            }
+                        }}
+                    />
+                    {show && !disabled && filtered.length > 0 && (
+                        <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
+                            {filtered.map((opt, i) => (
+                                <div
+                                    key={i}
+                                    className="cursor-pointer p-2 hover:bg-gray-200"
+                                    onClick={() => {
+                                        onSelect(opt);
+                                        setShow(false);
+                                    }}
+                                >
+                                    {getOptionLabel(opt)}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                {showRevert && <RevertButton onClick={onRevert} />}
             </div>
         </div>
     );
@@ -161,10 +193,8 @@ export default function RegistroAsistencial() {
     const initialFormState = {
         // Datos básicos
         idDatos: null,
-        codigoSinDni: null,
         tipoDocumento: "DNI",
         documentoIdentidad: "",
-        nombreBuscador: "",
         NHCL: null,
         fecha: today,
 
@@ -177,7 +207,6 @@ export default function RegistroAsistencial() {
         estadoCivil: "",
         nivelEstudios: "",
 
-        lugarNacimiento: "",
         departamento: "",
         provincia: "",
         distrito: "",
@@ -186,6 +215,14 @@ export default function RegistroAsistencial() {
 
         ocupacion: "",
 
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Habilitar edición (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -193,12 +230,19 @@ export default function RegistroAsistencial() {
         setForm,
         handleChange,
         handleChangeNumberDecimals,
-        handleRadioButton,
         handleChangeSimple,
         handleClear,
         handlePrintDefault,
         handleFocusNext,
     } = useForm(initialFormState, { storageKey: "registroPacienteAsistencial" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
 
     const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
 
@@ -250,6 +294,13 @@ export default function RegistroAsistencial() {
         SubmitDataService(form, token, handleClear, userlogued);
     };
 
+    // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado (DNI,
+    // Pasaporte y Sin Documento son búsquedas independientes), así que el formulario
+    // se limpia por completo y solo conserva el nuevo tipo elegido.
+    const handleTipoDocumentoChange = (e, value) => {
+        setForm({ ...initialFormState, tipoDocumento: value });
+    };
+
     // Enter se comporta como Tab: salta al siguiente campo enfocable
     const handleEnterAsTab = (e) => {
         if (e.key !== "Enter" || e.shiftKey) return;
@@ -260,16 +311,37 @@ export default function RegistroAsistencial() {
         handleFocusNext(e);
     };
 
+    // Un registro cargado (nuevo por RENIEC o ya existente) se detecta por los datos de
+    // resultado (nombres/apellidos), nunca por el documento que el usuario está tipeando.
+    const hayRegistroCargado = Boolean(form.nombres || form.apellidos);
+    // El N° de documento se bloquea una vez cargado un registro, para forzar "Limpiar" (o
+    // cambiar el tipo de documento, que también limpia) antes de buscar a otro paciente.
+    // Corregir el documento de un registro existente requiere un endpoint aparte
+    // (PUT /{id}/documento), no este formulario.
+    const busquedaDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4" >
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-2 gap-y-3 gap-x-4">
                 <InputsRadioGroup
                     name="tipoDocumento"
                     value={form.tipoDocumento}
                     label="Tipo de Documento"
                     labelWidth="120px"
-                    onChange={handleRadioButton}
+                    onChange={handleTipoDocumentoChange}
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
@@ -286,7 +358,7 @@ export default function RegistroAsistencial() {
                         value={form.documentoIdentidad}
                         onChange={handleChange}
                         onKeyUp={handleSearch}
-                        disabled={form.tipoDocumento === "SIN_DOCUMENTO"}
+                        disabled={form.tipoDocumento === "SIN_DOCUMENTO" || busquedaDisabled}
                         labelWidth="120px"
                     />
                 }
@@ -308,6 +380,9 @@ export default function RegistroAsistencial() {
                     value={form.nombres}
                     onChange={handleChange}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("nombres")}
+                    onRevert={() => revertField("nombres")}
                 />
                 <InputTextOneLine
                     label="Apellidos"
@@ -315,6 +390,9 @@ export default function RegistroAsistencial() {
                     value={form.apellidos}
                     onChange={handleChange}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("apellidos")}
+                    onRevert={() => revertField("apellidos")}
                 />
                 <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
                     <div className="flex flex-col gap-1">
@@ -324,7 +402,10 @@ export default function RegistroAsistencial() {
                             value={form.fechaNacimiento}
                             onChange={handleFechaNacimiento}
                             labelWidth="120px"
+                            disabled={camposDeshabilitados}
                             inputClassName={esMenorDeEdad ? "border-red-500 text-red-600 font-bold" : ""}
+                            edited={isFieldEdited("fechaNacimiento")}
+                            onRevert={() => revertField("fechaNacimiento")}
                         />
                         <span className="text-[11px] text-gray-500" style={{ marginLeft: "136px" }}>
                             Formato: Día-Mes-Año (DD-MM-AAAA)
@@ -355,18 +436,22 @@ export default function RegistroAsistencial() {
                         >
                             Sexo :
                         </label>
-                        <select
-                            id="sexo"
-                            name="sexo"
-                            value={form.sexo}
-                            onChange={handleChangeSimple}
-                            className="border rounded px-2 py-1 w-full bg-white"
-                        >
-                            <option value="">-- Seleccione --</option>
-                            {SEXO_OPTIONS.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
+                        <div className="w-full flex items-center gap-1.5">
+                            <select
+                                id="sexo"
+                                name="sexo"
+                                value={form.sexo}
+                                onChange={handleChangeSimple}
+                                disabled={camposDeshabilitados}
+                                className={`border rounded px-2 py-1 w-full ${camposDeshabilitados ? "bg-gray-300" : "bg-white"} ${isFieldEdited("sexo") ? "border-orange-400 bg-orange-100" : ""}`}
+                            >
+                                <option value="">-- Seleccione --</option>
+                                {SEXO_OPTIONS.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                            {isFieldEdited("sexo") && <RevertButton onClick={() => revertField("sexo")} />}
+                        </div>
                     </div>
                     <AutocompleteOneLine
                         label="Estado Civil"
@@ -376,6 +461,9 @@ export default function RegistroAsistencial() {
                         onType={(v) => setField("estadoCivil", v)}
                         onSelect={(opt) => setField("estadoCivil", opt)}
                         labelWidth="120px"
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("estadoCivil")}
+                        onRevert={() => revertField("estadoCivil")}
                     />
                 </div>
                 <AutocompleteOneLine
@@ -386,6 +474,9 @@ export default function RegistroAsistencial() {
                     onType={(v) => setField("nivelEstudios", v)}
                     onSelect={(opt) => setField("nivelEstudios", opt)}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("nivelEstudios")}
+                    onRevert={() => revertField("nivelEstudios")}
                 />
                 <InputTextOneLine
                     label="Lugar Nacimiento"
@@ -393,6 +484,9 @@ export default function RegistroAsistencial() {
                     value={form.lugarNacimiento}
                     onChange={handleChange}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("lugarNacimiento")}
+                    onRevert={() => revertField("lugarNacimiento")}
                 />
                 <AutocompleteOneLine
                     label="Departamento"
@@ -405,6 +499,9 @@ export default function RegistroAsistencial() {
                         setForm((f) => ({ ...f, departamento: opt.nombre, provincia: "", distrito: "" }))
                     }
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("departamento")}
+                    onRevert={() => revertField("departamento")}
                 />
                 <AutocompleteOneLine
                     label="Provincia"
@@ -415,6 +512,9 @@ export default function RegistroAsistencial() {
                     onType={(v) => setForm((f) => ({ ...f, provincia: v }))}
                     onSelect={(opt) => setForm((f) => ({ ...f, provincia: opt.nombre, distrito: "" }))}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("provincia")}
+                    onRevert={() => revertField("provincia")}
                 />
                 <AutocompleteOneLine
                     label="Distrito"
@@ -425,6 +525,9 @@ export default function RegistroAsistencial() {
                     onType={(v) => setForm((f) => ({ ...f, distrito: v }))}
                     onSelect={(opt) => setForm((f) => ({ ...f, distrito: opt.nombre }))}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("distrito")}
+                    onRevert={() => revertField("distrito")}
                 />
                 <InputTextOneLine
                     label="Domicilio Actual"
@@ -432,6 +535,9 @@ export default function RegistroAsistencial() {
                     value={form.domicilioActual}
                     onChange={handleChange}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("domicilioActual")}
+                    onRevert={() => revertField("domicilioActual")}
                 />
                 <InputTextOneLine
                     label="Telefono"
@@ -439,6 +545,9 @@ export default function RegistroAsistencial() {
                     value={form.telefono}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("telefono")}
+                    onRevert={() => revertField("telefono")}
                 />
                 <AutocompleteOneLine
                     label="Ocupación"
@@ -449,27 +558,33 @@ export default function RegistroAsistencial() {
                     onType={(v) => setField("ocupacion", v)}
                     onSelect={(opt) => setField("ocupacion", opt.descripcion)}
                     labelWidth="120px"
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("ocupacion")}
+                    onRevert={() => revertField("ocupacion")}
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Fecha" className="grid xl:grid-cols-3 gap-y-3 gap-x-4">
-                <InputTextOneLine
-                    label="Fecha"
-                    name="fecha"
-                    value={form.fecha}
-                    type="Date"
-                    disabled
+                    
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
                 />
-                <InputTextOneLine
-                    label="Hora"
-                    name="hora"
-                    value={hora}
-                    inputClassName="font-bold"
-                    disabled
-                />
-            </SectionFieldset>
+            )}
 
-            <BotonesAccion form={form} handleSave={handleSave} handleClear={handleClear} handleChangeNumberDecimals={handleChangeNumberDecimals}
+            <BotonesForm
+                form={form}
+                handleSave={handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hidePrint
             />
         </div>
     )
