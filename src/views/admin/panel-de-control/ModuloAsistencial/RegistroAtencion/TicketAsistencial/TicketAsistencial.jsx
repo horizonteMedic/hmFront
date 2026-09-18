@@ -12,13 +12,14 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket } from "./controllerTicketAsistencial";
+import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero } from "./controllerTicketAsistencial";
+import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
 
 const METODOS_PAGO = [
     { value: "CONTADO", label: "CONTADO" },
     { value: "CREDITO", label: "CREDITO" },
-    { value: "TARJETA_DEBITO", label: "TARJETA DEBITO" },
-    { value: "TARJETA_CREDITO", label: "TARJETA CREDITO" },
+    { value: "TARJETA DE DEBITO", label: "TARJETA DEBITO" },
+    { value: "TARJETA DE CREDITO", label: "TARJETA CREDITO" },
     { value: "TRANSFERENCIA", label: "TRANSFERENCIA" },
     { value: "YAPE/PLIN", label: "YAPE / PLIN" },
 ];
@@ -301,9 +302,13 @@ export default function TicketAsistencial() {
         documentoIdentidad: "",
         idDatos: null,
         dni: null,
+        fechaNacimiento: null,
         NHCL: "",
         nroTicket: "",
         codVendedor: "",
+
+        metodoPago: "",
+        autorizadoPor: "",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
@@ -363,6 +368,7 @@ export default function TicketAsistencial() {
             documentoIdentidad: item.numeroDocumento ?? "",
             nombres: `${item.apellidos ?? ""} ${item.nombres ?? ""}`.trim(),
             NHCL: item.numeroHistoriaClinica ? parseInt(item.numeroHistoriaClinica) : null,
+            fechaNacimiento: item.fechaNacimiento ?? null,
         }));
     };
 
@@ -375,6 +381,7 @@ export default function TicketAsistencial() {
             documentoIdentidad: "",
             nombres: "",
             NHCL: "",
+            fechaNacimiento: null,
         }));
     };
 
@@ -599,24 +606,71 @@ export default function TicketAsistencial() {
             return;
         }
 
-        setForm((f) => ({ ...f, nroTicket: creado.numeroTicket ?? f.nroTicket }));
+        const numeroTicketCreado = creado.numeroTicket ?? form.nroTicket;
+        setForm((f) => ({ ...f, nroTicket: numeroTicketCreado }));
+
         Swal.fire({
-            title: "Éxito",
+            title: "Ticket registrado",
             icon: "success",
             html: `
                 <p style="margin:0 0 10px;">Ticket registrado correctamente.</p>
                 <p style="margin:0; font-size:1.2em; font-weight:600;">N° de Ticket</p>
                 <p style="margin:0; font-size:1.8em; font-weight:800; color:#16a34a;">
-                    ${creado.numeroTicket ?? form.nroTicket ?? ""}
+                    ${numeroTicketCreado ?? ""}
                 </p>
             `,
+            showCancelButton: true,
+            confirmButtonText: "Sí, Imprimir",
+            cancelButtonText: "No",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                imprimirTicketVenta(numeroTicketCreado);
+            }
+        });
+    };
+
+    // Arma e imprime el ticket de venta de 80mm (Horizonte Medic). Los datos del ticket
+    // (médico, fecha, servicios, montos) se traen de GET /api/tickets/numero/{n} -el
+    // registro ya persistido-, no del formulario en pantalla; los datos del paciente
+    // (nombre/documento/edad) sí vienen del formulario, porque ese endpoint solo trae el
+    // pacienteId. Se usa tanto al confirmar impresión justo después de registrar, como
+    // desde el botón "Imprimir" para reimprimir un ticket ya registrado.
+    const imprimirTicketVenta = async (numeroTicket) => {
+        const numero = numeroTicket ?? form.nroTicket;
+        if (!numero) return;
+
+        const ticket = await ObtenerTicketPorNumero(numero, token);
+
+        if (!ticket) {
+            Swal.fire("Error", "No se pudo obtener el ticket para imprimir.", "error");
+            return;
+        }
+
+        TicketVenta({
+            tipoDocumento: form.tipoDocumento,
+            documentoIdentidad: form.documentoIdentidad,
+            nombres: form.nombres,
+            fechaNacimiento: form.fechaNacimiento,
+            medico: ticket.medico,
+            fecha: ticket.fechaTicket,
+            numeroTicket: ticket.numeroTicket,
+            items: (ticket.contenidos || []).map((c) => ({
+                descripcion: c.descripcion,
+                unidad: c.unidad,
+                cantidad: c.cantidad,
+                precio: c.precioUnitario,
+                total: c.precioTotal,
+                descuento: c.descuentoLinea,
+            })),
         });
     };
 
     const handleImprimirTicket = () => {
-        handlePrintDefault(() => {
-            window.print();
-        });
+        if (!form.nroTicket) {
+            Swal.fire("Error", "Debe registrar el ticket antes de imprimir.", "error");
+            return;
+        }
+        imprimirTicketVenta();
     };
 
     const handleImprimirFecha = () => {
