@@ -91,6 +91,8 @@ const AperturaExamenesPreOcup = (props) => {
     tmarihuana: false,
     tcocaina: false,
     pruebaEsfuerzo: false,
+    examenVigia: false,
+    examenSanidad: false,
 
     nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: ""
@@ -220,7 +222,7 @@ const AperturaExamenesPreOcup = (props) => {
     setSearchMedico(m.mensaje);
     setDatos(d => ({ ...d, n_medico: m.mensaje }));
     setFilteredMedicos([]);
-    document.getElementById('tipoPrueba')?.focus();
+    document.getElementById('cargoDe')?.focus();
   };
 
   // — Autocomplete Tipo de Prueba —
@@ -613,6 +615,10 @@ const AperturaExamenesPreOcup = (props) => {
       espaciosConfinados: false,
       tmarihuana: false,
       tcocaina: false,
+
+      pruebaEsfuerzo: false,
+      examenVigia: false,
+      examenSanidad: false,
 
       nombres: "",
       apellidos: "",
@@ -1310,53 +1316,6 @@ const AperturaExamenesPreOcup = (props) => {
               )}
             </div>
           </div>
-
-          {/* — Autocomplete Tipo de Prueba — */}
-          <div className="flex items-center space-x-2 mb-1">
-            <label htmlFor="tipoPrueba" className="block w-32">Tipo Prueba:</label>
-            <div className="relative flex-grow flex items-center">
-              <input autoComplete="off"
-                id="tipoPrueba"
-                name="tipoPrueba"
-                type="text"
-                value={searchPrueba}
-                placeholder="Escribe para buscar prueba..."
-                disabled={habilitar}
-                onChange={handlePruebaSearch}
-                className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-1/2 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (filteredPruebas.length > 0) {
-                      handleSelectPrueba(filteredPruebas[0]);
-                    }
-                    // Focus on cargo input after selection
-                    document.getElementById('cargoDe').focus();
-                  }
-                }}
-                onFocus={() => {
-                  if (searchPrueba) {
-                    setFilteredPruebas(
-                      PruebaMulti.filter(p =>
-                        p.mensaje.toLowerCase().includes(searchPrueba.toLowerCase())
-                      )
-                    );
-                  }
-                }}
-                onBlur={() => setTimeout(() => setFilteredPruebas([]), 100)}
-              />
-              <div className="flex items-center w-1/2 ml-2">
-                <label className="whitespace-nowrap mr-2 font-medium">Historia clínica:</label>
-                <input
-                  type="text"
-                  value={datos.n_orden || ""}
-                  disabled
-                  className="border border-gray-300 px-3 py-4 mb-1 rounded-md focus:outline-none w-full font-bold bg-slate-100 h-14 text-3xl"
-                  placeholder="N° Orden"
-                />
-              </div>
-            </div>
-          </div>
           {/* — Autocomplete Protocolo — */}
           <div className="flex items-center space-x-2 mb-1">
             <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
@@ -1382,6 +1341,16 @@ const AperturaExamenesPreOcup = (props) => {
                 </ul>
               )}
             </div>
+          </div>
+          <div className="flex items-center space-x-2 mt-2 mb-1">
+            <label className="block w-32 font-bold ">Historia clínica:</label>
+            <input
+              type="text"
+              value={datos.n_orden || ""}
+              disabled
+              className="border border-gray-300 px-3 py-4 mb-1 rounded-md focus:outline-none w-full font-bold bg-slate-100 h-14 text-3xl"
+              placeholder="N° Orden"
+            />
           </div>
 
           <div className="mb-1 mt-5">
@@ -1566,6 +1535,15 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center mr-4 mb-2 ">
                 <input type="checkbox" title='P. DE ESFUERZO' disabled={habilitar} checked={datos.pruebaEsfuerzo} onChange={handleCheack} id="examenAdicional19" name="pruebaEsfuerzo" className="mr-2" />
                 <label className='font-bold text-lg' htmlFor="examenAdicional19" title='P. DE ESFUERZO'>P. DE ESFUERZO</label>
+              </div>
+
+              <div className="flex items-center mr-4 mb-2 ">
+                <input type="checkbox" title='EXAMEN VIGIA' disabled={habilitar} checked={datos.examenVigia} onChange={handleCheack} id="examenAdicional20" name="examenVigia" className="mr-2" />
+                <label className='font-bold text-lg' htmlFor="examenAdicional20" title='EXAMEN VIGIA'>EXAMEN VIGIA</label>
+              </div>
+              <div className="flex items-center mr-4 mb-2 ">
+                <input type="checkbox" title='EXAMEN SANIDAD' disabled={habilitar} checked={datos.examenSanidad} onChange={handleCheack} id="examenAdicional21" name="examenSanidad" className="mr-2" />
+                <label className='font-bold text-lg' htmlFor="examenAdicional21" title='EXAMEN SANIDAD'>EXAMEN SANIDAD</label>
               </div>
 
             </div>
