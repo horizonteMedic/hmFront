@@ -4,6 +4,14 @@ import { jsPDF } from "jspdf";
 const LOGO_URL = "/img/logo-color_nuevocreado.png";
 const LOGO_RATIO = 3517 / 1260;
 
+// Datos de la empresa/sede para el encabezado del ticket (mismos datos que footerTR.jsx
+// usa para la sede Huamachuco en los demás reportes impresos).
+const RAZON_SOCIAL = "CORPORACIÓN PERUANA DE CENTROS MÉDICOS S.A.C.";
+const RUC = "20477167561";
+const DIRECCION_SEDE = "Jr. Leoncio Prado N°786 - Huamachuco";
+const CONTACTO_SEDE = "Telf: 044-348070 · Cel: 990094744-969603777";
+const WEB_SEDE = "www.horizontemedic.com";
+
 function calcularEdad(fechaNacimiento) {
     if (!fechaNacimiento) return "";
     const fecha = new Date(fechaNacimiento);
@@ -81,6 +89,7 @@ export default async function TicketVenta({
         return medidor.splitTextToSize(String(texto ?? ""), anchoDisponible);
     };
 
+    const razonSocialLineas = medir(8, RAZON_SOCIAL, ancho - margenLateral * 2);
     const nombreLineas = medir(9, nombres, ancho - margenLateral * 2 - 24);
     const medicoLineas = medir(9, medico || "-", ancho - anchoValor - margenLateral);
     const itemsMedidos = items.map((item) => ({
@@ -95,7 +104,12 @@ export default async function TicketVenta({
     const gapLogo = 6; // más espacio entre el logo y el contenido de abajo
 
     let altoDoc = margenSuperior; // y inicial
-    altoDoc += logoAlto + gapLogo; // logo
+    altoDoc += logoAlto + 2; // logo
+    altoDoc += razonSocialLineas.length * 3.4 + 1; // razón social
+    altoDoc += 3.4; // RUC
+    altoDoc += 3.2; // dirección
+    altoDoc += 3.2; // teléfono/celular
+    altoDoc += 3.2 + gapLogo; // web + espacio antes de los datos del paciente
     altoDoc += Math.max(nombreLineas.length * 4.2, 5) + 2; // paciente
     altoDoc += 6; // documento
     altoDoc += 6; // edad
@@ -106,8 +120,9 @@ export default async function TicketVenta({
     altoDoc += 9; // número grande
     altoDoc += 6; // separador
     altoDoc += 6; // encabezado servicios + línea
-    itemsMedidos.forEach(({ lineasNombre }) => {
-        altoDoc += lineasNombre.length * 3.8 + 1 + 5;
+    itemsMedidos.forEach(({ item, lineasNombre }) => {
+        const tieneDescuento = (Number(item.descuento) || 0) > 0;
+        altoDoc += lineasNombre.length * 3.8 + 1 + (tieneDescuento ? 3.6 + 3.6 + 5 : 5);
     });
     altoDoc += 6; // separador
     altoDoc += 10; // total general
@@ -126,10 +141,30 @@ export default async function TicketVenta({
     // ── Logo (siempre Horizonte Medic, nunca el de una campaña) ───────────────
     try {
         doc.addImage(LOGO_URL, "PNG", (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
-        y += logoAlto + gapLogo;
+        y += logoAlto + 2;
     } catch {
-        y += gapLogo;
+        y += 2;
     }
+
+    // ── Datos de la empresa / sede (razón social, RUC, dirección, contacto) ───
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.text(razonSocialLineas, ancho / 2, y, { align: "center" });
+    y += razonSocialLineas.length * 3.4 + 1;
+
+    doc.text(`RUC: ${RUC}`, ancho / 2, y, { align: "center" });
+    y += 3.4;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(DIRECCION_SEDE, ancho / 2, y, { align: "center" });
+    y += 3.2;
+
+    doc.text(CONTACTO_SEDE, ancho / 2, y, { align: "center" });
+    y += 3.2;
+
+    doc.text(WEB_SEDE, ancho / 2, y, { align: "center" });
+    y += gapLogo;
 
     // ── Paciente ────────────────────────────────────────────────────────────────
     doc.setFont("helvetica", "bold");
@@ -202,7 +237,10 @@ export default async function TicketVenta({
     itemsMedidos.forEach(({ item, lineasNombre }) => {
         const cantidad = Number(item.cantidad) || 0;
         const precioUnitario = Number(item.precio) || 0;
+        const descuentoPct = Number(item.descuento) || 0;
+        const subtotal = precioUnitario * cantidad;
         const total = Number(item.total) || 0;
+        const montoDescuento = Math.max(subtotal - total, 0);
         totalGeneral += total;
 
         doc.setFont("helvetica", "normal");
@@ -211,9 +249,26 @@ export default async function TicketVenta({
         y += lineasNombre.length * 3.8 + 1;
 
         doc.text(`${cantidad} x S/ ${precioUnitario.toFixed(2)}`, margenLateral, y);
-        doc.setFont("helvetica", "bold");
-        doc.text(`S/ ${total.toFixed(2)}`, ancho - margenLateral, y, { align: "right" });
-        y += 5;
+
+        if (descuentoPct > 0) {
+            // Muestra el subtotal sin descuento, cuánto se descontó, y el valor final
+            // (con descuento) ya aplicado.
+            doc.text(`S/ ${subtotal.toFixed(2)}`, ancho - margenLateral, y, { align: "right" });
+            y += 3.6;
+
+            doc.setFont("helvetica", "italic");
+            doc.text(`Dscto ${descuentoPct}%`, margenLateral, y);
+            doc.text(`-S/ ${montoDescuento.toFixed(2)}`, ancho - margenLateral, y, { align: "right" });
+            y += 3.6;
+
+            doc.setFont("helvetica", "bold");
+            doc.text(`S/ ${total.toFixed(2)}`, ancho - margenLateral, y, { align: "right" });
+            y += 5;
+        } else {
+            doc.setFont("helvetica", "bold");
+            doc.text(`S/ ${total.toFixed(2)}`, ancho - margenLateral, y, { align: "right" });
+            y += 5;
+        }
     });
 
     // ── Línea separadora ──────────────────────────────────────────────────────
