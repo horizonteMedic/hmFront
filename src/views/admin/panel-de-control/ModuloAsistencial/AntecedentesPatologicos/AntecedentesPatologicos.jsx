@@ -153,6 +153,8 @@ export default function AntecedentesPatologicos() {
         // 1. Antecedentes Patológicos Personales
         ...Object.fromEntries(ENFERMEDADES.map(([name]) => [name, false])),
         otrasPatologias: "",
+        reaccionAdversaMedicamentos: false,
+        reaccionAdversaMedicamentosEspecificar: "",
 
         // 2. Antecedentes Inmunológicos / Vacunas
         ...Object.fromEntries([...VACUNAS_COL1, ...VACUNAS_COL2].map(([name]) => [name, false])),
@@ -296,6 +298,24 @@ export default function AntecedentesPatologicos() {
                             ))}
                         </div>
                     ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                    <InputCheckbox
+                        label="Reacción adversa a medicamentos"
+                        name="reaccionAdversaMedicamentos"
+                        checked={form.reaccionAdversaMedicamentos}
+                        onChange={handleCheckBoxChange}
+                    />
+                    <div className="flex-1 min-w-[250px]">
+                        <InputTextOneLine
+                            label="Especificar"
+                            name="reaccionAdversaMedicamentosEspecificar"
+                            value={form.reaccionAdversaMedicamentosEspecificar}
+                            onChange={handleChange}
+                            disabled={!form.reaccionAdversaMedicamentos}
+                            labelWidth="90px"
+                        />
+                    </div>
                 </div>
                 <InputTextOneLine
                     label="Otras Patologías"
