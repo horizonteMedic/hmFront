@@ -111,12 +111,13 @@ export default async function ReporteExamen1(datos) {
         { label: "RX COLUMNA\nLUMBAR F y L ", w: 28, hide: !datos.alba ? true : datos.rxc_lumba ? true : false },
         { label: "RX COLUMNA\nLUMBOSACRA F y L", w: 28, hide: !datos.albo ? true : datos.rxc_lumbo ? true : false },
         { label: "METALES PESADOS", w: 28, hide: !datos.aplomo || !datos.amercurio ? true : !datos.plomos || !datos.mercurioo ? true : false },
-        { label: "EXAMEN VIGIA", w: 28, hide: !datos.examenVigia ? true : false },
+        { label: "EXAMEN VIGIA", w: 23, hide: !datos.examenVigia ? true : false },
     ];
     const exAdd2 = [
         { label: "ESPACIOS\nCONFINADOS", w: 28, hide: !datos.espaciosConfinados ? true : false },
-        { label: "TEST\nCOCAINA", w: 28, hide: !datos.cocaina ? true : false },
-        { label: "TEST\nMARIHUANA", w: 28, hide: !datos.marihuana ? true : false },
+        { label: "FIRST TEST", w: 22, hide: !datos.altaft ? true : datos.fisttest ? true : false },
+        { label: "TEST\nCOCAINA", w: 22, hide: !datos.cocaina ? true : false },
+        { label: "TEST\nMARIHUANA", w: 22, hide: !datos.marihuana ? true : false },
         { label: "PLOMO EN SANGRE", w: 28, hide: !datos.aplomo ? true : datos.plomos ? true : false },
         { label: "MERCURIO EN ORINA", w: 28, hide: !datos.amercurio ? true : datos.mercurioo ? true : false },
         { label: "EXAMEN SANIDAD", w: 28, hide: !datos.examenSanidad ? true : false },
@@ -132,13 +133,15 @@ export default async function ReporteExamen1(datos) {
     // Exámenes adicionales: solo aparece si hay al menos uno visible
     const hasAdditional = [...exAdd1, ...exAdd2].some(b => !b.hide);
     if (hasAdditional) {
-        currentY += 2;
-        doc.setFontSize(8);
+        currentY += 3.8;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
         doc.text("EXAMENES ADICIONALES:", pageW / 2, currentY, { align: "center" });
+        doc.setFont("helvetica", "normal");
         currentY += 5;
-        doc.setFontSize(6);
-        if (drawPackedRow(exAdd1, currentY, 8)) currentY += 11;
-        if (drawPackedRow(exAdd2, currentY, 8)) currentY += 11;
+        doc.setFontSize(6.5);
+        if (drawPackedRow(exAdd1, currentY, 9)) currentY += 12;
+        if (drawPackedRow(exAdd2, currentY, 9)) currentY += 12;
     }
 
     doc.setFontSize(8);
