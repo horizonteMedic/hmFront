@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import { faBroom, faCalendarDay, faPlus, faPrint, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faCalendarDay, faCircleExclamation, faPlus, faPrint, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
@@ -11,6 +11,7 @@ import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
+import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero } from "./controllerTicketAsistencial";
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
@@ -345,6 +346,9 @@ export default function TicketAsistencial() {
 
     const [errors, setErrors] = useState({});
 
+    // Error inline del input "N° Ticket" de la sección IMPRIMIR (reimpresión manual).
+    const [errorImprimirTicket, setErrorImprimirTicket] = useState("");
+
     // Paciente elegido en el buscador de "Sin DNI" (bloquea el input tras seleccionarlo)
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
@@ -353,6 +357,7 @@ export default function TicketAsistencial() {
     const handleTipoDocumentoChange = (e, value) => {
         setPacienteSeleccionado(null);
         setErrors({});
+        setErrorImprimirTicket("");
         setForm({ ...initialFormState, tipoDocumento: value });
     };
 
@@ -560,6 +565,7 @@ export default function TicketAsistencial() {
 
     const handleClearForm = () => {
         setErrors({});
+        setErrorImprimirTicket("");
         setPacienteSeleccionado(null);
         handleClear();
     };
@@ -599,7 +605,11 @@ export default function TicketAsistencial() {
             })),
         };
 
+        LoadingDefault("Registrando Ticket");
+
         const creado = await RegistrarTicket(body, token, userlogued);
+
+        Swal.close();
 
         if (!creado) {
             Swal.fire("Error", "No se pudo registrar el ticket", "error");
@@ -607,6 +617,7 @@ export default function TicketAsistencial() {
         }
 
         const numeroTicketCreado = creado.numeroTicket ?? form.nroTicket;
+        setErrorImprimirTicket("");
         setForm((f) => ({ ...f, nroTicket: numeroTicketCreado }));
 
         Swal.fire({
@@ -629,28 +640,28 @@ export default function TicketAsistencial() {
         });
     };
 
-    // Arma e imprime el ticket de venta de 80mm (Horizonte Medic). Los datos del ticket
-    // (médico, fecha, servicios, montos) se traen de GET /api/tickets/numero/{n} -el
-    // registro ya persistido-, no del formulario en pantalla; los datos del paciente
-    // (nombre/documento/edad) sí vienen del formulario, porque ese endpoint solo trae el
-    // pacienteId. Se usa tanto al confirmar impresión justo después de registrar, como
-    // desde el botón "Imprimir" para reimprimir un ticket ya registrado.
+    // Arma e imprime el ticket de venta de 80mm (Horizonte Medic). Todos los datos -incluidos
+    // los del paciente (nombre/documento/edad)- se traen de GET /api/tickets/numero/{n}, el
+    // registro ya persistido; nunca del formulario en pantalla, porque al reimprimir un ticket
+    // anterior desde el input de "Imprimir" el formulario puede estar vacío o tener cargado
+    // otro paciente distinto. Se usa tanto al confirmar impresión justo después de registrar,
+    // como desde el botón "Imprimir" para reimprimir un ticket ya registrado.
     const imprimirTicketVenta = async (numeroTicket) => {
         const numero = numeroTicket ?? form.nroTicket;
-        if (!numero) return;
+        if (!numero) return false;
 
         const ticket = await ObtenerTicketPorNumero(numero, token);
 
         if (!ticket) {
-            Swal.fire("Error", "No se pudo obtener el ticket para imprimir.", "error");
-            return;
+            Swal.fire("Error", `No existe un ticket registrado con el N° ${numero}.`, "error");
+            return false;
         }
 
         TicketVenta({
-            tipoDocumento: form.tipoDocumento,
-            documentoIdentidad: form.documentoIdentidad,
-            nombres: form.nombres,
-            fechaNacimiento: form.fechaNacimiento,
+            tipoDocumento: "DNI",
+            documentoIdentidad: ticket.pacienteDni,
+            nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
+            edad: ticket.pacienteEdad,
             medico: ticket.medico,
             fecha: ticket.fechaTicket,
             numeroTicket: ticket.numeroTicket,
@@ -663,14 +674,20 @@ export default function TicketAsistencial() {
                 descuento: c.descuentoLinea,
             })),
         });
+        return true;
     };
 
-    const handleImprimirTicket = () => {
-        if (!form.nroTicket) {
-            Swal.fire("Error", "Debe registrar el ticket antes de imprimir.", "error");
+    const handleImprimirTicket = async () => {
+        const numero = String(form.nroTicket ?? "").trim();
+        if (!numero) {
+            setErrorImprimirTicket("Debe ingresar un N° de Ticket.");
             return;
         }
-        imprimirTicketVenta();
+        setErrorImprimirTicket("");
+        const ok = await imprimirTicketVenta(numero);
+        if (!ok) {
+            setErrorImprimirTicket(`El N° de Ticket "${numero}" no existe.`);
+        }
     };
 
     const handleImprimirFecha = () => {
@@ -980,13 +997,34 @@ export default function TicketAsistencial() {
                 handleClear={handleClearForm}
                 hideEdit
                 printSlot={
-                    <button
-                        type="button"
-                        onClick={handleImprimirTicket}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
-                    >
-                        <FontAwesomeIcon icon={faPrint} /> Imprimir
-                    </button>
+                    <div className="flex flex-col items-end">
+                        <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                        <div className="flex items-center gap-2">
+                            <input
+                                name="nroTicket"
+                                value={form.nroTicket}
+                                onChange={(e) => {
+                                    setErrorImprimirTicket("");
+                                    handleChangeNumberDecimals(e);
+                                }}
+                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket()}
+                                className={`border rounded px-2 py-1 text-base w-24 ${errorImprimirTicket ? "border-red-500 bg-red-50" : ""}`}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleImprimirTicket}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
+                            >
+                                <FontAwesomeIcon icon={faPrint} />
+                            </button>
+                        </div>
+                        {errorImprimirTicket && (
+                            <p className="flex items-center gap-1.5 mt-1 text-sm text-red-600">
+                                <FontAwesomeIcon icon={faCircleExclamation} className="shrink-0" />
+                                <span>{errorImprimirTicket}</span>
+                            </p>
+                        )}
+                    </div>
                 }
             >
                 <button

@@ -12,17 +12,6 @@ const DIRECCION_SEDE = "Jr. Leoncio Prado N°786 - Huamachuco";
 const CONTACTO_SEDE = "Telf: 044-348070 · Cel: 990094744-969603777";
 const WEB_SEDE = "www.horizontemedic.com";
 
-function calcularEdad(fechaNacimiento) {
-    if (!fechaNacimiento) return "";
-    const fecha = new Date(fechaNacimiento);
-    if (isNaN(fecha)) return "";
-    const hoy = new Date();
-    let edad = hoy.getFullYear() - fecha.getFullYear();
-    const cumple = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
-    if (hoy < cumple) edad--;
-    return String(edad);
-}
-
 function formatearFecha(fechaIso) {
     if (!fechaIso) {
         return new Date().toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -61,7 +50,7 @@ export default async function TicketVenta({
     tipoDocumento = "DNI",
     documentoIdentidad = "",
     nombres = "",
-    fechaNacimiento = null,
+    edad = null,
     medico = "",
     fecha = "",
     numeroTicket = "",
@@ -74,7 +63,6 @@ export default async function TicketVenta({
     const margenSuperior = 1.5;
     const margenInferior = 3;
     const anchoValor = margenLateral + 24; // columna donde arrancan todos los valores (Paciente/Documento/Edad/Médico)
-    const edad = calcularEdad(fechaNacimiento);
 
     const tipoDocLabel =
         tipoDocumento === "PASAPORTE" ? "Pasaporte" : tipoDocumento === "SIN DNI" ? "Documento" : "DNI";
@@ -187,7 +175,7 @@ export default async function TicketVenta({
     doc.setFontSize(9);
     doc.text("Edad:", margenLateral, y);
     doc.setFont("helvetica", "normal");
-    doc.text(edad ? `${edad} años` : "-", anchoValor, y);
+    doc.text(edad !== null && edad !== undefined && edad !== "" ? `${edad} años` : "-", anchoValor, y);
     y += 6;
 
     // ── Médico (el valor arranca en la misma columna que las filas de arriba) ─
