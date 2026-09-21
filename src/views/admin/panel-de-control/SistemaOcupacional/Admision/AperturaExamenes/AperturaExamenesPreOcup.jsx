@@ -1799,14 +1799,14 @@ const AperturaExamenesPreOcup = (props) => {
                 />
               </div>
               <div className="flex flex-col text-lg ">
-                <div className='flex flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0'>
+                <div className='flex flex-col justify-end sm:flex-row sm:space-x-6 mt-2 sm:mt-0'>
                   <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">{CanP.Completos}</span></span>
                   <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-red-600">{CanP.Faltantes}</span></span>
                 </div>
                 <div className='flex items-center justify-end mt-2'>
                   <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes</button>
                   <button onClick={() => setModalReportePacientes2(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes 2</button>
-                  <button onClick={() => setModalContabilidad(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Dina</button>
+                  <button onClick={() => setModalContabilidad(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte Contabilidad</button>
 
                 </div>
               </div>
