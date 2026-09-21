@@ -672,17 +672,33 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   yPos += alturaFilaMotivo;
 
-  // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
+  // Fila "EVALUACIÓN DE ESPECIALISTA" (fila gris, más alta para el texto 12pt)
+  const filaAlturaEspecialidad = 8;
   doc.setFillColor(196, 196, 196);
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAlturaEspecialidad, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaEspecialidad);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaEspecialidad);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + filaAlturaEspecialidad, tablaInicioX + tablaAncho, yPos + filaAlturaEspecialidad);
+
+  // Centrar manualmente: label en negro (8pt) + especialidad en negro (12pt)
+  const yTextoEspecialidad = yPos + filaAlturaEspecialidad / 2 + 1.5; // centrado vertical
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  const labelEval = "EVALUACIÓN DE ESPECIALISTA:    ";
+  const labelEvalWidth = doc.getTextWidth(labelEval);
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  const especialidadWidth = doc.getTextWidth(datosFinales.especialidad);
+  const totalEvalWidth = labelEvalWidth + especialidadWidth;
+  const startXEval = tablaInicioX + tablaAncho / 2 - totalEvalWidth / 2;
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(`EVALUACIÓN DE ESPECIALISTA: ${datosFinales.especialidad} `, tablaInicioX + tablaAncho / 2, yPos + 3, { align: "center" });
-  yPos += filaAltura;
+  doc.setTextColor(0, 0, 0);
+  doc.text(labelEval, startXEval, yTextoEspecialidad);
+
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(datosFinales.especialidad, startXEval + labelEvalWidth, yTextoEspecialidad);
+  yPos += filaAlturaEspecialidad;
 
   // Fila "Fecha atención" (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
