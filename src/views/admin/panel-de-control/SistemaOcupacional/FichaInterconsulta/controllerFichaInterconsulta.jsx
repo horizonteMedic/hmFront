@@ -155,19 +155,22 @@ export const GetInfoEspecialidad = async (
     );
     if (res) {
         console.log(res)
-        set((prev) => ({
-            ...prev,
-            ...res,
-            // Header
-            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente}`,
-            dniUser: prev.dniUser,
-            fechaExamen: prev.fechaExamen,
-            motivo: prev.motivo
-
-        }));
+        set((prev) => {
+            const sexoTexto = res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO";
+            const sexoVM = res.sexoPaciente === "F" ? "MUJER" : "VARÓN";
+            return {
+                ...prev,
+                ...res,
+                // Header
+                nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
+                sexo: sexoTexto,
+                PA: `${res.sistolica}/${res.diastolica}`,
+                edadPaciente: `${res.edadPaciente}`,
+                dniUser: prev.dniUser,
+                fechaExamen: prev.fechaExamen,
+                motivo: `PACIENTE ${sexoVM} DE ${res.edadPaciente} AÑOS DE EDAD: \n${prev.motivo}`
+            };
+        });
     }
 };
 //para ver uno ya registrado

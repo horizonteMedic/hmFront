@@ -196,6 +196,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
 
   // --- Búsqueda de paciente -------------------------
   const handleSearch = e => {
+    console.log(selectedSede)
     e.preventDefault();
     if (!form.nrodoc) return Swal.fire('Error', 'Coloque el DNI', 'error');
     resetFormNoDNI();

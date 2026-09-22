@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSessionData } from "../../hooks/useSessionData";
 import RevertButton from "./RevertButton";
 
@@ -13,9 +15,12 @@ export default function EmpleadoComboBox({
     idField = "user_medicoFirma",
     truelabel = true,
     edited = false,
-    onRevert
+    onRevert,
+    required = false,
+    error = "",
 }) {
     const showRevert = edited && typeof onRevert === "function";
+    const hasError = Boolean(error);
     const { listaEmpleados: empleados } = useSessionData();
     const safeEmpleados = empleados || [];
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
@@ -150,7 +155,10 @@ export default function EmpleadoComboBox({
             {(truelabel || showRevert) && (
                 <div className="flex items-center justify-between mb-1">
                     {truelabel ? (
-                        <label className="block font-semibold">{label} :</label>
+                        <label className="block font-semibold">
+                            {label}
+                            {required && <span className="text-red-500 ml-0.5">*</span>} :
+                        </label>
                     ) : (
                         <span />
                     )}
@@ -166,7 +174,9 @@ export default function EmpleadoComboBox({
                     autoComplete="off"
                     value={inputValue}
                     onChange={handleSearch}
-                    className={`border rounded px-2 py-1 w-full  ${isLoading ? 'pr-8' : ''} ${disabled ? 'bg-gray-300' : ''} ${edited ? 'border-orange-600 bg-orange-100' : ''}`}
+                    aria-invalid={hasError}
+                    aria-describedby={hasError ? `${nameField}-error` : undefined}
+                    className={`border rounded px-2 py-1 w-full  ${isLoading ? 'pr-8' : ''} ${disabled ? 'bg-gray-300' : ''} ${hasError ? 'border-red-500 bg-red-50' : edited ? 'border-orange-600 bg-orange-100' : ''}`}
                     onKeyDown={(e) => {
                         if (e.key === "Enter" && filteredEmpleados.length > 0) {
                             e.preventDefault();
@@ -201,6 +211,15 @@ export default function EmpleadoComboBox({
                     </ul>
                 )}
             </div>
+            {hasError && (
+                <p
+                    id={`${nameField}-error`}
+                    className="flex items-center gap-1.5 mt-1 text-sm text-red-600 animate-field-error"
+                >
+                    <FontAwesomeIcon icon={faCircleExclamation} className="shrink-0" />
+                    <span>{error}</span>
+                </p>
+            )}
         </div>
     );
 }

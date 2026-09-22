@@ -15,6 +15,8 @@ export default function BotonesForm({
     hideClear = false,
     hideEdit = false,
     hidePrint = false,
+    printSlot = null,
+    children,
 }) {
     return (
         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
@@ -66,9 +68,11 @@ export default function BotonesForm({
                         <FontAwesomeIcon icon={faBroom} /> Limpiar
                     </button>
                 )}
+
+                {children}
             </div>
 
-            {!hidePrint && (
+            {printSlot ? printSlot : (!hidePrint && (
                 <div className="flex flex-col items-end">
                     <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
                     <div className="flex items-center gap-2">
@@ -95,7 +99,7 @@ export default function BotonesForm({
                         </button>
                     </div>
                 </div>
-            )}
+            ))}
         </section>
     );
 }

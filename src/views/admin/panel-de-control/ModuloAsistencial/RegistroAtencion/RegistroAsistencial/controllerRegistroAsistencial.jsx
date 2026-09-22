@@ -79,7 +79,20 @@ export const SubmitDataService = async (form, token, limpiar = () => { }, userlo
     return;
   }
 
-  Swal.fire("Éxito", "Datos registrados correctamente", "success");
+  const nhcl = res.resultado.numeroHistoriaClinica ?? form.NHCL ?? "";
+  Swal.fire({
+    title: "Éxito",
+    icon: "success",
+    html: `
+      <p style="margin:0 0 10px;">Datos registrados correctamente.</p>
+      <p style="margin:0; font-size:1.2em; font-weight:600;">
+        Su número de Historia Clínica es 
+      </p>
+      <p style="margin:0 0 10px; font-size:1.8em; font-weight:800; color:#16a34a;">
+        ${nhcl}
+      </p>
+    `,
+  });
   limpiar();
 };
 
@@ -93,6 +106,11 @@ const toSexoOption = (sexo) => {
 };
 
 // Vuelca en el form los datos de un paciente ya registrado localmente (schema "paciente").
+// Nota sobre auditoría: a diferencia de los formularios ocupacionales (obtenerReporte),
+// no está confirmado con el backend bajo qué nombre viaja la auditoría de "paciente"
+// (se probó con las variantes más usadas en el resto del sistema). Si el backend usa
+// otras claves, basta con ajustarlas aquí: AuditoriaRegistro ya maneja con gracia los
+// valores vacíos (muestra "—"), así que esto no rompe nada si no calzan.
 const setFormFromPaciente = (setForm, data) => {
   setForm((prev) => ({
     ...prev,
@@ -113,6 +131,12 @@ const setFormFromPaciente = (setForm, data) => {
     nivelEstudios: data.nivelEstudios ?? "",
     lugarNacimiento: data.lugarNacimiento ?? "",
     ocupacion: data.ocupacion ?? "",
+
+    tieneRegistro: true,
+    userRegistro: data.userRegistro ?? data.usuarioRegistro ?? "",
+    fechaRegistro: data.fechaRegistro ?? data.fechaCreacion ?? "",
+    usuarioActualizacion: data.usuarioActualizacion ?? "",
+    fechaActualizacion: data.fechaActualizacion ?? data.fechaModificacion ?? "",
   }));
 };
 
@@ -184,6 +208,12 @@ export const BuscarPorDni = async (dni, token, setForm) => {
     nivelEstudios: "",
     lugarNacimiento: "",
     ocupacion: "",
+
+    tieneRegistro: false,
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   }));
 
   Swal.fire(

@@ -9,6 +9,7 @@ const CrearMedicamentoModal = ({ setShowModal, Refresgpag, token }) => {
   const [creating, setCreating] = useState(false);
 
   const [nombre, setNombre] = useState('');
+  const [uso, setUso] = useState('');
   const [presentacion, setPresentacion] = useState('');
   const [laboratorio, setLaboratorio] = useState('');
   const [marca, setMarca] = useState('');
@@ -50,7 +51,7 @@ const CrearMedicamentoModal = ({ setShowModal, Refresgpag, token }) => {
     }
 
     setCreating(true);
-    crearMedicamento(nombre, presentacion, laboratorio, marca, unidadMedida, parseInt(stockMinimo), token)
+    crearMedicamento(nombre, presentacion, uso, laboratorio, marca, unidadMedida, parseInt(stockMinimo), token)
       .then(() => {
         AlertSucces();
       })
@@ -85,6 +86,7 @@ const CrearMedicamentoModal = ({ setShowModal, Refresgpag, token }) => {
           <form className="space-y-4">
             <FloatingInput id="c-nombre" label="Nombre" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
             <FloatingAutocomplete id="c-presentacion" label="Presentación" required value={presentacion} onChange={(e) => setPresentacion(e.target.value)} groupedOptions={PRESENTACIONES_OPTIONS} />
+            <FloatingInput id="c-uso" label="Uso" value={uso} onChange={(e) => setUso(e.target.value)} />
             <FloatingInput id="c-laboratorio" label="Laboratorio" value={laboratorio} onChange={(e) => setLaboratorio(e.target.value)} />
             <FloatingInput id="c-marca" label="Marca" value={marca} onChange={(e) => setMarca(e.target.value)} />
             <FloatingInput id="c-unidadMedida" label="Unidad de Medida" value={unidadMedida} onChange={(e) => setUnidadMedida(e.target.value)} />

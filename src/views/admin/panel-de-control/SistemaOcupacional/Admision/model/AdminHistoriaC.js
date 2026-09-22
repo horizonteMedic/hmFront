@@ -70,6 +70,8 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     tcocaina: data.tcocaina,
     pruebaEsfuerzo: data.pruebaEsfuerzo,
     espaciosConfinados: data.espaciosConfinados,
+    examenVigia: data.examenVigia,
+    examenSanidad: data.examenSanidad,
     user_registro: data.user_registro,
     idPreNorden: data.idPreNorden ? data.idPreNorden : null,
   };
