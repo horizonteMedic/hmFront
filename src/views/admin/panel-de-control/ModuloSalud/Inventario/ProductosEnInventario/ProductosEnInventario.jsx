@@ -214,6 +214,7 @@ export default function ProductosEnInventario() {
                   <tr className="border-b border-gray-200">
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">N°</th>
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Uso</th>
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Presentación</th>
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock Mínimo</th>
                     <th className="px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">Stock</th>
@@ -232,6 +233,7 @@ export default function ProductosEnInventario() {
                       >
                         <td className="px-3 py-3 text-gray-500">{(currentPage - 1) * recordsPerPage + index + 1}</td>
                         <td className="px-3 py-3 font-semibold text-gray-800">{item.nombre}</td>
+                        <td className="px-3 py-3 text-gray-700">{item.uso}</td>
                         <td className="px-3 py-3 text-gray-700">{item.presentacion}</td>
                         <td className="px-3 py-3 text-gray-700">{item.stockMinimo}</td>
                         <td className="px-3 py-3 font-semibold cursor-default" onClick={(e) => e.stopPropagation()}>

@@ -22,9 +22,10 @@ export function getMedicamentoDetalle(id, token) {
   return fetch(url, options).then(res => res.json()).then(response => response)
 }
 
-export function crearMedicamento(nombre, presentacion, laboratorio, marca, unidadMedida, stockMinimo, token) {
+export function crearMedicamento(nombre, presentacion, uso, laboratorio, marca, unidadMedida, stockMinimo, token) {
   const data = {
     nombre: nombre,
+    uso: uso,
     presentacion: presentacion,
     laboratorio: laboratorio,
     marca: marca,
