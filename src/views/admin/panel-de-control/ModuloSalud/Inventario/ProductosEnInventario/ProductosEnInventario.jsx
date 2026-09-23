@@ -5,9 +5,10 @@ import { getMedicamentos } from './model/ProductosEnInventario';
 import CrearMedicamentoModal from './CrearMedicamentoModal/CrearMedicamentoModal';
 import DetalleMedicamentoModal from './DetalleMedicamentoModal/DetalleMedicamentoModal';
 import IngresoStockModal from './IngresoStockModal/IngresoStockModal';
+import CargaMasivaMedicamentos from './CargaMasivaMedicamentos/CargaMasivaMedicamentos';
 import { FloatingInput, FloatingSelect } from './components/FloatingField';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faPlus, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 
 const normalizeText = (text) => {
   return (text ?? '')
@@ -78,6 +79,7 @@ export default function ProductosEnInventario() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetalleModal, setShowDetalleModal] = useState(false);
   const [showIngresoModal, setShowIngresoModal] = useState(false);
+  const [showCargaMasivaModal, setShowCargaMasivaModal] = useState(false);
   const [selectedMedicamento, setSelectedMedicamento] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
@@ -173,6 +175,13 @@ export default function ProductosEnInventario() {
                   <option value={100}>100</option>
                 </select>
               </div>
+              <button
+                onClick={() => setShowCargaMasivaModal(true)}
+                className="verde-btn font-semibold py-2 px-4 rounded-lg flex items-center gap-2 text-sm"
+              >
+                <FontAwesomeIcon icon={faFileExcel} />
+                Carga Masiva
+              </button>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="azul-btn font-semibold py-2 px-4 rounded-lg flex items-center gap-2 text-sm"
@@ -316,6 +325,7 @@ export default function ProductosEnInventario() {
       {showCreateModal && <CrearMedicamentoModal setShowModal={setShowCreateModal} Refresgpag={Refresgpag} token={token} />}
       {showDetalleModal && <DetalleMedicamentoModal closeModal={() => setShowDetalleModal(false)} id={selectedId} token={token} Refresgpag={Refresgpag} />}
       {showIngresoModal && <IngresoStockModal closeModal={() => setShowIngresoModal(false)} Refresgpag={Refresgpag} token={token} medicamento={selectedMedicamento} usuarioRegistro={userlogued?.sub} />}
+      {showCargaMasivaModal && <CargaMasivaMedicamentos onClose={() => setShowCargaMasivaModal(false)} Refresgpag={Refresgpag} token={token} />}
     </div>
   );
 }

@@ -643,7 +643,7 @@ const toggleAllImprimir = () => {
     });
 };
 
-const handleGenerarFolio = async (comprimidoz = false, urlType = "azure") => {
+const handleGenerarFolio = async (comprimidoz = false, urlType = "azure", sinCompresion = false) => {
     // Cancelar petición anterior si existe
     if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -717,7 +717,9 @@ const handleGenerarFolio = async (comprimidoz = false, urlType = "azure") => {
             comprimidoz,
             urlType,
             form.fechaPersonalizada,
-            form.diasVencimientoPersonalizado
+            form.diasVencimientoPersonalizado,
+            false,
+            sinCompresion
         );
 
         const normalizeKey = (value) =>
@@ -1347,6 +1349,7 @@ return (
                     >
                         Limpiar
                     </button>
+                    {/*
                     <button
                         className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
                         onClick={() => handleGenerarFolio(false)}
@@ -1368,9 +1371,25 @@ return (
                     >
                         Generar Folio Comprimido Respaldo
                     </button>
+                    */}
+                    <button
+                        className="bg-green-500/60 hover:bg-green-400/70 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => handleGenerarFolio(false, "azure", true)}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                    >
+                        Generar Folio Sin Compresión
+                    </button>
+                    <button
+                        className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        onClick={() => handleGenerarFolio(true, "azure")}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                    >
+                        Generar Folio
+                    </button>
                 </div>
 
                 <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
+                    {/*
                     <button
                         className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
                         onClick={handlePrintCamoAnexo2}
@@ -1394,6 +1413,7 @@ return (
                     >
                         Generar CAMO ADMINISTRATIVOS
                     </button>
+                    */}
                 </div>
 
             </div>

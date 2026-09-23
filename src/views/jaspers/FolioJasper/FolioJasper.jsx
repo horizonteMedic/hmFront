@@ -11,7 +11,7 @@ import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 import { aplicarFechaPersonalizada } from "../../admin/panel-de-control/SistemaOcupacional/Folio/fechaOverrideMap";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure", fechaPersonalizada = "", diasVencimientoPersonalizado = "", omitirImpresion = false) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure", fechaPersonalizada = "", diasVencimientoPersonalizado = "", omitirImpresion = false, sinCompresion = false) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -466,8 +466,12 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         ? `${nro} - ${apellidos.toUpperCase()} ${nombres.toUpperCase()}.pdf`
         : `Folio_${nro}.pdf`;
 
-    console.log({ comprimidoz });
-    if (comprimidoz) {
+    console.log({ comprimidoz, sinCompresion });
+    if (sinCompresion) {
+        // Peso completo, sin pasar por el compresor (ni subida a azure/respaldo, ni rasterizado local)
+        if (!omitirImpresion) imprimirBytes(baseBytes, nombreArchivo);
+        return baseBytes;
+    } else if (comprimidoz) {
         // descargarPdf(rasterizedBytes, nombreArchivo);
         const archivoProcesado = await subirArchivoPdfNode(
             baseBytes,
