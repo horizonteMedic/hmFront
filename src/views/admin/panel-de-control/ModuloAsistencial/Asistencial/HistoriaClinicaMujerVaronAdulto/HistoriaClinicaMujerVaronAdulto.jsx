@@ -164,7 +164,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
   return (
     <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
-      <SectionFieldset legend="Header" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+      <SectionFieldset legend="Header" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputTextOneLine
           label="N° HCL"
           name="n_hcl"
@@ -181,7 +181,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaborales form={form} />
+      <DatosPersonalesLaborales form={form} laborales={false} />
 
       <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" collapsible>
         <InputTextOneLine label="Nombre del Padre" name="nombre_padre" value={form.nombre_padre} onChange={handleChange} />
@@ -202,7 +202,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionFieldset legend="Antecedentes Personales" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2 border p-2 rounded">
               <p className="font-semibold text-sm">Consumo de sustancias nocivas:</p>
               <div className="grid grid-cols-2 gap-2">
@@ -242,8 +242,26 @@ export default function HistoriaClinicaMujerVaronAdulto() {
               )}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <InputTextOneLine label="Edad Inicio Relaciones Sex." name="inicio_relaciones_sexuales" value={form.inicio_relaciones_sexuales} onChange={handleChange} />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-2 border p-2 rounded">
+              <p className="font-semibold text-sm">Vigilancia de Enfermedades No Transmisibles: </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                <label className="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="vigilancia_diabetes" checked={form.vigilancia_diabetes} onChange={handleCheckBoxChange} />
+                  <span>DIABETES</span>
+                </label>
+                <label className="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="vigilancia_hipertension" checked={form.vigilancia_hipertension} onChange={handleCheckBoxChange} />
+                  <span>HIPERTENSIÓN ARTERIAL</span>
+                </label>
+                <label className="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" name="vigilancia_violencia" checked={form.vigilancia_violencia} onChange={handleCheckBoxChange} />
+                  <span>VIOLENCIA INTRAFAMILIAR</span>
+                </label>
+              </div>
+            </div>
+
             <div className="space-y-2 border p-2 rounded">
               <p className="font-semibold text-sm">DATOS MUJER:</p>
               <div className="grid grid-cols-1 gap-2">
@@ -258,10 +276,18 @@ export default function HistoriaClinicaMujerVaronAdulto() {
               </div>
             </div>
           </div>
+
+          <InputTextOneLine
+            label="Edad Inicio Relaciones Sex."
+            name="inicio_relaciones_sexuales"
+            value={form.inicio_relaciones_sexuales}
+            onChange={handleChange}
+            labelWidth="150px" />
+
         </SectionFieldset>
 
         <SectionFieldset legend="Antecedentes Patológicos" className="space-y-3">
-          <div className="grid grid-cols-2 gap-x-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
             <div className="grid grid-cols-1 gap-1">
               {[
                 { name: "ap_obesidad", label: "1. Obesidad" },
@@ -274,7 +300,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
                 { name: "ap_glaucoma", label: "8. Glaucoma" },
               ].map(item => (
                 <label key={item.name} className="flex items-center space-x-2 text-sm">
-                  <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} />
+                  <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} disabled />
                   <span>{item.label}</span>
                 </label>
               ))}
@@ -289,11 +315,11 @@ export default function HistoriaClinicaMujerVaronAdulto() {
                 { name: "ap_insuficiencia_renal", label: "14. Insuficiencia Renal" },
               ].map(item => (
                 <label key={item.name} className="flex items-center space-x-2 text-sm">
-                  <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} />
+                  <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} disabled />
                   <span>{item.label}</span>
                 </label>
               ))}
-              <InputTextOneLine label="15. Neoplasia" name="ap_neoplasia" value={form.ap_neoplasia} onChange={handleChange} />
+              <InputTextOneLine label="15. Neoplasia" name="ap_neoplasia" value={form.ap_neoplasia} onChange={handleChange} disabled />
             </div>
           </div>
           <hr />
@@ -317,9 +343,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         </SectionFieldset>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionFieldset legend="Antecedentes Familiares">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <SectionFieldset legend="Antecedentes Familiares" fieldsetClassName="lg:col-span-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
             {[
               { name: "af_hipertension", label: "1. Hipertensión Arterial" },
               { name: "af_epilepsia", label: "2. Epilepsia" },
@@ -334,71 +360,54 @@ export default function HistoriaClinicaMujerVaronAdulto() {
               { name: "af_vih_sida", label: "11. VIH/SIDA" },
             ].map(item => (
               <label key={item.name} className="flex items-center space-x-2 text-sm">
-                <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} />
+                <input type="checkbox" name={item.name} checked={form[item.name]} onChange={handleCheckBoxChange} disabled />
                 <span>{item.label}</span>
               </label>
             ))}
-            <div className="col-span-2 mt-2">
-              <InputTextOneLine label="12. Otros" name="af_otros" value={form.af_otros} onChange={handleChange} />
+            <div className="sm:col-span-2 mt-2">
+              <InputTextOneLine label="12. Otros" name="af_otros" value={form.af_otros} onChange={handleChange} disabled />
             </div>
           </div>
         </SectionFieldset>
 
-        <SectionFieldset legend="Vigilancia de Enfermedades No Transmisibles">
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center space-x-2 text-sm">
-              <input type="checkbox" name="vigilancia_diabetes" checked={form.vigilancia_diabetes} onChange={handleCheckBoxChange} />
-              <span>DIABETES</span>
-            </label>
-            <label className="flex items-center space-x-2 text-sm">
-              <input type="checkbox" name="vigilancia_hipertension" checked={form.vigilancia_hipertension} onChange={handleCheckBoxChange} />
-              <span>HIPERTENSIÓN ARTERIAL</span>
-            </label>
-            <label className="flex items-center space-x-2 text-sm">
-              <input type="checkbox" name="vigilancia_violencia" checked={form.vigilancia_violencia} onChange={handleCheckBoxChange} />
-              <span>VIOLENCIA INTRAFAMILIAR</span>
-            </label>
+        <SectionFieldset legend="Inmunizaciones" fieldsetClassName="lg:col-span-2">
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse border border-gray-300 text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2 whitespace-nowrap">VACUNAS</th>
+                  <th className="border border-gray-300 p-2" colSpan="6">DOSIS / FECHA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">DT</td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_1_dosis" value={form.vacuna_dt_1_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_2_dosis" value={form.vacuna_dt_2_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_3_dosis" value={form.vacuna_dt_3_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">HVB</td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_1_dosis" value={form.vacuna_hvb_1_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_2_dosis" value={form.vacuna_hvb_2_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                  <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_3_dosis" value={form.vacuna_hvb_3_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">ANTIAMARILICA</td>
+                  <td className="border border-gray-300 p-1" colSpan="1"><input type="text" name="vacuna_antiamarilica_1_dosis" value={form.vacuna_antiamarilica_1_dosis} onChange={handleChange} className="w-full min-w-[60px] text-center outline-none" placeholder="Dosis" /></td>
+                  <td className="border border-gray-300 p-1" colSpan="1"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeSimple} className="w-full min-w-[130px] outline-none" /></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </SectionFieldset>
       </div>
-
-      <SectionFieldset legend="Inmunizaciones">
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-300 text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">VACUNAS</th>
-                <th className="border border-gray-300 p-2" colSpan="6">DOSIS / FECHA</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-gray-300 p-2 font-semibold">DT</td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_1_dosis" value={form.vacuna_dt_1_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_2_dosis" value={form.vacuna_dt_2_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_dt_3_dosis" value={form.vacuna_dt_3_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2 font-semibold">HVB</td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_1_dosis" value={form.vacuna_hvb_1_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_2_dosis" value={form.vacuna_hvb_2_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-                <td className="border border-gray-300 p-1"><input type="text" name="vacuna_hvb_3_dosis" value={form.vacuna_hvb_3_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 p-2 font-semibold">ANTIAMARILICA</td>
-                <td className="border border-gray-300 p-1" colSpan="2"><input type="text" name="vacuna_antiamarilica_1_dosis" value={form.vacuna_antiamarilica_1_dosis} onChange={handleChange} className="w-full text-center outline-none" placeholder="Dosis" /></td>
-                <td className="border border-gray-300 p-1" colSpan="4"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeSimple} className="w-full outline-none" /></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </SectionFieldset>
 
       <SectionFieldset legend="Asignación de Médico">
         <EmpleadoComboBox

@@ -1,9 +1,8 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
-import { LoadingDefault, PrintHojaRDefault } from "../../../../utils/functionUtils";
+import { LoadingDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "/api/v01/ct/antecedentesPatologicosAsistencial/obtenerReporte";
 const fichaPorTicketUrl = "/api/antecedentes/ticket";
 const registrarUrl = "/api/antecedentes";
 
@@ -74,6 +73,16 @@ export const VerifyTR = async (numeroTicket, token, set, today, enfermedadesKeys
         user_medicoFirma: data.user_medicoFirma || prev.user_medicoFirma,
         ...Object.fromEntries(enfermedadesKeys.map((key) => [key, personalesSet.has(key)])),
         ...Object.fromEntries(vacunasKeys.map((key) => [key, vacunasSet.has(key)])),
+        // Control de edición (useRegistroEditable) + auditoría. tieneRegistro=true solo si
+        // este ticket YA tiene antecedentes guardados (data.id); si no, el ticket existe pero
+        // el registro es nuevo (queda editable). Claves de auditoría mapeadas defensivamente
+        // (sin confirmar contra el backend real) siguiendo el mismo criterio que Triaje/
+        // RegistroAsistencial de este módulo.
+        tieneRegistro,
+        userRegistro: data.userRegistro ?? data.usuarioRegistro ?? "",
+        fechaRegistro: data.fechaRegistro ?? data.fechaCreacion ?? "",
+        usuarioActualizacion: data.usuarioActualizacion ?? data.userActualizacion ?? "",
+        fechaActualizacion: data.fechaActualizacion ?? data.fechaModificacion ?? "",
     }));
 
     if (tieneRegistro) {
@@ -141,32 +150,8 @@ export const SubmitDataService = async (
         return;
     }
 
-    Swal.fire({
-        title: "Éxito",
-        text: "Antecedentes Patológicos registrados correctamente. ¿Desea imprimir?",
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonText: "Sí, imprimir",
-        cancelButtonText: "No",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
-        }
-    });
+    Swal.fire("Éxito", "Antecedentes Patológicos registrados correctamente.", "success");
     limpiar();
-};
-
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/ModuloAsistencial/AntecedentesPatologicos/*.jsx");
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../jaspers/ModuloAsistencial/AntecedentesPatologicos"
-    );
 };
 
 export const Loading = (mensaje) => {

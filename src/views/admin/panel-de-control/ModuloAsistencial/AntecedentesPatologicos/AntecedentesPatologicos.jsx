@@ -6,14 +6,40 @@ import {
     InputTextOneLine,
     SectionFieldset,
 } from "../../../../components/reusableComponents/ResusableComponents";
-import { DatosPersonalesLaborales, BotonesAccion } from "../../../../components/templates/Templates";
+import { DatosPersonalesLaborales } from "../../../../components/templates/Templates";
+import BotonesForm from "../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday } from "../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+import { SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
 
 const tabla = "antecedentes_patologicos_asistencial";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+// Los checkboxes (enfermedades/vacunas) e inputs temporales de "agregar quirúrgico" quedan
+// fuera: InputCheckbox no soporta edited/onRevert y los qXxx no son campos propios del
+// registro guardado (son el borrador de la fila a agregar).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "etapaVida",
+    "observaciones",
+    "otrasPatologias",
+    "reaccionAdversaMedicamentosEspecificar",
+    "dosisVacunas",
+    "padre",
+    "madre",
+    "hermanos",
+    "hijos",
+    "esposaConyuge",
+    "carnetConadis",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 // Enfermedades a marcar (Antecedentes Patológicos Personales)
 const ENFERMEDADES = [
@@ -186,6 +212,13 @@ export default function AntecedentesPatologicos() {
         // Especialista
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de edición + auditoría (useRegistroEditable / buildAuditoria)
+        tieneRegistro: false,
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -193,13 +226,32 @@ export default function AntecedentesPatologicos() {
         setForm,
         handleChange,
         handleChangeNumber,
-        handleChangeNumberDecimals,
         handleChangeSimple,
         handleCheckBoxChange,
         handleClear,
         handleClearnotO,
-        handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "antecedentes_patologicos_asistencial" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     const enfermedadesColumnas = chunkColumns(ENFERMEDADES, 4);
 
@@ -221,12 +273,6 @@ export default function AntecedentesPatologicos() {
             handleClearnotO();
             VerifyTR(form.norden, token, setForm, today, ENFERMEDADES_KEYS, VACUNAS_KEYS);
         }
-    };
-
-    const handlePrint = () => {
-        handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter);
-        });
     };
 
     const handleAgregarQuirurgico = () => {
@@ -260,6 +306,7 @@ export default function AntecedentesPatologicos() {
     };
 
     const handleEliminarQuirurgico = (index) => {
+        if (camposDeshabilitados) return;
         setForm((prev) => ({
             ...prev,
             quirurgicos: prev.quirurgicos.filter((_, i) => i !== index),
@@ -268,6 +315,14 @@ export default function AntecedentesPatologicos() {
 
     return (
         <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
                 <InputTextOneLine
                     label="N° Ticket"
@@ -283,6 +338,9 @@ export default function AntecedentesPatologicos() {
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -297,7 +355,7 @@ export default function AntecedentesPatologicos() {
 
             <DatosPersonalesLaborales form={form} laborales={false} />
 
-            <SectionFieldset legend="1. Antecedentes Patológicos Personales" collapsible>
+            <SectionFieldset legend="Antecedentes Patológicos Personales" collapsible>
                 <p className="mb-3 font-semibold text-red-600">
                     Marcar todas las enfermedades que ha tenido o tiene
                 </p>
@@ -311,6 +369,7 @@ export default function AntecedentesPatologicos() {
                                     name={name}
                                     checked={form[name]}
                                     onChange={handleCheckBoxChange}
+                                    disabled={camposDeshabilitados}
                                 />
                             ))}
                         </div>
@@ -322,6 +381,7 @@ export default function AntecedentesPatologicos() {
                         name="reaccionAdversaMedicamentos"
                         checked={form.reaccionAdversaMedicamentos}
                         onChange={handleCheckBoxChange}
+                        disabled={camposDeshabilitados}
                     />
                     <div className="flex-1 min-w-[250px]">
                         <InputTextOneLine
@@ -329,7 +389,9 @@ export default function AntecedentesPatologicos() {
                             name="reaccionAdversaMedicamentosEspecificar"
                             value={form.reaccionAdversaMedicamentosEspecificar}
                             onChange={handleChange}
-                            disabled={!form.reaccionAdversaMedicamentos}
+                            disabled={camposDeshabilitados || !form.reaccionAdversaMedicamentos}
+                            edited={isFieldEdited("reaccionAdversaMedicamentosEspecificar")}
+                            onRevert={() => revertField("reaccionAdversaMedicamentosEspecificar")}
                             labelWidth="90px"
                         />
                     </div>
@@ -339,6 +401,9 @@ export default function AntecedentesPatologicos() {
                     name="otrasPatologias"
                     value={form.otrasPatologias}
                     onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("otrasPatologias")}
+                    onRevert={() => revertField("otrasPatologias")}
                     labelWidth="150px"
                 />
             </SectionFieldset>
@@ -353,6 +418,7 @@ export default function AntecedentesPatologicos() {
                                 name={name}
                                 checked={form[name]}
                                 onChange={handleCheckBoxChange}
+                                disabled={camposDeshabilitados}
                             />
                         ))}
                     </div>
@@ -364,6 +430,7 @@ export default function AntecedentesPatologicos() {
                                 name={name}
                                 checked={form[name]}
                                 onChange={handleCheckBoxChange}
+                                disabled={camposDeshabilitados}
                             />
                         ))}
                     </div>
@@ -373,7 +440,9 @@ export default function AntecedentesPatologicos() {
                     name="dosisVacunas"
                     value={form.dosisVacunas}
                     onChange={handleChangeNumber}
-                    disabled={!form.covidAntecedentePatologico}
+                    disabled={camposDeshabilitados || !form.covidAntecedentePatologico}
+                    edited={isFieldEdited("dosisVacunas")}
+                    onRevert={() => revertField("dosisVacunas")}
                     labelWidth="180px"
                     className="mt-3"
                 />
@@ -381,16 +450,17 @@ export default function AntecedentesPatologicos() {
 
             <SectionFieldset legend="Antecedentes Quirúrgicos" collapsible>
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-3">
-                    <InputTextOneLine label="Año" labelOnTop name="qFecha" value={form.qFecha} onChange={handleChange} />
-                    <InputTextOneLine label="Hospital (Nombre - Lugar)" labelOnTop name="qHospital" value={form.qHospital} onChange={handleChange} />
-                    <InputTextOneLine label="Operación" labelOnTop name="qOperacion" value={form.qOperacion} onChange={handleChange} />
-                    <InputTextOneLine label="Días Hospitalización" labelOnTop name="qDiasHospitalizacion" value={form.qDiasHospitalizacion} onChange={handleChangeNumber} />
-                    <InputTextOneLine label="Complicaciones" labelOnTop name="qComplicaciones" value={form.qComplicaciones} onChange={handleChange} />
+                    <InputTextOneLine label="Año" labelOnTop name="qFecha" value={form.qFecha} onChange={handleChange} disabled={camposDeshabilitados} />
+                    <InputTextOneLine label="Hospital (Nombre - Lugar)" labelOnTop name="qHospital" value={form.qHospital} onChange={handleChange} disabled={camposDeshabilitados} />
+                    <InputTextOneLine label="Operación" labelOnTop name="qOperacion" value={form.qOperacion} onChange={handleChange} disabled={camposDeshabilitados} />
+                    <InputTextOneLine label="Días Hospitalización" labelOnTop name="qDiasHospitalizacion" value={form.qDiasHospitalizacion} onChange={handleChangeNumber} disabled={camposDeshabilitados} />
+                    <InputTextOneLine label="Complicaciones" labelOnTop name="qComplicaciones" value={form.qComplicaciones} onChange={handleChange} disabled={camposDeshabilitados} />
                 </div>
                 <button
                     type="button"
                     onClick={handleAgregarQuirurgico}
-                    className="bg-[#059668] hover:bg-[#047857] text-white px-4 py-2 rounded flex items-center gap-2 mb-3"
+                    disabled={camposDeshabilitados}
+                    className="bg-[#059668] hover:bg-[#047857] text-white px-4 py-2 rounded flex items-center gap-2 mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <FontAwesomeIcon icon={faPlus} />
                     Agregar
@@ -426,7 +496,8 @@ export default function AntecedentesPatologicos() {
                                             <button
                                                 type="button"
                                                 onClick={() => handleEliminarQuirurgico(index)}
-                                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded flex items-center gap-2"
+                                                disabled={camposDeshabilitados}
+                                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <FontAwesomeIcon icon={faTrash} />
                                             </button>
@@ -440,12 +511,66 @@ export default function AntecedentesPatologicos() {
             </SectionFieldset>
 
             <SectionFieldset legend="Antecedentes Patológicos Familiares" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InputTextOneLine label="Padre - Especifique" name="padre" value={form.padre} onChange={handleChange} labelWidth="180px" />
-                <InputTextOneLine label="Madre - Especifique" name="madre" value={form.madre} onChange={handleChange} labelWidth="180px" />
-                <InputTextOneLine label="Hermanos - Especifique" name="hermanos" value={form.hermanos} onChange={handleChange} labelWidth="180px" />
-                <InputTextOneLine label="Hijos - Especifique" name="hijos" value={form.hijos} onChange={handleChange} labelWidth="180px" />
-                <InputTextOneLine label="Esposa/Cónyuge - Especifique" name="esposaConyuge" value={form.esposaConyuge} onChange={handleChange} labelWidth="180px" />
-                <InputTextOneLine label="Carné CONADIS - Especifique" name="carnetConadis" value={form.carnetConadis} onChange={handleChange} labelWidth="180px" />
+                <InputTextOneLine
+                    label="Padre - Especifique"
+                    name="padre"
+                    value={form.padre}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("padre")}
+                    onRevert={() => revertField("padre")}
+                    labelWidth="180px"
+                />
+                <InputTextOneLine
+                    label="Madre - Especifique"
+                    name="madre"
+                    value={form.madre}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("madre")}
+                    onRevert={() => revertField("madre")}
+                    labelWidth="180px"
+                />
+                <InputTextOneLine
+                    label="Hermanos - Especifique"
+                    name="hermanos"
+                    value={form.hermanos}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("hermanos")}
+                    onRevert={() => revertField("hermanos")}
+                    labelWidth="180px"
+                />
+                <InputTextOneLine
+                    label="Hijos - Especifique"
+                    name="hijos"
+                    value={form.hijos}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("hijos")}
+                    onRevert={() => revertField("hijos")}
+                    labelWidth="180px"
+                />
+                <InputTextOneLine
+                    label="Esposa/Cónyuge - Especifique"
+                    name="esposaConyuge"
+                    value={form.esposaConyuge}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("esposaConyuge")}
+                    onRevert={() => revertField("esposaConyuge")}
+                    labelWidth="180px"
+                />
+                <InputTextOneLine
+                    label="Carné CONADIS - Especifique"
+                    name="carnetConadis"
+                    value={form.carnetConadis}
+                    onChange={handleChange}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("carnetConadis")}
+                    onRevert={() => revertField("carnetConadis")}
+                    labelWidth="180px"
+                />
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
@@ -454,15 +579,32 @@ export default function AntecedentesPatologicos() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            <BotonesForm
                 form={form}
                 handleSave={handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
-                handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hidePrint
             />
         </div>
     );
