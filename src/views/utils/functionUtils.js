@@ -51,6 +51,60 @@ export const GetInfoPacDefault = async (nro, token, sede) => {
         Swal.close();
     }
 };
+
+export const GetInfoPacNroTicketDefault = async (nro, token) => {
+    try {
+        const res = await getFetch(
+            `/api/tickets/busqueda-por-filtros?numeroTicket=${nro}`,
+            token
+        );
+
+        return res;
+    } catch (error) {
+        Swal.fire("Error", "Paciente no encontrado", "error");
+        throw error;
+    } finally {
+        Swal.close();
+    }
+};
+
+
+// Registra un servicio del módulo asistencial (POST genérico para endpoints REST que devuelven
+// { codigo, estatus, resultado }). Maneja loading, éxito y error de forma estándar.
+export const RegistrarServicioAsistencialDefault = async (
+    token,
+    body,
+    registrarUrl,
+    onSuccess = () => {},
+    mensajeExito = "Datos registrados correctamente."
+) => {
+    try {
+        LoadingDefault("Registrando Datos");
+        const res = await SubmitData(body, registrarUrl, token);
+        Swal.close();
+
+        const fallo =
+            !res ||
+            res.ok === false ||
+            res.error === true ||
+            (res.codigo && Number(res.codigo) >= 400);
+
+        if (fallo) {
+            const detalle = res?.resultado?.detalle ?? res?.resultado?.mensaje ?? res?.mensaje ?? "";
+            Swal.fire("Error", detalle || "Ocurrió un error al registrar", "error");
+            return;
+        }
+
+        await Swal.fire({ title: "Éxito", text: mensajeExito, icon: "success" });
+        onSuccess();
+    } catch (error) {
+        Swal.close();
+        console.error(error);
+        Swal.fire("Error", "Ocurrió un error inesperado al registrar los datos", "error");
+    }
+};
+
+
 export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
 
     LoadingDefault("Cargando Formato a Imprimir");
