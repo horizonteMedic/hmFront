@@ -153,10 +153,14 @@ export default async function Ticket({
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
 
+    const esImparSolitario = especialidades.length % 2 !== 0;
+
     especialidades.forEach((esp, i) => {
-        const col = i % 2;
+        const esUltimoSolitario = esImparSolitario && i === especialidades.length - 1;
         const fila = Math.floor(i / 2);
-        const x = margen + col * (colAncho + 3);
+        const x = esUltimoSolitario
+            ? margen + (ancho - margen * 2 - colAncho) / 2
+            : margen + (i % 2) * (colAncho + 3);
         const yCell = y + fila * altoCelda;
 
         // Borde del cuadro

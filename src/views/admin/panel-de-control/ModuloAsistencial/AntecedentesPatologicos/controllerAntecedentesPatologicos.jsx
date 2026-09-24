@@ -1,65 +1,159 @@
 import Swal from "sweetalert2";
-import {
-    GetInfoPacDefault,
-    GetInfoServicioDefault,
-    LoadingDefault,
-    PrintHojaRDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
-} from "../../../../utils/functionUtils";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
+import { LoadingDefault, PrintHojaRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/antecedentesPatologicosAsistencial/obtenerReporte";
-const registrarUrl = "/api/v01/ct/antecedentesPatologicosAsistencial/registrarActualizar";
+const fichaPorTicketUrl = "/api/antecedentes/ticket";
+const registrarUrl = "/api/antecedentes";
 
-export const GetInfoServicio = async (
-    nro,
-    tabla,
-    set,
-    token,
-    today,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            fecha: res.fecha ?? today,
-            quirurgicos: res.quirurgicos ?? [],
-            quirurgicosEliminados: [],
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-        }));
+const sexoToOption = (sexo) => {
+    if (sexo === "M") return "MASCULINO";
+    if (sexo === "F") return "FEMENINO";
+    return "";
+};
+
+const formFromPaciente = (paciente) => ({
+    dni: paciente?.numeroDocumento ?? "",
+    nombres: paciente?.nombres ?? "",
+    apellidos: paciente?.apellidos ?? "",
+    fechaNacimiento: formatearFechaCorta(paciente?.fechaNacimiento ?? ""),
+    lugarNacimiento: paciente?.lugarNacimiento ?? "",
+    edad: paciente?.edad ?? "",
+    sexo: sexoToOption(paciente?.sexo),
+    estadoCivil: paciente?.estadoCivil ?? "",
+    nivelEstudios: paciente?.nivelEstudios ?? "",
+    ocupacion: paciente?.ocupacion ?? "",
+});
+
+// Busca la ficha de antecedentes por N° de Ticket: GET /api/antecedentes/ticket/{numeroTicket}.
+// El paciente viaja anidado en la respuesta (resultado.paciente), así que un solo llamado
+// alcanza para saber si ya existe registro y para llenar tanto los datos del paciente como
+// los campos clínicos ya guardados (si los hay).
+export const VerifyTR = async (numeroTicket, token, set, today, enfermedadesKeys, vacunasKeys) => {
+    if (!numeroTicket) {
+        await Swal.fire("Error", "Debe ingresar un N° de Ticket válido", "error");
+        return;
+    }
+
+    LoadingDefault("Validando datos");
+
+    const res = await getFetch(`${fichaPorTicketUrl}/${numeroTicket}`, token);
+
+    Swal.close();
+
+    const data = res?.resultado;
+
+    if (!res || res.error || res.codigo !== 200 || !data) {
+        Swal.fire("Error", "No se encontró el ticket ingresado", "error");
+        return;
+    }
+
+    const personalesSet = new Set(data.personales ?? []);
+    const vacunasSet = new Set(data.vacunas ?? []);
+    const tieneRegistro = Boolean(data.id);
+
+    set((prev) => ({
+        ...prev,
+        ...formFromPaciente(data.paciente),
+        id: data.id ?? null,
+        fecha: data.fecha ?? today,
+        etapaVida: data.etapaVida ?? "",
+        observaciones: data.observaciones ?? "",
+        otrasPatologias: data.otrasPatologias ?? "",
+        reaccionAdversaMedicamentosEspecificar: data.reaccionAdversaMedicamentosEspecificar ?? "",
+        reaccionAdversaMedicamentos: Boolean(data.reaccionAdversaMedicamentosEspecificar),
+        dosisVacunas: data.dosisVacunas ?? "",
+        quirurgicos: data.quirurgicos ?? [],
+        padre: data.familiares?.padre ?? "",
+        madre: data.familiares?.madre ?? "",
+        hermanos: data.familiares?.hermanos ?? "",
+        hijos: data.familiares?.hijos ?? "",
+        esposaConyuge: data.familiares?.esposaConyuge ?? "",
+        carnetConadis: data.familiares?.carnetConadis ?? "",
+        user_medicoFirma: data.user_medicoFirma || prev.user_medicoFirma,
+        ...Object.fromEntries(enfermedadesKeys.map((key) => [key, personalesSet.has(key)])),
+        ...Object.fromEntries(vacunasKeys.map((key) => [key, vacunasSet.has(key)])),
+    }));
+
+    if (tieneRegistro) {
+        Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con Antecedentes Patológicos registrados.",
+            "warning"
+        );
     }
 };
 
+// Registra o actualiza la ficha: POST /api/antecedentes?usuario=...
+// Es un upsert -- si form.id viene informado (cargado desde VerifyTR) el backend actualiza
+// el registro existente; si no, crea uno nuevo asociado al ticket (nticket).
 export const SubmitDataService = async (
     form,
     token,
-    user,
+    userlogued,
     limpiar,
     tabla,
-    datosFooter
+    datosFooter,
+    enfermedadesKeys,
+    vacunasKeys
 ) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+
     const body = {
-        ...form,
-        userRegistro: user,
-        usuarioFirma: form.user_medicoFirma,
+        id: form.id ?? null,
+        fecha: form.fecha,
+        etapaVida: form.etapaVida ?? "",
+        observaciones: form.observaciones ?? "",
+        personales: enfermedadesKeys.filter((key) => form[key]),
+        otrasPatologias: form.otrasPatologias ?? "",
+        reaccionAdversaMedicamentosEspecificar: form.reaccionAdversaMedicamentos
+            ? form.reaccionAdversaMedicamentosEspecificar ?? ""
+            : "",
+        vacunas: vacunasKeys.filter((key) => form[key]),
+        dosisVacunas: form.dosisVacunas ?? "",
+        quirurgicos: form.quirurgicos,
+        familiares: {
+            padre: form.padre ?? "",
+            madre: form.madre ?? "",
+            hermanos: form.hermanos ?? "",
+            hijos: form.hijos ?? "",
+            esposaConyuge: form.esposaConyuge ?? "",
+            carnetConadis: form.carnetConadis ?? "",
+        },
+        nticket: Number(form.norden),
+        user_medicoFirma: form.user_medicoFirma,
     };
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+    LoadingDefault("Registrando Datos");
+
+    const query = new URLSearchParams({ usuario: userlogued ?? "" });
+    const res = await SubmitData(body, `${registrarUrl}?${query.toString()}`, token);
+
+    Swal.close();
+
+    const codigoOk = res?.codigo === 200 || res?.codigo === 201;
+    if (!res || res.error || !codigoOk || !res.resultado) {
+        Swal.fire("Error", res?.mensaje ?? "Ocurrió un error al registrar", "error");
+        return;
+    }
+
+    Swal.fire({
+        title: "Éxito",
+        text: "Antecedentes Patológicos registrados correctamente. ¿Desea imprimir?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Sí, imprimir",
+        cancelButtonText: "No",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        }
     });
+    limpiar();
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
@@ -73,47 +167,6 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         jasperModules,
         "../../../../jaspers/ModuloAsistencial/AntecedentesPatologicos"
     );
-};
-
-export const VerifyTR = async (nro, tabla, token, set, sede, today) => {
-    VerifyTRDefault(
-        nro,
-        tabla,
-        token,
-        set,
-        sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
-            GetInfoServicio(nro, tabla, set, token, today, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con Antecedentes Patológicos registrados.",
-                    "warning"
-                );
-            });
-        }
-    );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-    const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad,
-            ocupacion: res.areaO ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-        }));
-    }
 };
 
 export const Loading = (mensaje) => {

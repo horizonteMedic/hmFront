@@ -15,6 +15,7 @@ import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero } from "./controllerTicketAsistencial";
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
+import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
 
 const METODOS_PAGO = [
     { value: "CONTADO", label: "CONTADO" },
@@ -228,6 +229,79 @@ function AutocompleteServicio({ label, value, options, onType, onSelect, labelWi
     );
 }
 
+// Autocompletado de Empresa contra el mismo catálogo multi-sede que usa PlantillasCorreo
+// (ComboboxEmpresasMulti("T-NP")): sugiere razones sociales mientras se escribe.
+function AutocompleteEmpresa({ value, options, onChange, onSelect, error, labelWidth = "120px" }) {
+    const [show, setShow] = useState(false);
+    const boxRef = useRef(null);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (boxRef.current && !boxRef.current.contains(e.target)) setShow(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const text = value ?? "";
+    const filtered = (text
+        ? options.filter((emp) => (emp.mensaje ?? "").toLowerCase().includes(text.toLowerCase()))
+        : options
+    ).slice(0, 30);
+
+    return (
+        <div>
+            <div className="flex items-center gap-4" ref={boxRef}>
+                <label className="font-semibold" style={{ minWidth: labelWidth, maxWidth: labelWidth }}>
+                    Empresa<span className="text-red-500 ml-0.5">*</span> :
+                </label>
+                <div className="relative w-full">
+                    <input
+                        type="text"
+                        autoComplete="off"
+                        value={text}
+                        onChange={(e) => {
+                            onChange(e.target.value.toUpperCase());
+                            setShow(true);
+                        }}
+                        onFocus={() => setShow(true)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && filtered.length > 0) {
+                                e.preventDefault();
+                                onSelect(filtered[0]);
+                                setShow(false);
+                            }
+                        }}
+                        className={`border rounded px-2 py-1 w-full ${error ? "border-red-500 bg-red-50" : ""}`}
+                    />
+                    {show && text && filtered.length > 0 && (
+                        <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-56 overflow-y-auto shadow-lg">
+                            {filtered.map((emp) => (
+                                <div
+                                    key={emp.id}
+                                    className="cursor-pointer p-2 hover:bg-gray-200"
+                                    onClick={() => {
+                                        onSelect(emp);
+                                        setShow(false);
+                                    }}
+                                >
+                                    {emp.mensaje}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+            {error && (
+                <p className="flex items-center gap-1.5 mt-1 text-sm text-red-600">
+                    <FontAwesomeIcon icon={faCircleExclamation} className="shrink-0" />
+                    <span>{error}</span>
+                </p>
+            )}
+        </div>
+    );
+}
+
 // Modal para registrar un servicio nuevo en el catálogo (POST /api/servicios-generales).
 function ModalNuevoServicio({ open, value, onChange, onClose, onSave, saving }) {
     if (!open) return null;
@@ -343,6 +417,9 @@ export default function TicketAsistencial() {
         handleClear,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "ticketAsistencial" });
+
+    // Mismo catálogo multi-sede ("T-NP") que alimenta el autocompletado de Empresa en PlantillasCorreo.
+    const EmpresasMulti = ComboboxEmpresasMulti("T-NP");
 
     const [errors, setErrors] = useState({});
 
@@ -770,14 +847,13 @@ export default function TicketAsistencial() {
                     disabled
                     className="xl:col-span-2"
                 />
-                <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
+                <AutocompleteEmpresa
                     value={form.empresa}
-                    onChange={handleChange}
-                    labelWidth="120px"
-                    required
+                    options={EmpresasMulti}
+                    onChange={(v) => setForm((f) => ({ ...f, empresa: v }))}
+                    onSelect={(emp) => setForm((f) => ({ ...f, empresa: emp.mensaje ?? "" }))}
                     error={errors.empresa}
+                    labelWidth="120px"
                 />
                 <SelectField
                     label="Método de pago"

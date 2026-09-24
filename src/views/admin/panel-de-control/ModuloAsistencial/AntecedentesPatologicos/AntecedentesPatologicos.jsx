@@ -127,11 +127,15 @@ const chunkColumns = (arr, columnas) => {
     );
 };
 
+const ENFERMEDADES_KEYS = ENFERMEDADES.map(([key]) => key);
+const VACUNAS_KEYS = [...VACUNAS_COL1, ...VACUNAS_COL2].map(([key]) => key);
+
 export default function AntecedentesPatologicos() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+    const { token, userlogued, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
+        id: null,
         norden: "",
         fecha: today,
 
@@ -150,9 +154,14 @@ export default function AntecedentesPatologicos() {
         ocupacion: "",
         cargoDesempenar: "",
 
+        etapaVida: "",
+        observaciones: "",
+
         // 1. Antecedentes Patológicos Personales
         ...Object.fromEntries(ENFERMEDADES.map(([name]) => [name, false])),
         otrasPatologias: "",
+        reaccionAdversaMedicamentos: false,
+        reaccionAdversaMedicamentosEspecificar: "",
 
         // 2. Antecedentes Inmunológicos / Vacunas
         ...Object.fromEntries([...VACUNAS_COL1, ...VACUNAS_COL2].map(([name]) => [name, false])),
@@ -165,7 +174,6 @@ export default function AntecedentesPatologicos() {
         qDiasHospitalizacion: "",
         qComplicaciones: "",
         quirurgicos: [],
-        quirurgicosEliminados: [],
 
         // 4. Antecedentes Patológicos Familiares
         padre: "",
@@ -196,13 +204,22 @@ export default function AntecedentesPatologicos() {
     const enfermedadesColumnas = chunkColumns(ENFERMEDADES, 4);
 
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(
+            form,
+            token,
+            userlogued,
+            handleClear,
+            tabla,
+            datosFooter,
+            ENFERMEDADES_KEYS,
+            VACUNAS_KEYS
+        );
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede, today);
+            VerifyTR(form.norden, token, setForm, today, ENFERMEDADES_KEYS, VACUNAS_KEYS);
         }
     };
 
@@ -243,29 +260,22 @@ export default function AntecedentesPatologicos() {
     };
 
     const handleEliminarQuirurgico = (index) => {
-        setForm((prev) => {
-            const reg = prev.quirurgicos[index];
-            const quirurgicosEliminados =
-                reg && reg.id != null
-                    ? [...prev.quirurgicosEliminados, reg.id]
-                    : prev.quirurgicosEliminados;
-            return {
-                ...prev,
-                quirurgicos: prev.quirurgicos.filter((_, i) => i !== index),
-                quirurgicosEliminados,
-            };
-        });
+        setForm((prev) => ({
+            ...prev,
+            quirurgicos: prev.quirurgicos.filter((_, i) => i !== index),
+        }));
     };
 
     return (
         <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
             <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
                 <InputTextOneLine
-                    label="N° Orden"
+                    label="N° Ticket"
                     name="norden"
                     value={form.norden}
-                    onChange={handleChangeNumberDecimals}
+                    onChange={handleChangeNumber}
                     onKeyUp={handleSearch}
+                    labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Fecha"
@@ -273,10 +283,19 @@ export default function AntecedentesPatologicos() {
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Ocupación"
+                    name="ocupacion"
+                    value={form.ocupacion}
+                    disabled
+                    className="2xl:col-span-2"
+                    labelWidth="120px"
                 />
             </SectionFieldset>
 
-            <DatosPersonalesLaborales form={form} />
+            <DatosPersonalesLaborales form={form} laborales={false} />
 
             <SectionFieldset legend="1. Antecedentes Patológicos Personales" collapsible>
                 <p className="mb-3 font-semibold text-red-600">
@@ -296,6 +315,24 @@ export default function AntecedentesPatologicos() {
                             ))}
                         </div>
                     ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-3 my-3">
+                    <InputCheckbox
+                        label="Reacción adversa a medicamentos"
+                        name="reaccionAdversaMedicamentos"
+                        checked={form.reaccionAdversaMedicamentos}
+                        onChange={handleCheckBoxChange}
+                    />
+                    <div className="flex-1 min-w-[250px]">
+                        <InputTextOneLine
+                            label="Especificar"
+                            name="reaccionAdversaMedicamentosEspecificar"
+                            value={form.reaccionAdversaMedicamentosEspecificar}
+                            onChange={handleChange}
+                            disabled={!form.reaccionAdversaMedicamentos}
+                            labelWidth="90px"
+                        />
+                    </div>
                 </div>
                 <InputTextOneLine
                     label="Otras Patologías"
