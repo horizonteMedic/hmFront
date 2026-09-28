@@ -2,18 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCheck, faBoxesStacked, faStethoscope, faGear } from "@fortawesome/free-solid-svg-icons";
+import { faUserCheck, faBoxesStacked, faStethoscope, faGear, faIdCard } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import AdmisionTabSelector from "./Admision/AdmisionTabSelector";
 import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 import RegistroEspecialidades from "./RegistroEspecialidades/RegistroEspecialidades";
 import Configuracion from "./Configuracion/Configuracion";
+import Proveedor from "./Proveedor/Proveedor";
 
 const sections = [
     { tab: 1, vista: "Admision Salud", label: "Admisión", icon: faUserCheck, component: AdmisionTabSelector },
     { tab: 2, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
     { tab: 3, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
     { tab: 4, vista: "Configuracion", label: "Configuracion", icon: faGear, component: Configuracion },
+    { tab: 5, vista: "Proveedor Nombres", label: "Consultar por Nombres", icon: faIdCard, component: Proveedor },
 ];
 
 const ModuloSalud = () => {
