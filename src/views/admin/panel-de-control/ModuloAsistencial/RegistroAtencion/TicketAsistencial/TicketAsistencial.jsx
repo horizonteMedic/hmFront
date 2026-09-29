@@ -767,11 +767,11 @@ export default function TicketAsistencial() {
         }
     };
 
-    const handleImprimirFecha = () => {
-        handlePrintDefault(() => {
-            window.print();
-        });
-    };
+    // const handleImprimirFecha = () => {
+    //     handlePrintDefault(() => {
+    //         window.print();
+    //     });
+    // };
 
     // Un registro cargado se detecta por los datos de resultado (nombres/dni), nunca por
     // el documento que el usuario está tipeando.
@@ -878,6 +878,7 @@ export default function TicketAsistencial() {
                     error={errors.autorizadoPor}
                 />
                 <div className="flex flex-wrap items-center gap-6">
+                    <p className="w-[120px] font-semibold">Edad:</p>
                     <InputCheckbox
                         label="< 5 AÑOS"
                         name="menorCincoAños"
@@ -1103,13 +1104,13 @@ export default function TicketAsistencial() {
                     </div>
                 }
             >
-                <button
+                {/* <button
                     type="button"
                     onClick={handleImprimirFecha}
                     className="bg-purple-600 hover:bg-purple-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
                 >
                     <FontAwesomeIcon icon={faCalendarDay} /> Imprimir Fecha
-                </button>
+                </button> */}
             </BotonesForm>
 
             <ModalNuevoServicio

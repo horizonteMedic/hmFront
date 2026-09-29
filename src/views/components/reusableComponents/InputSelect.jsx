@@ -35,7 +35,7 @@ export function SelectField({
                 disabled={disabled}
                 aria-invalid={hasError}
                 aria-describedby={hasError ? `${name}-error` : undefined}
-                className={`pointer border px-3 py-2 rounded-md w-full focus:outline-none ${disabled ? "bg-gray-300" : ""} ${stateClasses}`}
+                className={`pointer border px-2 py-1 rounded-md w-full focus:outline-none ${disabled ? "bg-gray-300" : ""} ${stateClasses}`}
             >
                 {!hidePlaceHolder && <option value="">{placeholder}</option>}
                 {options.map(({ value, label }) => (

@@ -8,12 +8,14 @@ import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabS
 import TriajeAsistencial from "./Triaje/Triaje";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos";
+import ReportesTabSelector from "./Reportes/ReportesTabSelector";
 
 const sections = [
     { tab: 1, vista: "Registro de Atencion", label: "Registro de Atención", icon: faUserCheck, component: RegistroAtencionTabSelector },
     { tab: 2, vista: "Triaje Asistencial", label: "Triaje", icon: faStethoscope, component: TriajeAsistencial },
     { tab: 3, vista: "Antecedentes Patologicos", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
     { tab: 4, vista: "Historia Asistencial", label: "Historia Asistencial", icon: faNotesMedical, component: AsistencialTabSelector },
+    { tab: 5, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
 ];
 
 const ModuloAsistencial = () => {

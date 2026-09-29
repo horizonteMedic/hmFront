@@ -173,7 +173,8 @@ const Accesos = () => {
       item.apellidos.toLowerCase().includes(searchLower) ||
       String(item.numDocumento).toLowerCase().includes(searchLower) || // Convertir numDocumento a string
       item.cargo.toLowerCase().includes(searchLower) ||
-      (item.empresas && item.empresas.toLowerCase().includes(searchLower))
+      (item.empresas && item.empresas.toLowerCase().includes(searchLower)) ||
+      (item.contratas && item.contratas.toLowerCase().includes(searchLower))
     );
   });
 
@@ -237,7 +238,7 @@ const Accesos = () => {
                   <FontAwesomeIcon icon={getSortIcon('nombres')} className="ml-2" />
                 </th>
                 <th className="border border-gray-300 px-2 py-1">Cargo</th>
-                <th className="border border-gray-300 px-2 py-1">Razón Social</th>
+                <th className="border border-gray-300 px-2 py-1">Empresas / Contratas</th>
 
               </tr>
             </thead>
@@ -269,13 +270,20 @@ const Accesos = () => {
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>
-                  <td className="border border-gray-300 px-2 py-1 whitespace-pre-line">
-                    {item.empresas ? item.empresas
-                      .split(" - ")
-                      .map((empresa, index) => (
-                        <div key={index}>- {empresa}</div>
-                      ))
-                      : "N/A"}
+                  <td className="border border-gray-300 px-2 py-1">
+                    {item.empresas && item.empresas.split(" - ").map((e, i) => (
+                      <div key={`e-${i}`} className="flex items-center gap-1 mb-0.5">
+                        <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-1 rounded shrink-0">EMP</span>
+                        <span className="text-sm">{e}</span>
+                      </div>
+                    ))}
+                    {item.contratas && item.contratas.split(" - ").map((c, i) => (
+                      <div key={`c-${i}`} className="flex items-center gap-1 mb-0.5">
+                        <span className="text-xs font-semibold bg-orange-100 text-orange-700 px-1 rounded shrink-0">CON</span>
+                        <span className="text-sm">{c}</span>
+                      </div>
+                    ))}
+                    {!item.empresas && !item.contratas && <span className="text-gray-400">N/A</span>}
                   </td>
                 </tr>
               ))}
