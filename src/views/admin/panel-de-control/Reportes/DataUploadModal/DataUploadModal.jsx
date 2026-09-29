@@ -7,6 +7,7 @@ import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
 import NewIndex from '../model/newIndex';
 import { GetlistPDF } from '../model/getPDFlist';
+import RefreshToken from '../model/refreshToken';
 import autoTable from "jspdf-autotable";
 
 const date = new Date();
@@ -15,6 +16,8 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
+// Cantidad de archivos que se suben en paralelo
+const UPLOAD_CONCURRENCY = 5;
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([]);
@@ -82,69 +85,66 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
 
 
-  const SubidaArchivos = async () => {
-    setIndice(0);
-    let failedUploads = [];
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const index = await NewIndex(user, uploadedFiles.length, token);
-    let uploadedCount = 0; // Contador de archivos procesados
+  const subirUnArchivo = async (folder, indexId, authToken) => {
+    try {
+      const fileBase64 = await toBase64(folder);
+      const base64WithoutHeader = fileBase64.split(',')[1];
+      const datos = {
+        nombre: folder.name,
+        sede: selectedSede.cod_sede,
+        base64: base64WithoutHeader,
+        nomenclatura: null,
+        indice: indexId
+      };
 
-    for (const folder of uparchFile) {
-      try {
-
-        const fileBase64 = await toBase64(folder);
-        console.log("Tamaño base64:", fileBase64.length / 1024 / 1024, "MB");
-
-        const base64WithoutHeader = fileBase64.split(',')[1];
-        const datos = {
-          nombre: folder.name,
-          sede: selectedSede.cod_sede,
-          base64: base64WithoutHeader,
-          nomenclatura: null,
-          indice: index.id
-        };
-
-        const response = await ArchivosMasivos(datos, user, token);
-        console.log(response)
-        if (response.id) {
-          if (response.id === 1) {
-          } else {
-            setUploadStatus((prevStatus) => ({
-              ...prevStatus,
-              [folder.name]: 'error',
-            }));
-            failedUploads.push(folder.name);
-          }
-        } else {
-          setUploadStatus((prevStatus) => ({
-            ...prevStatus,
-            [folder.name]: 'error',
-          }));
-          failedUploads.push(folder.name);
-        }
-
-      } catch (error) {
-        console.error(`Error uploading ${folder.name}:`, error);
-        setUploadStatus((prevStatus) => ({
-          ...prevStatus,
-          [folder.name]: 'error',
-        }));
-        failedUploads.push(folder.name);
+      const response = await ArchivosMasivos(datos, user, authToken);
+      if (response.id && response.id === 1) {
+        return true;
       }
 
-      // Actualizar el progreso
-      uploadedCount++;
-      const progress = Math.round((uploadedCount / uparchFile.length) * 100);
-      setUploadProgress(progress);
+      setUploadStatus((prevStatus) => ({
+        ...prevStatus,
+        [folder.name]: 'error',
+      }));
+      return false;
 
-      // Espera 4 segundos antes de la siguiente iteración
-      await sleep(4000);
+    } catch (error) {
+      console.error(`Error uploading ${folder.name}:`, error);
+      setUploadStatus((prevStatus) => ({
+        ...prevStatus,
+        [folder.name]: 'error',
+      }));
+      return false;
     }
+  };
+
+  const SubidaArchivos = async (authToken) => {
+    setIndice(0);
+    const failedUploads = [];
+    const index = await NewIndex(user, uploadedFiles.length, authToken);
+    let uploadedCount = 0; // Contador de archivos procesados
+
+    // Pool de workers: cada uno toma el siguiente archivo disponible hasta agotar la lista
+    let cursor = 0;
+    const workers = Array.from({ length: Math.min(UPLOAD_CONCURRENCY, uparchFile.length) }, async () => {
+      while (cursor < uparchFile.length) {
+        const folder = uparchFile[cursor];
+        cursor++;
+
+        const ok = await subirUnArchivo(folder, index.id, authToken);
+        if (!ok) failedUploads.push(folder.name);
+
+        uploadedCount++;
+        setUploadProgress(Math.round((uploadedCount / uparchFile.length) * 100));
+      }
+    });
+    await Promise.all(workers);
+
     setIndice(index.id);
     setSucred(true);
     setIsUploading(false);
     setIsPDFAvailable(true); // Activa el botón de descarga PDF
-    descargarPDF(index.id)
+    descargarPDF(index.id, authToken)
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -185,11 +185,20 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
       cancelButtonText: 'Cancelar',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
         setIsUploading(true);
         setUploadProgress(0); // Reiniciar el progreso
-        SubidaArchivos();
+
+        // Refresca el token antes de iniciar la subida, para que no venza a mitad de proceso
+        const authToken = await RefreshToken();
+        if (!authToken) {
+          setIsUploading(false);
+          Swal.fire('Error', 'No se pudo refrescar la sesión. Por favor vuelve a iniciar sesión.', 'error');
+          return;
+        }
+
+        SubidaArchivos(authToken);
       }
     });
   };
@@ -230,7 +239,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     }, 200); // cada 200ms aumenta un 10%
   };
 
-  const descargarPDF = (indice) => {
+  const descargarPDF = (indice, authToken = token) => {
     const doc = new jsPDF();
     const imgUrl = "/img/logo-color.png";
 
@@ -254,7 +263,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
     loadImageAsBase64(imgUrl)
       .then((logoData) => {
-        GetlistPDF(token, indice)
+        GetlistPDF(authToken, indice)
           .then((res) => {
             const errores = res.filter((item) => item.id === 0); // Archivos con error
             const subidos = res.filter((item) => item.id === 1); // Archivos correctos
@@ -404,8 +413,6 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
 
-  console.log(uploadedFiles)
-  console.log(uploadStatus)
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[800px] relative">
@@ -487,7 +494,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
-              <p style={{ padding: '10px' }}>*Cada archivo se subira cada 4 segundos al sistema</p>
+              <p style={{ padding: '10px' }}>*Los archivos se suben en paralelo (hasta {UPLOAD_CONCURRENCY} a la vez) para optimizar el tiempo de carga</p>
 
               {isUploading && (
                 <div className="flex items-center">
