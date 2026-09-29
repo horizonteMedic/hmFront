@@ -36,7 +36,6 @@ const CAMPOS_EDITABLES = [
     "hermanos",
     "hijos",
     "esposaConyuge",
-    "carnetConadis",
     "user_medicoFirma",
     "nombre_medico",
 ];
@@ -56,6 +55,8 @@ const ENFERMEDADES = [
     ["cariesGingivitis", "Caries o gingivitis"],
     ["colecistitis", "Colecistitis"],
     ["columna", "Columna"],
+    ["dengue", "Dengue"],
+    ["depresion", "Depresión"], 
     ["dermatitis", "Dermatitis"],
     ["diabetes", "Diabetes"],
     ["discopatias", "Discopatías"],
@@ -77,6 +78,7 @@ const ENFERMEDADES = [
     ["forunculosis", "Forunculosis"],
     ["fracturas", "Fracturas"],
     ["gastritisCronica", "Gastritis crónica"],
+    ["glaucoma", "Glaucoma"],
     ["gonorrea", "Gonorrea"],
     ["gota", "Gota"],
     ["hemorroides", "Hemorroides"],
@@ -89,6 +91,7 @@ const ENFERMEDADES = [
     ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
     ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
     ["intoxicaciones", "Intoxicaciones"],
+    ["its", "ITS"],
     ["litiasisUrinaria", "Litiasis Urinaria"],
     ["meningitis", "Meningitis"],
     ["migrana", "Migraña"],
@@ -118,6 +121,7 @@ const ENFERMEDADES = [
     ["tendinitis", "Tendinitis"],
     ["tifoidea", "Tifoidea"],
     ["tosConvulsiva", "Tos convulsiva"],
+    ["transfusionSanguinea", "Transfusión Sanguínea"],
     ["trastornosNerviosos", "Trastornos Nerviosos"],
     ["traumatismoEncefalocraneano", "Traumatismo encefalocraneano"],
     ["tuberculosis", "Tuberculosis"],
@@ -162,6 +166,7 @@ export default function AntecedentesPatologicos() {
 
     const initialFormState = {
         id: null,
+        pacienteId: null,
         norden: "",
         fecha: today,
 
@@ -207,7 +212,6 @@ export default function AntecedentesPatologicos() {
         hermanos: "",
         hijos: "",
         esposaConyuge: "",
-        carnetConadis: "",
 
         // Especialista
         nombre_medico: userName,
@@ -560,17 +564,7 @@ export default function AntecedentesPatologicos() {
                     edited={isFieldEdited("esposaConyuge")}
                     onRevert={() => revertField("esposaConyuge")}
                     labelWidth="180px"
-                />
-                <InputTextOneLine
-                    label="Carné CONADIS - Especifique"
-                    name="carnetConadis"
-                    value={form.carnetConadis}
-                    onChange={handleChange}
-                    disabled={camposDeshabilitados}
-                    edited={isFieldEdited("carnetConadis")}
-                    onRevert={() => revertField("carnetConadis")}
-                    labelWidth="180px"
-                />
+                /> 
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
