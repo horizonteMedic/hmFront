@@ -21,7 +21,7 @@ const calcularEdad = (fechaNacimiento) => {
     return edad;
 };
 
-const aplanarFila = (item, idx) => {
+const aplanarFila = (item) => {
     const paciente = item.paciente ?? {};
     const parentescos = Array.isArray(paciente.parentescos) ? paciente.parentescos : [];
     const parentescoTexto = parentescos
@@ -29,7 +29,6 @@ const aplanarFila = (item, idx) => {
         .join(" | ");
 
     return {
-        item: idx + 1,
         norden: item.norden ?? "",
         fechaVisita: item.fechaVisita ?? "",
         estadoVisita: item.estadoVisita ?? "",
@@ -82,7 +81,7 @@ const ReportePacientesConVisita = ({ onClose, sede, token }) => {
         const sheet = workbook.addWorksheet("REPORTE");
 
         // ── Título ────────────────────────────────────────────────────
-        sheet.mergeCells("A1:L1");
+        sheet.mergeCells("A1:K1");
         const titleCell = sheet.getCell("A1");
         titleCell.value = `REPORTE DE PACIENTES CON VISITA | ${fechaInicio} al ${fechaFin}`;
         titleCell.font = { bold: true, size: 13, color: { argb: "FFFFFFFF" } };
@@ -92,7 +91,6 @@ const ReportePacientesConVisita = ({ onClose, sede, token }) => {
 
         // ── Headers ───────────────────────────────────────────────────
         const headers = [
-            { key: "item", label: "N°", width: 6, destacado: false },
             { key: "norden", label: "N° Orden", width: 10, destacado: false },
             { key: "fechaVisita", label: "Fecha Visita", width: 14, destacado: false },
             { key: "estadoVisita", label: "Estado", width: 12, destacado: false },
@@ -135,7 +133,7 @@ const ReportePacientesConVisita = ({ onClose, sede, token }) => {
             .filter(Boolean); // columnas 1-based destacadas
 
         data.forEach((item, rowIdx) => {
-            const fila = aplanarFila(item, rowIdx);
+            const fila = aplanarFila(item);
             const values = headers.map(h => fila[h.key] ?? "");
             const dataRow = sheet.addRow(values);
             dataRow.height = 18;
