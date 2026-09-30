@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faChartLine, faCheck, faDownload, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import ReporteVisitas from "./ReporteVisitas";
+import ReportePacientesConVisita from "./ReportePacientesConVisita";
 import ReporteDashboard from "./ReporteDashboard";
 import RegistrarNuevaVisita from "./RegistrarNuevaVisita";
 
@@ -28,6 +29,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
   const [disabled, setDisabled] = useState(false);
   const [refresh, setRefresh] = useState(false)
   const [modalReportePacientes, setModalReportePacientes] = useState(false)
+  const [modalReporteVisitas, setModalReporteVisitas] = useState(false)
   const [modalDashboard, setModalDashboard] = useState(false)
   const [modalRegistrarVisita, setModalRegistrarVisita] = useState(false)
 
@@ -229,6 +231,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
         <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
           <div className="flex justify-center gap-x-4 gap-y-3">
             <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes <FontAwesomeIcon className="ml-2" icon={faDownload} /></button>
+            <button onClick={() => setModalReporteVisitas(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Visitas <FontAwesomeIcon className="ml-2" icon={faDownload} /></button>
             <button onClick={() => setModalDashboard(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Dashboard <FontAwesomeIcon className="ml-2" icon={faChartLine} /></button>
           </div>
           <Table
@@ -245,6 +248,11 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
       </div>
       {modalReportePacientes && <ReporteVisitas
         onClose={() => setModalReportePacientes(false)}
+        sede={selectedSede}
+        token={token}
+      />}
+      {modalReporteVisitas && <ReportePacientesConVisita
+        onClose={() => setModalReporteVisitas(false)}
         sede={selectedSede}
         token={token}
       />}
