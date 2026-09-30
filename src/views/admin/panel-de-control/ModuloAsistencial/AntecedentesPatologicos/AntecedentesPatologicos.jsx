@@ -182,7 +182,6 @@ export default function AntecedentesPatologicos() {
         nivelEstudios: "",
         empresa: "",
         contrata: "",
-        ocupacion: "",
         cargoDesempenar: "",
 
         etapaVida: "",
@@ -327,7 +326,7 @@ export default function AntecedentesPatologicos() {
                 onLimpiar={handleClear}
             />
 
-            <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+            <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputTextOneLine
                     label="N° Ticket"
                     name="norden"
@@ -346,15 +345,7 @@ export default function AntecedentesPatologicos() {
                     edited={isFieldEdited("fecha")}
                     onRevert={() => revertField("fecha")}
                     labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Ocupación"
-                    name="ocupacion"
-                    value={form.ocupacion}
-                    disabled
-                    className="2xl:col-span-2"
-                    labelWidth="120px"
-                />
+                /> 
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} laborales={false} />

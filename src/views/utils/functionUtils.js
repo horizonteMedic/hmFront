@@ -71,12 +71,15 @@ export const GetInfoPacNroTicketDefault = async (nro, token) => {
 
 // Registra un servicio del módulo asistencial (POST genérico para endpoints REST que devuelven
 // { codigo, estatus, resultado }). Maneja loading, éxito y error de forma estándar.
+// Si se pasa `onPrint`, el mensaje de éxito pregunta "¿Desea imprimir?" y lo ejecuta al confirmar
+// (después de `onSuccess`, que normalmente limpia el formulario).
 export const RegistrarServicioAsistencialDefault = async (
     token,
     body,
     registrarUrl,
     onSuccess = () => {},
-    mensajeExito = "Datos registrados correctamente."
+    mensajeExito = "Datos registrados correctamente.",
+    onPrint = null
 ) => {
     try {
         LoadingDefault("Registrando Datos");
@@ -92,6 +95,20 @@ export const RegistrarServicioAsistencialDefault = async (
         if (fallo) {
             const detalle = res?.resultado?.detalle ?? res?.resultado?.mensaje ?? res?.mensaje ?? "";
             Swal.fire("Error", detalle || "Ocurrió un error al registrar", "error");
+            return;
+        }
+
+        if (onPrint) {
+            const { isConfirmed } = await Swal.fire({
+                title: "Éxito",
+                text: `${mensajeExito}\n¿Desea imprimir?`,
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            });
+            onSuccess();
+            if (isConfirmed) onPrint();
             return;
         }
 

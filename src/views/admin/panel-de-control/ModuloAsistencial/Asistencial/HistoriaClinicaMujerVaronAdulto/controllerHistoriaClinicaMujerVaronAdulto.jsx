@@ -6,7 +6,16 @@ import { convertirGenero } from "../../../../../utils/helpers";
 
 const baseUrl = "/asistencial/historia-asistencial/historia-mujer-o-varon-adulto";
 
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por eso
+// se declara aquí (en el controller).
+const jasperModules = import.meta.glob("../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/*.jsx");
+const rutaJasper =
+    "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/HistoriaClinicaMujerVaronAdulto_Digitalizado.jsx";
+
 const unwrap = (res) => (res && typeof res === "object" && "resultado" in res ? res.resultado : res);
+
+const pacienteDe = (data) => data?.paciente ?? data?.antecedentesInformativos?.paciente ?? null;
+const tieneHistoria = (data) => data.id !== null && data.id !== undefined && data.id !== "";
 
 const boolToSiNo = (value) => (value === true ? "SI" : value === false ? "NO" : undefined);
 const siNoToBool = (value) => (value === "SI" ? true : value === "NO" ? false : null);
@@ -66,8 +75,7 @@ const formFromAntecedentesInformativos = (antecedentesInformativos) => {
 const formFromPaciente = (paciente, infoTicket) => ({
     pacienteId: paciente?.id ?? null,
     dni: paciente?.numeroDocumento ?? "",
-    nombres: paciente?.nombres ?? "",
-    apellidos: paciente?.apellidos ?? "",
+    nombres: paciente?.nombres + " " + paciente?.apellidos ?? "",
     fechaNacimiento: formatearFechaCorta(paciente?.fechaNacimiento ?? ""),
     lugarNacimiento: paciente?.lugarNacimiento ?? "",
     edad: paciente?.edad ?? "",
@@ -172,14 +180,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
     Swal.close();
 
     const data = unwrap(res);
-    const paciente = data?.paciente ?? data?.antecedentesInformativos?.paciente ?? null;
+    const paciente = pacienteDe(data);
 
     if (res?.error || !data || !paciente) {
         await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
         return;
     }
 
-    const tieneRegistro = data.id !== null && data.id !== undefined && data.id !== "";
+    const tieneRegistro = tieneHistoria(data);
 
     set((prev) => ({
         ...prev,
@@ -187,6 +195,8 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...formFromHistoria(data, today),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         n_hcl: String(numeroTicket),
+        // Si ya hay Historia Clínica, el bloque IMPRIMIR queda apuntando a este ticket.
+        ticketImprimir: tieneRegistro ? String(numeroTicket) : "",
         tieneRegistro,
         userRegistro: data.usuarioRegistro ?? "",
         fechaRegistro: data.fechaRegistro ?? "",
@@ -305,7 +315,7 @@ const construirBody = (form) => ({
 
 // Registra o actualiza la Historia Clínica: POST .../historia-mujer-o-varon-adulto?usuario=...
 // Upsert por numeroTicket (igual que Triaje/AntecedentesPatologicos de este mismo módulo).
-export const SubmitDataService = async (form, token, userlogued, limpiar) => {
+export const SubmitDataService = async (form, token, userlogued, limpiar, datosFooter) => {
     if (!form.n_hcl) {
         await Swal.fire("Error", "Debe buscar un N° de Ticket válido antes de registrar.", "error");
         return;
@@ -313,14 +323,85 @@ export const SubmitDataService = async (form, token, userlogued, limpiar) => {
 
     const body = construirBody(form);
     const query = new URLSearchParams({ usuario: userlogued ?? "" });
+    // Se captura antes de limpiar: el formulario se vacía al terminar de guardar.
+    const numeroTicket = form.n_hcl;
 
     await RegistrarServicioAsistencialDefault(
         token,
         body,
         `${baseUrl}?${query.toString()}`,
         limpiar,
-        "Historia Clínica de la Mujer y el Varón Adulto registrada correctamente."
+        "Historia Clínica de la Mujer y el Varón Adulto registrada correctamente.",
+        () => PrintHojaR(numeroTicket, token, datosFooter)
     );
+};
+
+// Datos que consume el Jasper: mismos nombres de campo del formulario, armados con los mappers de
+// arriba a partir del registro guardado (así la impresión y la pantalla nunca se desalinean).
+const construirDatosImpresion = (data) => {
+    const paciente = pacienteDe(data);
+    return {
+        ...formFromPaciente(paciente, data.infoTicket),
+        ...formFromHistoria(data, ""),
+        numeroTicket: data.numeroTicket ?? "",
+        numeroHistoriaClinica: data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? "",
+        nombre_medico: data.doctorAsignado ?? "",
+    };
+};
+
+// Imprime la Historia Clínica GUARDADA de un ticket: GET .../ticket/{numeroTicket} y Jasper.
+export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
+    LoadingDefault("Cargando Formato a Imprimir");
+
+    try {
+        const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+        const data = unwrap(res);
+
+        if (res?.error || !data || !pacienteDe(data)) {
+            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            return;
+        }
+        if (!tieneHistoria(data)) {
+            Swal.fire(
+                "Sin Historia Clínica",
+                `El ticket N° ${numeroTicket} todavía no tiene una Historia Clínica registrada.`,
+                "warning"
+            );
+            return;
+        }
+
+        const modulo = await jasperModules[rutaJasper]();
+        if (typeof modulo.default !== "function") {
+            console.error(`El módulo ${rutaJasper} no exporta una función por defecto`);
+            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            return;
+        }
+
+        await modulo.default({ ...construirDatosImpresion(data), ...datosFooter });
+        Swal.close();
+    } catch (error) {
+        console.error("Error al generar el reporte:", error);
+        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+    }
+};
+
+// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+    if (!numeroTicket) {
+        await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
+        return;
+    }
+
+    const { isConfirmed } = await Swal.fire({
+        title: "¿Desea Imprimir Reporte?",
+        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b></div>`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, Imprimir",
+        cancelButtonText: "Cancelar",
+    });
+
+    if (isConfirmed) PrintHojaR(numeroTicket, token, datosFooter);
 };
 
 export const Loading = (mensaje) => {

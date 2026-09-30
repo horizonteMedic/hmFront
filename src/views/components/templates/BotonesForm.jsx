@@ -15,6 +15,8 @@ export default function BotonesForm({
     hideClear = false,
     hideEdit = false,
     hidePrint = false,
+    printField = "norden",
+    printLabel = "IMPRIMIR",
     printSlot = null,
     children,
 }) {
@@ -74,11 +76,11 @@ export default function BotonesForm({
 
             {printSlot ? printSlot : (!hidePrint && (
                 <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                    <span className="font-bold italic text-base mb-1">{printLabel}</span>
                     <div className="flex items-center gap-2">
                         <input
-                            name="norden"
-                            value={form.norden}
+                            name={printField}
+                            value={form[printField]}
                             onChange={onNordenChange ?? handleChangeNumberDecimals}
                             onKeyUp={(e) => e.key === "Enter" && handlePrint()}
                             className="border rounded px-2 py-1 text-base w-24"
