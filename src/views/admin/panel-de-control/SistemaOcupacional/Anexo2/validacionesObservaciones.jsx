@@ -2,6 +2,8 @@
 // Cada validador recibe el/los valor(es) a evaluar más el texto acumulado hasta el momento,
 // y devuelve el texto actualizado (agregando la observación solo si la condición se cumple).
 
+import { EMPRESA_NUEVA_BOROO } from "../../../../utils/consts";
+
 export function agregarTexto(textoActual, nuevoTexto) {
   if (!nuevoTexto || !nuevoTexto.trim()) return textoActual;
   if (!textoActual || !textoActual.trim()) return nuevoTexto;
@@ -398,7 +400,7 @@ export function validarCreatinina(creatinina) {
 
 
 export function validarRiesgoCardiovascularFramingham(empresa, edad, nomExamen, riesgoCoronarioValor, observaciones) {
-  const aplica = empresa === "MINERA BOROO MISQUICHILCA S.A." && parseFloat(edad) > 30 && nomExamen === "PRE-OCUPACIONAL";
+  const aplica = (empresa === "MINERA BOROO MISQUICHILCA S.A." || empresa === EMPRESA_NUEVA_BOROO) && parseFloat(edad) > 30 && nomExamen === "PRE-OCUPACIONAL";
   if (!aplica) return { observaciones };
   return {
     observaciones: agregarObservacion(observaciones, `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${riesgoCoronarioValor}. CONTROL ANUAL\n`),

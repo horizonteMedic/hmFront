@@ -10,6 +10,7 @@ import {
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 import { getDatePlusYears } from "../../../../utils/helpers";
+import { EMPRESA_NUEVA_BOROO } from "../../../../utils/consts";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion";
@@ -123,7 +124,7 @@ export const GetInfoServicio = async (
             }
         }
 
-        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
+        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A." || ((res.empresa ?? "") === EMPRESA_NUEVA_BOROO));
         const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
             (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
         const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
@@ -260,7 +261,7 @@ export const GetInfoServicioEditar = async (
                 imcRed = true;
             }
         }
-        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
+        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A." || ((res.empresa ?? "") === EMPRESA_NUEVA_BOROO));
         const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." ||
             (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
 
@@ -411,7 +412,7 @@ export const SubmitDataService = async (
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
-    } 
+    }
 
     const body = {
         norden: form.norden,

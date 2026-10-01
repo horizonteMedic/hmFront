@@ -1442,7 +1442,7 @@ export const resolverEmpresaContratistaBoroo = (empresa, contratista) => {
     const contratistaTexto = (contratista ?? "").toString();
     const normalizadoEmpresa = empresaTexto.toUpperCase().replace(/\s+/g, "");
     const normalizadoContrata = contratistaTexto.toUpperCase().replace(/\s+/g, "");
-    const variantes = ["BOROO", "BORO", "BOORO"];
+    const variantes = ["BOROO", "BORO", "BOORO","LUXCO S.A. SUCURSAL DEL PER"];
     const empresaEsBoroo = variantes.some((v) => normalizadoEmpresa.includes(v));
     const contrataEsBoroo = variantes.some((v) => normalizadoContrata.includes(v));
     const esBoroo = empresaEsBoroo || contrataEsBoroo;

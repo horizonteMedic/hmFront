@@ -3,6 +3,7 @@ import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, LoadingDefault,
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
+import { EMPRESA_NUEVA_BOROO } from "../../../../utils/consts";
 
 export const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
@@ -1192,7 +1193,7 @@ export const GetInfoServicio = (
           data.plomoSangre = res.plomoSangre ?? "N/A";
 
           if (
-            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A." || data.empresa === EMPRESA_NUEVA_BOROO) &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
@@ -2651,7 +2652,7 @@ export const GetInfoServicioEditar = (
           }
 
           if (
-            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A." || data.empresa === EMPRESA_NUEVA_BOROO) &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
