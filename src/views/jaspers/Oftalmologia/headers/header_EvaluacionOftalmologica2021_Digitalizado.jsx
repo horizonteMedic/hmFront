@@ -75,7 +75,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) 
     const { esBoroo, empresaTexto: empresaTextoBase } = resolverEmpresaContratistaBoroo(empresaBase, contrataBase);
     const empresaUpper = empresaTextoBase.toUpperCase();
     const empresaTexto =
-        empresaUpper.includes("BOROO") || empresaUpper.includes("BORO")
+        empresaUpper.includes("BOROO") || empresaUpper.includes("BORO") || empresaUpper.includes("LUXCO S.A. SUCURSAL DEL PER")
             ? contrataBase || empresaTextoBase
             : empresaTextoBase;
 
