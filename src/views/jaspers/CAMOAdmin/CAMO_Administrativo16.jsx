@@ -4,12 +4,13 @@ import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import CAMO_Administrativo16_MARSA from './CAMO_Administrativo16_MARSA.jsx';
+import { EMPRESA_NUEVA_BOROO } from "../../utils/consts.js";
 
 export default async function CAMO_Administrativo16(data = {}, docExistente = null, isSimple = false) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   let numeroPagina = 1;
-  const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A."
+  const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A." || String(data.empresa) === EMPRESA_NUEVA_BOROO;
   const esMARSA = String(data.empresa) === "MINERA AURIFERA RETAMAS S.A."
   const Recomendaciones = (esBoro || esMARSA) && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 

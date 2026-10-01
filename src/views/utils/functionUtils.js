@@ -77,7 +77,7 @@ export const RegistrarServicioAsistencialDefault = async (
     token,
     body,
     registrarUrl,
-    onSuccess = () => {},
+    onSuccess = () => { },
     mensajeExito = "Datos registrados correctamente.",
     onPrint = null
 ) => {
@@ -1442,10 +1442,11 @@ export const resolverEmpresaContratistaBoroo = (empresa, contratista) => {
     const contratistaTexto = (contratista ?? "").toString();
     const normalizadoEmpresa = empresaTexto.toUpperCase().replace(/\s+/g, "");
     const normalizadoContrata = contratistaTexto.toUpperCase().replace(/\s+/g, "");
-    const variantes = ["BOROO", "BORO", "BOORO"];
+    const variantes = ["BOROO", "BORO", "BOORO", "LUXCO"];
     const empresaEsBoroo = variantes.some((v) => normalizadoEmpresa.includes(v));
     const contrataEsBoroo = variantes.some((v) => normalizadoContrata.includes(v));
     const esBoroo = empresaEsBoroo || contrataEsBoroo;
+    // console.log(esBoroo, "empres ", empresaTexto, "contrata ", contratistaTexto)
 
     if (esBoroo) {
         if (empresaEsBoroo && !contrataEsBoroo && contratistaTexto) {

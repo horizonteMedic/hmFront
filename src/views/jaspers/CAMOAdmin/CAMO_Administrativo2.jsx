@@ -5,12 +5,13 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import { dnicompletarConCeros } from "../../utils/functionUtils.js";
+import { EMPRESA_NUEVA_BOROO } from "../../utils/consts.js";
 
 export default async function CAMO_Administrativo2(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A."
+  const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A." || String(data.empresa) === EMPRESA_NUEVA_BOROO;
   const Recomendaciones = esBoro && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
   const limpiarTexto = (txt) =>

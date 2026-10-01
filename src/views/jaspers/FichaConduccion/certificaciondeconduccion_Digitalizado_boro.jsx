@@ -231,7 +231,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yPos += filaAltura;
 
   // Séptima fila: Contrata (fila completa) - Solo si NO es BOROO
-  if (!esBoroo || !isNYV) {
+  if (!esBoroo && !isNYV) {
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -317,7 +317,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yTexto += filaAltura;
 
   // Séptima fila: Contrata - Solo si NO es BOROO
-  if (!esBoroo || !isNYV) {
+  if (!esBoroo && !isNYV) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1370,7 +1370,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yPos += alturaSeccionDeclaracion;
 
   // === FOOTER ===
-  if (!esBoroo || !isNYV) {
+  if (!esBoroo && !isNYV) {
     footerTR(doc, { footerOffsetY: 8 });
   }
 

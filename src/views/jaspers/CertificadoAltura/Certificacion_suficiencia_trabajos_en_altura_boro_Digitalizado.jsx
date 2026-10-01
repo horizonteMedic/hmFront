@@ -235,7 +235,7 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
 
   if (!esBoroo) {
     const empresaUpper = (datosFinales.empresa || "").toUpperCase();
-    if (empresaUpper.includes("BOROO") || empresaUpper.includes("BORO")) {
+    if (empresaUpper.includes("BOROO") || empresaUpper.includes("BORO")||empresaUpper.includes("LUXCO S.A. SUCURSAL DEL PER")) {
       esBoroo = true;
       empresaTexto = datosFinales.contratista || datosFinales.empresa;
     }
