@@ -3,6 +3,7 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
+import { useAuthStore } from "../../../../../../store/auth";
 
 const baseUrl = "/asistencial/historia-asistencial/historia-mujer-o-varon-adulto";
 
@@ -336,6 +337,13 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     );
 };
 
+// Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar): lo usa la
+// cabecera del reporte.
+const nombreSedeActual = () => {
+    const { userlogued, selectedSede } = useAuthStore.getState();
+    return userlogued?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede ?? "";
+};
+
 // Datos que consume el Jasper: mismos nombres de campo del formulario, armados con los mappers de
 // arriba a partir del registro guardado (así la impresión y la pantalla nunca se desalinean).
 const construirDatosImpresion = (data) => {
@@ -343,6 +351,7 @@ const construirDatosImpresion = (data) => {
     return {
         ...formFromPaciente(paciente, data.infoTicket),
         ...formFromHistoria(data, ""),
+        sede: nombreSedeActual(),
         numeroTicket: data.numeroTicket ?? "",
         numeroHistoriaClinica: data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? "",
         nombre_medico: data.doctorAsignado ?? "",

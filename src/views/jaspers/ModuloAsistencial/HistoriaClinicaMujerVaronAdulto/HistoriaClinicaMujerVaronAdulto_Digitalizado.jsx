@@ -1,6 +1,12 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../../utils/formatDateUtils";
-import CabeceraLogo from "../../components/CabeceraLogo.jsx";
+import HeaderAsistencial from "../../components/headerAsistencial.jsx";
+import DatosPersonalesAsistencial from "../../components/datosPersonalesAsistencial.jsx";
+import TituloSeccionAsistencial, { ALTO_FILA, FUENTE_CUERPO } from "../../components/tituloSeccionAsistencial.jsx";
+import FilaEtiquetaValorAsistencial, {
+  dibujarEtiquetaValor,
+  medirEtiquetaValor,
+} from "../../components/filaEtiquetaValorAsistencial.jsx";
 import footerTR from "../../components/footerTR.jsx";
 import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
 
@@ -10,15 +16,14 @@ import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx
 // mismos nombres de campo del formulario (n_hcl, nombre_padre, ap_obesidad, vacuna_dt_1_dosis...)
 // + los datos del pie (datosFooter). Página 1 = réplica de la hoja; página 2 (solo si hay datos)
 // = Examen físico / Exámenes auxiliares / Diagnóstico / Tratamiento + firma del médico.
+//
+// Estándar tipográfico (el de "Datos personales", ver tituloSeccionAsistencial.jsx): títulos de sección
+// en MAYÚSCULAS (barra gris), subtítulos solo con la 1ª letra en mayúscula, y una única letra de 9pt.
 
 const X = 10;
 const ANCHO = 190;
-const ALTO_BARRA = 5;
-const ALTO_FILA = 5.5;
-const ALTO_ITEM = 5;
 const CASILLA = 3.2;
-const FS = 7.5; // fuente base
-const FS_BLOQUE = 7; // fuente de los bloques densos (Datos Generales)
+const FS = FUENTE_CUERPO;
 const PIE_OFFSET_Y = 8;
 
 const texto = (v) => String(v ?? "").trim();
@@ -26,44 +31,15 @@ const sinAcentos = (v) => texto(v).normalize("NFD").replace(/[̀-ͯ]/g, "").toUp
 const fechaCorta = (v) => formatearFechaCorta(texto(v)) || texto(v);
 
 const normalizarDatos = (data) => {
-  const nivel = sinAcentos(data.nivelEstudios);
-  const civil = sinAcentos(data.estadoCivil);
-  const sexo = sinAcentos(data.sexo);
   const nacionalidad = sinAcentos(data.nacionalidad);
-
-  const gradoInstruccion = /ANALFABET|SIN INSTRUCCION|SIN ESTUDIOS/.test(nivel)
-    ? "ANALFABETO"
-    : nivel.includes("PRIMARIA")
-      ? "PRIMARIA"
-      : nivel.includes("SECUNDARIA")
-        ? "SECUNDARIA"
-        : /SUPERIOR|TECNIC|UNIVERSIT|INSTITUTO|BACHILLER|TITULAD|MAESTR|MAGISTER|DOCTORAD|POSTGRADO/.test(nivel)
-          ? "SUPERIOR"
-          : "";
-
-  const estadoCivil = /SOLTER/.test(civil)
-    ? "SOLTERO"
-    : /CONVIV/.test(civil)
-      ? "CONVIVIENTE"
-      : /CASAD/.test(civil)
-        ? "CASADO"
-        : civil
-          ? "OTRA"
-          : "";
-
+  
   const esPeruana = nacionalidad.startsWith("PERU");
 
   return {
     numeroHistoriaClinica: texto(data.numeroHistoriaClinica),
     fechaApertura: fechaCorta(data.fecha_apertura_hcl),
     nombreCompleto: `${texto(data.apellidos)} ${texto(data.nombres)}`.trim(),
-    fechaNacimiento: fechaCorta(data.fechaNacimiento),
     dni: texto(data.dni),
-    ocupacion: texto(data.ocupacion),
-    gradoInstruccion,
-    estadoCivil,
-    estadoCivilOtro: estadoCivil === "OTRA" ? texto(data.estadoCivil) : "",
-    sexo: sexo.startsWith("M") ? "M" : sexo.startsWith("F") ? "F" : "",
     esPeruana,
     otraNacionalidad: nacionalidad && !esPeruana ? texto(data.nacionalidad) : "",
     tienePagina2: [data.examenFisico, data.examenesAuxiliares, data.diagnostico, data.tratamiento].some(
@@ -113,28 +89,25 @@ const FAMILIARES = [
   ],
   [{ etiqueta: "Esposa/Cónyuge - Especifique:", campo: "esposaConyuge" }],
 ];
-// Filas "ETIQUETA: valor" de alto dinámico (ver filaEtiquetaValor): alto de línea y tope de líneas.
-const ALTO_LINEA_TEXTO = 3.6;
-const MAX_LINEAS_CELDA = 3;
-
 // Inmunizaciones: prefijo de los campos del formulario y N° de dosis que soporta cada vacuna.
 const VACUNAS = [
   { nombre: "DT", prefijo: "vacuna_dt", dosis: 3 },
   { nombre: "HVB", prefijo: "vacuna_hvb", dosis: 3 },
-  { nombre: "ANTIAMARILICA", prefijo: "vacuna_antiamarilica", dosis: 1 },
+  { nombre: "Antiamarílica", prefijo: "vacuna_antiamarilica", dosis: 1 },
 ];
 
 export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const d = normalizarDatos(data);
-  const totalPaginas = d.tienePagina2 ? 2 : 1;
 
   // ===== Primitivas de dibujo =====
   const fuente = (estilo = "normal", size = FS) => doc.setFont("helvetica", estilo).setFontSize(size);
-  const yBase = (yFila, alto = ALTO_FILA) => yFila + alto / 2 + 1.1; // baseline centrado en la fila
+  const yBase = (yFila, alto = ALTO_FILA) => yFila + alto / 2 + 1; // baseline centrado en la fila
   const celda = (x, y, w, h) => doc.rect(x, y, w, h);
 
-  // Texto de una línea: si no cabe en el ancho dado reduce la letra (hasta 5.5) y, en último caso, recorta.
+  // Texto de una línea para valores cortos de casillas fijas (números): si no cabe en el ancho dado
+  // reduce la letra (hasta 5.5) y, en último caso, recorta. Los campos de texto libre NO lo usan:
+  // van en celdas adaptables (filaEtiquetaValor), que achican un poco la letra y saltan de línea.
   const textoAjustado = (t, x, y, anchoMax, opts) => {
     const valor = texto(t);
     if (!valor) return;
@@ -149,57 +122,19 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     doc.setFontSize(base);
   };
 
-  // "ETIQUETA: valor" — etiqueta en negrita y el valor a continuación, dentro de un ancho máximo.
-  const etiquetaValor = (etiqueta, valor, x, y, anchoMax, size = FS) => {
-    fuente("bold", size);
+  // "Etiqueta: valor" — etiqueta en negrita y el valor a continuación, dentro de un ancho máximo.
+  const etiquetaValor = (etiqueta, valor, x, y, anchoMax) => {
+    fuente("bold");
     doc.text(etiqueta, x, y);
     const ancho = doc.getTextWidth(etiqueta) + 1.5;
-    fuente("normal", size);
+    fuente("normal");
     textoAjustado(valor, x + ancho, y, anchoMax - ancho);
   };
 
-  // Fila de celdas "ETIQUETA: valor" cuyo alto crece con el texto libre del valor (hasta
-  // MAX_LINEAS_CELDA líneas; si no cabe, reduce la letra). La 1ª línea va junto a la etiqueta
-  // y las siguientes desde el margen izquierdo de la celda. Devuelve la Y donde termina la fila.
-  const filaEtiquetaValor = (celdas, y) => {
-    const armadas = celdas.map(({ etiqueta, valor, ancho }) => {
-      const limpio = texto(valor).replace(/\s+/g, " ");
-      fuente("bold");
-      const anchoEtiqueta = doc.getTextWidth(etiqueta) + 1.5;
-      const envolver = (size) => {
-        fuente("normal", size);
-        if (!limpio) return [];
-        const [primera = ""] = doc.splitTextToSize(limpio, ancho - 4 - anchoEtiqueta);
-        const resto = limpio.slice(primera.length).trim();
-        return [primera, ...(resto ? doc.splitTextToSize(resto, ancho - 4) : [])];
-      };
-      let size = FS;
-      let lineas = envolver(size);
-      while (lineas.length > MAX_LINEAS_CELDA && size > 5.5) {
-        size -= 0.5;
-        lineas = envolver(size);
-      }
-      return { etiqueta, ancho, anchoEtiqueta, size, lineas: lineas.slice(0, MAX_LINEAS_CELDA) };
-    });
-
-    const alto = Math.max(
-      ALTO_FILA,
-      ...armadas.map(({ lineas }) => lineas.length * ALTO_LINEA_TEXTO + (ALTO_FILA - ALTO_LINEA_TEXTO))
-    );
-    const yPrimera = yBase(y);
-    let xCelda = X;
-    armadas.forEach(({ etiqueta, ancho, anchoEtiqueta, size, lineas }) => {
-      celda(xCelda, y, ancho, alto);
-      fuente("bold");
-      doc.text(etiqueta, xCelda + 2, yPrimera);
-      fuente("normal", size);
-      lineas.forEach((linea, i) =>
-        doc.text(linea, i === 0 ? xCelda + 2 + anchoEtiqueta : xCelda + 2, yPrimera + i * ALTO_LINEA_TEXTO)
-      );
-      xCelda += ancho;
-    });
-    return y + alto;
-  };
+  // Fila de celdas "Etiqueta: valor" adaptables al texto: si el valor no cabe, primero se achica un
+  // poco la letra y, si aun así no entra, salta de línea (la fila crece, nunca se recorta). Ver
+  // filaEtiquetaValorAsistencial.jsx. Devuelve la Y donde termina la fila.
+  const filaEtiquetaValor = (celdas, y) => FilaEtiquetaValorAsistencial(doc, celdas, { x: X, y });
 
   const casilla = (x, y, marcada) => {
     doc.setLineWidth(0.2);
@@ -214,17 +149,43 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
   };
 
   // "Etiqueta ☐" en línea: devuelve la X donde puede seguir la siguiente opción.
-  const opcion = (etiqueta, marcada, x, yTexto, size = FS) => {
-    fuente("normal", size);
+  const opcion = (etiqueta, marcada, x, yTexto) => {
+    fuente("normal");
     doc.text(etiqueta, x, yTexto);
     const xCasilla = x + doc.getTextWidth(etiqueta) + 1.2;
     casilla(xCasilla, yTexto - CASILLA + 0.5, marcada);
     return xCasilla + CASILLA + 3;
   };
 
+  // Ancho que ocupa una opción "Etiqueta ☐" dibujada con `opcion`.
+  const anchoOpcion = (etiqueta) => {
+    fuente("normal");
+    return doc.getTextWidth(etiqueta) + 1.2 + CASILLA + 3;
+  };
+
+  // Contenido propio para una celda adaptable (ver filaEtiquetaValor), entre la etiqueta y el valor.
+  const adornoSiNo = (valor) => ({
+    ancho: 2.5 + anchoOpcion("Si") + anchoOpcion("No"),
+    dibujar: (x, yTexto) => {
+      const xNo = opcion("Si", valor === "SI", x + 2.5, yTexto);
+      opcion("No", valor === "NO", xNo, yTexto);
+    },
+  });
+  const adornoNacionalidad = () => {
+    fuente("normal");
+    return {
+      ancho: anchoOpcion("Peruana") + doc.getTextWidth("Otra:") + 1,
+      dibujar: (x, yTexto) => {
+        const xOtra = opcion("Peruana", d.esPeruana, x, yTexto);
+        fuente("normal");
+        doc.text("Otra:", xOtra, yTexto);
+      },
+    };
+  };
+
   // "Etiqueta ........ ☐" con la casilla pegada al borde derecho de la columna.
   const itemColumna = (etiqueta, marcada, xCol, wCol, yFila, { estilo = "normal", linea = false } = {}) => {
-    const yt = yBase(yFila, ALTO_ITEM);
+    const yt = yBase(yFila);
     fuente(estilo);
     doc.text(etiqueta, xCol + 2, yt);
     const xCasilla = xCol + wCol - CASILLA - 2;
@@ -232,203 +193,145 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
       doc.setLineWidth(0.2);
       doc.line(xCol + 2 + doc.getTextWidth(etiqueta) + 1, yt + 0.4, xCasilla - 1.5, yt + 0.4);
     }
-    casilla(xCasilla, yFila + (ALTO_ITEM - CASILLA) / 2, marcada);
+    casilla(xCasilla, yFila + (ALTO_FILA - CASILLA) / 2, marcada);
   };
 
-  const barra = (titulo, y) => {
-    doc.setFillColor(196, 196, 196);
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-    doc.rect(X, y, ANCHO, ALTO_BARRA, "FD");
-    fuente("bold", 8.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(titulo, X + ANCHO / 2, y + 3.6, { align: "center" });
-    return y + ALTO_BARRA;
-  };
+  // Barra de título de sección (siempre en mayúsculas), la misma que usa "Datos personales".
+  const barra = (titulo, y) => TituloSeccionAsistencial(doc, titulo, { x: X, y, ancho: ANCHO });
 
   // ===== Encabezado =====
+  // Cabecera compartida del módulo asistencial (formato de Riesgo Cardiovascular, con N° Ticket y
+  // N° Historia Clínica). Devuelve la Y donde empieza el contenido.
   const dibujarEncabezado = async (pagina) => {
-    doc.setTextColor(0, 0, 0);
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
 
-    await CabeceraLogo(doc, {});
-
-    fuente("bold", 11);
-    doc.text("HISTORIA CLÍNICA DE LA MUJER Y EL VARÓN ADULTO", 140, 16, { align: "center" });
-
-    fuente("normal", 7);
-    doc.text(`Pág. ${pagina} de ${totalPaginas}`, X + ANCHO, 8, { align: "right" });
-
-    fuente("bold", 8.5);
-    doc.text("N° HCL:", 128, 24);
-    doc.line(142, 24.8, X + ANCHO, 24.8);
-    fuente("normal", 9);
-    doc.text(d.numeroHistoriaClinica, 146, 24);
-
-    fuente("bold", 8);
-    doc.text("ESTABLECIMIENTO:", X, 32);
-    fuente("normal", 8);
-    doc.text("POLICLINICO HORIZONTE MEDIC", X + 33, 32);
-
-    fuente("bold", 8);
-    doc.text("FECHA DE APERTURA HCL:", 128, 32);
-    doc.line(165, 32.8, X + ANCHO, 32.8);
-    fuente("normal", 8);
-    doc.text(d.fechaApertura, 168, 32);
+    return HeaderAsistencial(
+      doc,
+      {
+        numeroTicket: data.numeroTicket,
+        numeroHistoriaClinica: d.numeroHistoriaClinica,
+        sede: data.sede,
+        fecha: d.fechaApertura,
+      },
+      { pagina, titulo: "HISTORIA CLÍNICA DE LA MUJER Y EL VARÓN ADULTO", etiquetaFecha: "Fecha de apertura HCL" }
+    );
   };
 
   // ===== Página 1: réplica de la hoja =====
   const dibujarPagina1 = (yInicio) => {
-    let y = barra("DATOS GENERALES", yInicio);
+    // ----- Datos personales (mismo diseño que Riesgo Cardiovascular) -----
+    let y = DatosPersonalesAsistencial(doc, { ...data, nombreCompleto: d.nombreCompleto }, { x: X, y: yInicio, ancho: ANCHO });
 
-    celda(X, y, 130, ALTO_FILA);
-    celda(X + 130, y, 60, ALTO_FILA);
-    etiquetaValor("APELLIDOS Y NOMBRES:", d.nombreCompleto, X + 2, yBase(y), 126);
-    etiquetaValor("FECHA NAC.:", d.fechaNacimiento, X + 132, yBase(y), 56);
-    y += ALTO_FILA;
+    // ----- Datos generales: lo propio de la hoja que no cubre la tabla de datos personales -----
+    y = barra("DATOS GENERALES", y);
 
-    celda(X, y, 95, ALTO_FILA);
-    celda(X + 95, y, 95, ALTO_FILA);
-    etiquetaValor("NOMBRE DEL PADRE:", data.nombre_padre, X + 2, yBase(y), 91);
-    etiquetaValor("NOMBRE DE LA MADRE:", data.nombre_madre, X + 97, yBase(y), 91);
-    y += ALTO_FILA;
-
-    celda(X, y, ANCHO, ALTO_FILA);
-    etiquetaValor("DIRECCIÓN (Jr., Calle, Avenida, Urbanización, Caserío):", data.direccion, X + 2, yBase(y), 186);
-    y += ALTO_FILA;
-
-    // Bloque: grado de instrucción | ocupación | lugar de nacimiento | estado civil y sexo
-    const altoBloque = 28;
-    const paso = 4.5;
-    const colX = [X, X + 58, X + 96, X + 154];
-    const colW = [58, 38, 58, 36];
-    colX.forEach((cx, i) => celda(cx, y, colW[i], altoBloque));
-    const fila = (n) => y + 4 + paso * n; // baseline de la fila n del bloque (0 = título)
-
-    fuente("bold", FS_BLOQUE);
-    doc.text("GRADO DE INSTRUCCIÓN:", colX[0] + 2, fila(0));
-    [
-      ["Analfabeto", "ANALFABETO"],
-      ["Primaria", "PRIMARIA"],
-      ["Secundaria", "SECUNDARIA"],
-      ["Superior", "SUPERIOR"],
-    ].forEach(([etiqueta, clave], i) => {
-      const yt = fila(i + 1);
-      fuente("normal", FS_BLOQUE);
-      doc.text(etiqueta, colX[0] + 2, yt);
-      casilla(colX[0] + 24, yt - CASILLA + 0.5, d.gradoInstruccion === clave);
-      if (clave !== "ANALFABETO") {
-        fuente("normal", 5.5);
-        doc.text("Último año aprobado", colX[0] + 29, yt);
-        doc.line(colX[0] + 47, yt + 0.3, colX[0] + colW[0] - 2, yt + 0.3);
-      }
-    });
-
-    fuente("bold", FS_BLOQUE);
-    doc.text("OCUPACIÓN(ES):", colX[1] + 2, fila(0));
-    fuente("normal", FS_BLOQUE);
-    doc
-      .splitTextToSize(d.ocupacion, colW[1] - 4)
-      .slice(0, 5)
-      .forEach((linea, i) => doc.text(linea, colX[1] + 2, fila(i + 1)));
-
-    fuente("bold", FS_BLOQUE);
-    doc.text("LUGAR DE NACIMIENTO:", colX[2] + 2, fila(0));
-    [
-      ["Localidad:", data.localidad],
-      ["Distrito:", data.distrito],
-      ["Provincia:", data.provincia],
-      ["Departamento:", data.departamento],
-    ].forEach(([etiqueta, valor], i) =>
-      etiquetaValor(etiqueta, valor, colX[2] + 2, fila(i + 1), colW[2] - 4, FS_BLOQUE)
-    );
-    const yNac = fila(5);
-    fuente("bold", FS_BLOQUE);
-    doc.text("Nacionalidad:", colX[2] + 2, yNac);
-    const xPeruana = colX[2] + 2 + doc.getTextWidth("Nacionalidad:") + 1.5;
-    const xOtra = opcion("Peruana", d.esPeruana, xPeruana, yNac, FS_BLOQUE);
-    fuente("normal", FS_BLOQUE);
-    doc.text("Otra:", xOtra, yNac);
-    const xOtraValor = xOtra + doc.getTextWidth("Otra:") + 1;
-    textoAjustado(d.otraNacionalidad, xOtraValor, yNac, colX[2] + colW[2] - 2 - xOtraValor);
-
-    fuente("bold", FS_BLOQUE);
-    doc.text("ESTADO CIVIL:", colX[3] + 2, fila(0));
-    const xConviviente = opcion("Soltero", d.estadoCivil === "SOLTERO", colX[3] + 2, fila(1), FS_BLOQUE);
-    opcion("Conviviente", d.estadoCivil === "CONVIVIENTE", xConviviente, fila(1), FS_BLOQUE);
-    const xOtroCivil = opcion("Casado", d.estadoCivil === "CASADO", colX[3] + 2, fila(2), FS_BLOQUE);
-    fuente("normal", FS_BLOQUE);
-    doc.text("Otro:", xOtroCivil, fila(2));
-    const xOtroCivilValor = xOtroCivil + doc.getTextWidth("Otro:") + 1;
-    textoAjustado(d.estadoCivilOtro, xOtroCivilValor, fila(2), colX[3] + colW[3] - 2 - xOtroCivilValor);
-    etiquetaValor("Raza:", data.raza, colX[3] + 2, fila(3), colW[3] - 4, FS_BLOQUE);
-    etiquetaValor("Religión:", data.religion, colX[3] + 2, fila(4), colW[3] - 4, FS_BLOQUE);
-    fuente("bold", FS_BLOQUE);
-    doc.text("Sexo:", colX[3] + 2, fila(5));
-    const xM = colX[3] + 2 + doc.getTextWidth("Sexo:") + 1.5;
-    const xF = opcion("M", d.sexo === "M", xM, fila(5), FS_BLOQUE);
-    opcion("F", d.sexo === "F", xF, fila(5), FS_BLOQUE);
-    y += altoBloque;
-
-    // Una sola fila (suman ANCHO): "lugares" es texto libre y puede ocupar hasta 3 líneas.
     y = filaEtiquetaValor(
       [
-        { etiqueta: "Lugares en que estuvo en los últimos 6 meses:", valor: data.lugares_6_meses, ancho: 80 },
-        { etiqueta: "Documento de identidad:", valor: d.dni, ancho: 49 },
-        { etiqueta: "GPO. SANG:", valor: data.grupo_sang, ancho: 26 },
-        { etiqueta: "FACTOR RH:", valor: data.factor_rh, ancho: 35 },
+        { etiqueta: "Nombre del padre:", valor: data.nombre_padre, ancho: ANCHO / 2 },
+        { etiqueta: "Nombre de la madre:", valor: data.nombre_madre, ancho: ANCHO / 2 },
+      ],
+      y
+    );
+    y = filaEtiquetaValor(
+      [{ etiqueta: "Dirección (Jr., calle, avenida, urbanización, caserío):", valor: data.direccion, ancho: ANCHO }],
+      y
+    );
+    y = filaEtiquetaValor(
+      [
+        { etiqueta: "Localidad:", valor: data.localidad, ancho: ANCHO / 2 },
+        { etiqueta: "Distrito:", valor: data.distrito, ancho: ANCHO / 2 },
+      ],
+      y
+    );
+    y = filaEtiquetaValor(
+      [
+        { etiqueta: "Provincia:", valor: data.provincia, ancho: ANCHO / 2 },
+        { etiqueta: "Departamento:", valor: data.departamento, ancho: ANCHO / 2 },
+      ],
+      y
+    );
+
+    // Nacionalidad (casilla Peruana / Otra) | Raza | Religión
+    y = filaEtiquetaValor(
+      [
+        { etiqueta: "Nacionalidad:", valor: d.otraNacionalidad, ancho: 80, adorno: adornoNacionalidad() },
+        { etiqueta: "Raza:", valor: data.raza, ancho: 55 },
+        { etiqueta: "Religión:", valor: data.religion, ancho: 55 },
+      ],
+      y
+    );
+
+    // "Lugares" es texto libre y puede ocupar varias líneas.
+    y = filaEtiquetaValor(
+      [{ etiqueta: "Lugares en que estuvo en los últimos 6 meses:", valor: data.lugares_6_meses, ancho: ANCHO }],
+      y
+    );
+    y = filaEtiquetaValor(
+      [
+        { etiqueta: "Grupo sanguíneo:", valor: data.grupo_sang, ancho: ANCHO / 2 },
+        { etiqueta: "Factor Rh:", valor: data.factor_rh, ancho: ANCHO / 2 },
       ],
       y
     );
 
     // ----- Antecedentes personales -----
     y = barra("ANTECEDENTES PERSONALES", y);
-    const altoAP = 26;
     const apX = [X, X + 55, X + 110, X + 145];
     const apW = [55, 55, 35, 45];
+    // "Especificar" es texto libre: si ocupa varias líneas el bloque crece y empuja "Sedentarismo".
+    const mEspecificar = medirEtiquetaValor(doc, {
+      etiqueta: "Especificar:",
+      valor: data.especificarDrogasSedentarismo,
+      ancho: apW[1],
+    });
+    const extraAP = mEspecificar.alto - ALTO_FILA;
+    const altoAP = 26 + extraAP;
     apX.forEach((cx, i) => celda(cx, y, apW[i], altoAP));
+    // Las 4 columnas comparten el mismo ritmo vertical: subtítulo (n = 0) y una línea cada ALTO_FILA.
+    const linea = (n) => y + 3.5 + ALTO_FILA * n;
 
-    fuente("bold", FS_BLOQUE);
-    doc.text("CONSUMO DE SUSTANCIAS NOCIVAS:", apX[0] + 2, y + 4);
+    fuente("bold");
+    doc.text("Consumo de sustancias nocivas:", apX[0] + 2, linea(0));
     [
       ["Hoja de coca", data.sustancia_hoja_coca],
-      ["Bebidas Alcohólicas", data.sustancia_alcohol],
+      ["Bebidas alcohólicas", data.sustancia_alcohol],
       ["Tabaco", data.sustancia_tabaco],
       ["Café", data.sustancia_cafe],
     ].forEach(([etiqueta, marcada], i) =>
-      itemColumna(etiqueta, Boolean(marcada), apX[0], apW[0], y + 5 + i * 4.5)
+      itemColumna(etiqueta, Boolean(marcada), apX[0], apW[0], y + ALTO_FILA * (i + 1))
     );
 
-    fuente("bold", FS_BLOQUE);
-    doc.text("CONSUMO DE DROGAS:", apX[1] + 2, y + 4);
-    const xNoDrogas = opcion("Si", data.consumo_drogas === "SI", apX[1] + 2, y + 9);
-    opcion("No", data.consumo_drogas === "NO", xNoDrogas, y + 9);
-    fuente("bold", FS_BLOQUE);
-    doc.text("SEDENTARISMO:", apX[1] + 2, y + 21);
-    const xSed = apX[1] + 2 + doc.getTextWidth("SEDENTARISMO:") + 1.5;
-    const xNoSed = opcion("Si", data.sedentarismo === "SI", xSed, y + 21);
-    opcion("No", data.sedentarismo === "NO", xNoSed, y + 21);
-    etiquetaValor("Especificar:", data.especificarDrogasSedentarismo, apX[1] + 2, y + 14.5, apW[1] - 4, FS_BLOQUE);
+    fuente("bold");
+    doc.text("Consumo de drogas:", apX[1] + 2, linea(0));
+    const xNoDrogas = opcion("Si", data.consumo_drogas === "SI", apX[1] + 2, linea(1));
+    opcion("No", data.consumo_drogas === "NO", xNoDrogas, linea(1));
+    dibujarEtiquetaValor(doc, mEspecificar, apX[1], y + ALTO_FILA * 2);
+    const ySed = linea(3) + extraAP;
+    fuente("bold");
+    doc.text("Sedentarismo:", apX[1] + 2, ySed);
+    const xSed = apX[1] + 2 + doc.getTextWidth("Sedentarismo:") + 1.5;
+    const xNoSed = opcion("Si", data.sedentarismo === "SI", xSed, ySed);
+    opcion("No", data.sedentarismo === "NO", xNoSed, ySed);
 
-    fuente("bold", FS_BLOQUE);
-    doc.text("SEXUALIDAD", apX[2] + apW[2] / 2, y + 4, { align: "center" });
-    fuente("normal", FS_BLOQUE);
-    doc.text("Edad de inicio de", apX[2] + apW[2] / 2, y + 8.5, { align: "center" });
-    doc.text("Relaciones Sexuales:", apX[2] + apW[2] / 2, y + 12, { align: "center" });
+    fuente("bold");
+    doc.text("Sexualidad", apX[2] + apW[2] / 2, linea(0), { align: "center" });
+    fuente("normal");
+    doc.text("Edad de inicio de", apX[2] + apW[2] / 2, linea(1), { align: "center" });
+    doc.text("Relaciones sexuales:", apX[2] + apW[2] / 2, linea(2), { align: "center" });
     celda(apX[2] + (apW[2] - 14) / 2, y + 15, 14, 7);
-    fuente("bold", 9);
-    doc.text(texto(data.inicio_relaciones_sexuales), apX[2] + apW[2] / 2, y + 20, { align: "center" });
+    fuente("bold");
+    doc.text(texto(data.inicio_relaciones_sexuales), apX[2] + apW[2] / 2, y + 20.2, { align: "center" });
 
-    fuente("bold", FS_BLOQUE);
-    doc.text("DATOS MUJER:", apX[3] + 2, y + 4);
-    etiquetaValor("Menarquía:", data.menarquiaAnios, apX[3] + 2, y + 10, apW[3] - 12, FS_BLOQUE);
-    fuente("normal", FS_BLOQUE);
-    doc.text("años", apX[3] + apW[3] - 2, y + 10, { align: "right" });
-    fuente("bold", FS_BLOQUE);
-    doc.text("Régimen Catamenial:", apX[3] + 2, y + 15.5);
-    const yReg = y + 21;
-    fuente("normal", FS_BLOQUE);
+    fuente("bold");
+    doc.text("Datos mujer:", apX[3] + 2, linea(0));
+    etiquetaValor("Menarquía:", data.menarquiaAnios, apX[3] + 2, linea(1), apW[3] - 12);
+    fuente("normal");
+    doc.text("años", apX[3] + apW[3] - 2, linea(1), { align: "right" });
+    fuente("bold");
+    doc.text("Régimen catamenial:", apX[3] + 2, linea(2));
+    const yReg = linea(3);
+    fuente("normal");
     textoAjustado(data.regimenCatamenialSangrado, apX[3] + 3, yReg, 11);
     doc.line(apX[3] + 2, yReg + 0.5, apX[3] + 14, yReg + 0.5);
     doc.text("días /", apX[3] + 16, yReg);
@@ -439,14 +342,14 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
 
     // ----- Antecedentes patológicos -----
     y = barra("ANTECEDENTES PATOLÓGICOS", y);
-    celda(X, y, ANCHO, ALTO_ITEM * 4);
+    celda(X, y, ANCHO, ALTO_FILA * 4);
     const anchoPat = ANCHO / PATOLOGICOS.length;
     PATOLOGICOS.forEach((col, ci) => {
       const cx = X + ci * anchoPat;
       col.forEach(([campo, etiqueta, tipo], i) => {
-        const yFila = y + i * ALTO_ITEM;
+        const yFila = y + i * ALTO_FILA;
         if (tipo === "linea") {
-          const yt = yBase(yFila, ALTO_ITEM);
+          const yt = yBase(yFila);
           fuente("normal");
           doc.text(etiqueta, cx + 2, yt);
           const xLinea = cx + 2 + doc.getTextWidth(etiqueta) + 1;
@@ -457,17 +360,15 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
         }
       });
     });
-    y += ALTO_ITEM * 4;
+    y += ALTO_FILA * 4;
 
-    celda(X, y, 95, ALTO_FILA);
-    celda(X + 95, y, 95, ALTO_FILA);
-    fuente("bold");
-    doc.text("16. ALERGIA MEDICAMENTOS", X + 2, yBase(y));
-    const xSiAlergia = X + 2 + doc.getTextWidth("16. ALERGIA MEDICAMENTOS") + 4;
-    const xNoAlergia = opcion("SI", data.ap_alergia_medicamentos === "SI", xSiAlergia, yBase(y));
-    opcion("NO", data.ap_alergia_medicamentos === "NO", xNoAlergia, yBase(y));
-    etiquetaValor("ESPECIFIQUE:", data.ap_alergia_medicamentos_especificar, X + 97, yBase(y), 91);
-    y += ALTO_FILA; 
+    y = filaEtiquetaValor(
+      [
+        { etiqueta: "16. Alergia medicamentos", ancho: ANCHO / 2, adorno: adornoSiNo(data.ap_alergia_medicamentos) },
+        { etiqueta: "Especifique:", valor: data.ap_alergia_medicamentos_especificar, ancho: ANCHO / 2 },
+      ],
+      y
+    );
 
     // ----- Antecedentes patológicos familiares -----
     y = barra("ANTECEDENTES FAMILIARES", y);
@@ -484,15 +385,19 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     celda(X, y, 40, ALTO_FILA);
     celda(X + 40, y, 150, ALTO_FILA);
     fuente("bold");
-    doc.text("VACUNAS", X + 20, yBase(y), { align: "center" });
-    doc.text("DOSIS / FECHA", X + 40 + 75, yBase(y), { align: "center" });
+    doc.text("Vacunas", X + 20, yBase(y), { align: "center" });
+    doc.text("Dosis / fecha", X + 40 + 75, yBase(y), { align: "center" });
     y += ALTO_FILA;
 
-    const altoVacuna = 6.5;
     VACUNAS.forEach(({ nombre, prefijo, dosis }) => {
+      // El texto de la dosis (a la izquierda) se adapta; la fecha va fija a la derecha de la celda.
+      const medidas = Array.from({ length: dosis }, (_, i) =>
+        medirEtiquetaValor(doc, { valor: data[`${prefijo}_${i + 1}_dosis`], ancho: 50, anchoValor: 26 })
+      );
+      const altoVacuna = Math.max(ALTO_FILA, ...medidas.map((m) => m.alto));
       celda(X, y, 40, altoVacuna);
       fuente("bold");
-      doc.text(nombre, X + 2, yBase(y, altoVacuna));
+      doc.text(nombre, X + 2, yBase(y));
       for (let n = 1; n <= 3; n++) {
         const xCelda = X + 40 + (n - 1) * 50;
         // La vacuna con 1 sola dosis deja el resto de la fila como una celda vacía.
@@ -501,10 +406,12 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
           continue;
         }
         celda(xCelda, y, 50, altoVacuna);
-        fuente("normal");
-        textoAjustado(data[`${prefijo}_${n}_dosis`], xCelda + 2, yBase(y, altoVacuna), 22);
+        dibujarEtiquetaValor(doc, medidas[n - 1], xCelda, y);
         const fechaDosis = fechaCorta(data[`${prefijo}_${n}_fecha`]);
-        if (fechaDosis) doc.text(fechaDosis, xCelda + 48, yBase(y, altoVacuna), { align: "right" });
+        if (fechaDosis) {
+          fuente("normal");
+          doc.text(fechaDosis, xCelda + 48, yBase(y), { align: "right" });
+        }
       }
       y += altoVacuna;
     });
@@ -513,18 +420,17 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     y = barra("VIGILANCIA DE ENFERMEDADES NO TRANSMISIBLES", y);
     const anchoVig = ANCHO / 3;
     [
-      ["DIABETES", data.vigilancia_diabetes],
-      ["HIPERTENSIÓN ARTERIAL", data.vigilancia_hipertension],
-      ["VIOLENCIA INTRAFAMILIAR", data.vigilancia_violencia],
+      ["Diabetes", data.vigilancia_diabetes],
+      ["Hipertensión arterial", data.vigilancia_hipertension],
+      ["Violencia intrafamiliar", data.vigilancia_violencia],
     ].forEach(([etiqueta, marcada], i) => {
       const cx = X + i * anchoVig;
-      celda(cx, y, anchoVig, altoVacuna);
-      const yt = yBase(y, altoVacuna);
+      celda(cx, y, anchoVig, ALTO_FILA);
       fuente("bold");
-      doc.text(etiqueta, cx + 2, yt);
-      casilla(cx + anchoVig - CASILLA - 2, y + (altoVacuna - CASILLA) / 2, Boolean(marcada));
+      doc.text(etiqueta, cx + 2, yBase(y));
+      casilla(cx + anchoVig - CASILLA - 2, y + (ALTO_FILA - CASILLA) / 2, Boolean(marcada));
     });
-    y += altoVacuna;
+    y += ALTO_FILA;
 
     return y;
   };
@@ -573,14 +479,13 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
   // };
 
   // ===== Armado del documento =====
-  await dibujarEncabezado(1);
-  dibujarPagina1(35);
+  const yContenido = await dibujarEncabezado(1);
+  dibujarPagina1(yContenido);
   footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
 
   // if (d.tienePagina2) {
   //   doc.addPage();
-  //   await dibujarEncabezado(2);
-  //   dibujarPagina2(37);
+  //   dibujarPagina2(await dibujarEncabezado(2));
   //   footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
   // }
 
