@@ -30,6 +30,7 @@ import {
     BuscarPorNroTicket,
     BuscarPorTicket,
     CargarDesdeFila,
+    ConfirmarImpresion,
     ObtenerTablaTickets,
     RegistrarTriaje,
 } from './controllerTriajeAsistencial';
@@ -58,7 +59,7 @@ const CAMPOS_EDITABLES = [
 ];
 
 export default function TriajeAsistencial() {
-    const { token, userlogued } = useSessionData();
+    const { token, userlogued, datosFooter } = useSessionData();
     const debounceTimeout = useRef(null);
 
     const initialFormState = {
@@ -70,6 +71,7 @@ export default function TriajeAsistencial() {
         pacienteId: null,
         id: null,
         numeroTicket: '',
+        ticketImprimir: '',
         nroHistorial: '',
         nomExam: '',
         empresa: '',
@@ -120,6 +122,7 @@ export default function TriajeAsistencial() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleChangeNumberDecimals,
         handleClear,
     } = useForm(initialFormState, { storageKey: 'triaje_asistencial' });
 
@@ -188,7 +191,11 @@ export default function TriajeAsistencial() {
         RegistrarTriaje(form, token, userlogued, () => {
             handleClear();
             setRefresh((r) => r + 1);
-        });
+        }, datosFooter);
+    };
+
+    const handlePrint = () => {
+        ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
     };
 
     const handleClearForm = () => {
@@ -477,7 +484,10 @@ export default function TriajeAsistencial() {
                 handleClear={handleClearForm}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
-                hidePrint
+                handlePrint={handlePrint}
+                printField="ticketImprimir"
+                printLabel="IMPRIMIR N° TICKET"
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
             />
         </div>
     );
