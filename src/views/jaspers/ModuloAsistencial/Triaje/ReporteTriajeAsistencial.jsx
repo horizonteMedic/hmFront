@@ -60,7 +60,7 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
       sede: data.sede,
       fecha: data.fecha,
     },
-    { pagina: 1, titulo: "INFORME TRIAJE", etiquetaFecha: "Fecha de examen" }
+    { pagina: 1, titulo: "INFORME TRIAJE ASISTENCIAL", etiquetaFecha: "Fecha de examen" }
   );
 
   // ===== Datos personales =====
