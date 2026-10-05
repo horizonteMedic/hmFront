@@ -510,11 +510,14 @@ export const SubmitDataServiceDefault = async (
     registrarUrl,
     onFinish = () => { },
     tienePrint = true,
+    // `id` de la respuesta que se considera éxito. Por defecto solo 1; algunos endpoints
+    // antiguos (p. ej. Test de Fatiga) responden 0 al actualizar y 1 al registrar.
+    idsExito = [1],
 ) => {
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
         console.log(res)
-        if (res.id === 1 || res.nOrden || res.codigo == "201") {
+        if (idsExito.includes(res.id) || res.nOrden || res.codigo == "201") {
             if (tienePrint) {
                 Swal.fire({
                     title: "Exito",

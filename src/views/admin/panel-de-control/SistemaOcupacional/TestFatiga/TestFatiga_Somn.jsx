@@ -1,372 +1,327 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMicroscope,
-  faTint,
-  faHeartbeat,
-  faSave,
-  faBroom,
-  faPrint,
-} from "@fortawesome/free-solid-svg-icons";
-
-import Swal from "sweetalert2";
-
-import { useSessionData } from "../../../../hooks/useSessionData";
-import { useForm } from "../../../../hooks/useForm";
-import { PrintHojaR, SubmitTestFatiga, VerifyTR } from "./ControllerTestF";
+import { useState } from "react";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { getToday } from "../../../../utils/helpers";
+import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import RadioTable from "../../../../components/reusableComponents/RadioTable";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./ControllerTestF";
+import {
+    OPCIONES_PROBABILIDAD,
+    PREGUNTAS_SITUACION,
+    RESPUESTAS_INICIALES,
+    calcularPuntaje,
+} from "./modelTest";
 
-const tabla = "test_fatiga_somnolencia"
+const tabla = "test_fatiga_somnolencia";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fexamen",
+    ...PREGUNTAS_SITUACION.map(({ name }) => name),
+    "manejaVehiculos",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 const Test_fatiga = () => {
-  const today = getToday();
-  const { token, selectedSede, datosFooter, userlogued, userCompleto, userName } =
-    useSessionData();
-  const initialFormState = {
-    norden: "",
-    fexamen: today,
-    nombres: "",
-    dni: "",
-    edad: "",
-    sexoPa: "",
-    areaO: "",
-    razonEmpresa: "",
-    //SITUACIÓN
-    rbs1Nunca: true,
-    rbs1Poca: false,
-    rbs1Moderada: false,
-    rbs1Alta: false,
+    const { token, userlogued, selectedSede, datosFooter, userName, userCompleto } = useSessionData();
+    const today = getToday();
 
-    rbs2Nunca: true,
-    rbs2Poca: false,
-    rbs2Moderada: false,
-    rbs2Alta: false,
+    const initialFormState = {
+        // Header
+        norden: "",
+        fexamen: today,
+        // Datos personales
+        dni: "",
+        nombres: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        edad: "",
+        sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
-    rbs3Nunca: true,
-    rbs3Poca: false,
-    rbs3Moderada: false,
-    rbs3Alta: false,
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
-    rbs4Nunca: true,
-    rbs4Poca: false,
-    rbs4Moderada: false,
-    rbs4Alta: false,
+        // Situación: cada pregunta guarda UNA opción ("NUNCA" | "POCA" | "MODERADA" | "ALTA")
+        ...RESPUESTAS_INICIALES,
 
-    rbs5Nunca: true,
-    rbs5Poca: false,
-    rbs5Moderada: false,
-    rbs5Alta: false,
+        // Pregunta obligatoria: "SI" | "NO"
+        manejaVehiculos: "",
 
-    rbs6Nunca: true,
-    rbs6Poca: false,
-    rbs6Moderada: false,
-    rbs6Alta: false,
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
 
-    rbs7Nunca: true,
-    rbs7Poca: false,
-    rbs7Moderada: false,
-    rbs7Alta: false,
+        // Usuario que registra (el backend lo guarda como txtMedico / dniUser)
+        txtMedico: userCompleto?.datos?.nombres_user ?? "",
+        dniUser: userCompleto?.datos?.dni_user ?? "",
 
-    rbs8Nunca: true,
-    rbs8Poca: false,
-    rbs8Moderada: false,
-    rbs8Alta: false,
+        // Identificador del registro en backend (null = registro nuevo)
+        codEval: null,
 
-    rbs9Nunca: true,
-    rbs9Poca: false,
-    rbs9Moderada: false,
-    rbs9Alta: false,
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
 
-    txtPuntaje: "0",
-    rbNo: false,
-    rbSi: false,
-    txtMedico: userCompleto.datos.nombres_user,
-    dniUser: userCompleto.datos.dni_user,
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-  };
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
+    };
 
-  const { form, setForm, handleChange, handleChangeNumber, handleClear, handleClearnotO, handleCheckBoxChange } = useForm(initialFormState)
+    const {
+        form,
+        setForm,
+        handleChangeNumber,
+        handleRadioButton,
+        handleClear,
+        handleChangeSimple,
+        handleClearnotO,
+        handlePrintDefault,
+        handleChangeNumberDecimals,
+    } = useForm(initialFormState, { storageKey: "TestFatigaSomnolencia" });
 
-  const handlePrint = () => {
-    if (!form.norden) return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Test de Fatiga y Somnolencia?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-      }
-    });
-  };
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
 
-  const scoreMap = {
-    Nunca: 0,
-    Poca: 1,
-    Moderada: 2,
-    Alta: 3
-  }
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
-  const handleChangeSimple = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+    const [errors, setErrors] = useState({});
 
-  const handleInputChangeCheckedGroup = (e, group) => {
-    const { name } = e.target;
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
 
-    setForm(prev => {
-      const newForm = { ...prev };
+    // Los errores se muestran solo tras intentar guardar y mientras el campo siga sin
+    // resolverse; se limpian solos cuando el usuario lo completa.
+    const nordenError = errors.norden && !hayRegistroCargado ? errors.norden : "";
+    const manejaVehiculosError =
+        errors.manejaVehiculos && !form.manejaVehiculos ? errors.manejaVehiculos : "";
 
-      // Primero, desmarcamos todos los radios del grupo
-      group.forEach(code => newForm[code] = false);
-
-      // Activamos solo el seleccionado
-      newForm[name] = true;
-
-      // Calcular puntaje acumulado
-      let puntaje = 0;
-      Object.keys(newForm).forEach(key => {
-        if (newForm[key] === true) {
-          if (key.includes("Nunca")) puntaje += 0;
-          else if (key.includes("Poca")) puntaje += 1;
-          else if (key.includes("Moderada")) puntaje += 2;
-          else if (key.includes("Alta")) puntaje += 3;
+    const validateForm = () => {
+        const next = {};
+        if (!hayRegistroCargado) {
+            next.norden = "Busque un N° Orden válido antes de guardar.";
         }
-      });
+        if (!form.manejaVehiculos) {
+            next.manejaVehiculos = "Indique si el trabajador maneja vehículos motorizados.";
+        }
+        setErrors(next);
+        return Object.keys(next).length === 0;
+    };
 
-      newForm.txtPuntaje = puntaje;
+    const handleSave = () => {
+        if (!validateForm()) return;
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
 
-      return newForm;
+    const handleEdit = () => {
+        if (!validateForm()) return;
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleClearForm = () => {
+        setErrors({});
+        handleClear();
+    };
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        setErrors({});
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
+    const handleSearch = (e) => {
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setErrors({});
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
     });
-  };
-  const RowCheck = ({ title, N, P, M, A }) => {
 
     return (
-      <>
-        <div className="col-span-2">{title}</div>
-        <div className="text-center"><input type="radio" checked={form[N]} onChange={(e) => handleInputChangeCheckedGroup(e, [N, P, M, A])} name={N} /></div>
-        <div className="text-center"><input type="radio" checked={form[P]} onChange={(e) => handleInputChangeCheckedGroup(e, [N, P, M, A])} name={P} /></div>
-        <div className="text-center"><input type="radio" checked={form[M]} onChange={(e) => handleInputChangeCheckedGroup(e, [N, P, M, A])} name={M} /></div>
-        <div className="text-center"><input type="radio" checked={form[A]} onChange={(e) => handleInputChangeCheckedGroup(e, [N, P, M, A])} name={A} /></div>
-      </>
-    )
-  }
+        <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClearForm}
+            />
 
-  return (
-    <div className="">
-      <div className="max-w-[70%] mx-auto">
-        <h1 className="text-3xl font-bold mb-4 text-center">Test de Fatiga y Somnolencia</h1>
-        {/* Tabs */}
-        <div className="flex flex-col space-x-1 mt-4 border shadow p-8 mx-auto">
-          <h1 className=" text-xl">Filiación</h1>
-          <div className="flex flex-col border rounded p-4 mt-6 overflow-auto">
-            <div className="flex items-center my-2 ">
-              <label className="w-20 text-right mr-2" htmlFor="">N° Orden:</label>
-              <input type="text" value={form.norden} name="norden" onChange={handleChangeNumber} className="border rounded px-2 py-1  "
-                onKeyUp={(event) => {
-                  if (event.key === "Enter")
-                    handleClearnotO(),
-                      VerifyTR(
-                        form.norden,
-                        tabla,
-                        token,
-                        setForm,
-                        selectedSede
-                      );
-                }} />
-              <label className="w-20 text-right mr-2" htmlFor="">Fecha:</label>
-              <input type="date" value={form.fexamen} name="fexamen" onChange={handleChange} className="border rounded px-2 py-1  " />
-            </div>
-            <div className="flex items-center my-2">
-              <label className="w-20 text-right mr-2" htmlFor="">Nombres:</label>
-              <input type="text" value={form.nombres} disabled className="border rounded px-2 py-1 min-w-[38%] " />
-              <label className="w-20 text-right mr-2" htmlFor="">DNI:</label>
-              <input type="text" value={form.dni} disabled className="border rounded px-2 py-1  " />
-              <label className="w-20 text-right mr-2" htmlFor="">Edad:</label>
-              <input type="text" value={form.edad} disabled className="border rounded px-2 py-1 w-20" />
-              <label className="w-20 text-right mr-2" htmlFor="">Sexo:</label>
-              <input type="text" disabled value={form.sexoPa === "F" ? "FEMENINO" : form.sexoPa === "M" ? "MASCULINO" : ""} className="border rounded px-2 py-1" />
-            </div>
-            <div className="flex items-center my-2">
-              <label className="w-20 text-right mr-2" htmlFor="">Area de Trabajo:</label>
-              <input type="text" value={form.areaO} disabled className="border rounded px-2 py-1 w-[38%] " />
-              <label className="w-20 text-right ml-4 mr-2" htmlFor="">Empresa:</label>
-              <input type="text" value={form.razonEmpresa} disabled className="border rounded px-2 py-1 w-[38%] " />
-            </div>
-          </div>
-          {/* Tabs */}
-          <div className="flex space-x-1 overflow-x-auto mt-4">
-            <button
-              className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap bg-[#233245] text-white `}
-            >
-              <FontAwesomeIcon icon={faTint} className="mr-2" />
-              Examen
-            </button>
-          </div>
-
-          {/* Active Content */}
-          <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
-            <h1 className="text-blue-800 font-bold">SITUACIÓN</h1>
-            <div className="border-2 flex border-blue-900 p-2 justify-center">
-              <div className="grid grid-cols-[5fr,1fr,1fr,1fr,1fr,1fr,1fr] gap-2 items-center ">
-                {/* Encabezados */}
-                <div className="col-span-2"></div>
-                <div className="text-center font-bold text-blue-800">Nunca</div>
-                <div className="text-center font-bold text-blue-800">Poca</div>
-                <div className="text-center font-bold text-blue-800">Moderada</div>
-                <div className="text-center font-bold text-blue-800">Alta</div>
-                <div className=""></div>
-                {/* Pregunta 1 */}
-                <RowCheck title={"1. Sentado leyendo"}
-                  N="rbs1Nunca"
-                  P="rbs1Poca"
-                  M="rbs1Moderada"
-                  A="rbs1Alta" />
-
-
-                {/* Pregunta 2 */}
-                <RowCheck title={"2. Viendo televisión"}
-                  N="rbs2Nunca"
-                  P="rbs2Poca"
-                  M="rbs2Moderada"
-                  A="rbs2Alta" />
-
-                {/* Pregunta 3 */}
-                <RowCheck title={"3. Sentado (por ejemplo en el teatro, en una reunión, en el cine, en una conferencia, escuchando misa o en el culto)"}
-                  N="rbs3Nunca"
-                  P="rbs3Poca"
-                  M="rbs3Moderada"
-                  A="rbs3Alta" />
-
-                {/* Pregunta 4 */}
-                <RowCheck title={"4. Como pasajero en un automóvil, ómnibus, micro o combi durante una hora o menos de recorrido"}
-                  N="rbs4Nunca"
-                  P="rbs4Poca"
-                  M="rbs4Moderada"
-                  A="rbs4Alta" />
-
-                {/* Pregunta 5 */}
-                <RowCheck title={"5. Recostado en la tarde si las circunstancias lo permiten"}
-                  N="rbs5Nunca"
-                  P="rbs5Poca"
-                  M="rbs5Moderada"
-                  A="rbs5Alta" />
-                <div className="flex flex-col justify-center items-center">
-                  <label htmlFor="">PUNTAJE</label>
-                  <input type="text" value={form.txtPuntaje} onChange={handleChange} name="txtPuntaje" className="w-24 border rounded px-2 py-1" />
-                </div>
-
-                {/* Pregunta 6 */}
-                <RowCheck title={"6. Sentado conversando con alguien"}
-                  N="rbs6Nunca"
-                  P="rbs6Poca"
-                  M="rbs6Moderada"
-                  A="rbs6Alta" />
-
-                {/* Pregunta 7 */}
-                <RowCheck title={"7. Sentado luego del almuerzo y sin haber bebido"}
-                  N="rbs7Nunca"
-                  P="rbs7Poca"
-                  M="rbs7Moderada"
-                  A="rbs7Alta" />
-
-                {/* Pregunta 8 */}
-                <RowCheck title={"8. Conduciendo el automóvil cuando se detiene algunos minutos por razones de tráfico"}
-                  N="rbs8Nunca"
-                  P="rbs8Poca"
-                  M="rbs8Moderada"
-                  A="rbs8Alta" />
-
-                {/* Pregunta 9 */}
-                <RowCheck title={"9. Parado y apoyándose o no en una pared o mueble"}
-                  N="rbs9Nunca"
-                  P="rbs9Poca"
-                  M="rbs9Moderada"
-                  A="rbs9Alta" />
-
-              </div>
-            </div>
-            <div className="flex flex-col justify-center items-center my-6">
-              <h1 className="text-blue-800 font-bold text-left">Pregunta Obligatoria</h1>
-              <div className="flex items-center justify-center">
-                <label className="w-[60%] " htmlFor="">Usted maneja vehículos motorizados (auto, camioneta, ómnibus, combi, montacarga, grúa, etc).</label>
-                <label className="text-xl" htmlFor="">Si</label>
-                <input type="checkbox" checked={form.rbSi} name="rbSi" onChange={(e) => handleInputChangeCheckedGroup(e, ["rbSi", "rbNo"])} id="" className=" mx-3" />
-                <label className="text-xl" htmlFor="">No</label>
-                <input type="checkbox" checked={form.rbNo} name="rbNo" onChange={(e) => handleInputChangeCheckedGroup(e, ["rbSi", "rbNo"])} id="" className=" mx-3" />
-              </div>
-            </div>
-            <div className="mb-4">
-              <EmpleadoComboBox
-                value={form.nombre_medico}
-                form={form}
-                onChange={handleChangeSimple}
-              />
-            </div>
-
-            <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
-              <h1 className="text-blue-800 font-bold">GRABAR / ACTUALIZAR</h1>
-              <div className="flex gap-2 justify-around">
-
-                <div className="flex flex-col p-2 ">
-                  <button
-                    type="button"
-                    onClick={() => SubmitTestFatiga(form, token, userlogued, handleClear, tabla, datosFooter)}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                  >
-                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    className="bg-yellow-400 mt-2 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                  >
-                    <FontAwesomeIcon icon={faBroom} /> Limpiar
-                  </button>
-                </div>
-                <div className="flex flex-col p-2 ">
-                  <span className="font-bold italic text-base mb-1">Imprimir</span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="norden"
-                      value={form.norden}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1 text-base"
+            {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="w-full"
+                        error={nordenError}
                     />
-
-                    <button
-                      type="button"
-                      onClick={handlePrint}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                    >
-                      <FontAwesomeIcon icon={faPrint} />
-                    </button>
-                  </div>
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
                 </div>
-              </div>
+                <InputTextOneLine
+                    label="Fecha de Examen"
+                    name="fexamen"
+                    type="date"
+                    value={form.fexamen}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    labelWidth="120px"
+                    edited={isFieldEdited("fexamen")}
+                    onRevert={() => revertField("fexamen")}
+                />
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+            <DatosPersonalesLaborales form={form} />
+
+            {/* ===== SECCIÓN: SITUACIÓN ===== */}
+            <SectionFieldset legend="Situación">
+                <p className="mb-3 text-gray-700">
+                    ¿Qué tan probable es que usted cabecee o se quede dormido en las siguientes situaciones?
+                    Considere los últimos meses de sus actividades habituales; no se refiere a sentirse cansado
+                    debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas,
+                    considere cómo le habrían afectado. Marque la opción más apropiada para cada situación.
+                </p>
+                <RadioTable
+                    items={PREGUNTAS_SITUACION}
+                    options={OPCIONES_PROBABILIDAD}
+                    form={form}
+                    handleRadioButton={handleRadioButton}
+                    labelColumns={5}
+                    disabled={camposDeshabilitados}
+                    isFieldEdited={isFieldEdited}
+                    onRevert={revertField}
+                    stackOnMobile
+                />
+                <div className="mt-3 flex justify-end">
+                    <InputTextOneLine
+                        label="Puntaje Total"
+                        name="txtPuntaje"
+                        value={calcularPuntaje(form)}
+                        disabled
+                        labelWidth="120px"
+                        className="w-full sm:w-[260px]"
+                    />
+                </div>
+            </SectionFieldset>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
+                {/* ===== SECCIÓN: PREGUNTA OBLIGATORIA ===== */}
+                <SectionFieldset legend="Pregunta Obligatoria" className="w-full space-y-2">
+                    <p className="font-semibold">
+                        Usted maneja vehículos motorizados (auto, camioneta, ómnibus, combi, montacarga, grúa, etc.)
+                        <span className="text-red-500 ml-0.5">*</span>
+                    </p>
+                    <InputsRadioGroup
+                        name="manejaVehiculos"
+                        value={form.manejaVehiculos}
+                        onChange={handleRadioButton}
+                        disabled={camposDeshabilitados}
+                        options={[
+                            { label: "SI", value: "SI" },
+                            { label: "NO", value: "NO" },
+                        ]}
+                        edited={isFieldEdited("manejaVehiculos")}
+                        onRevert={() => revertField("manejaVehiculos")}
+                        error={manejaVehiculosError}
+                    />
+                </SectionFieldset>
+
+                {/* ===== SECCIÓN: ASIGNACIÓN DE MÉDICO ===== */}
+                <SectionFieldset legend="Asignación de Médico" className="w-full">
+                    <EmpleadoComboBox
+                        value={form.nombre_medico}
+                        label="Especialista"
+                        form={form}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isMedicoEdited}
+                        onRevert={revertMedico}
+                    />
+                </SectionFieldset>
             </div>
-          </div>
 
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
 
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClearForm}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
         </div>
-
-
-
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Test_fatiga;
-

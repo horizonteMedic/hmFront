@@ -38,6 +38,7 @@ import { PlantillaDiagnosticoManager } from '../../../../components/reusableComp
 import Swal from 'sweetalert2';
 import DatosPersonalesLaboralesAsistencial from '../../../../components/templates/DatosPersonalesLaboralesAsistencial';
 import BotonesAccion from '../../../../components/templates/BotonesAccion';
+import EmpleadoComboBox from '../../../../components/reusableComponents/EmpleadoComboBox';
 
 const today = getToday();
 
@@ -56,10 +57,12 @@ const CAMPOS_EDITABLES = [
     'diastolica',
     'fRespiratoria',
     'diagnostico',
+    'user_medicoFirma',
+    'nombre_medico',
 ];
 
 export default function TriajeAsistencial() {
-    const { token, userlogued, datosFooter } = useSessionData();
+    const { token, userlogued, userName, datosFooter } = useSessionData();
     const debounceTimeout = useRef(null);
 
     const initialFormState = {
@@ -105,6 +108,10 @@ export default function TriajeAsistencial() {
         diagnostico: '',
         diagnosticoCompleto: '',
 
+        // Asignación de médico (por defecto, el usuario logueado)
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
         // Búsqueda tabla derecha
         codigo: '',
         nombresBusqueda: '',
@@ -124,6 +131,7 @@ export default function TriajeAsistencial() {
         handleChangeNumber,
         handleChangeNumberDecimals,
         handleClear,
+        handleChangeSimple,
     } = useForm(initialFormState, { storageKey: 'triaje_asistencial' });
 
     const {
@@ -132,7 +140,13 @@ export default function TriajeAsistencial() {
         camposDeshabilitados,
         isFieldEdited,
         revertField,
+        revertFields,
     } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     const [refresh, setRefresh] = useState(0);
     const [tablehc, setTablehc] = useState([]);
@@ -465,6 +479,18 @@ export default function TriajeAsistencial() {
                     />
                 </SectionFieldset>
             </div>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
+                />
+            </SectionFieldset>
 
             {hayRegistroCargado && (
                 <AuditoriaRegistro

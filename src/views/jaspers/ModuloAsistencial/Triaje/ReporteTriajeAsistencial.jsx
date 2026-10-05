@@ -5,6 +5,8 @@ import TituloSeccionAsistencial, { FUENTE_CUERPO } from "../../components/titulo
 import FilaEtiquetaValorAsistencial from "../../components/filaEtiquetaValorAsistencial.jsx";
 import footerTR from "../../components/footerTR.jsx";
 import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
+import { dibujarFirmas } from "../../../utils/dibujarFirmas";
+import { getSign } from "../../../utils/helpers";
 
 // Informe de Triaje del módulo asistencial. Mismo contenido que el de Triaje Ocupacional
 // (jaspers/Triaje/ReporteTriaje.jsx): datos personales, signos vitales y observaciones (aquí, el
@@ -12,15 +14,19 @@ import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx
 //
 // Recibe el objeto plano que arma `construirDatosImpresion` (controller del formulario), con los
 // mismos nombres de campo del formulario (talla, peso, fCardiaca, sat02...) + los datos del pie
-// (datosFooter).
+// (datosFooter) + `digitalizacion` con el sello del médico asignado (SELLOFIRMADOCASIG).
 
 const X = 10;
 const ANCHO = 190;
 const ANCHO_ETIQUETA = 80;
 const PIE_OFFSET_Y = 8;
-// Y donde empieza la línea del pie (ver footerTR.jsx) menos un respiro: el cuadro de diagnóstico no
-// debe pasar de aquí.
+// Y donde empieza la línea del pie (ver footerTR.jsx) menos un respiro: el contenido no debe pasar
+// de aquí.
 const Y_LIMITE_CONTENIDO = 297 - 25 + PIE_OFFSET_Y - 3.6 - 2;
+// Bloque de firma (ver dibujarFirmas): sello de 20 mm + línea + 2 renglones de texto. Va fijo justo
+// encima del pie; si hay sello, el cuadro de diagnóstico se detiene antes.
+const ALTO_FIRMAS = 27;
+const Y_FIRMAS = Y_LIMITE_CONTENIDO - ALTO_FIRMAS;
 
 const texto = (v) => String(v ?? "").trim();
 
@@ -87,16 +93,19 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
     );
   });
 
+  const tieneSelloMedico = Boolean(getSign(data, "SELLOFIRMADOCASIG"));
+  const yLimiteDiagnostico = tieneSelloMedico ? Y_FIRMAS - 2 : Y_LIMITE_CONTENIDO;
+
   // ===== Diagnóstico =====
   // Igual que las "Observaciones" del ocupacional: solo se imprime si hay texto. Si es muy largo se
-  // achica la letra para que el cuadro no pise el pie de página.
+  // achica la letra para que el cuadro no pise la firma ni el pie de página.
   if (texto(data.diagnostico)) {
     y = TituloSeccionAsistencial(doc, "DIAGNÓSTICO", { x: X, y, ancho: ANCHO });
 
     const lineHeight = 4;
     const paddingTop = 4.5;
     const paddingBottom = 2;
-    const disponible = Y_LIMITE_CONTENIDO - y;
+    const disponible = yLimiteDiagnostico - y;
 
     dibujarCuadroTextoDinamico(doc, {
       x: X,
@@ -110,6 +119,24 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
       minHeight: Math.min(50, disponible),
       maxLineas: Math.max(1, Math.floor((disponible - paddingTop - paddingBottom) / lineHeight)),
     });
+  }
+
+  // ===== Firma del médico asignado =====
+  // Si la imagen del sello no se puede cargar, se imprime el informe igual (sin sello).
+  if (tieneSelloMedico) {
+    doc.setDrawColor(0, 0, 0);
+    doc.setTextColor(0, 0, 0);
+    try {
+      await dibujarFirmas({
+        doc,
+        datos: data,
+        y: Y_FIRMAS,
+        pageW: doc.internal.pageSize.getWidth(),
+        mostrarFirmaPaciente: false,
+      });
+    } catch (error) {
+      console.error("No se pudo dibujar el sello del médico:", error);
+    }
   }
 
   // ===== Pie =====
