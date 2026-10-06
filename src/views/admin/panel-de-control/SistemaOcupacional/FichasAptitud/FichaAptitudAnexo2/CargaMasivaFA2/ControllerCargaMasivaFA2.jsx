@@ -4,7 +4,7 @@ import { saveAs } from "file-saver";
 import { SubmitData, getFetch } from "../../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../../utils/helpers";
 import { GetInfoServicio } from "../controllerFichaAptitudAnexo2";
-import { getFA2InitialFormState } from "../FA2FormDefaults";
+import { getFA2InitialFormState, getFA2FechaVencimiento } from "../FA2FormDefaults";
 import Swal from "sweetalert2";
 
 const urlRegistroIndividual = "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarFichaAnexo2";
@@ -201,7 +201,7 @@ const construirBodyFA2 = (state, userlogued, medicoNombre, medicoUsername) => ({
 // Cada fila se envía individualmente al endpoint urlRegistroIndividual.
 export const guardarCargaMasivaFA2 = async (
     data,
-    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, reemplazar },
+    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, reemplazar, duracionAnios = "1" },
     onProgress = () => { }
 ) => {
     const resultados = [];
@@ -271,6 +271,8 @@ export const guardarCargaMasivaFA2 = async (
                 }
                 state.apto = aptitudAnexo2;
             }
+
+            state.fechaVencimiento = getFA2FechaVencimiento(state.fechaValido, duracionAnios);
 
             const body = construirBodyFA2(state, userlogued, medicoNombre, medicoUsername);
             const res = await SubmitData(body, urlRegistroIndividual, token);

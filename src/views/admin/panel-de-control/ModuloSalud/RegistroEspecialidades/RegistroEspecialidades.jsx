@@ -5,6 +5,7 @@ import { faSearch, faBroom } from "@fortawesome/free-solid-svg-icons";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import { useSessionData } from "../../../../hooks/useSessionData";
+import useCampaniaActiva from "../utils/useCampaniaActiva";
 import { getVisita, patchAtencion } from "./controllerRegistroEspecialidades";
 import FichaEspecialidadCard from "./FichaEspecialidadCard";
 import BuscarMedicamentoModal from "./BuscarMedicamentoModal/BuscarMedicamentoModal";
@@ -27,6 +28,7 @@ const construirEntregasPorFicha = (fichasData) => {
 
 export default function RegistroEspecialidades({ visitaActiva, onVisitaConsumida }) {
   const { token, userlogued } = useSessionData();
+  const { campania } = useCampaniaActiva();
 
   const [codVisita, setCodVisita] = useState("");
   const [loading, setLoading] = useState(false);
@@ -252,6 +254,7 @@ export default function RegistroEspecialidades({ visitaActiva, onVisitaConsumida
       {fichaMedicamento && (
         <BuscarMedicamentoModal
           ficha={fichaMedicamento}
+          campaniaId={fichaMedicamento.especialidad?.campania?.id ?? campania?.id} // la de la visita; si el detalle no la trae, la activa
           token={token}
           usuarioRegistro={userlogued}
           entregasExistentes={entregasPorFicha[fichaMedicamento.id] || []}

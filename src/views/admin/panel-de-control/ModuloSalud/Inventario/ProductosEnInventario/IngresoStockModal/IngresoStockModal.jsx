@@ -1,109 +1,87 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import Swal from 'sweetalert2';
-import { registrarIngresoMedicamento } from '../model/ProductosEnInventario';
-import { FloatingInput } from '../components/FloatingField';
+import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import ModalBase from "../../../components/ModalBase";
+import { mensajeDeError } from "../../../utils/apiSalud";
+import useFormulario from "../../../utils/useFormulario";
+import { getTodayPlusOneYear } from "../../../../../../utils/helpers";
+import { FloatingInput } from "../components/FloatingField";
+import { registrarIngresoStock } from "../controllerProductosEnInventario";
 
-const getFechaVencimientoPorDefecto = () => {
-  const fecha = new Date();
-  fecha.setFullYear(fecha.getFullYear() + 1);
-  return fecha.toISOString().split('T')[0];
+const FORM_ID = "form-ingreso-stock";
+
+// Lote y fecha de vencimiento son obligatorios para el backend; se sugieren valores para no frenar la carga.
+const valoresIniciales = () => ({ cantidad: "", lote: "0000", fechaVencimiento: getTodayPlusOneYear(), motivo: "Restock" });
+
+const validar = ({ cantidad, lote, fechaVencimiento, motivo }) => {
+    const errores = {};
+    if (!/^[1-9]\d*$/.test(cantidad.trim())) errores.cantidad = "Ingresa una cantidad entera mayor a 0";
+    if (!lote.trim()) errores.lote = "Ingresa el lote";
+    if (!fechaVencimiento) errores.fechaVencimiento = "Selecciona la fecha de vencimiento";
+    if (!motivo.trim()) errores.motivo = "Ingresa el motivo";
+    return errores;
 };
 
-const IngresoStockModal = ({ closeModal, Refresgpag, token, medicamento, usuarioRegistro }) => {
-  const [registrando, setRegistrando] = useState(false);
-
-  const [cantidad, setCantidad] = useState('');
-  const [lote, setLote] = useState('0000');
-  const [fechaVencimiento, setFechaVencimiento] = useState(getFechaVencimientoPorDefecto());
-  const [motivo, setMotivo] = useState('Restock');
-
-  function AlertSucces() {
-    Swal.fire({
-      title: "¡Exito!",
-      text: "Se ha registrado el ingreso de stock",
-      icon: "success",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Aceptar"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        closeModal();
-        Refresgpag();
-      }
+// Suma stock a un medicamento de la campaña (compra o reposición).
+export default function IngresoStockModal({ token, usuario, medicamento, onClose, onGuardado }) {
+    const { valores, errores, cambiar, guardando, enviar } = useFormulario(valoresIniciales(), validar);
+    const campo = (name) => ({
+        id: `ingreso-${name}`,
+        name,
+        value: valores[name],
+        error: errores[name],
+        onChange: (e) => cambiar(name, e.target.value),
     });
-  }
 
-  const handleRegistrarIngreso = () => {
-    if (!cantidad || !lote || !fechaVencimiento || !motivo) {
-      let errorMessage = 'Por favor, complete los siguientes campos obligatorios:';
-      if (!cantidad) errorMessage += '\n- Cantidad';
-      if (!lote) errorMessage += '\n- Lote';
-      if (!fechaVencimiento) errorMessage += '\n- Fecha de Vencimiento';
-      if (!motivo) errorMessage += '\n- Motivo';
+    const guardar = async (ingreso) => {
+        try {
+            await registrarIngresoStock(medicamento.id, ingreso, usuario, token);
+            onGuardado();
+            onClose();
+            Swal.fire("¡Éxito!", `Se sumaron ${ingreso.cantidad} unidades al stock de "${medicamento.nombre}"`, "success");
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", mensajeDeError(error, "Ha ocurrido un error al registrar el ingreso"), "error");
+        }
+    };
 
-      Swal.fire({
-        title: 'Error',
-        text: errorMessage,
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
-
-    setRegistrando(true);
-    registrarIngresoMedicamento(medicamento.id, parseInt(cantidad), lote, fechaVencimiento, usuarioRegistro, motivo, token)
-      .then(() => {
-        AlertSucces();
-      })
-      .catch((error) => {
-        console.error('Error', error);
-        Swal.fire({
-          title: 'Error',
-          text: 'Ha ocurrido un error al registrar el ingreso',
-          icon: 'error',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Aceptar'
-        });
-      })
-      .finally(() => {
-        setRegistrando(false);
-      });
-  };
-
-  return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
-        <FontAwesomeIcon
-          icon={faTimes}
-          className="absolute top-0 right-0 m-3 cursor-pointer text-white"
-          onClick={closeModal}
-        />
-        <div className="p-3 azuloscurobackground flex justify-between">
-          <h1 className="text-start font-bold color-azul text-white">Ingreso de Stock</h1>
-        </div>
-        <div className="container p-4">
-          <p className="mb-3 text-sm text-gray-600">Medicamento: <span className="font-semibold">{medicamento.nombre}</span></p>
-          <form className="space-y-4">
-            <FloatingInput id="cantidad" label="Cantidad" required type="number" min="1" value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
-            <FloatingInput id="lote" label="Lote" required value={lote} onChange={(e) => setLote(e.target.value)} />
-            <FloatingInput id="fechaVencimiento" label="Fecha de Vencimiento" required type="date" value={fechaVencimiento} onChange={(e) => setFechaVencimiento(e.target.value)} />
-            <FloatingInput id="motivo" label="Motivo" required value={motivo} onChange={(e) => setMotivo(e.target.value)} />
-          </form>
-          <div className="flex justify-end mt-4">
-            <button
-              disabled={registrando}
-              onClick={handleRegistrarIngreso}
-              className="azul-btn text-white font-bold py-2 px-4 rounded">
-              {registrando ? 'Registrando...' : 'Registrar Ingreso'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default IngresoStockModal;
+    return (
+        <ModalBase
+            title="Ingreso de stock"
+            onClose={onClose}
+            footer={
+                <>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        form={FORM_ID}
+                        disabled={guardando}
+                        className="azul-btn flex items-center gap-2 rounded px-5 py-2 text-sm font-semibold disabled:opacity-50"
+                    >
+                        <FontAwesomeIcon icon={faCheck} />
+                        {guardando ? "Registrando..." : "Registrar ingreso"}
+                    </button>
+                </>
+            }
+        >
+            <form id={FORM_ID} onSubmit={enviar(guardar)} className="space-y-4">
+                <p className="text-sm text-gray-600">
+                    Medicamento: <span className="font-semibold">{medicamento.nombre}</span>
+                    {" · "}Stock actual: <span className="font-semibold">{medicamento.stockActual ?? 0}</span>
+                </p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FloatingInput {...campo("cantidad")} label="Cantidad" required type="number" min="1" />
+                    <FloatingInput {...campo("lote")} label="Lote" required />
+                    <FloatingInput {...campo("fechaVencimiento")} label="Fecha de vencimiento" required type="date" />
+                    <FloatingInput {...campo("motivo")} label="Motivo" required />
+                </div>
+            </form>
+        </ModalBase>
+    );
+}

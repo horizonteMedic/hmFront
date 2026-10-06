@@ -1,171 +1,133 @@
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
-import { saveAs } from "file-saver";
-import { SubmitData } from "../../../../../../utils/apiHelpers";
-import Swal from "sweetalert2";
+import { postJson } from "../../../utils/apiSalud";
+import { descargarLibro } from "../../../utils/descargarLibro";
+import { nombreSeguro } from "../../../utils/excelReporte";
+import { normalizar } from "../../../utils/filtrarPorTexto";
 
-const urlMasivo = "/api/medicamentos/masivo";
+const URL_MASIVO = "/api/medicamentos/masivo";
 
-const HEADERS = [
-    { key: "nombre", label: "NOMBRE" },
-    { key: "presentacion", label: "PRESENTACION" },
-    { key: "uso", label: "USO" },
-    { key: "laboratorio", label: "LABORATORIO" },
-    { key: "marca", label: "MARCA" },
-    { key: "unidadMedida", label: "UNIDAD DE MEDIDA" },
-    { key: "stockMinimo", label: "STOCK MÍNIMO" },
+// Columnas del Excel (plantilla y resultado) y el campo del medicamento que corresponde a cada una
+const columnas = [
+    { campo: "nombre", etiqueta: "NOMBRE", ancho: 26 },
+    { campo: "presentacion", etiqueta: "PRESENTACION", ancho: 22 },
+    { campo: "uso", etiqueta: "USO", ancho: 40 },
+    { campo: "laboratorio", etiqueta: "LABORATORIO", ancho: 20 },
+    { campo: "marca", etiqueta: "MARCA", ancho: 20 },
+    { campo: "unidadMedida", etiqueta: "UNIDAD DE MEDIDA", ancho: 20 },
+    { campo: "stockMinimo", etiqueta: "STOCK MÍNIMO", ancho: 14 },
 ];
 
-const normalizarTexto = (texto) =>
-    (texto ?? "")
-        .toString()
-        .toUpperCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .trim();
+const ETIQUETA_ESTADO = { success: "REGISTRADO", error: "ERROR", invalida: "INVÁLIDA", pendiente: "PENDIENTE" };
+
+const texto = (valor) => String(valor ?? "").trim();
+const entero = (valor) => Math.max(0, Math.trunc(Number(valor) || 0));
+
+// El backend no valida duplicados: con el mismo nombre y presentación crearía otra fila
+const claveMedicamento = ({ nombre, presentacion }) => `${normalizar(nombre).trim()}|${normalizar(presentacion).trim()}`;
+
+const estilarEncabezado = (hoja) =>
+    hoja.getRow(1).eachCell((celda) => {
+        celda.font = { bold: true };
+        celda.alignment = { horizontal: "center", vertical: "middle" };
+        celda.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
+    });
 
 export const descargarPlantillaMedicamentos = async () => {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet("PLANTILLA");
-
-    sheet.addRow(HEADERS.map((h) => h.label));
-    sheet.getRow(1).eachCell((cell) => {
-        cell.font = { bold: true };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
-    });
-
-    sheet.addRow(["Paracetamol", "500 mg tableta", "Alivio del dolor leve a moderado y fiebre", "Genfar", "Genfar", "Tableta", 20]);
-
-    sheet.columns = [
-        { width: 26 }, { width: 22 }, { width: 40 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 14 },
-    ];
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "Plantilla_CargaMasivaMedicamentos.xlsx");
+    const libro = new ExcelJS.Workbook();
+    const hoja = libro.addWorksheet("PLANTILLA");
+    hoja.addRow(columnas.map((c) => c.etiqueta));
+    hoja.addRow(["Paracetamol", "500 mg tableta", "Alivio del dolor leve a moderado y fiebre", "Genfar", "Genfar", "Tableta", 20]);
+    estilarEncabezado(hoja);
+    hoja.columns = columnas.map((c) => ({ width: c.ancho }));
+    await descargarLibro(libro, "Plantilla_CargaMasivaMedicamentos.xlsx");
 };
 
-export const handleSubirExcelMedicamentos = async (setData) => {
-    const { value: file } = await Swal.fire({
-        title: "Selecciona un archivo Excel",
-        input: "file",
-        inputAttributes: {
-            accept: ".xlsx,.xls",
-            "aria-label": "Sube tu Excel",
-        },
-        showCancelButton: true,
-        confirmButtonText: "Procesar",
-        cancelButtonText: "Cancelar",
-    });
+// Lee la primera hoja del Excel. Cada fila queda "pendiente" (lista para enviar) o "invalida" si le falta
+// algo obligatorio (nombre o presentación); el `mensaje` avisa de posibles duplicados con `existentes`
+// (los medicamentos que la campaña ya tiene) o con filas anteriores del mismo archivo.
+export const leerExcelMedicamentos = async (archivo, existentes) => {
+    const libro = XLSX.read(await archivo.arrayBuffer(), { type: "array" });
+    const filas = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]], { defval: "" });
+    const vistos = new Set(existentes.map(claveMedicamento));
 
-    if (!file) return;
-    setData([]);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const binaryStr = e.target.result;
-        const workbook = XLSX.read(binaryStr, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-        const filas = jsonData
-            .map((row) => {
-                const keys = Object.keys(row);
-                const findKey = (label) => keys.find((k) => normalizarTexto(k) === normalizarTexto(label));
-
-                const nombre = String(row[findKey("NOMBRE")] ?? "").trim();
-                const presentacion = String(row[findKey("PRESENTACION")] ?? "").trim();
-                const uso = String(row[findKey("USO")] ?? "").trim();
-                const laboratorio = String(row[findKey("LABORATORIO")] ?? "").trim();
-                const marca = String(row[findKey("MARCA")] ?? "").trim();
-                const unidadMedida = String(row[findKey("UNIDAD DE MEDIDA")] ?? "").trim();
-                const stockCelda = row[findKey("STOCK MÍNIMO")];
-                const stockMinimo =
-                    stockCelda === "" || stockCelda === null || stockCelda === undefined
-                        ? 0
-                        : Number(stockCelda) || 0;
-
-                return { nombre, presentacion, uso, laboratorio, marca, unidadMedida, stockMinimo };
-            })
-            // Descarta filas completamente vacías (p.ej. filas sobrantes de la plantilla)
-            .filter((row) =>
-                row.nombre || row.presentacion || row.uso || row.laboratorio || row.marca || row.unidadMedida || row.stockMinimo
+    return filas
+        .map((fila) => {
+            const celdas = Object.fromEntries(Object.entries(fila).map(([clave, valor]) => [normalizar(clave).trim(), valor]));
+            return Object.fromEntries(
+                columnas.map(({ campo, etiqueta }) => {
+                    const valor = celdas[normalizar(etiqueta)];
+                    return [campo, campo === "stockMinimo" ? entero(valor) : texto(valor)];
+                })
             );
+        })
+        .filter((medicamento) => Object.values(medicamento).some((valor) => valor !== "" && valor !== 0))
+        .map((medicamento) => {
+            if (!medicamento.nombre) return { ...medicamento, estado: "invalida", mensaje: "Falta el nombre" };
+            if (!medicamento.presentacion) return { ...medicamento, estado: "invalida", mensaje: "Falta la presentación" };
 
-        setData(filas.map((row) => ({ ...row, estado: "pendiente", mensaje: "" })));
-    };
-    reader.readAsBinaryString(file);
+            const clave = claveMedicamento(medicamento);
+            const repetido = vistos.has(clave);
+            vistos.add(clave);
+            return {
+                ...medicamento,
+                estado: "pendiente",
+                mensaje: repetido ? "Posible duplicado: ya existe en la campaña o se repite en el archivo" : "",
+            };
+        });
 };
 
-// El endpoint recibe la lista completa en un solo POST y procesa cada ítem de forma
-// secuencial en el backend: los que fallan (falta nombre/presentación, error de BD, etc.)
-// se reportan en medicamentosFallidos sin detener el resto del lote.
-// Como no procesamos fila por fila desde el front, emparejamos cada fallo reportado con
-// su fila original por nombre+presentación (en orden, por si hay duplicados) para marcar
-// el estado correspondiente en la tabla de resultados.
-export const guardarCargaMasivaMedicamentos = async (data, token) => {
-    const body = data.map(({ nombre, presentacion, uso, laboratorio, marca, unidadMedida, stockMinimo }) => ({
-        nombre,
-        presentacion,
-        uso,
-        laboratorio,
-        marca,
-        unidadMedida,
-        stockMinimo,
-    }));
-
-    const res = await SubmitData(body, urlMasivo, token);
-
-    // SubmitData devuelve el Response crudo (sin parsear) cuando la petición no fue ok
-    if (!res || res instanceof Response) {
-        throw new Error("La solicitud al servidor no se pudo completar");
-    }
-
-    const fallidos = Array.isArray(res?.medicamentosFallidos) ? res.medicamentosFallidos : [];
-
-    const colaFallidos = new Map();
-    fallidos.forEach((f) => {
-        const key = `${normalizarTexto(f?.nombre)}|${normalizarTexto(f?.presentacion)}`;
-        const mensaje = f?.motivo || f?.mensaje || f?.error || f?.detalle || "No se pudo registrar";
-        if (!colaFallidos.has(key)) colaFallidos.set(key, []);
-        colaFallidos.get(key).push(mensaje);
-    });
-
-    const resultados = data.map((row) => {
-        const key = `${normalizarTexto(row.nombre)}|${normalizarTexto(row.presentacion)}`;
-        const cola = colaFallidos.get(key);
-        if (cola && cola.length > 0) {
-            const mensaje = cola.shift();
-            return { ...row, estado: "error", mensaje };
-        }
-        return { ...row, estado: "success", mensaje: "Registrado correctamente" };
-    });
-
-    return { resultados, raw: res };
+// ¿Es este fallo el de esta fila? El backend informa el medicamento por su nombre (`nombresPa`).
+const coincide = (nombreFallo, nombre) => {
+    const fallo = normalizar(nombreFallo).trim();
+    const fila = normalizar(nombre).trim();
+    return Boolean(fallo && fila) && (fallo === fila || fallo.includes(fila) || fila.includes(fallo));
 };
 
-export const exportarResultadosMedicamentos = async (resultados) => {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet("RESULTADO");
+// Envía las filas "pendiente" en UNA sola petición, todas a la campaña `campaniaId`. El backend procesa
+// cada una por separado: las que fallan vuelven en `medicamentosFallidos` ({ nombresPa, motivoFallo }) sin
+// detener el resto. Cada fallo se asigna, en orden, a la fila con ese nombre; los que no se puedan asociar
+// a ninguna fila se devuelven en `sinFila` para que no pasen desapercibidos.
+export const guardarCargaMasivaMedicamentos = async (filas, campaniaId, token) => {
+    const cuerpo = filas
+        .filter((fila) => fila.estado === "pendiente")
+        .map(({ nombre, presentacion, uso, laboratorio, marca, unidadMedida, stockMinimo }) => ({
+            nombre,
+            presentacion,
+            uso,
+            laboratorio,
+            marca,
+            unidadMedida,
+            stockMinimo,
+            campaniaId,
+        }));
 
-    sheet.addRow(["NOMBRE", "PRESENTACION", "USO", "LABORATORIO", "MARCA", "UNIDAD DE MEDIDA", "STOCK MÍNIMO", "ESTADO", "MENSAJE"]);
-    sheet.getRow(1).eachCell((cell) => {
-        cell.font = { bold: true };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
+    const respuesta = await postJson(URL_MASIVO, cuerpo, token, "No se pudo procesar la carga masiva");
+
+    const sinFila = [...(Array.isArray(respuesta?.medicamentosFallidos) ? respuesta.medicamentosFallidos : [])];
+    const resultados = filas.map((fila) => {
+        if (fila.estado !== "pendiente") return fila;
+
+        const i = sinFila.findIndex((fallo) => coincide(fallo.nombresPa, fila.nombre));
+        if (i === -1) return { ...fila, estado: "success", mensaje: "Registrado correctamente" };
+
+        const [fallo] = sinFila.splice(i, 1);
+        return { ...fila, estado: "error", mensaje: fallo.motivoFallo || "No se pudo registrar" };
     });
 
-    resultados.forEach((r) => {
-        const estado = r.estado === "success" ? "REGISTRADO" : r.estado === "error" ? "ERROR" : "PENDIENTE";
-        sheet.addRow([r.nombre, r.presentacion, r.uso, r.laboratorio, r.marca, r.unidadMedida, r.stockMinimo, estado, r.mensaje || ""]);
-    });
+    return { resultados, sinFila, respuesta };
+};
 
-    sheet.columns = [
-        { width: 26 }, { width: 22 }, { width: 40 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 14 }, { width: 14 }, { width: 50 },
-    ];
+export const exportarResultadosMedicamentos = async (resultados, codigoCampania) => {
+    const libro = new ExcelJS.Workbook();
+    const hoja = libro.addWorksheet("RESULTADO");
+    hoja.addRow([...columnas.map((c) => c.etiqueta), "ESTADO", "MENSAJE"]);
+    resultados.forEach((fila) =>
+        hoja.addRow([...columnas.map((c) => fila[c.campo]), ETIQUETA_ESTADO[fila.estado], fila.mensaje || ""])
+    );
+    estilarEncabezado(hoja);
+    hoja.columns = [...columnas.map((c) => ({ width: c.ancho })), { width: 14 }, { width: 50 }];
 
-    const buffer = await workbook.xlsx.writeBuffer();
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    saveAs(new Blob([buffer]), `Resultado_CargaMasivaMedicamentos_${fecha}.xlsx`);
+    await descargarLibro(libro, `Resultado_CargaMasivaMedicamentos_${nombreSeguro(codigoCampania)}_${fecha}.xlsx`);
 };

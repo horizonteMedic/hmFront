@@ -3,7 +3,9 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import InputsRadioGroup from "../../../../../../components/reusableComponents/InputsRadioGroup";
 import { getToday } from "../../../../../../utils/helpers";
+import { DURACION_FA2_OPCIONES } from "../FA2FormDefaults";
 import {
     descargarPlantillaFA2,
     exportarResultadosFA2,
@@ -16,6 +18,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
     const [reemplazar, setReemplazar] = useState(false);
+    const [duracionAnios, setDuracionAnios] = useState("1");
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
 
@@ -58,7 +61,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
             html: `${reemplazar
                     ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
                     : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
-                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha por defecto: <b>${fecha}</b>`,
+                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha por defecto: <b>${fecha}</b><br/>Duración: <b>${duracionAnios === "2" ? "2 años" : "1 año"}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -83,6 +86,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                 medicoUsername: medico.user_medicoFirma,
                 sede,
                 reemplazar,
+                duracionAnios,
             },
             actualizarFila
         );
@@ -143,7 +147,7 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                     />
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-4 border border-gray-200 rounded p-3 items-end">
+                <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 border border-gray-200 rounded p-3 items-end">
                     <EmpleadoComboBox
                         value={medico.nombre_medico}
                         form={medico}
@@ -161,6 +165,14 @@ export default function CargaMasivaFA2({ onClose, token, userlogued, userName, s
                             className="border rounded px-2 py-1 w-full"
                         />
                     </div>
+                    <InputsRadioGroup
+                        label="Duración"
+                        name="duracionAnios"
+                        value={duracionAnios}
+                        disabled={procesando}
+                        onChange={(e, value) => setDuracionAnios(value)}
+                        options={DURACION_FA2_OPCIONES}
+                    />
                     <label className="flex items-center gap-2 font-semibold">
                         <input
                             type="checkbox"

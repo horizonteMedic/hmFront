@@ -2,19 +2,26 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCheck, faBoxesStacked, faStethoscope, faGear, faIdCard } from "@fortawesome/free-solid-svg-icons";
+import { faUserCheck, faBoxesStacked, faStethoscope, faGear, faIdCard, faBullhorn, faUserDoctor } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import AdmisionTabSelector from "./Admision/AdmisionTabSelector";
 import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 import RegistroEspecialidades from "./RegistroEspecialidades/RegistroEspecialidades";
 import Configuracion from "./Configuracion/Configuracion";
+import Campanias from "./Campanias/Campanias";
+import Especialidades from "./Especialidades/Especialidades";
 import Proveedor from "./Proveedor/Proveedor";
+
+const seccionCampanias = { tab: 6, vista: "Campanias Salud", label: "Campañas", icon: faBullhorn, component: Campanias };
+const seccionEspecialidades = { tab: 7, vista: "Especialidades Salud", label: "Especialidades", icon: faUserDoctor, component: Especialidades };
 
 const sections = [
     { tab: 1, vista: "Admision Salud", label: "Admisión", icon: faUserCheck, component: AdmisionTabSelector },
     { tab: 2, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
     { tab: 3, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
     { tab: 4, vista: "Configuracion", label: "Configuracion", icon: faGear, component: Configuracion },
+    seccionCampanias,
+    seccionEspecialidades,
     { tab: 5, vista: "Proveedor Nombres", label: "Consultar por Nombres", icon: faIdCard, component: Proveedor },
 ];
 
@@ -27,6 +34,9 @@ const ModuloSalud = () => {
     const tieneVista = (nombreVista) => {
         return Vista.some((item) => item === nombreVista);
     };
+
+    // Las secciones que solo funcionan dentro de una campaña ofrecen ir a activarla (si el usuario puede entrar a Campañas)
+    const irACampanias = tieneVista(seccionCampanias.vista) ? () => setActiveTab(seccionCampanias.tab) : undefined;
 
     const handleVisitaSeleccionada = (visitaId) => {
         setVisitaActiva(visitaId);
@@ -69,13 +79,17 @@ const ModuloSalud = () => {
                 {activeSection && (
                     <SectionWithBack title={activeSection.label} onBack={() => setActiveTab(null)}>
                         {activeSection.tab === 1 && (
-                            <AdmisionTabSelector tieneVista={tieneVista} onVisitaSeleccionada={handleVisitaSeleccionada} />
+                            <AdmisionTabSelector
+                                tieneVista={tieneVista}
+                                onVisitaSeleccionada={handleVisitaSeleccionada}
+                                onIrACampanias={irACampanias}
+                            />
                         )}
                         {activeSection.tab === 2 && (
                             <RegistroEspecialidades tieneVista={tieneVista} visitaActiva={visitaActiva} onVisitaConsumida={() => setVisitaActiva(null)} />
                         )}
                         {activeSection.tab !== 1 && activeSection.tab !== 2 && (
-                            <activeSection.component tieneVista={tieneVista} />
+                            <activeSection.component tieneVista={tieneVista} onIrACampanias={irACampanias} />
                         )}
 
                     </SectionWithBack>

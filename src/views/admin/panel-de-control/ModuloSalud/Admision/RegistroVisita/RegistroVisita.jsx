@@ -1,353 +1,221 @@
-import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
-import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
-import { useSessionData } from "../../../../../hooks/useSessionData";
-import { useForm } from "../../../../../hooks/useForm";
+import { useMemo, useState } from "react";
 import Swal from "sweetalert2";
-import TablaTemplate from "../../../../../components/templates/TablaTemplate";
-import { useEffect, useRef, useState } from "react";
-import { getEspecialidades, getInfoTabla, getVisitaById, SearchPaciente, SubmitRegistro } from "./controllerRegistroVisita";
-import Ticket from "../../../../../jaspers/Ticket/Ticket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faChartLine, faCheck, faDownload, faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import ReporteVisitas from "./ReporteVisitas";
-import ReportePacientesConVisita from "./ReportePacientesConVisita";
-import ReporteDashboard from "./ReporteDashboard";
+import { faRotateRight, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import Ticket from "../../../../../jaspers/Ticket/Ticket";
+import { LoadingDefault } from "../../../../../utils/functionUtils";
+import { useAuthStore } from "../../../../../../store/auth";
+import useCampaniaActiva from "../../utils/useCampaniaActiva";
+import BuscadorTexto from "../../components/BuscadorTexto";
+import CampaniaRequerida from "../../components/CampaniaRequerida";
+import { mensajeDeError } from "../../utils/apiSalud";
+import { filtrarPorTexto } from "../../utils/filtrarPorTexto";
+import { crearVisita, getVisitaById } from "./controllerRegistroVisita";
+import ModalReporte from "./ModalReporte";
 import RegistrarNuevaVisita from "./RegistrarNuevaVisita";
+import { REPORTES } from "./reportes";
+import useEspecialidadesActivas from "./useEspecialidadesActivas";
+import useRegistroAutomatico from "./useRegistroAutomatico";
+import useVisitasCampania from "./useVisitasCampania";
+import VisitasTabla from "./VisitasTabla";
 
-export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada }) {
-  const initialFormState = {
-    pacienteId: "",
-    TipoDoc: "1",
-    origen: "",
-    dni: "",
-    nombres: "",
-    Seleccionespecialidades: [],
-  };
-  const [dataTabla, setDataTabla] = useState([]);
-  const [especialidades, setEspecialidades] = useState([]);
-  const [disabled, setDisabled] = useState(false);
-  const [refresh, setRefresh] = useState(false)
-  const [modalReportePacientes, setModalReportePacientes] = useState(false)
-  const [modalReporteVisitas, setModalReporteVisitas] = useState(false)
-  const [modalDashboard, setModalDashboard] = useState(false)
-  const [modalRegistrarVisita, setModalRegistrarVisita] = useState(false)
+const MENSAJE_CAMPANIA_REQUERIDA =
+    "Las visitas se registran dentro de una campaña: su N° de orden y sus especialidades son propios de cada una.";
 
-
-  const { token, userlogued, selectedSede, datosFooter, campaniaActiva } = useSessionData();
-  const autoSubmitRef = useRef(null);
-
-  const { form, setForm, handleChange, handleChangeSimple, handleChangeNumberDecimals, handleClear } = useForm(initialFormState);
-
-  // Auto-registro cuando viene desde RegistroPaciente
-  useEffect(() => {
-    if (!pacienteActivo || especialidades.length === 0) return;
-    if (autoSubmitRef.current === pacienteActivo.pacienteId) return;
-    autoSubmitRef.current = pacienteActivo.pacienteId;
-
-    const seleccionadas = especialidades
-      .filter((e) => e.activo)
-      .map((e) => ({ id: e.id, nombre: e.nombre }));
-
-    const formData = {
-      ...initialFormState,
-      pacienteId: pacienteActivo.pacienteId,
-      dni: pacienteActivo.dni,
-      nombres: pacienteActivo.nombres,
-      Seleccionespecialidades: seleccionadas,
-    };
-
-    setForm(formData);
-    SubmitRegistro(formData, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, autoPrint);
-    onAutoRegistrado?.();
-  }, [pacienteActivo, especialidades]);
-
-  const obtenerInfoTabla = () => {
-    getInfoTabla(setDataTabla, token);
-  };
-
-  const obtenerEspecialidades = () => {
-    getEspecialidades(setEspecialidades, token);
-  };
-
-  useEffect(() => {
-    obtenerInfoTabla();
-  }, [refresh]);
-
-  useEffect(() => {
-    obtenerEspecialidades();
-  }, []);
-
-  useEffect(() => {
-    if (especialidades.length === 0) return;
-    setForm((f) => ({
-      ...f,
-      Seleccionespecialidades: especialidades
-        .filter((e) => e.activo)
-        .map((e) => ({ id: e.id, nombre: e.nombre })),
-    }));
-  }, [especialidades]);
-
-  const handleLimpiar = () => {
-    setDisabled(true);
-    setForm((f) => ({
-      ...initialFormState,
-      Seleccionespecialidades: f.Seleccionespecialidades,
-    }));
-  };
-
-  const handleSubmit = () => {
-    SubmitRegistro(form, token, userlogued, handleLimpiar, () => { setRefresh(refresh + 1) }, autoPrint);
-  }
-
-  // ── Imprimir ticket ───────────────────────────────────────────────────────
-  const fetchAndPrint = async (visitaId) => {
-    const datos = await getVisitaById(visitaId, token);
-    await Ticket({
-      datos,
-      titulo: campaniaActiva?.nombre ?? undefined,
-      logoUrl: campaniaActiva?.urlRuta ?? null,
-    });
-  };
-
-  const handlePrintConfirm = async (row) => {
-    const result = await Swal.fire({
-      title: "Confirmar impresión",
-      text: `¿Deseas imprimir el ticket N° ${row.norden}?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, imprimir",
-      cancelButtonText: "No",
-    });
-    if (result.isConfirmed) fetchAndPrint(row.visitaId);
-  };
-
-  const autoPrint = (res) => fetchAndPrint(res.id);
-
-  // ── Búsqueda ──────────────────────────────────────────────────────────────
-  const handleSearch = async (e, tipoBusqueda) => {
-    if (e.key === "Enter") {
-      setDisabled(true)
-      SearchPaciente(form, token, handleLimpiar, setForm, tipoBusqueda);
+// Por qué todavía no se puede registrar una visita en la campaña (null = se puede)
+const motivoBloqueo = (campania, { especialidades, cargando, fallo }) => {
+    if (cargando) return "Cargando las especialidades de la campaña...";
+    if (fallo) return "No se pudieron cargar las especialidades de la campaña.";
+    if (!especialidades.length) {
+        return `La campaña "${campania.nombre}" no tiene especialidades activas, por eso no se pueden registrar visitas. Agrégalas o actívalas en la sección «Especialidades».`;
     }
-  };
+    return null;
+};
 
-  const handleRegistrarDesdeModal = (paciente) => {
-    if (!paciente) return;
+const textoVacio = ({ cargando, fallo, busqueda }) => {
+    if (cargando) return "Cargando visitas...";
+    if (fallo) return "No se pudo cargar la lista de visitas. Usa «Actualizar» para reintentar.";
+    if (busqueda.trim()) return "Ninguna visita coincide con la búsqueda.";
+    return "Aún no hay visitas registradas en esta campaña.";
+};
 
-    const seleccionadas = especialidades
-      .filter((e) => e.activo)
-      .map((e) => ({ id: e.id, nombre: e.nombre }));
+// Se usa cuando llega un paciente recién registrado y no hay campaña activa: su visita no se puede crear.
+const avisarCampaniaRequerida = async (paciente, onIrACampanias) => {
+    const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: "Primero activa una campaña",
+        text: `El paciente "${paciente.nombres}" ya está registrado. Para crear su visita activa una campaña y luego búscalo con «Registrar nueva visita».`,
+        showConfirmButton: Boolean(onIrACampanias),
+        confirmButtonText: "Ir a Campañas",
+        showCancelButton: true,
+        cancelButtonText: onIrACampanias ? "Cerrar" : "Entendido",
+    });
+    if (isConfirmed) onIrACampanias?.();
+};
 
-    const formData = {
-      ...initialFormState,
-      pacienteId: paciente.pacienteId,
-      dni: paciente.dni,
-      nombres: paciente.nombres,
-      Seleccionespecialidades: seleccionadas,
+export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVisitaSeleccionada, onIrACampanias }) {
+    const token = useAuthStore((state) => state.token);
+    const usuario = useAuthStore((state) => state.userlogued?.sub ?? "");
+    const { campania } = useCampaniaActiva();
+    const { visitas, cargando, fallo, recargar } = useVisitasCampania(token, campania);
+    const especialidades = useEspecialidadesActivas(token, campania);
+    const [busqueda, setBusqueda] = useState("");
+    const [modal, setModal] = useState(null); // "registrar" | clave de REPORTES | null
+
+    const visibles = useMemo(
+        () => filtrarPorTexto(visitas, busqueda, (v) => [v.norden, v.dni, v.nombres, v.apellidos]),
+        [visitas, busqueda]
+    );
+    // Ids de las visitas de esta campaña (null mientras no se conocen), para distinguirlas de las de otras
+    const idsCampania = useMemo(
+        () => (cargando || fallo ? null : new Set(visitas.map((v) => v.visitaId))),
+        [visitas, cargando, fallo]
+    );
+    const bloqueo = campania && motivoBloqueo(campania, especialidades);
+
+    // ── Ticket ────────────────────────────────────────────────────────────────
+    const imprimirTicket = async (visitaId) => {
+        try {
+            const datos = await getVisitaById(visitaId, token);
+            await Ticket({ datos, titulo: campania.nombre, logoUrl: campania.fotoUrl });
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", "No se pudo generar el ticket de la visita", "error");
+        }
     };
 
-    SubmitRegistro(
-      formData,
-      token,
-      userlogued,
-      () => setModalRegistrarVisita(false),
-      () => setRefresh(refresh + 1),
-      autoPrint
-    );
-  };
+    const confirmarImpresion = async ({ norden, visitaId }) => {
+        const { isConfirmed } = await Swal.fire({
+            title: "Confirmar impresión",
+            text: `¿Deseas imprimir el ticket N° ${norden}?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Sí, imprimir",
+            cancelButtonText: "No",
+        });
+        if (isConfirmed) imprimirTicket(visitaId);
+    };
 
-  return (
-    <div className="px-4 max-w-[95%] mx-auto grid  gap-6">
-      {/* Columna izquierda: Formulario */}
-      <div className="space-y-3">
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={() => setModalRegistrarVisita(true)}
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold flex items-center gap-3 shadow-md"
-          >
-            <FontAwesomeIcon icon={faUserPlus} /> Registrar Nueva Visita
-          </button>
-        </div>
-        {/*<SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
-          <div className="flex gap-4 w-full col-span-full">
-            <InputTextOneLine
-              label="DNI"
-              name="dni"
-              value={form.dni}
-              onKeyUp={(e) => { handleSearch(e, "DNI") }}
-              onChange={handleChangeNumberDecimals}
-              className="flex-[1] min-w-0"
-              disabled={disabled}
-            />
-            <InputTextOneLine
-              label="Nombres y Apellidos"
-              name="nombres"
-              value={form.nombres}
-              onKeyUp={(e) => { handleSearch(e, "NOMBRES") }}
-              onChange={handleChange}
-              labelWidth="155px"
-              className="flex-[2] min-w-0"
-              disabled={disabled}
-            />
-          </div>
+    // ── Registro ──────────────────────────────────────────────────────────────
+    // Crea la visita del paciente en la campaña activa con todas sus especialidades activas.
+    // Devuelve true si se creó. Se usa desde el modal y desde el alta de paciente (auto-registro).
+    const registrarVisita = async (paciente) => {
+        if (!campania) {
+            avisarCampaniaRequerida(paciente, onIrACampanias);
+            return false;
+        }
+        if (bloqueo) {
+            Swal.fire("No se puede registrar", bloqueo, "warning");
+            return false;
+        }
 
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            disabled
-          //onChange={handleChangeNumberDecimals}
-          //onKeyUp={handleSearch}
-          />
-          <div className="flex flex-wrap justify-center gap-4">
-            <div className="flex flex-col items-center gap-1">
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faCheck} /> Registrar
-              </button>
-            </div>
+        LoadingDefault("Registrando visita...");
+        try {
+            const visita = await crearVisita(
+                {
+                    campaniaId: campania.id,
+                    pacienteId: paciente.pacienteId,
+                    especialidadIds: especialidades.especialidades.map((e) => e.id),
+                    usuarioRegistro: usuario,
+                },
+                token
+            );
+            recargar();
+            Swal.fire("Éxito", `Visita N° ${visita.norden} registrada en "${campania.nombre}"`, "success").then(() =>
+                imprimirTicket(visita.id)
+            );
+            return true;
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", mensajeDeError(error, "No se pudo registrar la visita"), "error");
+            return false;
+        }
+    };
 
-            <div className="flex flex-col items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleLimpiar()}
-                className="px-6 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            </div>
-          </div>
+    const handleRegistrarDesdeModal = async (paciente) => {
+        const creada = await registrarVisita(paciente);
+        if (creada) setModal(null);
+        return creada;
+    };
 
-        </SectionFieldset>*/}
+    // Paciente recién registrado: se le crea la visita en cuanto se conocen las especialidades de la campaña
+    useRegistroAutomatico(pacienteActivo, !campania || !especialidades.cargando, registrarVisita, onAutoRegistrado);
 
-      </div>
-      {/* Columna derecha: Panel de historial/búsqueda */}
-      <div className="space-y-3">
-        <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
-          <div className="flex justify-center gap-x-4 gap-y-3">
-            <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes <FontAwesomeIcon className="ml-2" icon={faDownload} /></button>
-            <button onClick={() => setModalReporteVisitas(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Visitas <FontAwesomeIcon className="ml-2" icon={faDownload} /></button>
-            <button onClick={() => setModalDashboard(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Dashboard <FontAwesomeIcon className="ml-2" icon={faChartLine} /></button>
-          </div>
-          <Table
-            data={dataTabla}
-            set={setForm}
-            token={token}
-            clean={handleLimpiar}
-            datosFooter={datosFooter}
-            onRowClick={(row) => onVisitaSeleccionada?.(row.visitaId)}
-            onPrintConfirm={handlePrintConfirm}
-          />
-        </SectionFieldset>
-
-      </div>
-      {modalReportePacientes && <ReporteVisitas
-        onClose={() => setModalReportePacientes(false)}
-        sede={selectedSede}
-        token={token}
-      />}
-      {modalReporteVisitas && <ReportePacientesConVisita
-        onClose={() => setModalReporteVisitas(false)}
-        sede={selectedSede}
-        token={token}
-      />}
-      {modalDashboard && <ReporteDashboard
-        onClose={() => setModalDashboard(false)}
-        token={token}
-      />}
-      {modalRegistrarVisita && <RegistrarNuevaVisita
-        onClose={() => setModalRegistrarVisita(false)}
-        token={token}
-        onRegistrar={handleRegistrarDesdeModal}
-      />}
-    </div>
-  );
-}
-
-
-function Table({ data, tabla, set, token, clean, datosFooter, onRowClick, onPrintConfirm }) {
-
-  const columns = [
-    {
-      label: "N° Orden",
-      accessor: "norden",
-      width: "120px",
-      render: (row) => <span className="font-bold">{row.norden}</span>,
-    },
-    {
-      label: "DNI",
-      accessor: "dni",
-      width: "120px",
-      render: (row) => <span className="font-bold">{row.dni}</span>,
-    },
-    {
-      label: "Nombres",
-      accessor: "nombres",
-      render: (row) => <span className="">{row.nombres} {row.apellidos}</span>,
-    },
-    {
-      label: "Fecha Visita",
-      accessor: "fechaVisita",
-      render: (row) => formatearFechaCorta(row.fechaVisita),
-    },
-    {
-      label: "Parentesco",
-      accessor: "parentescos",
-      render: (row) => {
-        const lista = row.parentescos ?? row.paciente?.parentescos ?? [];
-        if (!lista.length) return null;
+    if (!campania) {
         return (
-          <ul className="space-y-1">
-            {lista.map((p, i) => (
-              <li key={i} className="text-xs leading-tight">
-                <span className="font-semibold text-purple-700">{p.tipoRelacion}</span>
-                <span className="text-gray-700"> de: {p.nombreRelacionado}</span>
-                {p.dniRelacionado && (
-                  <span className="text-gray-400"> ({p.dniRelacionado})</span>
-                )}
-              </li>
-            ))}
-          </ul>
+            <div className="mx-auto max-w-[95%] px-4">
+                <CampaniaRequerida mensaje={MENSAJE_CAMPANIA_REQUERIDA} onIrACampanias={onIrACampanias} />
+            </div>
         );
-      },
-    },
-    {
-      label: "Especialidades",
-      accessor: "especialidades",
-      render: (row) => (
-        <ul className="space-y-1">
-          {row.especialidades.map((option) => (
-            <li key={option.id ?? option.nombre} className="flex items-center gap-2 text-lg">
-              <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${option.estado === "PASO" ? "bg-green-500" :
-                option.estado === "NO PASO" ? "bg-red-500" :
-                  "bg-gray-400"
-                }`} />
-              <span className={
-                option.estado === "PASO" ? "text-green-700" :
-                  option.estado === "NO PASO" ? "text-red-600" :
-                    "text-gray-600"
-              }>
-                {option.nombre}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ),
-    },
-  ];
+    }
 
-  return (
-    <TablaTemplate
-      columns={columns}
-      data={data}
-      height={780}
-      onRowClick={(row) => onRowClick?.(row)}
-      onRowRightClick={(row) => onPrintConfirm?.(row)}
-    />
-  );
+    return (
+        <div className="mx-auto max-w-[95%] space-y-4 px-4">
+            <SectionFieldset legend={`Visitas de la campaña (${visibles.length})`} className="space-y-4">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-center gap-2 lg:max-w-md lg:flex-1">
+                        <BuscadorTexto
+                            value={busqueda}
+                            onChange={setBusqueda}
+                            placeholder="Buscar por N° orden, DNI o nombre"
+                        />
+                        <button
+                            type="button"
+                            onClick={recargar}
+                            disabled={cargando}
+                            title="Actualizar lista"
+                            aria-label="Actualizar lista de visitas"
+                            className="flex-shrink-0 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            <FontAwesomeIcon icon={faRotateRight} spin={cargando} />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                        {Object.entries(REPORTES).map(([clave, { etiqueta, icono }]) => (
+                            <button
+                                key={clave}
+                                type="button"
+                                onClick={() => setModal(clave)}
+                                className="verde-btn flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold"
+                            >
+                                {etiqueta} <FontAwesomeIcon icon={icono} />
+                            </button>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setModal("registrar")}
+                            className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-blue-700"
+                        >
+                            <FontAwesomeIcon icon={faUserPlus} /> Registrar nueva visita
+                        </button>
+                    </div>
+                </div>
+
+                <VisitasTabla
+                    visitas={visibles}
+                    emptyText={textoVacio({ cargando, fallo, busqueda })}
+                    onSeleccionar={(visita) => onVisitaSeleccionada?.(visita.visitaId)}
+                    onImprimir={(visita) => imprimirTicket(visita.visitaId)}
+                    onClickDerecho={confirmarImpresion}
+                />
+            </SectionFieldset>
+
+            {modal === "registrar" && (
+                <RegistrarNuevaVisita
+                    token={token}
+                    campania={campania}
+                    especialidades={especialidades.especialidades}
+                    bloqueo={bloqueo}
+                    idsCampania={idsCampania}
+                    onClose={() => setModal(null)}
+                    onRegistrar={handleRegistrarDesdeModal}
+                />
+            )}
+            {REPORTES[modal] && (
+                <ModalReporte reporte={REPORTES[modal]} token={token} campania={campania} onClose={() => setModal(null)} />
+            )}
+        </div>
+    );
 }
