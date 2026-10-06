@@ -23,6 +23,8 @@ const BASIC_HEADERS = [
     { key: "EMPRESA", label: "EMPRESA", width: 28 },
     { key: "tipo de EXAMEN", label: "TIPO EXAMEN", width: 18 },
     { key: "PRECIO DE EXAMEN", label: "PRECIO", width: 12 },
+    { key: "OBSERVACION1", label: "OBSERVACIÓN 1", width: 28 },
+    { key: "OBSERVACION2", label: "OBSERVACIÓN 2", width: 28 },
 ];
 
 const EXAM_HEADERS = [

@@ -1,206 +1,219 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel, faUpload } from "@fortawesome/free-solid-svg-icons";
+import CampaniaActivaBanner from "../../../components/CampaniaActivaBanner";
+import ModalBase from "../../../components/ModalBase";
+import { mensajeDeError } from "../../../utils/apiSalud";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import {
     descargarPlantillaMedicamentos,
     exportarResultadosMedicamentos,
     guardarCargaMasivaMedicamentos,
-    handleSubirExcelMedicamentos,
+    leerExcelMedicamentos,
 } from "./ControllerCargaMasivaMedicamentos";
 
-export default function CargaMasivaMedicamentos({ onClose, token, Refresgpag }) {
-    const [data, setData] = useState([]);
+const ESTADO = {
+    pendiente: { etiqueta: "— Listo", fila: "" },
+    invalida: { etiqueta: "⚠ Inválida", fila: "bg-yellow-50" },
+    success: { etiqueta: "✔ Registrado", fila: "bg-green-50" },
+    error: { etiqueta: "✖ Error", fila: "bg-red-50" },
+};
+
+const ENCABEZADOS = ["Estado", "Nombre", "Presentación", "Uso", "Laboratorio", "Marca", "Unidad medida", "Stock mín.", "Mensaje"];
+
+const Dato = ({ titulo, valor, clase }) => (
+    <div className={`rounded px-4 py-2 shadow-sm ${clase}`}>
+        <p className="text-sm">{titulo}</p>
+        <p className="text-xl font-bold">{valor}</p>
+    </div>
+);
+
+// Carga de varios medicamentos a la vez desde un Excel, siempre a la campaña activa.
+// `existentes` son los medicamentos que la campaña ya tiene (para avisar de duplicados).
+export default function CargaMasivaMedicamentos({ token, campania, existentes, onClose, onCargado }) {
+    const [filas, setFilas] = useState([]);
+    const [sinFila, setSinFila] = useState([]); // fallos del backend que no se pudieron asociar a una fila
     const [procesando, setProcesando] = useState(false);
     const [procesado, setProcesado] = useState(false);
+    const selectorArchivo = useRef(null);
 
-    const handleSubir = () => {
-        setProcesado(false);
-        handleSubirExcelMedicamentos(setData);
+    const listos = filas.filter((f) => f.estado === "pendiente");
+    const posiblesDuplicados = listos.filter((f) => f.mensaje).length;
+    const puedeProcesar = listos.length > 0 && !procesando && !procesado; // procesar dos veces crearía duplicados
+    const cuenta = (...estados) => filas.filter((f) => estados.includes(f.estado)).length;
+
+    const handleArchivo = async (e) => {
+        const archivo = e.target.files[0];
+        e.target.value = "";
+        if (!archivo) return;
+
+        try {
+            setFilas(await leerExcelMedicamentos(archivo, existentes));
+            setSinFila([]);
+            setProcesado(false);
+        } catch (error) {
+            console.error(error);
+            Swal.fire("Error", "No se pudo leer el archivo. Verifica que sea un Excel (.xlsx o .xls) con las columnas de la plantilla.", "error");
+        }
     };
-
-    const handleDescargar = () => {
-        descargarPlantillaMedicamentos();
-    };
-
-    const puedeProcesar = data.length > 0 && !procesando;
 
     const handleProcesar = async () => {
-        if (!puedeProcesar) return;
-
-        const confirm = await Swal.fire({
-            title: "¿Procesar y guardar los medicamentos?",
-            html: `Se enviarán <b>${data.length}</b> medicamento(s) al servidor.<br/>Todos se crean con stock actual en 0; el "Stock Mínimo" indicado se usará como umbral de alerta.`,
+        const { isConfirmed } = await Swal.fire({
             icon: "warning",
+            title: "¿Procesar y guardar los medicamentos?",
+            text:
+                `Se enviarán ${listos.length} medicamento(s) a la campaña "${campania.nombre}". Todos se crean con stock 0; ` +
+                `el stock mínimo indicado se usa como umbral de alerta.` +
+                (posiblesDuplicados ? ` ${posiblesDuplicados} podrían estar duplicados y se crearían como filas independientes.` : ""),
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
             cancelButtonText: "Cancelar",
         });
-        if (!confirm.isConfirmed) return;
+        if (!isConfirmed) return;
 
         setProcesando(true);
-        setProcesado(false);
         LoadingDefault("Registrando medicamentos...");
-
         try {
-            const { resultados } = await guardarCargaMasivaMedicamentos(data, token);
-            setData(resultados);
+            const { resultados, sinFila: huerfanos, respuesta } = await guardarCargaMasivaMedicamentos(filas, campania.id, token);
+            setFilas(resultados);
+            setSinFila(huerfanos);
             setProcesado(true);
-            Swal.close();
 
-            const exitosos = resultados.filter((r) => r.estado === "success").length;
-            const fallidos = resultados.filter((r) => r.estado === "error").length;
-
+            const registrados = respuesta?.procesadosConExito ?? resultados.filter((r) => r.estado === "success").length;
+            const fallidos = respuesta?.totalFallidos ?? resultados.filter((r) => r.estado === "error").length;
             Swal.fire({
                 icon: fallidos === 0 ? "success" : "warning",
                 title: "Carga masiva finalizada",
-                html: `✅ Registrados: <b>${exitosos}</b><br/>⚠️ Con errores: <b>${fallidos}</b>`,
+                text: `Registrados: ${registrados}. Con errores: ${fallidos}.`,
             });
-
-            if (exitosos > 0) Refresgpag?.();
+            if (registrados > 0) onCargado();
         } catch (error) {
-            console.error("Error en carga masiva de medicamentos:", error);
-            Swal.close();
-            Swal.fire("Error", "No se pudo procesar la carga masiva", "error");
+            console.error(error);
+            Swal.fire("Error", mensajeDeError(error, "No se pudo procesar la carga masiva"), "error");
         } finally {
             setProcesando(false);
         }
     };
 
-    const handleExportar = () => {
-        exportarResultadosMedicamentos(data);
-    };
-
-    const totalOk = data.filter((r) => r.estado === "success").length;
-    const totalError = data.filter((r) => r.estado === "error").length;
-    const totalPendiente = data.filter((r) => r.estado === "pendiente").length;
-
-    const rowColor = (estado) => {
-        if (estado === "success") return "bg-green-50";
-        if (estado === "error") return "bg-red-50";
-        return "";
-    };
-
-    const estadoLabel = (estado) => {
-        if (estado === "success") return "✔ Registrado";
-        if (estado === "error") return "✖ Error";
-        return "— Pendiente";
-    };
-
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-auto max-w-[90%] max-h-[90vh] flex flex-col p-6 gap-4">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Medicamentos</h2>
-                    <FontAwesomeIcon
-                        icon={faTimes}
-                        className="cursor-pointer text-black"
-                        style={{ fontSize: 14 }}
-                        onClick={onClose}
-                    />
-                </div>
-
-                <p className="text-xs text-gray-500 -mt-2">
-                    Ninguna columna es obligatoria, excepto "Stock Mínimo" (si la celda viene vacía se registra como 0).
-                    Todos los medicamentos se crean con stock actual en 0; para cargar stock use luego el ingreso individual de cada medicamento.
-                </p>
-
-                <div className="flex gap-3">
+        <ModalBase
+            title="Carga masiva de medicamentos"
+            onClose={onClose}
+            maxWidth="max-w-5xl"
+            footer={
+                <>
                     <button
                         type="button"
-                        onClick={handleSubir}
+                        onClick={onClose}
+                        className="rounded border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                    >
+                        Cerrar
+                    </button>
+                    {procesado && (
+                        <button
+                            type="button"
+                            onClick={() => exportarResultadosMedicamentos(filas, campania.codigo)}
+                            className="azul-btn flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold"
+                        >
+                            <FontAwesomeIcon icon={faFileExcel} /> Exportar resultado
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={handleProcesar}
+                        disabled={!puedeProcesar}
+                        className={`rounded px-4 py-2 text-sm font-semibold ${puedeProcesar ? "verde-btn" : "cursor-not-allowed bg-gray-300 text-gray-500"}`}
+                    >
+                        {procesando ? "Procesando..." : procesado ? "Procesado" : `Procesar y guardar${listos.length ? ` (${listos.length})` : ""}`}
+                    </button>
+                </>
+            }
+        >
+            <div className="space-y-4">
+                <CampaniaActivaBanner campania={campania} />
+
+                <p className="text-xs text-gray-500">
+                    Obligatorios: nombre y presentación (las filas que no los tengan no se envían). El stock mínimo vacío se registra
+                    como 0. Todos los medicamentos se crean con stock 0; para cargar stock usa después el ingreso de cada medicamento (+).
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+                    <input ref={selectorArchivo} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleArchivo} />
+                    <button
+                        type="button"
+                        onClick={() => selectorArchivo.current.click()}
                         disabled={procesando}
-                        className="verde-btn px-4 py-1 rounded flex items-center gap-2"
+                        className="verde-btn flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold disabled:opacity-50"
                     >
                         Subir Excel <FontAwesomeIcon icon={faUpload} />
                     </button>
                     <button
                         type="button"
-                        onClick={handleDescargar}
+                        onClick={descargarPlantillaMedicamentos}
                         disabled={procesando}
-                        className="verde-btn px-4 py-1 rounded flex items-center gap-2"
+                        className="verde-btn flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold disabled:opacity-50"
                     >
-                        Descargar Plantilla <FontAwesomeIcon icon={faFileExcel} />
+                        Descargar plantilla <FontAwesomeIcon icon={faFileExcel} />
                     </button>
                 </div>
 
-                {data.length > 0 && (
-                    <div className="flex gap-4 flex-wrap">
-                        <div className="bg-gray-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-gray-600">Total</p>
-                            <p className="text-xl font-bold">{data.length}</p>
-                        </div>
-                        <div className="bg-green-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-green-700">Registrados</p>
-                            <p className="text-xl font-bold text-green-800">{totalOk}</p>
-                        </div>
-                        <div className="bg-red-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-red-700">Errores</p>
-                            <p className="text-xl font-bold text-red-800">{totalError}</p>
-                        </div>
-                        <div className="bg-blue-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-blue-700">Pendientes</p>
-                            <p className="text-xl font-bold text-blue-800">{totalPendiente}</p>
-                        </div>
+                {filas.length > 0 && (
+                    <div className="flex flex-wrap gap-3">
+                        <Dato titulo="Total" valor={filas.length} clase="bg-gray-100 text-gray-700" />
+                        <Dato titulo="Listos" valor={cuenta("pendiente")} clase="bg-blue-100 text-blue-800" />
+                        <Dato titulo="Registrados" valor={cuenta("success")} clase="bg-green-100 text-green-800" />
+                        <Dato titulo="Con errores" valor={cuenta("error", "invalida")} clase="bg-red-100 text-red-800" />
                     </div>
                 )}
 
-                {data.length > 0 && (
-                    <div className="overflow-auto flex-1">
-                        <table className="min-w-full border border-gray-300 text-sm">
+                {sinFila.length > 0 && (
+                    <div className="rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm text-yellow-800">
+                        <p className="font-semibold">
+                            El servidor reportó {sinFila.length} fallo(s) que no se pudieron asociar a una fila de la lista, así que
+                            alguna fila marcada como registrada podría no estarlo (revisa la lista de medicamentos):
+                        </p>
+                        <ul className="list-inside list-disc">
+                            {sinFila.map((fallo, i) => (
+                                <li key={i}>
+                                    {fallo.nombresPa || "(sin nombre)"}: {fallo.motivoFallo}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {filas.length > 0 && (
+                    <div className="overflow-auto rounded-lg border border-gray-300">
+                        <table className="min-w-full text-sm">
                             <thead>
                                 <tr>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">NOMBRE</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">PRESENTACIÓN</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">USO</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">LABORATORIO</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">MARCA</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">UNIDAD MEDIDA</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">STOCK MÍNIMO</th>
-                                    <th className="border px-3 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
-                                    <th className="border px-3 py-2 bg-gray-100">MENSAJE</th>
+                                    {ENCABEZADOS.map((titulo) => (
+                                        <th key={titulo} className="whitespace-nowrap border-b bg-gray-100 px-3 py-2 text-left">
+                                            {titulo}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.map((row, i) => (
-                                    <tr key={i} className={rowColor(row.estado)}>
-                                        <td className="border px-3 py-2 whitespace-nowrap font-semibold">{row.nombre}</td>
-                                        <td className="border px-3 py-2 whitespace-nowrap">{row.presentacion}</td>
-                                        <td className="border px-3 py-2">{row.uso}</td>
-                                        <td className="border px-3 py-2 whitespace-nowrap">{row.laboratorio}</td>
-                                        <td className="border px-3 py-2 whitespace-nowrap">{row.marca}</td>
-                                        <td className="border px-3 py-2 whitespace-nowrap">{row.unidadMedida}</td>
-                                        <td className="border px-3 py-2 whitespace-nowrap text-center">{row.stockMinimo}</td>
-                                        <td className="border px-3 py-2 font-semibold whitespace-nowrap">{estadoLabel(row.estado)}</td>
-                                        <td className="border px-3 py-2">{row.mensaje}</td>
+                                {filas.map((fila, i) => (
+                                    <tr key={i} className={`border-b ${ESTADO[fila.estado].fila}`}>
+                                        <td className="whitespace-nowrap px-3 py-2 font-semibold">{ESTADO[fila.estado].etiqueta}</td>
+                                        <td className="px-3 py-2 font-semibold">{fila.nombre}</td>
+                                        <td className="px-3 py-2">{fila.presentacion}</td>
+                                        <td className="px-3 py-2">{fila.uso}</td>
+                                        <td className="px-3 py-2">{fila.laboratorio}</td>
+                                        <td className="px-3 py-2">{fila.marca}</td>
+                                        <td className="px-3 py-2">{fila.unidadMedida}</td>
+                                        <td className="px-3 py-2 text-center">{fila.stockMinimo}</td>
+                                        <td className="min-w-[16rem] px-3 py-2">{fila.mensaje}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 )}
-
-                {data.length > 0 && (
-                    <div className="flex justify-end gap-3">
-                        {procesado && (
-                            <button
-                                onClick={handleExportar}
-                                className="azul-btn px-4 py-2 rounded flex items-center gap-2"
-                            >
-                                Exportar Resultado <FontAwesomeIcon icon={faFileExcel} />
-                            </button>
-                        )}
-                        <button
-                            onClick={handleProcesar}
-                            disabled={!puedeProcesar}
-                            className={`px-4 py-2 rounded ${!puedeProcesar ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "verde-btn"}`}
-                        >
-                            {procesando ? "Procesando..." : "Procesar y Guardar Todos"}
-                        </button>
-                    </div>
-                )}
             </div>
-        </div>
+        </ModalBase>
     );
 }

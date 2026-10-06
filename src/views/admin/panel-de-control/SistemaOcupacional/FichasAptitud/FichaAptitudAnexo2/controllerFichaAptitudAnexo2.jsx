@@ -8,6 +8,7 @@ import {
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { inferirDuracionFA2 } from "./FA2FormDefaults";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2";
@@ -101,6 +102,7 @@ export const GetInfoServicioEditar = async (
                         res.evaluado ? "EVALUADO" : ""),
             fechaValido: res.fechaDesde,
             fechaVencimiento: res.fechaHasta,
+            duracionAnios: inferirDuracionFA2(res.fechaDesde, res.fechaHasta),
             recomendaciones: res.recomendaciones,
             restricciones: res.restriccionesDescripcion,
 

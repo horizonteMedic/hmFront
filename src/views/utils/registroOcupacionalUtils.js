@@ -47,6 +47,7 @@ export const validarSede = async (nro, sede, token) => {
  * @param {string}   p.registrarUrl   Endpoint de registrar/actualizar.
  * @param {Function} p.buildBody      (form, user, esActualizacion) => body.
  * @param {Function} [p.onPrint]      Callback de impresión tras guardar.
+ * @param {number[]} [p.idsExito]     `id` de respuesta que cuentan como éxito (default [1]).
  */
 
 export const guardarRegistro = async ({
@@ -58,6 +59,7 @@ export const guardarRegistro = async ({
   registrarUrl,
   buildBody,
   onPrint = () => {},
+  idsExito,
 }) => {
   if (!form.norden) {
     await Swal.fire({
@@ -81,7 +83,7 @@ export const guardarRegistro = async ({
 
   // Registro nuevo: se sella la creación (usuario en sesión + fecha-hora actual).
   const body = buildBody(form, user, false);
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, onPrint);
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, onPrint, true, idsExito);
 };
 
 
@@ -94,6 +96,7 @@ export const actualizarRegistro = async ({
   registrarUrl,
   buildBody,
   onPrint = () => {},
+  idsExito,
 }) => {
   if (!form.norden) {
     await Swal.fire({
@@ -117,7 +120,7 @@ export const actualizarRegistro = async ({
 
   // Edición: se sella la actualización (usuario en sesión + fecha-hora actual).
   const body = buildBody(form, user, true);
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, onPrint);
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, onPrint, true, idsExito);
 };
 
 /**

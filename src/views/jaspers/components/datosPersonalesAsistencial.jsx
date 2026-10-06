@@ -2,20 +2,6 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import TituloSeccionAsistencial from "./tituloSeccionAsistencial.jsx";
 import FilaEtiquetaValorAsistencial from "./filaEtiquetaValorAsistencial.jsx";
 
-// Sección "DATOS PERSONALES" de los reportes del módulo asistencial. Mismo diseño que la de
-// RiesgoCardiovascular (barra gris + tabla de celdas "Etiqueta: valor"), pero sin los datos laborales:
-// Cargo, Área, Contrata y Tipo Examen. Sigue el estándar tipográfico de tituloSeccionAsistencial.jsx y
-// sus celdas se adaptan al texto (se achica un poco la letra y, si no cabe, salta de línea; ver
-// filaEtiquetaValorAsistencial.jsx).
-//
-// datos:
-//   nombreCompleto, dni, edad, sexo (M/F o MASCULINO/FEMENINO), estadoCivil, fechaNacimiento
-//   (yyyy-MM-dd o dd/MM/yyyy), lugarNacimiento, ocupacion, nivelEstudios, empresa
-// opciones:
-//   x (15), y (43), ancho (180), titulo ("DATOS PERSONALES")
-//
-// Devuelve la Y donde termina la tabla.
-
 // Cada celda: ancho como fracción del ancho total y valorX = distancia desde el borde izquierdo de la
 // celda hasta donde empieza el valor (fija por celda, para alinear columnas como en Riesgo).
 const FILAS = [

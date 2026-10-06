@@ -1,90 +1,43 @@
-import Swal from "sweetalert2";
-import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-import { LoadingDefault } from "../../../../../utils/functionUtils";
+import { getFetch } from "../../../../../utils/apiHelpers";
+import { getJson, getLista, postJson } from "../../utils/apiSalud";
 
-const SubmitURLVisita = "/api/visitas"
-const SearchURLDNI = "/api/pacientes/buscar-por-dni"
-const SearchURLName = "/api/pacientes/buscar-por-nombre-apellido"
-const BuscarVisitasURL = "/api/visitas/buscar"
+const URL_VISITAS = "/api/visitas";
+const URL_BUSCAR_VISITAS = "/api/visitas/buscar";
+const URL_REPORTE_VISITAS = "/api/reportes/visitas";
+const URL_PACIENTE_DNI = "/api/pacientes/buscar-por-dni";
+const URL_PACIENTE_NOMBRE = "/api/pacientes/buscar-por-nombre-apellido";
 
-export const getInfoTabla = (setData, token) => {
-    getFetch(`/api/reportes/visitas`, token)
-        .then(setData);
-};
+// Visitas de UNA campaña. El `norden` se reinicia en 1 en cada campaña, así que la lista
+// siempre se pide filtrada: sin `codigoCampania` el backend mezcla las visitas de todas.
+export const getVisitas = (codigoCampania, token) =>
+    getLista(
+        `${URL_REPORTE_VISITAS}?${new URLSearchParams({ codigoCampania })}`,
+        token,
+        "No se pudo cargar la lista de visitas"
+    );
 
-export const getEspecialidades = (setData, token) => {
-    getFetch(`/api/especialidades`, token)
-        .then(setData);
-};
+export const crearVisita = ({ campaniaId, pacienteId, especialidadIds, usuarioRegistro }, token) =>
+    postJson(
+        URL_VISITAS,
+        { campaniaId, pacienteId, especialidadIds, usuarioRegistro },
+        token,
+        "No se pudo registrar la visita"
+    );
 
-export const SubmitRegistro = async (form, token, userlogued, limpiar, setRefresh, onSuccess) => {
-    LoadingDefault("Registrando...")
-    const body = {
-        pacienteId: form.pacienteId,
-        especialidadIds: (form.Seleccionespecialidades ?? []).map((e) => e.id),
-        usuarioRegistro: userlogued
-    };
-    SubmitData(body, SubmitURLVisita, token)
-        .then(async (res) => {
-            // SubmitData devuelve el Response object cuando hay error HTTP
-            if (res && typeof res.json === "function") {
-                const error = await res.json();
-                Swal.close();
-                Swal.fire("Error", error.mensaje ?? "No se pudo registrar la visita", "error");
-                return;
-            }
-            if (res.norden) {
-                limpiar();
-                setRefresh();
-                Swal.fire("Éxito", "Visita creada correctamente", "success")
-                    .then(() => onSuccess?.(res));
-            }
-        })
-}
-
-export const SearchPaciente = async (form, token, handleLimpiar, set, tipoBusqueda) => {
-    LoadingDefault("Buscando...")
-    const url = tipoBusqueda === "DNI"
-        ? `${SearchURLDNI}?dni=${form.dni}`
-        : `${SearchURLName}?texto=${form.nombres}`;
-
-    const res = await getFetch(url, token);
-
-    console.log(res);
-
-    const paciente = res[0];
-
-    set((prev) => ({
-        ...prev,
-        dni: paciente.numeroDocumento,
-        nombres: `${paciente.nombres} ${paciente.apellidos}`,
-        pacienteId: paciente.id
-    }));
-
-    Swal.close();
-
-}
-
-export const BuscarPacientePorDniONombre = async (params, token) => {
-    const url = params.dni
-        ? `${SearchURLDNI}?dni=${params.dni}`
-        : `${SearchURLName}?texto=${params.nombres}`;
-
-    const res = await getFetch(url, token);
-
-    if (!Array.isArray(res) || res.length === 0) return null;
-    return res[0];
-}
-
+// Detalle completo: { visita, paciente (con parentescos), fichas (con medicamentos entregados) }
 export const getVisitaById = (visitaId, token) =>
-    getFetch(`/api/visitas/${visitaId}`, token);
+    getJson(`${URL_VISITAS}/${visitaId}`, token, "No se pudo obtener el detalle de la visita");
 
-export const BuscarVisitasPrevias = async (params, token) => {
-    const query = new URLSearchParams();
-    if (params.dni) query.set("dni", params.dni);
-    if (params.nombres) query.set("nombres", params.nombres);
-    if (params.apellidos) query.set("apellidos", params.apellidos);
+const listaOVacia = (res) => (Array.isArray(res) ? res : []);
 
-    const res = await getFetch(`${BuscarVisitasURL}?${query.toString()}`, token);
-    return Array.isArray(res) ? res : [];
-}
+// Primer paciente que coincide con el DNI o, si no hay, con los nombres escritos (null si no hay ninguno)
+export const buscarPaciente = async ({ dni, nombres }, token) => {
+    const url = dni
+        ? `${URL_PACIENTE_DNI}?${new URLSearchParams({ dni })}`
+        : `${URL_PACIENTE_NOMBRE}?${new URLSearchParams({ texto: nombres })}`;
+    return listaOVacia(await getFetch(url, token))[0] ?? null;
+};
+
+// Todas las visitas del paciente, de cualquier campaña (la búsqueda no filtra por campaña)
+export const buscarVisitasPrevias = async (dni, token) =>
+    dni ? listaOVacia(await getFetch(`${URL_BUSCAR_VISITAS}?${new URLSearchParams({ dni })}`, token)) : [];

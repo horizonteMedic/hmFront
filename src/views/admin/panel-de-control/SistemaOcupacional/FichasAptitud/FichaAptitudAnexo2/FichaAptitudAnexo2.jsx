@@ -8,8 +8,9 @@ import {
   SectionFieldset
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
+import { getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
+import { DURACION_FA2_OPCIONES, getFA2FechaVencimiento } from "./FA2FormDefaults";
 import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
@@ -49,7 +50,8 @@ export default function FichaAptitudAnexo2() {
     conclusiones: "",
     apto: "APTO",
     fechaValido: today,
-    fechaVencimiento: getDatePlus364Days(today),
+    duracionAnios: "1",
+    fechaVencimiento: getFA2FechaVencimiento(today, "1"),
     recomendaciones: "",
     restricciones: "NINGUNO.",
 
@@ -270,7 +272,8 @@ export default function FichaAptitudAnexo2() {
                 type="date"
                 value={form?.fechaValido}
                 onChange={(e) => {
-                  setForm(prev => ({ ...prev, fechaVencimiento: getDatePlus364Days(e.target.value) }));
+                  const { value } = e.target;
+                  setForm(prev => ({ ...prev, fechaVencimiento: getFA2FechaVencimiento(value, prev.duracionAnios) }));
                   handleChangeSimple(e)
                 }}
               />
@@ -290,6 +293,21 @@ export default function FichaAptitudAnexo2() {
                   disabled
                 />
               )}
+              <InputsRadioGroup
+                label="Duración"
+                name="duracionAnios"
+                value={form?.duracionAnios}
+                disabled={form?.apto == "NO APTO"}
+                onChange={(e, value) => {
+                  setForm(prev => ({
+                    ...prev,
+                    duracionAnios: value,
+                    fechaVencimiento: getFA2FechaVencimiento(prev.fechaValido, value),
+                  }));
+                }}
+                options={DURACION_FA2_OPCIONES}
+                className="xl:col-span-2"
+              />
             </div>
             <InputTextArea
               label="Recomendaciones"
