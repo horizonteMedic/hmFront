@@ -75,6 +75,7 @@ const ReportePacientes = ({ onClose, sede, token }) => {
             { key: "protocolo", label: "PROTOCOLO", width: 16, destacado: true },
             { key: "aptitud", label: "APTITUD", width: 16, destacado: true },
             { key: "fechaAdmision", label: "FECHA", width: 14, destacado: false },
+            { key: "horaAdmision", label: "HORA", width: 12, destacado: false },
             { key: "sede", label: "SEDE", width: 10, destacado: false },
         ];
 

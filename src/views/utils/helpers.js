@@ -1,4 +1,4 @@
-import { addDays, addYears, format, parse } from "date-fns";
+import { addDays, addYears, format, parse, subDays } from "date-fns";
 import { PDFDocument } from "pdf-lib";
 
 export function fixEncodingModern(str) {
@@ -23,6 +23,9 @@ export function getDatePlusOneYear(fechaStr) {//INPUT 2025-01-28 //OUTPUT 2026-0
 }
 export function getDatePlusYears(fechaStr, cantidadAnios) {//INPUT fechaStr: 2025-01-28, cantidadAnios: 2 //OUTPUT 2027-01-28
     return fechaStr ? format(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), cantidadAnios), "yyyy-MM-dd") : "";
+}
+export function getDatePlusYearsMinusOneDay(fechaStr, cantidadAnios) {//INPUT fechaStr: 2025-01-28, cantidadAnios: 2 //OUTPUT 2027-01-27
+    return fechaStr ? format(subDays(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), cantidadAnios), 1), "yyyy-MM-dd") : "";
 }
 export function getDatePlus364Days(fechaStr) {
     return fechaStr

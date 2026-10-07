@@ -1,39 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
-export const PRESENTACIONES_OPTIONS = [
-  {
-    group: '💊 Sólidas',
-    items: ['Tableta / comprimido', 'Cápsula', 'Gragea', 'Polvo', 'Granulado', 'Pastilla', 'Tableta masticable', 'Tableta sublingual', 'Tableta efervescente']
-  },
-  {
-    group: '🧴 Líquidas',
-    items: ['Jarabe', 'Solución oral', 'Suspensión', 'Gotas', 'Emulsión', 'Elixir']
-  },
-  {
-    group: '💉 Inyectables',
-    items: ['Ampolla', 'Vial / frasco ampolla', 'Jeringa prellenada', 'Solución inyectable', 'Suspensión inyectable']
-  },
-  {
-    group: '🧴 Uso tópico (piel)',
-    items: ['Crema', 'Pomada', 'Ungüento', 'Gel', 'Loción', 'Pasta', 'Spray']
-  },
-  {
-    group: '👁️ Otras vías',
-    items: [
-      'Oftálmica: gotas o solución ocular',
-      'Ótica: gotas para los oídos',
-      'Nasal: gotas o spray nasal',
-      'Rectal: supositorio o enema',
-      'Vaginal: óvulo, crema o gel vaginal',
-      'Inhalatoria: inhalador, aerosol o nebulización',
-      'Transdérmica: parche'
-    ]
-  }
-];
-
-export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false }) {
+// `error`: mensaje bajo el campo (con el borde en rojo) cuando el valor no es válido.
+export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false, error = '' }) {
   return (
     <div className={`relative ${className}`}>
       <input
@@ -48,7 +18,8 @@ export function FloatingInput({ id, name, label, value, onChange, type = 'text',
         disabled={disabled}
         autoFocus={autoFocus}
         placeholder=" "
-        className="block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer"
+        aria-invalid={Boolean(error)}
+        className={`block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border ${error ? 'border-red-500' : 'border-gray-300'} appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer`}
       />
       <label
         htmlFor={id}
@@ -56,11 +27,12 @@ export function FloatingInput({ id, name, label, value, onChange, type = 'text',
       >
         {label}{required && <span className="text-red-500"> *</span>}
       </label>
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
 }
 
-export function FloatingAutocomplete({ id, label, value, onChange, groupedOptions, required = false, className = '' }) {
+export function FloatingAutocomplete({ id, name, label, value, onChange, groupedOptions, required = false, className = '', error = '' }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -89,12 +61,14 @@ export function FloatingAutocomplete({ id, label, value, onChange, groupedOption
       <input
         type="text"
         id={id}
+        name={name || id}
         value={value}
         onChange={onChange}
         onFocus={() => setOpen(true)}
         placeholder=" "
         autoComplete="off"
-        className="block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer"
+        aria-invalid={Boolean(error)}
+        className={`block px-2.5 pb-2.5 pt-2.5 w-full text-sm text-gray-900 bg-transparent rounded-lg border ${error ? 'border-red-500' : 'border-gray-300'} appearance-none focus:outline-none focus:ring-0 focus:border-[#084788] peer`}
       />
       <label
         htmlFor={id}
@@ -102,6 +76,7 @@ export function FloatingAutocomplete({ id, label, value, onChange, groupedOption
       >
         {label}{required && <span className="text-red-500"> *</span>}
       </label>
+      {error && !open && <p className="mt-1 text-xs text-red-600">{error}</p>}
       {open && filteredGroups.length > 0 && (
         <ul className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg text-sm">
           {filteredGroups.map((g) => (

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faSearch, faCheck, faTrash, faPlus, faCheckCircle, faRotate } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getMedicamentos } from "../../Inventario/ProductosEnInventario/model/ProductosEnInventario";
+import { getMedicamentos } from "../../Inventario/ProductosEnInventario/controllerProductosEnInventario";
 import { crearEntrega, anularEntrega } from "../controllerRegistroEspecialidades";
 
 const normalizeText = (text) =>
@@ -29,8 +29,11 @@ const esLineaValida = (linea) => {
   );
 };
 
+// `campaniaId`: campaña de la visita. El stock es propio de cada campaña, así que solo se ofrecen los
+// medicamentos de esa campaña (sin ella el backend los trae mezclados).
 export default function BuscarMedicamentoModal({
   ficha,
+  campaniaId,
   token,
   usuarioRegistro,
   entregasExistentes = [],
@@ -46,9 +49,13 @@ export default function BuscarMedicamentoModal({
   const [registrando, setRegistrando] = useState(false);
 
   useEffect(() => {
+    if (!campaniaId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    getMedicamentos(token)
-      .then((res) => setMedicamentos(Array.isArray(res) ? res : []))
+    getMedicamentos(campaniaId, token)
+      .then(setMedicamentos)
       .catch(() => {
         Swal.fire({
           title: "Error",
@@ -59,7 +66,7 @@ export default function BuscarMedicamentoModal({
         });
       })
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [campaniaId, token]);
 
   const filtered = useMemo(
     () =>
@@ -241,11 +248,9 @@ export default function BuscarMedicamentoModal({
     // Re-consultar el stock: pudo cambiar y ser la causa de la falla.
     let medicamentosFrescos = medicamentos;
     try {
-      const fresh = await getMedicamentos(token);
-      if (Array.isArray(fresh)) {
-        medicamentosFrescos = fresh;
-        setMedicamentos(fresh);
-      }
+      const fresh = await getMedicamentos(campaniaId, token);
+      medicamentosFrescos = fresh;
+      setMedicamentos(fresh);
     } catch {
       // si el refresco falla, se mantiene el stock que ya se tenía
     }
@@ -312,7 +317,11 @@ export default function BuscarMedicamentoModal({
           </label>
 
           <div className="border rounded-lg max-h-[200px] overflow-y-auto divide-y">
-            {loading ? (
+            {!campaniaId ? (
+              <p className="text-center text-sm py-4 text-red-500">
+                No se pudo determinar la campaña de esta visita, por eso no se pueden listar sus medicamentos.
+              </p>
+            ) : loading ? (
               <p className="text-center text-sm py-4 text-gray-500">Cargando medicamentos...</p>
             ) : filtered.length === 0 ? (
               <p className="text-center text-sm py-4 text-gray-500">No se encontraron medicamentos</p>

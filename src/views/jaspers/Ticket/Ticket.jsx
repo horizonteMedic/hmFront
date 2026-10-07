@@ -43,7 +43,7 @@ export default async function Ticket({
     const altoCelda = 27;
     const altoParentesco = parentescos.length > 0 ? 6 + parentescos.length * 5 : 0;
     const altoBase = 115;
-    const altoDoc = altoBase + altoParentesco + filas * altoCelda - 10;
+    const altoDoc = altoBase + altoParentesco + filas * altoCelda - 80;
 
     const doc = new jsPDF({
         orientation: "portrait",
@@ -105,10 +105,10 @@ export default async function Ticket({
 
         doc.setFontSize(7);
         parentescos.forEach((p) => {
-            const relacion  = p.tipoRelacion ?? "";
+            const relacion = p.tipoRelacion ?? "";
             const nombreRel = p.nombreRelacionado ?? "";
-            const dniRel    = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
-            const prefijo   = `Es ${relacion} de:`;
+            const dniRel = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
+            const prefijo = `Es ${relacion} de:`;
             doc.setFont("helvetica", "bold");
             doc.text(prefijo, margen + 2, y);
             const anchoLabel = doc.getTextWidth(prefijo) + 2;
@@ -148,7 +148,7 @@ export default async function Ticket({
     y += 6;
 
     // ── Especialidades en 2 columnas ──────────────────────────────────────────
-    const colAncho = (ancho - margen * 2 - 3) / 2;   // ancho de cada celda
+    /*const colAncho = (ancho - margen * 2 - 3) / 2;   // ancho de cada celda
     const padding = 2.5;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
@@ -172,7 +172,7 @@ export default async function Ticket({
         const altoTexto = lineas.length * 3.5;
         const yTexto = yCell + (altoCelda - altoTexto) / 2 + 3;
         doc.text(lineas, x + colAncho / 2, yTexto, { align: "center" });
-    });
+    });*/
 
     // ── Footer ────────────────────────────────────────────────────────────────
     const yFooter = altoDoc - 5;
