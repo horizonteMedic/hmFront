@@ -1,10 +1,12 @@
 import { useRef, useLayoutEffect } from "react";
+import RevertButton from "./RevertButton";
 
 /**
  * Igual que InputTextArea pero aplica toUpperCase() automáticamente
  * y preserva la posición del cursor tras cada actualización.
  *
  * onChange recibe (valorEnMayusculas: string) en vez del evento completo.
+ * `edited`/`onRevert` (opcionales) resaltan el campo modificado y muestran el botón de revertir.
  */
 export default function InputTextAreaUpper({
     label = "",
@@ -18,7 +20,10 @@ export default function InputTextAreaUpper({
     className = "",
     classNameLabel = "",
     classNameArea = "",
+    edited = false,
+    onRevert,
 }) {
+    const showRevert = edited && typeof onRevert === "function";
     const textareaRef = useRef(null);
     const cursorRef = useRef(null);
 
@@ -36,10 +41,15 @@ export default function InputTextAreaUpper({
 
     return (
         <div className={`w-full ${className}`}>
-            {label && (
-                <label className={`block font-semibold mb-1 ${classNameLabel}`} htmlFor={name}>
-                    {label} :
-                </label>
+            {(label || showRevert) && (
+                <div className="flex items-center justify-between mb-1">
+                    {label && (
+                        <label className={`block font-semibold ${classNameLabel}`} htmlFor={name}>
+                            {label} :
+                        </label>
+                    )}
+                    {showRevert && <RevertButton onClick={onRevert} className="ml-auto" />}
+                </div>
             )}
             <textarea
                 ref={textareaRef}
@@ -53,7 +63,7 @@ export default function InputTextAreaUpper({
                 disabled={disabled}
                 className={`border rounded px-2 py-1 w-full resize-none ${classNameArea} ${
                     disabled ? "bg-gray-300" : ""
-                }`}
+                } ${edited ? "border-orange-600 bg-orange-100" : ""}`}
             />
         </div>
     );

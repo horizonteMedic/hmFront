@@ -69,6 +69,8 @@ export default function RadioTable({
       {/* Filas de items */}
       {items.map((item, itemIndex) => {
         const edited = hasRevert && typeof isFieldEdited === "function" && isFieldEdited(item.name);
+        // `item.disabled` (opcional) bloquea solo esa fila, además del `disabled` general.
+        const rowDisabled = disabled || Boolean(item.disabled);
         const optionCells = options.map((option, optionIndex) => (
           <div key={optionIndex} className={optionCellClass}>
             <input
@@ -76,8 +78,8 @@ export default function RadioTable({
               name={item.name}
               value={option.value}
               checked={form?.[item.name] === option.value}
-              onChange={(e) => (disabled ? null : handleRadioButton(e, option.value))}
-              disabled={disabled}
+              onChange={(e) => (rowDisabled ? null : handleRadioButton(e, option.value))}
+              disabled={rowDisabled}
               className={styleButton}
             />
             {stackOnMobile && (

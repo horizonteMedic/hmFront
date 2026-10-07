@@ -113,12 +113,11 @@ const resolverMedico = (doctorAsignado, listaEmpleados, prev) => {
 };
 
 // Mapea la Historia Clínica propiamente dicha (resultado de .../ticket/{numeroTicket}, o un
-// registro de .../ticket/{numeroTicket}/historial) a los campos propios de este formulario.
+// registro de .../ticket/{numeroTicket}/historial) a los campos PROPIOS de este formulario.
 // Los checkboxes de Consumo de Drogas/Sedentarismo se guardan como booleano en el backend
-// pero el formulario los maneja como RadioTable "SI"/"NO". "familiares" viaja anidado en
-// antecedentesInformativos: cruce informativo de solo lectura con el registro de
-// AntecedentesPatologicos del mismo paciente (por eso esos campos están disabled en el JSX).
-const formFromHistoria = (data, today) => ({
+// pero el formulario los maneja como RadioTable "SI"/"NO". Los campos informativos de solo
+// lectura (familiares / antecedentes patológicos) se mapean aparte en formFromInformativos.
+const formFromHistoriaPropia = (data, today) => ({
     id: data.id ?? null,
     fecha_apertura_hcl: data.fechaApertura ?? today,
     nombre_padre: data.nombrePadre ?? "",
@@ -158,12 +157,25 @@ const formFromHistoria = (data, today) => ({
     examenesAuxiliares: data.examenesAuxiliares ?? "",
     diagnostico: data.diagnostico ?? "",
     tratamiento: data.tratamiento ?? "",
+    seguimientoYControl: data.seguimientoYControl ?? "",
+});
+
+// Campos de solo lectura que vienen de OTRO formulario (AntecedentesPatologicos): familiares y
+// antecedentes patológicos personales. Pertenecen al paciente, no a esta Historia Clínica, así que
+// solo se cargan con el ticket buscado y NUNCA al completar con un registro previo (ver
+// OpenModalHistorialPrevio): ahí solo se reemplazan los campos propios.
+const formFromInformativos = (data) => ({
     padre: data.antecedentesInformativos?.familiares?.padre ?? "",
     madre: data.antecedentesInformativos?.familiares?.madre ?? "",
     hermanos: data.antecedentesInformativos?.familiares?.hermanos ?? "",
     hijos: data.antecedentesInformativos?.familiares?.hijos ?? "",
     esposaConyuge: data.antecedentesInformativos?.familiares?.esposaConyuge ?? "",
     ...formFromAntecedentesInformativos(data.antecedentesInformativos),
+});
+
+const formFromHistoria = (data, today) => ({
+    ...formFromHistoriaPropia(data, today),
+    ...formFromInformativos(data),
 });
 
 // Busca la Historia Clínica por N° de Ticket: GET .../ticket/{numeroTicket}. Un solo llamado
@@ -256,7 +268,8 @@ const OpenModalHistorialPrevio = async (numeroTicket, token, set, today, listaEm
 
     set((prev) => ({
         ...prev,
-        ...formFromHistoria(registro, today),
+        // Solo campos propios: familiares y antecedentes patológicos se conservan del ticket actual.
+        ...formFromHistoriaPropia(registro, today),
         ...resolverMedico(registro.doctorAsignado, listaEmpleados, prev),
         id: null,
         tieneRegistro: false,
@@ -311,6 +324,7 @@ const construirBody = (form) => ({
     examenesAuxiliares: form.examenesAuxiliares ?? "",
     diagnostico: form.diagnostico ?? "",
     tratamiento: form.tratamiento ?? "",
+    seguimientoYControl: form.seguimientoYControl ?? "",
     doctorAsignado: form.nombre_medico ?? "",
 });
 

@@ -48,6 +48,7 @@ const CAMPOS_EDITABLES = [
   "examenesAuxiliares",
   "diagnostico",
   "tratamiento",
+  "seguimientoYControl",
   "user_medicoFirma",
   "nombre_medico",
 ];
@@ -154,6 +155,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     examenesAuxiliares: "",
     diagnostico: "",
     tratamiento: "",
+    seguimientoYControl: "",
+
+
 
     // Médico que Certifica
     nombre_medico: userName,
@@ -245,6 +249,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           value={form.n_hcl}
           onChange={handleChangeNumber}
           onKeyUp={handleSearch}
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Fecha Apertura"
@@ -255,12 +260,13 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           disabled={camposDeshabilitados}
           edited={isFieldEdited("fecha_apertura_hcl")}
           onRevert={() => revertField("fecha_apertura_hcl")}
+          labelWidth="120px"
         />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} laborales={false} />
 
-      <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" collapsible>
+      <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 sm:grid-cols-2 gap-3" collapsible>
         <InputTextOneLine
           label="Nombre del Padre"
           name="nombre_padre"
@@ -269,6 +275,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           disabled={camposDeshabilitados}
           edited={isFieldEdited("nombre_padre")}
           onRevert={() => revertField("nombre_padre")}
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Nombre de la Madre"
@@ -278,8 +285,16 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           disabled={camposDeshabilitados}
           edited={isFieldEdited("nombre_madre")}
           onRevert={() => revertField("nombre_madre")}
+          labelWidth="120px"
         />
-        <InputTextOneLine label="Dirección" name="direccion" value={form.direccion} disabled />
+        <InputTextOneLine
+          label="Dirección"
+          name="direccion"
+          value={form.direccion}
+          disabled 
+          className="sm:col-span-2"
+          labelWidth="120px"
+        />
         <InputTextOneLine
           label="Localidad"
           name="localidad"
@@ -288,16 +303,18 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           disabled={camposDeshabilitados}
           edited={isFieldEdited("localidad")}
           onRevert={() => revertField("localidad")}
+          labelWidth="120px"
         />
-        <InputTextOneLine label="Distrito" name="distrito" value={form.distrito} disabled />
-        <InputTextOneLine label="Provincia" name="provincia" value={form.provincia} disabled />
-        <InputTextOneLine label="Departamento" name="departamento" value={form.departamento} disabled />
+        <InputTextOneLine label="Distrito" name="distrito" value={form.distrito} disabled labelWidth="120px" />
+        <InputTextOneLine label="Provincia" name="provincia" value={form.provincia} disabled labelWidth="120px" />
+        <InputTextOneLine label="Departamento" name="departamento" value={form.departamento} disabled labelWidth="120px" />
         <InputTextOneLine
           label="Nacionalidad"
           name="nacionalidad"
           value={form.nacionalidad}
           onChange={handleChange}
           disabled={camposDeshabilitados}
+          labelWidth="120px"
           edited={isFieldEdited("nacionalidad")}
           onRevert={() => revertField("nacionalidad")}
         />
@@ -314,13 +331,14 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           disabled={camposDeshabilitados}
           edited={isFieldEdited("lugares_6_meses")}
           onRevert={() => revertField("lugares_6_meses")}
+          labelWidth="120px"
         />
       </SectionFieldset>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionFieldset legend="Antecedentes Personales" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            
+
             <div className="space-y-2 border p-2 rounded">
               <RadioTable
                 items={[
@@ -417,7 +435,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
             </div>
 
 
-            
+
           </div>
 
           <InputTextOneLine
@@ -577,7 +595,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
       </div>
 
       <SectionFieldset collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <InputTextOneLine
+        <InputTextArea
           label="Examen Físico"
           name="examenFisico"
           value={form.examenFisico}
@@ -586,8 +604,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           edited={isFieldEdited("examenFisico")}
           onRevert={() => revertField("examenFisico")}
           labelWidth="180px"
+          rows={3}
         />
-        <InputTextOneLine
+        <InputTextArea
           label="Examenes Auxiliares"
           name="examenesAuxiliares"
           value={form.examenesAuxiliares}
@@ -596,8 +615,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           edited={isFieldEdited("examenesAuxiliares")}
           onRevert={() => revertField("examenesAuxiliares")}
           labelWidth="180px"
+          rows={3}
         />
-        <InputTextOneLine
+        <InputTextArea
           label="Diagnostico"
           name="diagnostico"
           value={form.diagnostico}
@@ -606,8 +626,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           edited={isFieldEdited("diagnostico")}
           onRevert={() => revertField("diagnostico")}
           labelWidth="180px"
+          rows={3}
         />
-        <InputTextOneLine
+        <InputTextArea
           label="Tratamiento"
           name="tratamiento"
           value={form.tratamiento}
@@ -616,6 +637,18 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           edited={isFieldEdited("tratamiento")}
           onRevert={() => revertField("tratamiento")}
           labelWidth="180px"
+          rows={3}
+        />
+        <InputTextArea
+          label="Seguimiento y Control"
+          name="seguimientoYControl"
+          value={form.seguimientoYControl}
+          onChange={handleChange}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("seguimientoYControl")}
+          onRevert={() => revertField("seguimientoYControl")}
+          labelWidth="180px"
+          rows={3}
         />
       </SectionFieldset>
 
