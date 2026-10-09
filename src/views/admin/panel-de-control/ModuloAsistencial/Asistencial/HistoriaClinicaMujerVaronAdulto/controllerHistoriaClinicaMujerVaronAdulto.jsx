@@ -494,6 +494,23 @@ const conUnidad = (valor, unidad) => {
     return v ? `${v} ${unidad}` : "";
 };
 
+// Sede donde se emitió el ticket (TicketDTO.sede). Puede llegar como nombre o como código de sede
+// (el ticket se emite con serieTicket = cod_sede): si es un código de las sedes del usuario se muestra
+// su nombre; si no hay nada, se usa la sede de la sesión actual.
+const sedeDelTicket = (ticket) => {
+    const { userlogued } = useAuthStore.getState();
+    const sedes = Array.isArray(userlogued?.sedes) ? userlogued.sedes : [];
+    const norm = (valor) => String(valor ?? "").trim().toUpperCase();
+    const nombrePorCodigo = (codigo) => sedes.find((sede) => norm(sede.cod_sede) === norm(codigo))?.nombre_sede;
+
+    return (
+        nombrePorCodigo(ticket?.sede) ||
+        String(ticket?.sede ?? "").trim() ||
+        nombrePorCodigo(ticket?.serieTicket) ||
+        nombreSedeActual()
+    );
+};
+
 // Datos que consume el reporte Resumen Asistencial: paciente + ticket + Historia Clínica (puede no
 // existir todavía: en ese caso solo trae paciente y ticket y los campos clínicos quedan en blanco) +
 // signos vitales/anamnesis del Triaje del mismo ticket (si lo hay).
@@ -510,7 +527,7 @@ const construirDatosResumen = (data, triaje, numeroTicket) => {
         ...formFromPaciente(paciente, ticket),
         nombreCompleto: `${paciente?.apellidos ?? ""} ${paciente?.nombres ?? ""}`.trim(),
         celular: paciente?.celular ?? "",
-        sede: nombreSedeActual(),
+        sede: sedeDelTicket(ticket),
         numeroTicket: data.numeroTicket ?? ticket.numeroTicket ?? numeroTicket,
         numeroHistoriaClinica: data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? "",
         fecha: ticket.fechaTicket ?? "",
