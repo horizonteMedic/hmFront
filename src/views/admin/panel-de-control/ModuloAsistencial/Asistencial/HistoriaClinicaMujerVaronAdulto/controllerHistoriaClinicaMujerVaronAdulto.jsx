@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { formatearFechaCorta, formatearHora } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
 import { useAuthStore } from "../../../../../../store/auth";
 
@@ -12,6 +12,9 @@ const baseUrl = "/asistencial/historia-asistencial/historia-mujer-o-varon-adulto
 const jasperModules = import.meta.glob("../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/*.jsx");
 const rutaJasper =
     "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/HistoriaClinicaMujerVaronAdulto_Digitalizado.jsx";
+const rutaJasperResumen =
+    "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/ResumenAsistencial.jsx";
+const triajeUrl = "/asistencial/triaje";
 
 const unwrap = (res) => (res && typeof res === "object" && "resultado" in res ? res.resultado : res);
 
@@ -425,6 +428,151 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     });
 
     if (isConfirmed) PrintHojaR(numeroTicket, token, datosFooter);
+};
+
+// Etiqueta impresa de cada antecedente patológico personal (mismos ítems del formulario).
+const AP_ETIQUETAS = {
+    ap_obesidad: "Obesidad",
+    ap_epilepsia: "Epilepsia",
+    ap_asma: "Asma",
+    ap_tuberculosis: "Tuberculosis",
+    ap_dengue: "Dengue",
+    ap_malaria: "Malaria",
+    ap_its: "ITS",
+    ap_glaucoma: "Glaucoma",
+    ap_vih_sida: "VIH/SIDA",
+    ap_hepatitis_b: "Hepatitis B",
+    ap_depresion: "Depresión",
+    ap_infarto_cardiaco: "Infarto cardiaco",
+    ap_dislipidemia: "Dislipidemia",
+    ap_insuficiencia_renal: "Insuficiencia renal",
+    ap_neoplasia: "Neoplasia",
+    ap_transfusion_sanguinea: "Transfusión sanguínea",
+};
+
+// "Antecedentes familiares y patológicos" de la hoja: los patológicos marcados y el texto de cada
+// familiar, tal como están en el formulario (si el Triaje trae su propio texto, va primero).
+const resumenAntecedentes = (historia, triaje) => {
+    const patologicos = Object.entries(AP_ETIQUETAS)
+        .filter(([campo]) => historia[campo])
+        .map(([, etiqueta]) => etiqueta);
+    if (historia.ap_alergia_medicamentos === "SI") {
+        const detalle = String(historia.ap_alergia_medicamentos_especificar ?? "").trim();
+        patologicos.push(detalle ? `Alergia a medicamentos (${detalle})` : "Alergia a medicamentos");
+    }
+
+    const familiares = [
+        ["Padre", historia.padre],
+        ["Madre", historia.madre],
+        ["Hermanos", historia.hermanos],
+        ["Hijos", historia.hijos],
+        ["Esposa/Cónyuge", historia.esposaConyuge],
+    ]
+        .filter(([, valor]) => String(valor ?? "").trim())
+        .map(([nombre, valor]) => `${nombre}: ${String(valor).trim()}`);
+
+    return [
+        String(triaje?.antecedentes ?? "").trim(),
+        patologicos.length ? `Patológicos: ${patologicos.join(", ")}.` : "",
+        familiares.length ? `Familiares: ${familiares.join("; ")}.` : "",
+    ]
+        .filter(Boolean)
+        .join("\n");
+};
+
+// "horaTicket" (LocalTime) puede llegar como "HH:mm:ss", [h, m, s] o { hour, minute }.
+const horaDeTicket = (hora) => {
+    if (!hora) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    if (typeof hora === "string") return formatearHora(hora);
+    const [h, m] = Array.isArray(hora) ? hora : [hora.hour, hora.minute];
+    return Number.isFinite(Number(h)) && Number.isFinite(Number(m)) ? `${pad(h)}:${pad(m)}` : "";
+};
+
+const conUnidad = (valor, unidad) => {
+    const v = String(valor ?? "").trim();
+    return v ? `${v} ${unidad}` : "";
+};
+
+// Datos que consume el reporte Resumen Asistencial: paciente + ticket + Historia Clínica (puede no
+// existir todavía: en ese caso solo trae paciente y ticket y los campos clínicos quedan en blanco) +
+// signos vitales/anamnesis del Triaje del mismo ticket (si lo hay).
+const construirDatosResumen = (data, triaje, numeroTicket) => {
+    const paciente = pacienteDe(data);
+    const ticket = data.infoTicket ?? {};
+    const historia = formFromHistoria(data, "");
+    const presion =
+        triaje?.presionSistolica != null && triaje?.presionDiastolica != null
+            ? `${triaje.presionSistolica}/${triaje.presionDiastolica} mmHg`
+            : "";
+
+    return {
+        ...formFromPaciente(paciente, ticket),
+        nombreCompleto: `${paciente?.apellidos ?? ""} ${paciente?.nombres ?? ""}`.trim(),
+        celular: paciente?.celular ?? "",
+        sede: nombreSedeActual(),
+        numeroTicket: data.numeroTicket ?? ticket.numeroTicket ?? numeroTicket,
+        numeroHistoriaClinica: data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? "",
+        fecha: ticket.fechaTicket ?? "",
+        horaIngreso: horaDeTicket(ticket.horaTicket),
+        // Signos vitales (Triaje). La hoja tiene "P" (pulso) y "FC": el Triaje solo registra la
+        // frecuencia cardiaca, así que "P" queda en blanco.
+        presionArterial: presion,
+        pulso: "",
+        frecuenciaCardiaca: conUnidad(triaje?.frecuenciaCardiaca, "x'"),
+        frecuenciaRespiratoria: conUnidad(triaje?.frecuenciaRespiratoria, "x'"),
+        temperatura: conUnidad(triaje?.temperaturaC, "°C"),
+        saturacionO2: conUnidad(triaje?.saturacionO2, "%"),
+        peso: conUnidad(triaje?.pesoKg, "kg"),
+        // La talla del Triaje asistencial se guarda en metros (ver ReporteTriajeAsistencial).
+        talla: conUnidad(triaje?.tallaCm, "m"),
+        anamnesis: triaje?.anamnesis ?? "",
+        antecedentes: resumenAntecedentes(historia, triaje),
+        examenFisico: historia.examenFisico,
+        examenesAuxiliares: historia.examenesAuxiliares,
+        diagnostico: historia.diagnostico,
+        tratamiento: historia.tratamiento,
+        cita: historia.seguimientoYControl || formatearFechaCorta(triaje?.fechaCita ?? ""),
+    };
+};
+
+// Botón "Resumen Asistencial": imprime la hoja de Historia Clínica del ticket (paciente, signos
+// vitales del Triaje y lo registrado en la Historia Clínica). No exige que la Historia Clínica ya
+// esté guardada: sin ella imprime la hoja con los datos del paciente y los renglones en blanco.
+export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) => {
+    if (!numeroTicket) {
+        await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
+        return;
+    }
+
+    LoadingDefault("Cargando Resumen Asistencial");
+
+    try {
+        const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+        const data = unwrap(res);
+
+        if (res?.error || !data || !pacienteDe(data)) {
+            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            return;
+        }
+
+        // Sin Triaje (o con error) los signos vitales simplemente quedan en blanco.
+        const resTriaje = await getFetch(`${triajeUrl}/numero-ticket/${numeroTicket}`, token);
+        const triaje = resTriaje && !resTriaje.error ? unwrap(resTriaje) : null;
+
+        const modulo = await jasperModules[rutaJasperResumen]();
+        if (typeof modulo.default !== "function") {
+            console.error(`El módulo ${rutaJasperResumen} no exporta una función por defecto`);
+            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            return;
+        }
+
+        await modulo.default({ ...construirDatosResumen(data, triaje, numeroTicket), ...datosFooter });
+        Swal.close();
+    } catch (error) {
+        console.error("Error al generar el reporte:", error);
+        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+    }
 };
 
 export const Loading = (mensaje) => {

@@ -626,7 +626,7 @@ const FichaSas = () => {
 
             {/* ===== SECCIÓN: TRABAJO DE NOCHE Y ANTECEDENTES PERSONALES ===== */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
-                <SectionFieldset legend="Trabajo de Noche" className="space-y-3">
+                <SectionFieldset legend="Trabajo de Noche" className="space-y-6">
                     <InputsBooleanRadioGroup
                         label="Trabaja de noche"
                         labelWidth="150px"
@@ -672,7 +672,7 @@ const FichaSas = () => {
 
                 <SectionFieldset legend="Antecedentes Personales" className="space-y-3">
                     {/* Ápnea del sueño */}
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2">
                         <InputsBooleanRadioGroup
                             label="Ápnea del sueño"
                             labelWidth="150px"
@@ -697,7 +697,7 @@ const FichaSas = () => {
                     </div>
 
                     {/* HTA */}
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2">
                         <InputsBooleanRadioGroup
                             label="HTA"
                             labelWidth="150px"
@@ -722,7 +722,7 @@ const FichaSas = () => {
                     </div>
 
                     {/* Polisomnografía */}
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2">
                         <InputsBooleanRadioGroup
                             label="Polisomnografía realizada"
                             labelWidth="150px"
@@ -748,30 +748,33 @@ const FichaSas = () => {
                     </div>
 
                     {/* Antecedentes de choque de vehículo */}
-                    <div className="space-y-2 pt-1">
+                    <div className="space-y-2 pt-1 ">
                         <span className="block font-bold">Antecedentes de choque de vehículo</span>
-                        <InputsBooleanRadioGroup
-                            label="Accidente en la mina"
-                            labelWidth="150px"
-                            stackOnMobile
-                            name="accidenteEnLaMina"
-                            value={form.accidenteEnLaMina}
-                            onChange={handleRadioButtonBoolean}
-                            disabled={camposDeshabilitados}
-                            edited={isFieldEdited("accidenteEnLaMina")}
-                            onRevert={() => revertField("accidenteEnLaMina")}
-                        />
-                        <InputsBooleanRadioGroup
-                            label="Accidente fuera de la mina"
-                            labelWidth="150px"
-                            stackOnMobile
-                            name="accidenteFueraDeLaMina"
-                            value={form.accidenteFueraDeLaMina}
-                            onChange={handleRadioButtonBoolean}
-                            disabled={camposDeshabilitados}
-                            edited={isFieldEdited("accidenteFueraDeLaMina")}
-                            onRevert={() => revertField("accidenteFueraDeLaMina")}
-                        />
+                        <div className="grid grid-cols-1 lg:grid-cols-2">
+                            <InputsBooleanRadioGroup
+                                label="Accidente en la mina"
+                                labelWidth="150px"
+                                stackOnMobile
+                                name="accidenteEnLaMina"
+                                value={form.accidenteEnLaMina}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("accidenteEnLaMina")}
+                                onRevert={() => revertField("accidenteEnLaMina")}
+                            />
+                            <InputsBooleanRadioGroup
+                                label="Accidente fuera de la mina"
+                                labelWidth="150px"
+                                stackOnMobile
+                                name="accidenteFueraDeLaMina"
+                                value={form.accidenteFueraDeLaMina}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("accidenteFueraDeLaMina")}
+                                onRevert={() => revertField("accidenteFueraDeLaMina")}
+                            />
+                        </div>
+
                     </div>
                 </SectionFieldset>
             </div>

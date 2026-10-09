@@ -5,6 +5,9 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 
+// Razón social para la que el resumen incluye el perfil lipídico en "4. EXAMENES DE LABORATORIO"
+const EMPRESA_CON_PERFIL_LIPIDICO = "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
+
 export default async function ResumenMedicoAnexo2(data = {}, docExistente = null) {
     const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -89,7 +92,10 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
             vdrl: String(data.inmunologiaVdrl ?? ""),
             vsg: String(data.vsgLaboratorioClinico_txtvsg ?? ""),
             colesterol: String(data.colesterolAnalisisBioquimico_txtcolesterol ?? ""),
-            trigliceridos: String(data.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "")
+            trigliceridos: String(data.trigliseridosAnalisisBioquimico_txttrigliseridos ?? ""),
+            hdl: String(data.hdlColesterol ?? ""),
+            ldl: String(data.ldlColesterol ?? ""),
+            vldl: String(data.vldlColesterol ?? "")
         },
         // Conclusiones y recomendaciones
         conclusion: String(data.conclusionAnexo7c_txtconclusion ?? ""),
@@ -706,6 +712,40 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     doc.text("VSG:", tablaInicioX + 102, yTextoLab + 1.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text((datosFinales.laboratorio.vsg || "") + " mm", tablaInicioX + 150, yTextoLab + 1.5);
+
+    // Perfil lipídico (parámetros bioquímicos): solo para la razón social HIDRANDINA
+    const empresaNormalizada = datosFinales.empresa.toUpperCase().trim();
+    if (empresaNormalizada === EMPRESA_CON_PERFIL_LIPIDICO) {
+        const conUnidad = (valor) => (valor ? `${valor} mg/dl` : "N/A");
+        const { colesterol, trigliceridos, hdl, ldl, vldl } = datosFinales.laboratorio;
+
+        // Dos columnas por fila; la última fila (VLDL) ocupa el ancho completo
+        const filasPerfilLipidico = [
+            [{ label: "Colesterol Total:", valor: colesterol }, { label: "Triglicéridos:", valor: trigliceridos }],
+            [{ label: "HDL Colesterol:", valor: hdl }, { label: "LDL Colesterol:", valor: ldl }],
+            [{ label: "VLDL Colesterol:", valor: vldl }]
+        ];
+
+        filasPerfilLipidico.forEach((celdas) => {
+            doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+            if (celdas.length > 1) {
+                doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura);
+            }
+            doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+            doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+            doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+            celdas.forEach(({ label, valor }, idx) => {
+                const xLabel = tablaInicioX + (idx === 0 ? 2 : 102);
+                const xValor = tablaInicioX + (idx === 0 ? 30 : 150);
+                doc.setFont("helvetica", "bold").setFontSize(8);
+                doc.text(label, xLabel, yPos + 3.5);
+                doc.setFont("helvetica", "normal").setFontSize(8);
+                doc.text(conUnidad(valor), xValor, yPos + 3.5);
+            });
+            yPos += filaAltura;
+        });
+    }
 
     // === SECCIÓN 5: CONCLUSION Y RECOMENDACIONES ===
     // Header gris: CONCLUSION Y RECOMENDACIONES
