@@ -1,239 +1,171 @@
 import jsPDF from "jspdf";
 import HeaderAsistencial from "../../components/headerAsistencial.jsx";
 import DatosPersonalesAsistencial from "../../components/datosPersonalesAsistencial.jsx";
+import TituloSeccionAsistencial, { ALTO_FILA, FUENTE_CUERPO } from "../../components/tituloSeccionAsistencial.jsx";
 import FilaEtiquetaValorAsistencial from "../../components/filaEtiquetaValorAsistencial.jsx";
-import { FUENTE_CUERPO } from "../../components/tituloSeccionAsistencial.jsx";
+import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
 import footerTR from "../../components/footerTR.jsx";
 
-// Resumen Asistencial: réplica de la hoja física "Historia Clínica" (Anamnesis, antecedentes,
-// examen físico con signos vitales, exámenes auxiliares, diagnósticos, tratamiento y cita), con la
-// cabecera y los datos personales estándar del módulo asistencial.
+// Resumen Asistencial: hoja "Historia Clínica" (Anamnesis, antecedentes, examen físico con signos
+// vitales, exámenes auxiliares, diagnósticos, tratamiento y cita) con la cabecera y los datos
+// personales estándar del módulo asistencial.
 //
 // Recibe el objeto plano que arma `construirDatosResumen` (controller del formulario) + los datos del
-// pie (datosFooter). Los campos sin dato quedan como renglones punteados en blanco, igual que la hoja
-// en papel (el médico puede completarlos a mano); los que tienen dato se escriben sobre el renglón.
+// pie (datosFooter). Cada sección es una barra de título (la estándar) con un cuadro debajo cuyo alto
+// se ajusta al texto (CuadroTextoDinamico): si una sección crece, las siguientes bajan. Los cuadros sin
+// dato quedan en blanco con una altura mínima, para que el médico pueda completarlos a mano. Si el
+// contenido no entra en la página, el cuadro continúa en la siguiente (con la cabecera repetida).
 
 const X = 10;
 const ANCHO = 190;
 const FS = FUENTE_CUERPO;
-const FS_MIN = 7; // letra mínima en renglones fijos antes de que el campo crezca
-const FS_MIN_LIBRE = 6.5; // letra mínima en áreas libres antes de recortar
 const PIE_OFFSET_Y = 8;
 // Y donde empieza la línea del pie (ver footerTR.jsx) menos un respiro: el contenido no debe pasar de aquí.
-const Y_LIMITE_CONTENIDO = 297 - 25 + PIE_OFFSET_Y - 3.6 - 5;
+const Y_LIMITE = 297 - 25 + PIE_OFFSET_Y - 3.6 - 5;
+// Y donde empieza el contenido de una página de continuación (cabecera + fila del paciente).
+const Y_INICIO_CONTINUACION = 43 + ALTO_FILA;
 
-const PASO = 5.5; // alto de un renglón punteado
-const PASO_TRATAMIENTO = 6.5; // el tratamiento va más holgado, como en la hoja
-const BASE = PASO - 1.7; // baseline del texto dentro del renglón (queda sobre la línea punteada)
-const GAP = 3; // separación entre secciones
-const ALTO_MIN_LIBRE = 12;
-const GRIS_PUNTOS = 90;
+// Mismos valores de cuadro de texto que el Triaje asistencial.
+const INTERLINEA = 4;
+const PADDING_TOP = 4.5;
+const PADDING_BOTTOM = 2;
+const PADDING_X = 4;
+
+const TITULO = "HISTORIA CLÍNICA";
 
 const texto = (v) => String(v ?? "").trim();
 
 export default async function ResumenAsistencial(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 
-  // ===== Primitivas de dibujo =====
-  const fuente = (estilo = "normal", size = FS) =>
-    doc.setFont("helvetica", estilo).setFontSize(size).setTextColor(0, 0, 0);
+  let pagina = 1;
+  let y = 0;
 
-  // Línea punteada (los renglones de la hoja).
-  const punteada = (x1, x2, y) => {
-    doc.setDrawColor(GRIS_PUNTOS);
-    doc.setLineWidth(0.25);
-    doc.setLineDashPattern([0.3, 0.9], 0);
-    doc.line(x1, y, x2, y);
-    doc.setLineDashPattern([], 0);
+  // ===== Páginas =====
+  const dibujarEncabezado = (n) => {
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
+    return HeaderAsistencial(
+      doc,
+      {
+        numeroTicket: data.numeroTicket,
+        numeroHistoriaClinica: data.numeroHistoriaClinica,
+        sede: data.sede,
+        fecha: data.fecha,
+      },
+      { pagina: n, titulo: TITULO }
+    );
   };
 
-  // Parte el texto en líneas respetando los saltos de línea del valor. La 1ª línea puede ser más
-  // angosta (cuando comparte renglón con la etiqueta). Usa la letra que esté configurada en el doc.
-  const envolver = (valor, anchoPrimera, anchoResto) => {
+  // Cierra la página actual (pie) y abre otra con la cabecera estándar + una fila con el paciente.
+  const nuevaPagina = async () => {
+    footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
+    doc.addPage();
+    pagina += 1;
+    y = await dibujarEncabezado(pagina);
+    y = FilaEtiquetaValorAsistencial(
+      doc,
+      [
+        { etiqueta: "Paciente:", valor: data.nombreCompleto, ancho: ANCHO * 0.7 },
+        { etiqueta: "DNI:", valor: data.dni, ancho: ANCHO * 0.3 },
+      ],
+      { x: X, y }
+    );
+  };
+
+  // ===== Cuadros =====
+  // Líneas del texto tal como las parte el cuadro (mismo ancho y letra), para poder repartirlas entre páginas.
+  const envolver = (valor) => {
+    doc.setFont("helvetica", "normal").setFontSize(FS);
     const lineas = [];
     texto(valor)
-      .split(/\r?\n/)
-      .map((parrafo) => parrafo.trim())
-      .filter(Boolean)
+      .split("\n")
       .forEach((parrafo) => {
-        const [primera = ""] = doc.splitTextToSize(parrafo, lineas.length === 0 ? anchoPrimera : anchoResto);
-        lineas.push(primera);
-        const resto = parrafo.slice(primera.length).trim();
-        if (resto) lineas.push(...doc.splitTextToSize(resto, anchoResto));
+        if (parrafo.trim() === "") lineas.push("");
+        else lineas.push(...doc.splitTextToSize(parrafo, ANCHO - PADDING_X - 2));
       });
     return lineas;
   };
 
-  // Achica la letra (de FS a `min`) hasta que el texto entre en `maxLineas`; si ni así entra, deja la
-  // letra mínima y devuelve todas las líneas (el llamador decide si crece o recorta).
-  const ajustar = (valor, { anchoPrimera, anchoResto, maxLineas, min = FS_MIN }) => {
-    let size = FS;
-    let lineas;
-    for (;;) {
-      fuente("normal", size);
-      lineas = envolver(valor, anchoPrimera, anchoResto);
-      if (lineas.length <= maxLineas || size <= min) return { lineas, size };
-      size -= 0.5;
+  // Barra de título + (opcional) filas propias de la sección + cuadro de texto que se amplía con el
+  // contenido. `encabezado(y)` dibuja esas filas y devuelve la Y donde terminan; `altoEncabezado` es su alto.
+  const seccion = async ({ titulo, valor, minHeight, encabezado = null, altoEncabezado = 0 }) => {
+    let lineas = envolver(valor);
+    const altoCuadro = (n) => Math.max(minHeight, n * INTERLINEA + PADDING_TOP + PADDING_BOTTOM);
+    const total = ALTO_FILA + altoEncabezado + altoCuadro(lineas.length);
+
+    // Un bloque que cabe en una página pero no en lo que queda de esta pasa entero a la siguiente; uno
+    // más largo que una página empieza aquí si entran el título y al menos una línea.
+    if (total <= Y_LIMITE - Y_INICIO_CONTINUACION) {
+      if (y + total > Y_LIMITE) await nuevaPagina();
+    } else if (y + ALTO_FILA + altoEncabezado + altoCuadro(1) > Y_LIMITE) {
+      await nuevaPagina();
     }
-  };
 
-  // Valor corto dentro de un campo de ancho fijo (signos vitales): achica la letra y, en último caso, recorta.
-  const textoAjustado = (valor, x, y, anchoMax) => {
-    const v = texto(valor);
-    if (!v) return;
-    let size = FS;
-    fuente("normal", size);
-    while (size > 6 && doc.getTextWidth(v) > anchoMax) {
-      size -= 0.5;
-      doc.setFontSize(size);
-    }
-    doc.text(doc.getTextWidth(v) > anchoMax ? doc.splitTextToSize(v, anchoMax)[0] : v, x, y);
-  };
+    for (let primera = true; ; primera = false) {
+      y = TituloSeccionAsistencial(doc, primera ? titulo : `${titulo} (continuación)`, { x: X, y, ancho: ANCHO });
+      if (primera && encabezado) y = encabezado(y);
 
-  // ===== Bloques (cada uno: alto + dibujar(y)) =====
+      const capacidad = Math.max(1, Math.floor((Y_LIMITE - y - PADDING_TOP - PADDING_BOTTOM) / INTERLINEA));
+      const parte = lineas.slice(0, capacidad);
+      lineas = lineas.slice(capacidad);
 
-  // "Etiqueta: ......" con renglones punteados; crece si el texto necesita más renglones que `minRenglones`.
-  const campoRenglones = ({ etiqueta, valor, minRenglones, ancho = ANCHO }) => {
-    fuente("bold");
-    const anchoEtiqueta = doc.getTextWidth(etiqueta) + 1.5;
-    const { lineas, size } = ajustar(valor, {
-      anchoPrimera: ancho - anchoEtiqueta - 1,
-      anchoResto: ancho - 1,
-      maxLineas: minRenglones,
-    });
-    const n = Math.max(minRenglones, lineas.length);
-    return {
-      alto: n * PASO,
-      dibujar: (y) => {
-        for (let i = 0; i < n; i++) punteada(i === 0 ? X + anchoEtiqueta : X, X + ancho, y + (i + 1) * PASO - 0.7);
-        fuente("bold");
-        doc.text(etiqueta, X, y + BASE);
-        fuente("normal", size);
-        lineas.forEach((linea, i) => doc.text(linea, (i === 0 ? X + anchoEtiqueta : X) + 0.5, y + i * PASO + BASE));
-      },
-    };
-  };
-
-  // Área en blanco sin renglones (Anamnesis, texto del examen físico): ocupa el espacio que sobre en la
-  // página. `necesario` es el alto que pide el texto a letra normal; `dibujar` achica la letra para que
-  // quepa en el alto asignado y, si ni así entra, recorta con "…".
-  const areaLibre = ({ etiqueta = "", valor }) => {
-    fuente("bold");
-    const anchoEtiqueta = etiqueta ? doc.getTextWidth(etiqueta) + 1.5 : 0;
-    const interlinea = (size) => size * 0.46;
-    const anchoPrimera = ANCHO - anchoEtiqueta - 1;
-    fuente("normal", FS);
-    const necesario = texto(valor) ? envolver(valor, anchoPrimera, ANCHO - 1).length * interlinea(FS) + 2 : 0;
-    return {
-      necesario: Math.max(ALTO_MIN_LIBRE, necesario),
-      dibujar: (y, alto) => {
-        if (etiqueta) {
-          fuente("bold");
-          doc.text(etiqueta, X, y + 3.5);
-        }
-        if (!texto(valor)) return;
-        let size = FS;
-        let lineas;
-        let capacidad;
-        for (;;) {
-          fuente("normal", size);
-          lineas = envolver(valor, anchoPrimera, ANCHO - 1);
-          capacidad = Math.max(1, Math.floor((alto - 1) / interlinea(size)));
-          if (lineas.length <= capacidad || size <= FS_MIN_LIBRE) break;
-          size -= 0.5;
-        }
-        if (lineas.length > capacidad) {
-          lineas = lineas.slice(0, capacidad);
-          lineas[capacidad - 1] = `${lineas[capacidad - 1].replace(/\s+\S*$/, "")} …`;
-        }
-        lineas.forEach((linea, i) =>
-          doc.text(linea, (i === 0 ? X + anchoEtiqueta : X) + 0.5, y + 3.5 + i * interlinea(size))
-        );
-      },
-    };
-  };
-
-  // "Etiqueta: ........" corto con el valor escrito sobre los puntos (signos vitales).
-  const campoCorto = (etiqueta, valor, x, ancho, y) => {
-    fuente("bold");
-    const anchoEtiqueta = doc.getTextWidth(etiqueta) + 1.5;
-    punteada(x + anchoEtiqueta, x + ancho - 3, y + PASO - 0.7);
-    doc.text(etiqueta, x, y + BASE);
-    textoAjustado(valor, x + anchoEtiqueta + 1, y + BASE, ancho - anchoEtiqueta - 5);
-  };
-
-  // "Examen físico:  P/A  P  FC  R  Tº  Sat O2" y debajo "PESO  TALLA".
-  const vitales = {
-    alto: PASO * 2,
-    dibujar: (y) => {
-      fuente("bold");
-      doc.text("Examen físico:", X, y + BASE);
-      const x0 = X + doc.getTextWidth("Examen físico:") + 3;
-      const fila1 = [
-        ["P/A:", data.presionArterial, 34],
-        ["P:", data.pulso, 22],
-        ["FC:", data.frecuenciaCardiaca, 26],
-        ["R:", data.frecuenciaRespiratoria, 22],
-        ["Tº:", data.temperatura, 26],
-        ["Sat O2:", data.saturacionO2, 32],
-      ];
-      const escala = (X + ANCHO - x0) / fila1.reduce((suma, [, , w]) => suma + w, 0);
-      let x = x0;
-      fila1.forEach(([etiqueta, valor, w]) => {
-        campoCorto(etiqueta, valor, x, w * escala, y);
-        x += w * escala;
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+      y = dibujarCuadroTextoDinamico(doc, {
+        x: X,
+        y,
+        ancho: ANCHO,
+        texto: parte.join("\n"),
+        fontSize: FS,
+        lineHeight: INTERLINEA,
+        paddingTop: PADDING_TOP,
+        paddingBottom: PADDING_BOTTOM,
+        paddingX: PADDING_X,
+        minHeight: Math.min(minHeight, Y_LIMITE - y),
       });
-      campoCorto("PESO:", data.peso, X, 55, y + PASO);
-      campoCorto("TALLA:", data.talla, X + 55, 55, y + PASO);
-    },
+
+      if (lineas.length === 0) return;
+      await nuevaPagina();
+    }
   };
 
-  // "Tratamiento:" y 4 renglones en 2 columnas (se llena la columna izquierda y luego la derecha).
-  const tratamiento = (() => {
-    const col = ANCHO / 2;
-    const anchoCol = col - 5;
-    const { lineas, size } = ajustar(data.tratamiento, { anchoPrimera: anchoCol, anchoResto: anchoCol, maxLineas: 8 });
-    const filas = Math.max(4, Math.ceil(lineas.length / 2));
-    return {
-      alto: PASO + filas * PASO_TRATAMIENTO,
-      dibujar: (y) => {
-        fuente("bold");
-        doc.text("Tratamiento:", X, y + BASE);
-        const y0 = y + PASO;
-        for (let i = 0; i < filas; i++) {
-          const yLinea = y0 + (i + 1) * PASO_TRATAMIENTO - 0.9;
-          punteada(X, X + col - 4, yLinea);
-          punteada(X + col + 1, X + ANCHO, yLinea);
-        }
-        fuente("normal", size);
-        lineas.forEach((linea, i) => {
-          const enDerecha = i >= filas;
-          const fila = enDerecha ? i - filas : i;
-          doc.text(linea, (enDerecha ? X + col + 1 : X) + 0.5, y0 + fila * PASO_TRATAMIENTO + PASO_TRATAMIENTO - 2.2);
-        });
-      },
-    };
-  })();
+  // Signos vitales de la hoja: "P/A, P, FC, R, Tº, Sat O2" y "Peso, Talla", en filas de 4 celdas iguales.
+  const VITALES = [
+    [
+      ["P/A:", data.presionArterial],
+      ["P:", data.pulso],
+      ["FC:", data.frecuenciaCardiaca],
+      ["R:", data.frecuenciaRespiratoria],
+    ],
+    [
+      ["Tº:", data.temperatura],
+      ["Sat O2:", data.saturacionO2],
+      ["Peso:", data.peso],
+      ["Talla:", data.talla],
+    ],
+  ];
+  const filasVitales = (yInicio) => {
+    let yFila = yInicio;
+    VITALES.forEach((fila) => {
+      yFila = FilaEtiquetaValorAsistencial(
+        doc,
+        fila.map(([etiqueta, valor]) => ({ etiqueta, valor, ancho: ANCHO / fila.length, valorX: 17 })),
+        { x: X, y: yFila }
+      );
+    });
+    return yFila;
+  };
 
   // ===== Encabezado y datos personales (estándar del módulo asistencial) =====
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  let y = await HeaderAsistencial(
-    doc,
-    {
-      numeroTicket: data.numeroTicket,
-      numeroHistoriaClinica: data.numeroHistoriaClinica,
-      sede: data.sede,
-      fecha: data.fecha,
-    },
-    { pagina: 1, titulo: "HISTORIA CLÍNICA" }
-  );
-
+  y = await dibujarEncabezado(1);
   y = DatosPersonalesAsistencial(doc, data, { x: X, y, ancho: ANCHO });
   // Lo que trae la hoja y la tabla estándar no cubre: dirección, hora de ingreso y teléfono.
-  y = FilaEtiquetaValorAsistencial(doc, [{ etiqueta: "Dirección:", valor: data.direccion, ancho: ANCHO, valorX: 22 }], { x: X, y });
+  y = FilaEtiquetaValorAsistencial(
+    doc,
+    [{ etiqueta: "Dirección:", valor: data.direccion, ancho: ANCHO, valorX: 22 }],
+    { x: X, y }
+  );
   y = FilaEtiquetaValorAsistencial(
     doc,
     [
@@ -242,58 +174,21 @@ export default async function ResumenAsistencial(data = {}, docExistente = null)
     ],
     { x: X, y }
   );
-  y += GAP;
 
   // ===== Cuerpo de la hoja =====
-  const antecedentes = campoRenglones({
-    etiqueta: "Antecedentes familiares y patológicos:",
-    valor: data.antecedentes,
-    minRenglones: 2,
+  await seccion({ titulo: "Anamnesis", valor: data.anamnesis, minHeight: 24 });
+  await seccion({ titulo: "Antecedentes familiares y patológicos", valor: data.antecedentes, minHeight: 14 });
+  await seccion({
+    titulo: "Examen físico",
+    valor: data.examenFisico,
+    minHeight: 22,
+    encabezado: filasVitales,
+    altoEncabezado: ALTO_FILA * VITALES.length,
   });
-  const auxiliares = campoRenglones({ etiqueta: "Exámenes auxiliares:", valor: data.examenesAuxiliares, minRenglones: 3 });
-  const diagnosticos = campoRenglones({ etiqueta: "Diagnósticos:", valor: data.diagnostico, minRenglones: 3 });
-  const cita = campoRenglones({ etiqueta: "Cita:", valor: data.cita, minRenglones: 1, ancho: ANCHO / 2 });
-  const anamnesis = areaLibre({ etiqueta: "Anamnesis:", valor: data.anamnesis });
-  const examenFisico = areaLibre({ valor: data.examenFisico });
-
-  // El espacio que queda en la página se reparte entre las dos áreas libres (como en la hoja:
-  // Anamnesis ~40% y examen físico ~60%); si el texto de una necesita más, toma lo que le sobre a la otra.
-  const fijos = [antecedentes, vitales, auxiliares, diagnosticos, tratamiento, cita].reduce((s, b) => s + b.alto, 0);
-  const secciones = 7;
-  const libre = Math.max(2 * ALTO_MIN_LIBRE, Y_LIMITE_CONTENIDO - y - fijos - GAP * (secciones - 1));
-  let altoAnamnesis = libre * 0.4;
-  let altoExamen = libre - altoAnamnesis;
-  if (anamnesis.necesario > altoAnamnesis) {
-    const toma = Math.min(anamnesis.necesario - altoAnamnesis, Math.max(0, altoExamen - examenFisico.necesario));
-    altoAnamnesis += toma;
-    altoExamen -= toma;
-  } else if (examenFisico.necesario > altoExamen) {
-    const toma = Math.min(examenFisico.necesario - altoExamen, Math.max(0, altoAnamnesis - anamnesis.necesario));
-    altoExamen += toma;
-    altoAnamnesis -= toma;
-  }
-
-  anamnesis.dibujar(y, altoAnamnesis);
-  y += altoAnamnesis + GAP;
-
-  antecedentes.dibujar(y);
-  y += antecedentes.alto + GAP;
-
-  vitales.dibujar(y);
-  y += vitales.alto;
-  examenFisico.dibujar(y, altoExamen);
-  y += altoExamen + GAP;
-
-  auxiliares.dibujar(y);
-  y += auxiliares.alto + GAP;
-
-  diagnosticos.dibujar(y);
-  y += diagnosticos.alto + GAP;
-
-  tratamiento.dibujar(y);
-  y += tratamiento.alto + GAP;
-
-  cita.dibujar(y);
+  await seccion({ titulo: "Exámenes auxiliares", valor: data.examenesAuxiliares, minHeight: 16 });
+  await seccion({ titulo: "Diagnósticos", valor: data.diagnostico, minHeight: 16 });
+  await seccion({ titulo: "Tratamiento", valor: data.tratamiento, minHeight: 26 });
+  await seccion({ titulo: "Cita", valor: data.cita, minHeight: 8 });
 
   // ===== Pie =====
   footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });

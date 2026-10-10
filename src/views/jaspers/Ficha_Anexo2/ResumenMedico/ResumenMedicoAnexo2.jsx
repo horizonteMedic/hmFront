@@ -846,7 +846,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     // === SECCIÓN DE FIRMAS ===
     const yFirmas = yPos; // Sin separación después de la fila de aptitud
-    const alturaSeccionFirmas = 30; // Altura para la sección de firmas
+    const alturaSeccionFirmas = 25; // Altura para la sección de firmas
 
     // Dibujar las líneas de la sección de firmas (1 columna completa)
     doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
@@ -856,14 +856,14 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     // === FIRMA DEL MÉDICO ===
     const firmaMedicoX = tablaInicioX + 80; // Centrado en la columna
-    const firmaMedicoY = yFirmas + 3;
+    const firmaMedicoY = yFirmas;
 
     // Agregar firma y sello médico
     let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
     if (firmaMedicoUrl) {
         try {
-            const imgWidth = 45;
-            const imgHeight = 20;
+            const imgWidth = 40;
+            const imgHeight = 15;
             const x = firmaMedicoX;
             const y = firmaMedicoY;
             doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
@@ -874,8 +874,8 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     doc.setFont("helvetica", "normal").setFontSize(8);
     const centroColumna = tablaInicioX + (tablaAncho / 2);
-    doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
-    doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+    doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 17.5, { align: "center" });
+    doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 19.5, { align: "center" });
 
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12 });
