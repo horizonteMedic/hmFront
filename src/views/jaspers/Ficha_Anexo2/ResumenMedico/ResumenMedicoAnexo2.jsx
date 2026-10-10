@@ -3,7 +3,6 @@ import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import { convertirGenero, getSign } from "../../../utils/helpers.js";
 import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
-import footerTR from '../../components/footerTR.jsx';
 
 // Razón social para la que el resumen incluye el perfil lipídico en "4. EXAMENES DE LABORATORIO"
 const EMPRESA_CON_PERFIL_LIPIDICO = "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
@@ -149,11 +148,14 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     // === FUNCIONES AUXILIARES ===
     // Función para texto con salto de línea
-    const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // `dibujar = false` solo mide (devuelve la Y final); `factor` escala el espaciado entre líneas
+    const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo, dibujar = true, factor = 1) => {
         // Validar que el texto no sea undefined, null o vacío
         if (!texto || texto === null || texto === undefined) {
             return y;
         }
+
+        const escribir = (...args) => { if (dibujar) doc.text(...args); };
 
         const fontSize = doc.internal.getFontSize();
         const palabras = String(texto).split(' ');
@@ -166,8 +168,8 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
             if (anchoPalabra > anchoMaximo) {
                 // Si hay una línea actual, dibujarla primero
                 if (lineaActual) {
-                    doc.text(lineaActual, x, yPos);
-                    yPos += fontSize * 0.35;
+                    escribir(lineaActual, x, yPos);
+                    yPos += fontSize * 0.35 * factor;
                     lineaActual = '';
                 }
                 // Dividir la palabra larga por caracteres
@@ -181,8 +183,8 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
                         palabraActual = textoPrueba;
                     } else {
                         if (palabraActual) {
-                            doc.text(palabraActual, x, yPos);
-                            yPos += fontSize * 0.35;
+                            escribir(palabraActual, x, yPos);
+                            yPos += fontSize * 0.35 * factor;
                         }
                         palabraActual = char;
                     }
@@ -199,21 +201,21 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
                     lineaActual = textoPrueba;
                 } else {
                     if (lineaActual) {
-                        doc.text(lineaActual, x, yPos);
-                        yPos += fontSize * 0.35;
+                        escribir(lineaActual, x, yPos);
+                        yPos += fontSize * 0.35 * factor;
                         lineaActual = palabra;
                     } else {
-                        doc.text(palabra, x, yPos);
-                        yPos += fontSize * 0.35;
+                        escribir(palabra, x, yPos);
+                        yPos += fontSize * 0.35 * factor;
                     }
                 }
             }
         });
 
         if (lineaActual) {
-            doc.text(lineaActual, x, yPos);
+            escribir(lineaActual, x, yPos);
             // Siempre agregar espacio después de dibujar texto
-            yPos += fontSize * 0.35;
+            yPos += fontSize * 0.35 * factor;
         }
 
         return yPos;
@@ -233,11 +235,13 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     };
 
     // Función mejorada para manejar textos con saltos de línea numerados
-    const dibujarTextoConSaltosLinea = (texto, x, y, anchoMaximo) => {
+    const dibujarTextoConSaltosLinea = (texto, x, y, anchoMaximo, dibujar = true, factor = 1) => {
         // Validar que el texto no sea undefined, null o vacío
         if (!texto || texto === null || texto === undefined) {
             return y;
         }
+
+        const escribir = (...args) => { if (dibujar) doc.text(...args); };
 
         const fontSize = doc.internal.getFontSize();
         let yPos = y;
@@ -256,34 +260,34 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
             // Si la línea es muy larga o está cerca del límite, usar la función de salto de línea por palabras
             if (anchoLinea > anchoMaximoConMargen) {
                 const yPosAntes = yPos;
-                yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximoConMargen);
+                yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximoConMargen, dibujar, factor);
 
                 // Si la función no agregó espacio al final, agregarlo
                 if (yPos === yPosAntes) {
-                    yPos += fontSize * 0.35;
+                    yPos += fontSize * 0.35 * factor;
                 }
 
                 // Espacio moderado después de una línea numerada que hizo salto
                 if (esLineaNumerada) {
-                    yPos += fontSize * 0.25; // Espacio moderado después de línea numerada con salto
+                    yPos += fontSize * 0.25 * factor; // Espacio moderado después de línea numerada con salto
                 }
 
                 // Si hay una siguiente línea numerada, agregar espacio adicional moderado
                 if (index < lineasProcesadas.length - 1) {
                     const siguienteLinea = lineasProcesadas[index + 1];
                     if (/^\d+\./.test(siguienteLinea)) {
-                        yPos += fontSize * 0.2; // Espacio moderado antes de la siguiente línea numerada
+                        yPos += fontSize * 0.2 * factor; // Espacio moderado antes de la siguiente línea numerada
                     }
                 }
             } else {
                 // Si la línea cabe, dibujarla directamente
-                doc.text(linea, x, yPos);
+                escribir(linea, x, yPos);
 
                 // Espaciado equilibrado para líneas numeradas
                 if (esLineaNumerada) {
-                    yPos += fontSize * 0.4; // Espacio equilibrado para líneas numeradas
+                    yPos += fontSize * 0.4 * factor; // Espacio equilibrado para líneas numeradas
                 } else {
-                    yPos += fontSize * 0.35; // Espacio normal
+                    yPos += fontSize * 0.35 * factor; // Espacio normal
                 }
             }
 
@@ -291,7 +295,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
             if (index < lineasProcesadas.length - 1 && anchoLinea <= anchoMaximoConMargen) {
                 const siguienteLinea = lineasProcesadas[index + 1];
                 if (esLineaNumerada && /^\d+\./.test(siguienteLinea)) {
-                    yPos += fontSize * 0.15; // Espacio moderado entre líneas numeradas
+                    yPos += fontSize * 0.15 * factor; // Espacio moderado entre líneas numeradas
                 }
             }
         });
@@ -755,12 +759,11 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     // Guardar la posición inicial del header para dibujar los bordes después
     const yPosInicioConclusion = yPos;
 
-    doc.setFont("helvetica", "normal").setFontSize(7);
     const textoConclusion = datosFinales.observacionesAnexo2_txtobservacionesfm || "";
 
     // Configuración de padding
     const alturaMinima = 15; // Altura mínima de la fila
-    const paddingSuperior = 4; // Padding superior 
+    const paddingSuperior = 4; // Padding superior
     const paddingInferior = 2; // Padding inferior
     const paddingLateral = 2; // Padding lateral
     const yTextoInicio = yPos + paddingSuperior;
@@ -768,8 +771,42 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
     const anchoMaximoDisponible = tablaAncho - (paddingLateral * 2);
 
+    // Las secciones 5 y 6 comparten el espacio que queda en la hoja (descontando header de la 6, aptitud y firmas)
+    const textoRestricciones = datosFinales.restriccionesAnexo02 || "";
+    const pageH = doc.internal.pageSize.getHeight();
+    const margenInferior = 6;
+    const alturaAptitud = filaAltura;
+    const alturaFirmas = 25;
+    const alturaDisponibleSecciones56 =
+        pageH - margenInferior - yPosInicioConclusion - (filaAltura + alturaAptitud + alturaFirmas);
+
+    // Altura de una caja de texto (con padding y altura mínima) para un tamaño de letra / espaciado dado
+    const medirAlturaCaja = (texto, tam, factor) => {
+        doc.setFont("helvetica", "normal").setFontSize(tam);
+        const yFin = dibujarTextoConSaltosLinea(texto, xTextoInicio, yTextoInicio, anchoMaximoDisponible, false, factor);
+        return Math.max(alturaMinima, (yFin - yTextoInicio) + paddingSuperior + paddingInferior);
+    };
+
+    // Ajuste automático: se prueba de mayor a menor tamaño de letra / espaciado hasta que ambas secciones quepan
+    const tamanosLetra = [7, 6.5, 6, 5.5, 5];
+    const factoresEspaciado = [1, 0.85, 0.7];
+    let fontSizeConclusion = tamanosLetra[tamanosLetra.length - 1];
+    let factorConclusion = factoresEspaciado[factoresEspaciado.length - 1];
+    ajuste:
+    for (const tam of tamanosLetra) {
+        for (const factor of factoresEspaciado) {
+            const alturaTotal = medirAlturaCaja(textoConclusion, tam, factor) + medirAlturaCaja(textoRestricciones, tam, factor);
+            if (alturaTotal <= alturaDisponibleSecciones56) {
+                fontSizeConclusion = tam;
+                factorConclusion = factor;
+                break ajuste;
+            }
+        }
+    }
+
     // Dibujar el texto primero para obtener la posición final real
-    const yPosFinalTexto = dibujarTextoConSaltosLinea(textoConclusion, xTextoInicio, yTextoInicio, anchoMaximoDisponible);
+    doc.setFont("helvetica", "normal").setFontSize(fontSizeConclusion);
+    const yPosFinalTexto = dibujarTextoConSaltosLinea(textoConclusion, xTextoInicio, yTextoInicio, anchoMaximoDisponible, true, factorConclusion);
 
     // Calcular la altura final de la fila basándose en la posición real del texto
     const alturaTextoUsada = yPosFinalTexto - yTextoInicio;
@@ -791,8 +828,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     // Guardar la posición inicial del header para dibujar los bordes después
     const yPosInicioRestricciones = yPos;
 
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    const textoRestricciones = datosFinales.restriccionesAnexo02 || "";
+    doc.setFont("helvetica", "normal").setFontSize(fontSizeConclusion);
 
     // Configuración de padding
     const alturaMinimaRestricciones = 15; // Altura mínima de la fila
@@ -805,7 +841,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     const anchoMaximoDisponibleRestricciones = tablaAncho - (paddingLateralRestricciones * 2);
 
     // Dibujar el texto primero para obtener la posición final real
-    const yPosFinalTextoRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, xTextoInicioRestricciones, yTextoInicioRestricciones, anchoMaximoDisponibleRestricciones);
+    const yPosFinalTextoRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, xTextoInicioRestricciones, yTextoInicioRestricciones, anchoMaximoDisponibleRestricciones, true, factorConclusion);
 
     // Calcular la altura final de la fila basándose en la posición real del texto
     const alturaTextoRestriccionesUsada = yPosFinalTextoRestricciones - yTextoInicioRestricciones;
@@ -876,9 +912,6 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
     const centroColumna = tablaInicioX + (tablaAncho / 2);
     doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 17.5, { align: "center" });
     doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 19.5, { align: "center" });
-
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12 });
 
     // === Imprimir ===
     if (docExistente) {
