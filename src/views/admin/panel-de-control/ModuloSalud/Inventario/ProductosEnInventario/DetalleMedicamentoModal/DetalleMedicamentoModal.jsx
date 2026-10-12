@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import ModalBase from "../../../components/ModalBase";
-import { getMedicamento } from "../controllerProductosEnInventario";
+import { formatearPrecio, getMedicamento } from "../controllerProductosEnInventario";
 
 const Campo = ({ label, value }) => {
     const vacio = value === undefined || value === null || value === "";
@@ -64,11 +64,9 @@ export default function DetalleMedicamentoModal({ id, token, onClose, onEditar }
                     </div>
                     <Campo label="Presentación" value={medicamento.presentacion} />
                     <Campo label="Uso" value={medicamento.uso} />
-                    <Campo label="Laboratorio" value={medicamento.laboratorio} />
-                    <Campo label="Marca" value={medicamento.marca} />
-                    <Campo label="Unidad de medida" value={medicamento.unidadMedida} />
-                    <Campo label="Stock mínimo" value={medicamento.stockMinimo} />
-                    {medicamento.stockActual !== undefined && <Campo label="Stock actual" value={medicamento.stockActual} />}
+                    <Campo label="Precio unitario" value={formatearPrecio(medicamento.precioUnitario)} />
+                    <Campo label="Stock actual" value={medicamento.stockActual} />
+                    {medicamento.unidades !== medicamento.stockActual && <Campo label="Unidades (UND)" value={medicamento.unidades} />}
                 </div>
             ) : (
                 <p className={`text-center ${fallo ? "text-red-500" : "text-gray-500"}`}>

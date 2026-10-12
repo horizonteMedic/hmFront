@@ -7,21 +7,38 @@ import { normalizar } from "../../../utils/filtrarPorTexto";
 
 const URL_MASIVO = "/api/medicamentos/masivo";
 
-// Columnas del Excel (plantilla y resultado) y el campo del medicamento que corresponde a cada una
+// Columnas del Excel (plantilla y resultado) y el campo del medicamento que corresponde a cada una.
+// `alias`: otros encabezados que también se reconocen (los que usa el backend o una planilla de inventario).
 const columnas = [
-    { campo: "nombre", etiqueta: "NOMBRE", ancho: 26 },
+    { campo: "nombre", etiqueta: "NOMBRE", alias: ["DETALLE"], ancho: 34 },
     { campo: "presentacion", etiqueta: "PRESENTACION", ancho: 22 },
-    { campo: "uso", etiqueta: "USO", ancho: 40 },
-    { campo: "laboratorio", etiqueta: "LABORATORIO", ancho: 20 },
-    { campo: "marca", etiqueta: "MARCA", ancho: 20 },
-    { campo: "unidadMedida", etiqueta: "UNIDAD DE MEDIDA", ancho: 20 },
-    { campo: "stockMinimo", etiqueta: "STOCK MÍNIMO", ancho: 14 },
+    { campo: "uso", etiqueta: "USO", ancho: 30 },
+    { campo: "unidades", etiqueta: "UNIDADES", alias: ["UND"], ancho: 12 },
+    { campo: "precioUnitario", etiqueta: "PRECIO UNITARIO", alias: ["PRECIO", "P. UNITARIO"], ancho: 18 },
 ];
 
 const ETIQUETA_ESTADO = { success: "REGISTRADO", error: "ERROR", invalida: "INVÁLIDA", pendiente: "PENDIENTE" };
 
 const texto = (valor) => String(valor ?? "").trim();
-const entero = (valor) => Math.max(0, Math.trunc(Number(valor) || 0));
+
+// Número de una celda: vale un número de Excel o un texto como "2,5" o "S/ 2.50". Devuelve null si está
+// vacía y, si no es un número, el texto tal cual (para poder mostrarlo en la fila inválida).
+const numero = (valor) => {
+    if (typeof valor === "number") return valor;
+    const celda = texto(valor);
+    if (!celda) return null;
+    const limpio = celda.replace(/[^\d.,-]/g, "").replace(",", ".");
+    return /\d/.test(limpio) && !Number.isNaN(Number(limpio)) ? Number(limpio) : celda;
+};
+
+// Mensaje del primer dato inválido de la fila, o "" si está completa. Unidades y precio son opcionales.
+const errorDeFila = ({ nombre, presentacion, unidades, precioUnitario }) => {
+    if (!nombre) return "Falta el nombre";
+    if (!presentacion) return "Falta la presentación";
+    if (unidades !== null && !(Number.isInteger(unidades) && unidades >= 0)) return "Las unidades deben ser un número entero (0 o más)";
+    if (precioUnitario !== null && !(precioUnitario >= 0)) return "El precio unitario debe ser un número (0 o más)";
+    return "";
+};
 
 // El backend no valida duplicados: con el mismo nombre y presentación crearía otra fila
 const claveMedicamento = ({ nombre, presentacion }) => `${normalizar(nombre).trim()}|${normalizar(presentacion).trim()}`;
@@ -37,15 +54,16 @@ export const descargarPlantillaMedicamentos = async () => {
     const libro = new ExcelJS.Workbook();
     const hoja = libro.addWorksheet("PLANTILLA");
     hoja.addRow(columnas.map((c) => c.etiqueta));
-    hoja.addRow(["Paracetamol", "500 mg tableta", "Alivio del dolor leve a moderado y fiebre", "Genfar", "Genfar", "Tableta", 20]);
+    hoja.addRow(["CIPROFLOXACINO 500MG, CJA X 100", "TABLETA", "ANTIBIÓTICO", 200, 2.5]);
     estilarEncabezado(hoja);
     hoja.columns = columnas.map((c) => ({ width: c.ancho }));
     await descargarLibro(libro, "Plantilla_CargaMasivaMedicamentos.xlsx");
 };
 
 // Lee la primera hoja del Excel. Cada fila queda "pendiente" (lista para enviar) o "invalida" si le falta
-// algo obligatorio (nombre o presentación); el `mensaje` avisa de posibles duplicados con `existentes`
-// (los medicamentos que la campaña ya tiene) o con filas anteriores del mismo archivo.
+// algo obligatorio (nombre o presentación) o trae unidades o precio que no son números válidos; el `mensaje`
+// avisa de posibles duplicados con `existentes` (los medicamentos que la campaña ya tiene) o con filas
+// anteriores del mismo archivo.
 export const leerExcelMedicamentos = async (archivo, existentes) => {
     const libro = XLSX.read(await archivo.arrayBuffer(), { type: "array" });
     const filas = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]], { defval: "" });
@@ -55,16 +73,23 @@ export const leerExcelMedicamentos = async (archivo, existentes) => {
         .map((fila) => {
             const celdas = Object.fromEntries(Object.entries(fila).map(([clave, valor]) => [normalizar(clave).trim(), valor]));
             return Object.fromEntries(
-                columnas.map(({ campo, etiqueta }) => {
-                    const valor = celdas[normalizar(etiqueta)];
-                    return [campo, campo === "stockMinimo" ? entero(valor) : texto(valor)];
+                columnas.map(({ campo, etiqueta, alias = [] }) => {
+                    const encabezado = [etiqueta, ...alias].map(normalizar).find((e) => e in celdas);
+                    return [campo, celdas[encabezado]];
                 })
             );
         })
-        .filter((medicamento) => Object.values(medicamento).some((valor) => valor !== "" && valor !== 0))
-        .map((medicamento) => {
-            if (!medicamento.nombre) return { ...medicamento, estado: "invalida", mensaje: "Falta el nombre" };
-            if (!medicamento.presentacion) return { ...medicamento, estado: "invalida", mensaje: "Falta la presentación" };
+        .filter((crudo) => Object.values(crudo).some((valor) => texto(valor) !== ""))
+        .map((crudo) => {
+            const medicamento = {
+                nombre: texto(crudo.nombre),
+                presentacion: texto(crudo.presentacion),
+                uso: texto(crudo.uso),
+                unidades: numero(crudo.unidades),
+                precioUnitario: numero(crudo.precioUnitario),
+            };
+            const error = errorDeFila(medicamento);
+            if (error) return { ...medicamento, estado: "invalida", mensaje: error };
 
             const clave = claveMedicamento(medicamento);
             const repetido = vistos.has(clave);
@@ -91,15 +116,13 @@ const coincide = (nombreFallo, nombre) => {
 export const guardarCargaMasivaMedicamentos = async (filas, campaniaId, token) => {
     const cuerpo = filas
         .filter((fila) => fila.estado === "pendiente")
-        .map(({ nombre, presentacion, uso, laboratorio, marca, unidadMedida, stockMinimo }) => ({
+        .map(({ nombre, presentacion, uso, unidades, precioUnitario }) => ({
+            campaniaId,
             nombre,
             presentacion,
             uso,
-            laboratorio,
-            marca,
-            unidadMedida,
-            stockMinimo,
-            campaniaId,
+            unidades: unidades ?? 0,
+            precioUnitario,
         }));
 
     const respuesta = await postJson(URL_MASIVO, cuerpo, token, "No se pudo procesar la carga masiva");

@@ -3,12 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 // `error`: mensaje bajo el campo (con el borde en rojo) cuando el valor no es válido.
-export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false, error = '' }) {
+export function FloatingInput({ id, name, label, value, onChange, type = 'text', min, step, required = false, className = '', onKeyUp, onBlur, disabled = false, autoFocus = false, error = '' }) {
   return (
     <div className={`relative ${className}`}>
       <input
         type={type}
         min={min}
+        step={step}
         id={id}
         name={name || id}
         value={value}
