@@ -18,14 +18,13 @@ const FILTROS_INICIALES = { nombre: "", presentacion: "", stock: "todos" };
 const FILTRO_STOCK_OPTIONS = [
     { value: "todos", label: "Todos" },
     { value: "sin-stock", label: "Sin stock" },
-    { value: "bajo-minimo", label: "Stock menor al mínimo" },
+    { value: "con-stock", label: "Con stock" },
 ];
 
 const filtrarMedicamentos = (medicamentos, { nombre, presentacion, stock }) =>
     filtrarPorTexto(filtrarPorTexto(medicamentos, nombre, (m) => [m.nombre]), presentacion, (m) => [m.presentacion]).filter((m) => {
-        const actual = m.stockActual ?? 0;
-        if (stock === "sin-stock") return actual === 0;
-        if (stock === "bajo-minimo") return actual < (m.stockMinimo ?? 0);
+        if (stock === "sin-stock") return m.stockActual <= 0;
+        if (stock === "con-stock") return m.stockActual > 0;
         return true;
     });
 
