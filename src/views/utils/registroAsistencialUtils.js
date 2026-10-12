@@ -99,6 +99,34 @@ export const obtenerRegistroPorTicket = async (url, numeroTicket, token) => {
 const lectorPorDefecto = (url) => (numeroTicket, token) => obtenerRegistroPorTicket(url, numeroTicket, token);
 
 /**
+ * Lector de los endpoints REALES de reporte por ticket:
+ *   GET {url}/obtenerReporte?numeroTicket=&nameService=&esJasper=  ->  { codigo, estatus, resultado }
+ * Devuelve `(esJasper) => (numeroTicket, token) => registro | null` (el `obtenerRegistro` que reciben
+ * verificar / guardar / actualizar / imprimir). `esJasper` agrega los datos de cabecera y sellos del
+ * reporte (sede, color, digitalización...). Un error (404...) o un `resultado` sin `tieneRegistro(data)`
+ * cuentan como "sin registro": el backend puede responder 200 con solo los datos del paciente.
+ *
+ * @param {object}   p
+ * @param {string}   p.url             Endpoint base del examen.
+ * @param {string}   p.nameService     nameService del examen (p. ej. "hemograma_asistencial").
+ * @param {Function} p.tieneRegistro   (resultado) => boolean; qué campo prueba que el registro existe.
+ */
+export const crearLectorReporte = ({ url, nameService, tieneRegistro }) => (esJasper) => async (numeroTicket, token) => {
+  try {
+    const res = await getFetch(
+      `${url}/obtenerReporte?numeroTicket=${numeroTicket}&nameService=${nameService}&esJasper=${esJasper}`,
+      token
+    );
+    if (!res || res.error) return null;
+    const data = unwrap(res);
+    return data && tieneRegistro(data) ? data : null;
+  } catch (error) {
+    console.error(`Error al consultar ${url} (${nameService}) del ticket ${numeroTicket}:`, error);
+    return null;
+  }
+};
+
+/**
  * Listado para la tabla de búsqueda lateral (Perfil Lipídico). Contrato asumido:
  *   GET {url}/buscar?numeroTicket=&nombreApellido=&desde=&hasta=  ->  { resultado: [...] }
  * Cada fila: { numeroTicket, nombres, fecha, estado, color }. Mismo criterio del Triaje: por ticket,
@@ -365,6 +393,28 @@ export const completarSellosFirma = async (registro, token) => {
   });
   return digitalizacion;
 };
+
+/**
+ * `ajustarDatos` de imprimirReporteTicket para reportes con endpoint REAL. Sobre la mezcla genérica
+ * (pensada para plantillas ocupacionales) corrige:
+ *  - numeroTicket: lo usa la cabecera asistencial.
+ *  - nombres: por defecto "Apellidos y Nombres" (la mezcla trae nombres + apellidos); con
+ *    `apellidosPrimero: false` queda "Nombres y Apellidos", para plantillas que rotulan así.
+ *  - numeroHistoriaClinica y sede: prevalece el dato del reporte; la sede de la sesión es el respaldo.
+ *  - digitalizacion: si el reporte no trae el sello del especialista / doctor asignado, se busca en el
+ *    archivo de empleados (como el Triaje asistencial).
+ */
+export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = true } = {}) => async (paciente, registro) => ({
+  numeroTicket,
+  nombres:
+    (apellidosPrimero
+      ? `${paciente.apellidos ?? ""} ${paciente.nombres ?? ""}`
+      : `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`
+    ).trim() || registro.nombres,
+  numeroHistoriaClinica: registro.numeroHistoriaClinica ?? paciente.numeroHistoriaClinica ?? "",
+  ...(registro.sede ? { sede: registro.sede } : {}),
+  digitalizacion: await completarSellosFirma(registro, token),
+});
 
 // Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar).
 const nombreSedeActual = () => {

@@ -1,49 +1,35 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../../../../../utils/apiHelpers.js";
 import { sellarAuditoria } from "../../../../../../utils/auditoriaUtils.js";
 import {
   LABORATORIO_ASISTENCIAL_URL,
   actualizarRegistroTicket,
+  ajustarDatosReporte,
   auditoriaFromRegistro,
-  completarSellosFirma,
   confirmarImpresionTicket,
+  crearLectorReporte,
   formFromTicket,
   guardarRegistroTicket,
   imprimirReporteTicket,
-  unwrap,
   verificarRegistroTicket,
 } from "../../../../../../utils/registroAsistencialUtils.js";
 
 // Endpoints REALES del backend (OpenAPI):
 //   POST {registrarUrl}                                                         registra / actualiza
-//   GET  {obtenerReporteUrl}?numeroTicket=&nameService=&esJasper=               registro del ticket
+//   GET  {registrarUrl}/obtenerReporte?numeroTicket=&nameService=&esJasper=     registro del ticket
 const registrarUrl = `${LABORATORIO_ASISTENCIAL_URL}/clinico`;
-const obtenerReporteUrl = `${registrarUrl}/obtenerReporte`;
-const nameService = "lab_clinico_asistencial";
 
 // Reporte Jasper asistencial (cabecera del módulo, sin datos de empresa). El glob debe ser un literal
 // para que Vite pueda resolverlo en build; por eso se declara aquí (en el controller).
 const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloAsistencial/Laboratorio/LaboratorioClinico/*.jsx");
 const rutaJasper = "../../../../../../jaspers/ModuloAsistencial/Laboratorio/LaboratorioClinico/LaboratorioClinico_Digitalizado.jsx";
 
-// Registro de Laboratorio Clínico del ticket. `esJasper` agrega los datos de cabecera y sellos del
-// reporte (sede, color, digitalización...). El OpenAPI no dice qué responde el backend cuando el
-// ticket aún no tiene registro, así que se toma como "sin registro" un error (404...), un `resultado`
-// vacío o un `codLabclinico` nulo/0.
-const leerRegistro = (esJasper) => async (numeroTicket, token) => {
-  try {
-    const res = await getFetch(
-      `${obtenerReporteUrl}?numeroTicket=${numeroTicket}&nameService=${nameService}&esJasper=${esJasper}`,
-      token
-    );
-    if (!res || res.error) return null;
-    const data = unwrap(res);
-    return data?.codLabclinico ? data : null;
-  } catch (error) {
-    console.error(`Error al consultar el Laboratorio Clínico del ticket ${numeroTicket}:`, error);
-    return null;
-  }
-};
+// El OpenAPI no dice qué responde el backend cuando el ticket aún no tiene registro: se toma como
+// "sin registro" un error (404...), un `resultado` vacío o un `codLabclinico` nulo/0.
+const leerRegistro = crearLectorReporte({
+  url: registrarUrl,
+  nameService: "lab_clinico_asistencial",
+  tieneRegistro: (data) => Boolean(data.codLabclinico),
+});
 const obtenerRegistroFormulario = leerRegistro(false);
 const obtenerRegistroReporte = leerRegistro(true);
 
@@ -218,21 +204,8 @@ const construirBody = (form, user, esActualizacion) =>
   });
 
 // ===== Impresión =====
-// La plantilla lee los campos del reporte tal cual. Sobre la mezcla genérica de imprimirReporteTicket
-// (pensada para plantillas ocupacionales) se corrige:
-//  - numeroTicket: lo usa la cabecera asistencial.
-//  - nombres: "Apellidos y Nombres" (la mezcla trae nombres + apellidos).
-//  - numeroHistoriaClinica y sede: prevalece el dato del reporte; la sede de la sesión es el respaldo.
-//  - digitalizacion: si el reporte no trae el sello del especialista / doctor asignado, se busca en el
-//    archivo de empleados (como el Triaje asistencial).
-const ajustarDatosReporte = (numeroTicket, token) => async (paciente, registro) => ({
-  numeroTicket,
-  nombres: `${paciente.apellidos ?? ""} ${paciente.nombres ?? ""}`.trim() || registro.nombres,
-  numeroHistoriaClinica: registro.numeroHistoriaClinica ?? paciente.numeroHistoriaClinica ?? "",
-  ...(registro.sede ? { sede: registro.sede } : {}),
-  digitalizacion: await completarSellosFirma(registro, token),
-});
-
+// La plantilla asistencial lee los campos del reporte tal cual; `ajustarDatosReporte` completa
+// numeroTicket, nombre (apellidos primero), sede, historia clínica y sellos de firma.
 export const PrintHojaR = (numeroTicket, token) =>
   imprimirReporteTicket({
     numeroTicket,

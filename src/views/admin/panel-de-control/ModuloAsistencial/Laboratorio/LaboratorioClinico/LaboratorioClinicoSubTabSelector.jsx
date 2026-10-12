@@ -1,8 +1,8 @@
 import { faDroplet, faHandHoldingDroplet, faHeartbeat, faVial } from "@fortawesome/free-solid-svg-icons";
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
-// import Hematologia from "./Hematologia/Hematologia";
+import Hematologia from "./Hematologia/Hematologia";
 import HematologiaBioquimicaECO from "./HematologiaBioquimicaECO/HematologiaBioquimicaECO";
-// import Hemoglobina from "./Hemoglobina/Hemoglobina";
+//import Hemoglobina from "./Hemoglobina/Hemoglobina";
 // import Coagulacion from "./Coagulacion/Coagulacion";
 
 export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
@@ -14,13 +14,13 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
       icon: faDroplet,
       component: HematologiaBioquimicaECO
     },
-    // {
-    //   id: 1,
-    //   permission: "Hematograma",
-    //   label: "Hemograma",
-    //   icon: faVial,
-    //   component: Hematologia
-    // },
+    {
+      id: 1,
+      permission: "Hematograma",
+      label: "Hemograma",
+      icon: faVial,
+      component: Hematologia
+    },
     // {
     //   id: 2,
     //   permission: "Hemoglobina",
