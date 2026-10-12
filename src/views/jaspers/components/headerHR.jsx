@@ -1,6 +1,8 @@
 // views/jaspers/components/headerHR.js
+import drawQrRedondeado from "./drawQrRedondeado";
 
-const headerHR = (doc, datos) => {
+// opciones.qr = true → en lugar del cuadro de color se dibuja un QR con el N° de orden
+const headerHR = (doc, datos, opciones = {}) => {
   // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
   const formatearFecha = (fecha) => {
     if (!fecha) return "";
@@ -30,7 +32,12 @@ const headerHR = (doc, datos) => {
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
 
   console.log("colorValido", colorValido);
-  if (colorValido) {
+  if (opciones.qr) {
+    if (datos.orden) {
+      const qrSize = 17;
+      drawQrRedondeado(doc, datos.orden, pageW - margin - qrSize, yOffset + 1, qrSize);
+    }
+  } else if (colorValido) {
     // color = datos.codigoColor || "#008f39";
     // boxText = (datos.textoColor || "F").toUpperCase();
 

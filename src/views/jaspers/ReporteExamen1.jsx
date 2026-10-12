@@ -251,7 +251,7 @@ export default async function ReporteExamen1(datos) {
     };
 
     //componente header
-    headerHR(doc, datos)
+    headerHR(doc, datos, { qr: true })
     // Encabezado
     doc.setFontSize(8)
     const leftspace = 10

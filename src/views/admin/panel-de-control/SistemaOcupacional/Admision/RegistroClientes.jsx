@@ -4,11 +4,12 @@ import { Loading } from '../../../../components/Loading';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faSearch, faX, faSignature, faFingerprint, faBroom } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faSearch, faX, faSignature, faFingerprint, faBroom, faCamera } from '@fortawesome/free-solid-svg-icons';
 
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
+import FotoPaciente from './foto/FotoPaciente';
 import { VerifyHoF } from './model/Submit';
 import SubidaMasiva from './RegistroPacientes/MasivoRegistroPacientes';
 
@@ -25,8 +26,10 @@ const RegistroClientes = (props) => {
   const [selectedProfesion, setSelectedProfesion] = useState('');
   const [modalhuellaF, setModalhuellaF] = useState(false);
   const [modalpad, setModalpad] = useState(false);
+  const [modalFoto, setModalFoto] = useState(false);
   const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
   const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
+  const [FotoP, setFotoP] = useState({ id: 0, url: '' });
   const [notCharge, setNotcharge] = useState(false)
   const { Profesiones, Departamentos, Provincias, Distritos } = props.listas
 
@@ -224,12 +227,14 @@ const RegistroClientes = (props) => {
         setFilteredDist([]);
 
         // 6️⃣ Cargar huella y firma
-        const [H, F] = await Promise.all([
+        const [H, F, FO] = await Promise.all([
           VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/HUELLA`),
-          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FIRMAP`)
+          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FIRMAP`),
+          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FOTO_PACIENTE`)
         ]);
         setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
         setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
+        setFotoP(FO.id === 1 ? { id: 1, url: FO.mensaje } : { id: 0, url: '' });
       })
       .catch(() => {
         Swal.close();
@@ -315,9 +320,10 @@ const RegistroClientes = (props) => {
     setSearchProv(''); setFilteredProv([]);
     setSearchDist(''); setFilteredDist([]);
 
-    // 🔄 limpia huella y firma previas
+    // 🔄 limpia huella, firma y foto previas
     setHuellaP({ id: 0, url: '' });
     setFirmaP({ id: 0, url: '' });
+    setFotoP({ id: 0, url: '' });
 
     // ⌨️ devuelve el foco al DNI para seguir escribiendo
     dniRef.current?.focus();
@@ -332,6 +338,11 @@ const RegistroClientes = (props) => {
     if (!props.datos.codPa)
       return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
     setModalpad(true);
+  };
+  const openFoto = () => {
+    if (!props.datos.codPa)
+      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+    setModalFoto(true);
   };
   // 1. Definir opciones (al principio del componente)
   const civilOptions = [
@@ -997,6 +1008,15 @@ const RegistroClientes = (props) => {
             <FontAwesomeIcon icon={faFingerprint} /> Tomar Huella Futronic
           </button>
         </div>
+        <div className='flex flex-col flex-wrap justify-center items-center'>
+          <label htmlFor="">{FotoP.id === 1 ? <FontAwesomeIcon color='green' size='xl' icon={faCheck} /> : <FontAwesomeIcon color='red' size='xl' icon={faX} />}</label>
+          <button
+            onClick={openFoto}
+            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-orange-500 text-white flex items-center gap-2 justify-center hover:bg-orange-600"
+          >
+            <FontAwesomeIcon icon={faCamera} /> Tomar Fotografía
+          </button>
+        </div>
         <div className='flex flex-col flex-wrap justify-end items-center'>
           <button
             onClick={handleSubmit}
@@ -1026,6 +1046,10 @@ const RegistroClientes = (props) => {
           <span className="text-gray-700 text-sm">Tomar Huella Futronic: Escanea la huella dactilar del paciente</span>
         </div>
         <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-orange-500 text-white"><FontAwesomeIcon icon={faCamera} /></span>
+          <span className="text-gray-700 text-sm">Tomar Fotografía: Captura la foto del paciente con la cámara</span>
+        </div>
+        <div className="flex items-center gap-2">
           <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-blue-600 text-white"><FontAwesomeIcon icon={faCheck} /></span>
           <span className="text-gray-700 text-sm">Registrar: Guarda los datos del paciente</span>
         </div>
@@ -1041,6 +1065,14 @@ const RegistroClientes = (props) => {
           DNI={props.datos.codPa}
           Huella={HuellaP}
           setHuella={() => { setHuellaP({ id: 1 }) }}
+        />
+      )}
+      {modalFoto && (
+        <FotoPaciente
+          close={() => setModalFoto(false)}
+          DNI={props.datos.codPa}
+          Foto={FotoP}
+          setFoto={(url) => { setFotoP({ id: 1, url }) }}
         />
       )}
       {modalpad && (
