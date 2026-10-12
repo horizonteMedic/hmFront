@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBacterium, faNotesMedical, faSearch, faStethoscope, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+import { faBacterium, faNotesMedical, faSearch, faStethoscope, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabSelector";
 import TriajeAsistencial from "./Triaje/Triaje";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos";
+import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector";
 import ReportesTabSelector from "./Reportes/ReportesTabSelector";
 
 const sections = [
@@ -15,7 +16,8 @@ const sections = [
     { tab: 2, vista: "Triaje Asistencial", label: "Triaje", icon: faStethoscope, component: TriajeAsistencial },
     { tab: 3, vista: "Antecedentes Patologicos", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
     { tab: 4, vista: "Historia Asistencial", label: "Historia Asistencial", icon: faNotesMedical, component: AsistencialTabSelector },
-    { tab: 5, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
+    { tab: 5, vista: "Laboratorio Asistencial", label: "Laboratorio", icon: faVial, component: LaboratorioTabSelector },
+    { tab: 6, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
 ];
 
 const ModuloAsistencial = () => {

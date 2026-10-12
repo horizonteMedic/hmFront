@@ -19,7 +19,6 @@ const sections = [
     { tab: 1, vista: "Admision Salud", label: "Admisión", icon: faUserCheck, component: AdmisionTabSelector },
     { tab: 2, vista: "Registro Especialidades Salud", label: "Registro Especialidades", icon: faStethoscope, component: RegistroEspecialidades },
     { tab: 3, vista: "Inventario Salud", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
-    { tab: 4, vista: "Configuracion", label: "Configuracion", icon: faGear, component: Configuracion },
     seccionCampanias,
     seccionEspecialidades,
     { tab: 5, vista: "Proveedor Nombres", label: "Consultar por Nombres", icon: faIdCard, component: Proveedor },
