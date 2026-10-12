@@ -1,21 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-
-const UMBRAL_CERCANIA_PORCENTAJE = 20;
-
-const ESTILO_STOCK = {
-    critico: { punto: "bg-red-400", texto: "text-red-600", titulo: "Stock igual o menor al mínimo" },
-    cercano: { punto: "bg-orange-400", texto: "text-orange-600", titulo: "Stock cerca del mínimo" },
-};
-
-// 'critico' si el stock llegó al mínimo, 'cercano' si está a menos de un 20% sobre él, null si no hay problema
-const getEstadoStock = (stockActual, stockMinimo) => {
-    const actual = stockActual ?? 0;
-    const minimo = stockMinimo ?? 0;
-    if (minimo <= 0) return null;
-    if (actual <= minimo) return "critico";
-    return ((actual - minimo) / minimo) * 100 <= UMBRAL_CERCANIA_PORCENTAJE ? "cercano" : null;
-};
+import { formatearPrecio } from "./controllerProductosEnInventario";
 
 const ENCABEZADO = "px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500";
 const SECUNDARIA = "hidden md:table-cell"; // en pantallas chicas solo quedan Nombre, Presentación, Stock y el «+»
@@ -31,15 +16,14 @@ export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyTe
                         <th className={ENCABEZADO}>Nombre</th>
                         <th className={`${ENCABEZADO} ${SECUNDARIA}`}>Uso</th>
                         <th className={ENCABEZADO}>Presentación</th>
-                        <th className={`${ENCABEZADO} ${SECUNDARIA}`}>Stock mínimo</th>
+                        <th className={`${ENCABEZADO} ${SECUNDARIA}`}>Precio unit.</th>
                         <th className={`${ENCABEZADO} w-16`}>Stock</th>
                         <th className={`${ENCABEZADO} w-10`}></th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                     {medicamentos.map((medicamento, i) => {
-                        const estado = getEstadoStock(medicamento.stockActual, medicamento.stockMinimo);
-                        const estilo = ESTILO_STOCK[estado];
+                        const sinStock = medicamento.stockActual <= 0;
                         return (
                             <tr
                                 key={medicamento.id}
@@ -51,12 +35,11 @@ export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyTe
                                 <td className="px-3 py-3 font-semibold text-gray-800">{medicamento.nombre}</td>
                                 <td className={`px-3 py-3 text-gray-700 ${SECUNDARIA}`}>{medicamento.uso}</td>
                                 <td className="px-3 py-3 text-gray-700">{medicamento.presentacion}</td>
-                                <td className={`px-3 py-3 text-gray-700 ${SECUNDARIA}`}>{medicamento.stockMinimo}</td>
-                                <td className="px-3 py-3 font-semibold">
-                                    <span className="inline-flex items-center gap-2" title={estilo?.titulo}>
-                                        {estilo && <span className={`h-2 w-2 shrink-0 rounded-full ${estilo.punto}`} />}
-                                        <span className={estilo?.texto ?? "text-gray-700"}>{medicamento.stockActual ?? 0}</span>
-                                    </span>
+                                <td className={`whitespace-nowrap px-3 py-3 text-gray-700 ${SECUNDARIA}`}>
+                                    {formatearPrecio(medicamento.precioUnitario)}
+                                </td>
+                                <td className={`px-3 py-3 font-semibold ${sinStock ? "text-red-600" : "text-gray-700"}`} title={sinStock ? "Sin stock" : undefined}>
+                                    {medicamento.stockActual}
                                 </td>
                                 <td className="px-2 py-3 text-center">
                                     <button

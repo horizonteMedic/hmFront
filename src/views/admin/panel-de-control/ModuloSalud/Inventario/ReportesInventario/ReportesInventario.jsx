@@ -32,7 +32,7 @@ export default function ReportesInventario({ campania }) {
     return (
         <div className="flex min-h-[300px] flex-col items-center justify-center gap-4 px-4 text-center">
             <p className="max-w-md text-sm text-gray-600">
-                Excel con los medicamentos de la campaña «{campania.nombre}»: presentación, uso, stock actual y stock mínimo.
+                Excel con los medicamentos de la campaña «{campania.nombre}»: presentación, uso, stock actual y precio unitario.
             </p>
             <button
                 type="button"

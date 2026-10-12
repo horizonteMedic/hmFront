@@ -20,7 +20,7 @@ const ESTADO = {
     error: { etiqueta: "✖ Error", fila: "bg-red-50" },
 };
 
-const ENCABEZADOS = ["Estado", "Nombre", "Presentación", "Uso", "Laboratorio", "Marca", "Unidad medida", "Stock mín.", "Mensaje"];
+const ENCABEZADOS = ["Estado", "Nombre", "Presentación", "Uso", "Unidades", "Precio unit.", "Mensaje"];
 
 const Dato = ({ titulo, valor, clase }) => (
     <div className={`rounded px-4 py-2 shadow-sm ${clase}`}>
@@ -63,8 +63,7 @@ export default function CargaMasivaMedicamentos({ token, campania, existentes, o
             icon: "warning",
             title: "¿Procesar y guardar los medicamentos?",
             text:
-                `Se enviarán ${listos.length} medicamento(s) a la campaña "${campania.nombre}". Todos se crean con stock 0; ` +
-                `el stock mínimo indicado se usa como umbral de alerta.` +
+                `Se enviarán ${listos.length} medicamento(s) a la campaña "${campania.nombre}".` +
                 (posiblesDuplicados ? ` ${posiblesDuplicados} podrían estar duplicados y se crearían como filas independientes.` : ""),
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -134,8 +133,8 @@ export default function CargaMasivaMedicamentos({ token, campania, existentes, o
                 <CampaniaActivaBanner campania={campania} />
 
                 <p className="text-xs text-gray-500">
-                    Obligatorios: nombre y presentación (las filas que no los tengan no se envían). El stock mínimo vacío se registra
-                    como 0. Todos los medicamentos se crean con stock 0; para cargar stock usa después el ingreso de cada medicamento (+).
+                    Columnas: NOMBRE (o DETALLE), PRESENTACION, USO, UNIDADES (o UND) y PRECIO UNITARIO. Obligatorios: nombre y
+                    presentación; las unidades vacías se registran como 0 y el precio es opcional. Las filas inválidas no se envían.
                 </p>
 
                 <div className="flex flex-wrap gap-3">
@@ -202,10 +201,8 @@ export default function CargaMasivaMedicamentos({ token, campania, existentes, o
                                         <td className="px-3 py-2 font-semibold">{fila.nombre}</td>
                                         <td className="px-3 py-2">{fila.presentacion}</td>
                                         <td className="px-3 py-2">{fila.uso}</td>
-                                        <td className="px-3 py-2">{fila.laboratorio}</td>
-                                        <td className="px-3 py-2">{fila.marca}</td>
-                                        <td className="px-3 py-2">{fila.unidadMedida}</td>
-                                        <td className="px-3 py-2 text-center">{fila.stockMinimo}</td>
+                                        <td className="px-3 py-2 text-center">{fila.unidades}</td>
+                                        <td className="whitespace-nowrap px-3 py-2 text-right">{fila.precioUnitario}</td>
                                         <td className="min-w-[16rem] px-3 py-2">{fila.mensaje}</td>
                                     </tr>
                                 ))}
