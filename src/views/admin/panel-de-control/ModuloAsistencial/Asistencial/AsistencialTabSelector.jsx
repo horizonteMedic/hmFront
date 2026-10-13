@@ -24,12 +24,12 @@ export default function AsistencialTabSelector({ tieneVista }) {
             label: "Historia Clinica del Varon o Mujer Adulto",
             component: HistoriaClinicaMujerVaronAdulto
         },
-        // {
-        //     id: 3,
-        //     permission: "Historia Clinica del Adulto Mayor",
-        //     label: "Historia Clinica del Adulto Mayor",
-        //     component: HistoriaClinicaAdultoMayor
-        // },
+        {
+            id: 1,
+            permission: "Historia Clinica del Adulto Mayor",
+            label: "Historia Clinica del Adulto Mayor",
+            component: HistoriaClinicaAdultoMayor
+        },
     ];
     return (
         <TabSelector
