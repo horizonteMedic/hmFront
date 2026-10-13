@@ -207,7 +207,7 @@ export default function Hematologia() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaboralesAsistencial form={form} />
+      <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
 
       <div className="font-semibold text-center bg-gray-100 p-3 rounded">
         MUESTRA: SANGRE TOTAL C/ EDTA

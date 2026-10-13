@@ -62,14 +62,32 @@ export const formFromTicket = (paciente) => ({
   empresa: paciente.empresa ?? "",
 });
 
+// Fecha-hora de auditoría como texto ISO. Casi todos los DTO la declaran date-time (texto), pero hay
+// reportes que la tipan como `object` (p. ej. Hemoglobina): según cómo la serialice el backend puede
+// llegar como texto, arreglo [año, mes, día, hora, min, seg, nano] (LocalDateTime) o epoch en ms.
+const fechaHoraISO = (valor) => {
+  if (!valor) return "";
+  if (Array.isArray(valor)) {
+    if (valor.length < 3) return "";
+    const [anio, mes, dia, hora = 0, minuto = 0, segundo = 0] = valor;
+    const dos = (n) => String(n).padStart(2, "0");
+    return `${anio}-${dos(mes)}-${dos(dia)}T${dos(hora)}:${dos(minuto)}:${dos(segundo)}`;
+  }
+  if (typeof valor === "number") {
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? "" : fecha.toISOString();
+  }
+  return typeof valor === "object" ? "" : valor;
+};
+
 // Auditoría REAL del registro guardado. Se guarda CRUDA (la vista la formatea: UTC -> local).
 // Se leen ambos nombres de clave porque los endpoints asistenciales usan "usuarioRegistro" y los
 // ocupacionales "userRegistro".
 export const auditoriaFromRegistro = (registro) => ({
   userRegistro: registro.usuarioRegistro ?? registro.userRegistro ?? "",
-  fechaRegistro: registro.fechaRegistro ?? "",
+  fechaRegistro: fechaHoraISO(registro.fechaRegistro),
   usuarioActualizacion: registro.usuarioActualizacion ?? registro.userActualizacion ?? "",
-  fechaActualizacion: registro.fechaActualizacion ?? "",
+  fechaActualizacion: fechaHoraISO(registro.fechaActualizacion),
 });
 
 // Datos del paciente por N° de Ticket. null si el ticket no existe.
@@ -100,7 +118,7 @@ const lectorPorDefecto = (url) => (numeroTicket, token) => obtenerRegistroPorTic
 
 /**
  * Lector de los endpoints REALES de reporte por ticket:
- *   GET {url}/obtenerReporte?numeroTicket=&nameService=&esJasper=  ->  { codigo, estatus, resultado }
+ *   GET {url}/{ruta}?numeroTicket=&nameService=&esJasper=  ->  { codigo, estatus, resultado }
  * Devuelve `(esJasper) => (numeroTicket, token) => registro | null` (el `obtenerRegistro` que reciben
  * verificar / guardar / actualizar / imprimir). `esJasper` agrega los datos de cabecera y sellos del
  * reporte (sede, color, digitalización...). Un error (404...) o un `resultado` sin `tieneRegistro(data)`
@@ -108,13 +126,15 @@ const lectorPorDefecto = (url) => (numeroTicket, token) => obtenerRegistroPorTic
  *
  * @param {object}   p
  * @param {string}   p.url             Endpoint base del examen.
+ * @param {string}   [p.ruta]          Ruta del reporte bajo `url` (default "obtenerReporte"; Hemoglobina
+ *                                     usa "obtenerReporteHemoglobina").
  * @param {string}   p.nameService     nameService del examen (p. ej. "hemograma_asistencial").
  * @param {Function} p.tieneRegistro   (resultado) => boolean; qué campo prueba que el registro existe.
  */
-export const crearLectorReporte = ({ url, nameService, tieneRegistro }) => (esJasper) => async (numeroTicket, token) => {
+export const crearLectorReporte = ({ url, ruta = "obtenerReporte", nameService, tieneRegistro }) => (esJasper) => async (numeroTicket, token) => {
   try {
     const res = await getFetch(
-      `${url}/obtenerReporte?numeroTicket=${numeroTicket}&nameService=${nameService}&esJasper=${esJasper}`,
+      `${url}/${ruta}?numeroTicket=${numeroTicket}&nameService=${nameService}&esJasper=${esJasper}`,
       token
     );
     if (!res || res.error) return null;
@@ -400,7 +420,8 @@ export const completarSellosFirma = async (registro, token) => {
  *  - numeroTicket: lo usa la cabecera asistencial.
  *  - nombres: por defecto "Apellidos y Nombres" (la mezcla trae nombres + apellidos); con
  *    `apellidosPrimero: false` queda "Nombres y Apellidos", para plantillas que rotulan así.
- *  - numeroHistoriaClinica y sede: prevalece el dato del reporte; la sede de la sesión es el respaldo.
+ *  - numeroHistoriaClinica y sede: prevalece el dato del reporte (`nombreSede` si lo trae, p. ej.
+ *    Hemoglobina, que además declara `sede`); la sede de la sesión es el respaldo.
  *  - digitalizacion: si el reporte no trae el sello del especialista / doctor asignado, se busca en el
  *    archivo de empleados (como el Triaje asistencial).
  */
@@ -412,7 +433,7 @@ export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = tr
       : `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`
     ).trim() || registro.nombres,
   numeroHistoriaClinica: registro.numeroHistoriaClinica ?? paciente.numeroHistoriaClinica ?? "",
-  ...(registro.sede ? { sede: registro.sede } : {}),
+  ...(registro.nombreSede || registro.sede ? { sede: registro.nombreSede || registro.sede } : {}),
   digitalizacion: await completarSellosFirma(registro, token),
 });
 
