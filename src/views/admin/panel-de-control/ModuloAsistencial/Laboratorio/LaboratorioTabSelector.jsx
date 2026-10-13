@@ -1,6 +1,6 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import LaboratorioClinicoSubTabSelector from "./LaboratorioClinico/LaboratorioClinicoSubTabSelector";
-// import AnalisisBioquimicosSubTabSelector from "./AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector";
+import AnalisisBioquimicosSubTabSelector from "./AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector";
 // import InmunologiaSubTabSelector from "./Inmunologia/InmunologiaSubTabSelector";
 // import ToxicologiaSubTabSelector from "./Toxicologia/ToxicologiaSubTabSelector";
 // import TabEnConstruccion from "./TabEnConstruccion";
@@ -17,13 +17,13 @@ export default function LaboratorioTabSelector({ tieneVista }) {
             icon: faFlask,
             component: LaboratorioClinicoSubTabSelector
         },
-        // {
-        //     id: 1,
-        //     permission: "Laboratorio Clinico Formulario",
-        //     label: "Análisis Bioquímicos",
-        //     icon: faFilter,
-        //     component: AnalisisBioquimicosSubTabSelector
-        // },
+        {
+            id: 1,
+            permission: "Laboratorio Clinico Formulario",
+            label: "Análisis Bioquímicos",
+            icon: faFilter,
+            component: AnalisisBioquimicosSubTabSelector
+        },
         // {
         //     id: 2,
         //     permission: "Inmunologia",

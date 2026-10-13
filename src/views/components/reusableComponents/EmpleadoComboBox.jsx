@@ -21,7 +21,7 @@ export default function EmpleadoComboBox({
 }) {
     const showRevert = edited && typeof onRevert === "function";
     const hasError = Boolean(error);
-    const { listaEmpleados: empleados } = useSessionData();
+    const { listaEmpleados: empleados, userlogued, userName } = useSessionData();
     const safeEmpleados = empleados || [];
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
 
@@ -130,6 +130,30 @@ export default function EmpleadoComboBox({
             });
         }
     }, [form[idField], idField, nameField]);
+
+    // El valor por defecto de los formularios es el usuario de la sesión (`sub` del token), pero este
+    // combo escribe al seleccionar el `username` de listaEmpleados, que es el que el backend y los
+    // reportes usan para ubicar el sello de firma. Si ambos no coinciden letra por letra, el
+    // predeterminado queda sin sello hasta que se vuelve a seleccionar a mano. Por eso, si el id es el
+    // usuario de la sesión y no está tal cual en listaEmpleados, se reemplaza por el empleado
+    // equivalente (mismo username sin distinguir mayúsculas o, si no, mismo nombre). Solo toca el
+    // usuario de la sesión: los registros cargados con otro usuario no se modifican.
+    useEffect(() => {
+        const id = form[idField];
+        if (!id || id !== userlogued || safeEmpleados.some((emp) => emp.username === id)) return;
+        const mismo = (a, b) => String(a ?? "").trim().toUpperCase() === String(b ?? "").trim().toUpperCase();
+        const equivalente =
+            safeEmpleados.find((emp) => mismo(emp.username, id)) ??
+            (userName ? safeEmpleados.find((emp) => mismo(emp.nombres, userName)) : undefined);
+        if (!equivalente?.username) return;
+        console.warn(`EmpleadoComboBox: el usuario de la sesión "${id}" no coincide con el username "${equivalente.username}" de listaEmpleados; se usa este último.`);
+        onChange({
+            target: {
+                name: idField,
+                value: equivalente.username
+            }
+        });
+    }, [form[idField], idField, userlogued, safeEmpleados.length]);
 
     const handleSelect = (emp) => {
         setFilteredEmpleados([]);

@@ -147,33 +147,6 @@ export const crearLectorReporte = ({ url, ruta = "obtenerReporte", nameService, 
 };
 
 /**
- * Listado para la tabla de búsqueda lateral (Perfil Lipídico). Contrato asumido:
- *   GET {url}/buscar?numeroTicket=&nombreApellido=&desde=&hasta=  ->  { resultado: [...] }
- * Cada fila: { numeroTicket, nombres, fecha, estado, color }. Mismo criterio del Triaje: por ticket,
- * por nombre (sin restringir fecha) o, sin filtros, solo la fecha indicada (por defecto, hoy).
- */
-export const listarRegistrosTicket = async (url, { numeroTicket, nombres, fecha }, token) => {
-  try {
-    const query = new URLSearchParams();
-    if (numeroTicket) {
-      query.set("numeroTicket", numeroTicket);
-    } else if (nombres) {
-      query.set("nombreApellido", nombres);
-    } else if (fecha) {
-      query.set("desde", fecha);
-      query.set("hasta", fecha);
-    }
-    const res = await getFetch(`${url}/buscar?${query.toString()}`, token);
-    if (!res || res.error) return [];
-    const data = unwrap(res);
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error(`Error al listar ${url}:`, error);
-    return [];
-  }
-};
-
-/**
  * VERIFICAR por N° Ticket: decide si el examen es NUEVO o EXISTENTE y delega la carga de datos.
  *
  *  - El ticket debe existir (si no, "Ticket no encontrado").
@@ -380,7 +353,9 @@ const obtenerSelloEmpleado = async (username, token) => {
   if (!username) return "";
   try {
     const { listaEmpleados } = useAuthStore.getState();
-    const empleado = (listaEmpleados || []).find((emp) => emp.username === username);
+    // Sin distinguir mayúsculas: el `usuarioFirma` guardado puede venir con otra caja que `username`.
+    const mismo = (a) => String(a ?? "").trim().toUpperCase() === String(username).trim().toUpperCase();
+    const empleado = (listaEmpleados || []).find((emp) => mismo(emp.username));
     if (!empleado?.idEmpleado) return "";
 
     const datosEmpleado = await getFetch(`${empleadoUrl}/${empleado.idEmpleado}`, token);
