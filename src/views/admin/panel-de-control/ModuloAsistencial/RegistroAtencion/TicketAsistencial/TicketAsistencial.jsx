@@ -10,11 +10,12 @@ import SectionFieldset from "../../../../../components/reusableComponents/Sectio
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getEdadDesdeFecha } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero } from "./controllerTicketAsistencial";
+import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero, ObtenerPacientePorId } from "./controllerTicketAsistencial";
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
+import TicketAsistencialA4 from "../../../../../jaspers/TicketAsistencial/TicketAsistencialA4";
 import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
 
 const METODOS_PAGO = [
@@ -34,6 +35,10 @@ const AUTORIZADO_POR = [
     { value: "CORREO", label: "POR CORREO" },
     { value: "OTROS", label: "OTROS" },
 ];
+
+// Cortes de edad (años cumplidos) para marcar ADULTO / ADULTO MAYOR según el paciente cargado.
+const EDAD_ADULTO = 18;
+const EDAD_ADULTO_MAYOR = 60;
 
 const DESCUENTOS = [
     { value: "0", label: "0%" },
@@ -382,6 +387,9 @@ export default function TicketAsistencial() {
         nroTicket: "",
         codVendedor: "",
 
+        // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
+        laArena: false,
+
         metodoPago: "",
         autorizadoPor: "",
 
@@ -392,10 +400,9 @@ export default function TicketAsistencial() {
         nombres: "",
         empresa: "",
 
+        // ADULTO / ADULTO MAYOR no se guardan: se derivan de fechaNacimiento (ver edadPaciente).
         menorCincoAños: false,
         adolescente: false,
-        adulto: true,
-        adultoMayor: false,
 
         // Agregar Servicios Ticket
         servicio: "",
@@ -414,6 +421,7 @@ export default function TicketAsistencial() {
         handleChange,
         handleChangeNumberDecimals,
         handleChangeSimple,
+        handleCheckBoxChange,
         handleClear,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "ticketAsistencial" });
@@ -430,12 +438,13 @@ export default function TicketAsistencial() {
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
     // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado, así que el
-    // formulario se limpia por completo y solo conserva el nuevo tipo elegido.
+    // formulario se limpia por completo y solo conserva el nuevo tipo elegido (y el modo La Arena,
+    // que no es un dato del paciente).
     const handleTipoDocumentoChange = (e, value) => {
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
-        setForm({ ...initialFormState, tipoDocumento: value });
+        setForm({ ...initialFormState, tipoDocumento: value, laArena: form.laArena });
     };
 
     const handleSeleccionarPacienteSinDni = (item) => {
@@ -627,15 +636,18 @@ export default function TicketAsistencial() {
         0
     );
 
-    // Todos los campos son obligatorios, excepto los de la sección "Agregar Servicios
-    // Ticket" (esos solo alimentan la tabla; lo obligatorio ahí es tener al menos un ítem).
+    // Todos los campos son obligatorios, excepto los de la sección "Agregar Servicios Ticket"
+    // (esos solo alimentan la tabla; lo obligatorio ahí es tener al menos un ítem). Con
+    // "La Arena" marcado no se piden código de vendedor, método de pago, autorizado por ni servicios.
     const validateForm = () => {
         const next = {};
         if (!form.empresa?.trim()) next.empresa = "La empresa es obligatoria.";
-        if (!form.metodoPago) next.metodoPago = "El método de pago es obligatorio.";
-        if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
+        if (!form.laArena) {
+            if (!form.metodoPago) next.metodoPago = "El método de pago es obligatorio.";
+            if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
+            if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
+        }
         if (!form.user_medicoFirma) next.nombre_medico = "Debe asignar un doctor.";
-        if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
         setErrors(next);
         return Object.keys(next).length === 0;
     };
@@ -653,7 +665,9 @@ export default function TicketAsistencial() {
             return;
         }
         if (!validateForm()) return;
-        if (!form.ticketItems?.length) {
+        // Con La Arena marcado esos campos están ocultos: aunque tengan datos de antes, no se envían.
+        const esLaArena = !!form.laArena;
+        if (!esLaArena && !form.ticketItems?.length) {
             Swal.fire("Error", "Agregue al menos un servicio al ticket.", "error");
             return;
         }
@@ -670,16 +684,18 @@ export default function TicketAsistencial() {
             horaTicket,
             serieTicket: selectedSede || "",
             operador: userlogued || null,
-            modoPago: form.metodoPago || null,
+            modoPago: !esLaArena && form.metodoPago ? form.metodoPago : null,
             empresa: form.empresa || null,
-            codigoVendedor: form.codVendedor ? Number(form.codVendedor) : null,
-            autoriza: form.autorizadoPor || null,
-            contenidos: form.ticketItems.map((item) => ({
-                codigoServicio: item.cod || null,
-                cantidad: Number(item.cantidad) || 0,
-                precioUnitario: Number(item.precio) || 0,
-                descuentoLinea: Number(item.descuento) || 0,
-            })),
+            codigoVendedor: !esLaArena && form.codVendedor ? Number(form.codVendedor) : null,
+            autoriza: !esLaArena && form.autorizadoPor ? form.autorizadoPor : null,
+            contenidos: esLaArena
+                ? []
+                : (form.ticketItems || []).map((item) => ({
+                    codigoServicio: item.cod || null,
+                    cantidad: Number(item.cantidad) || 0,
+                    precioUnitario: Number(item.precio) || 0,
+                    descuentoLinea: Number(item.descuento) || 0,
+                })),
         };
 
         LoadingDefault("Registrando Ticket");
@@ -708,12 +724,12 @@ export default function TicketAsistencial() {
                 </p>
             `,
             showCancelButton: true,
-            confirmButtonText: "Sí, Imprimir",
-            cancelButtonText: "No",
+            confirmButtonText: esLaArena ? "Hoja A4" : "Ticket 80mm",
+            cancelButtonText: "No imprimir",
         }).then((result) => {
-            if (result.isConfirmed) {
-                imprimirTicketVenta(numeroTicketCreado);
-            }
+            if (!result.isConfirmed) return;
+            if (esLaArena) imprimirTicketA4(numeroTicketCreado);
+            else imprimirTicketVenta(numeroTicketCreado);
         });
     };
 
@@ -754,14 +770,48 @@ export default function TicketAsistencial() {
         return true;
     };
 
-    const handleImprimirTicket = async () => {
+    // Imprime el ticket en hoja A4 con solo los datos del formulario (sin servicios). Igual que
+    // el de 80mm, parte del ticket ya persistido (GET /api/tickets/numero/{n}); la historia
+    // clínica y el tipo de documento no vienen en el ticket, así que se completan con la ficha
+    // del paciente (si esa consulta falla, el reporte sale igual sin esos dos datos).
+    const imprimirTicketA4 = async (numeroTicket) => {
+        const numero = numeroTicket ?? form.nroTicket;
+        if (!numero) return false;
+
+        const ticket = await ObtenerTicketPorNumero(numero, token);
+
+        if (!ticket) {
+            Swal.fire("Error", `No existe un ticket registrado con el N° ${numero}.`, "error");
+            return false;
+        }
+
+        const paciente = await ObtenerPacientePorId(ticket.pacienteId, token);
+
+        TicketAsistencialA4({
+            numeroTicket: ticket.numeroTicket,
+            numeroHistoriaClinica: paciente?.numeroHistoriaClinica,
+            sede: ticket.sede || selectedSede,
+            fecha: ticket.fechaTicket,
+            tipoDocumento: paciente?.tipoDocumento || (ticket.pacienteDni ? "DNI" : ""),
+            documentoIdentidad: ticket.pacienteDni || paciente?.numeroDocumento,
+            nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
+            edad: ticket.pacienteEdad,
+            empresa: ticket.empresa,
+            metodoPago: METODOS_PAGO.find((m) => m.value === ticket.modoPago)?.label ?? ticket.modoPago,
+            autorizadoPor: AUTORIZADO_POR.find((a) => a.value === ticket.autoriza)?.label ?? ticket.autoriza,
+            medico: ticket.medico,
+        });
+        return true;
+    };
+
+    const handleImprimirTicket = async (formato = "80mm") => {
         const numero = String(form.nroTicket ?? "").trim();
         if (!numero) {
             setErrorImprimirTicket("Debe ingresar un N° de Ticket.");
             return;
         }
         setErrorImprimirTicket("");
-        const ok = await imprimirTicketVenta(numero);
+        const ok = formato === "a4" ? await imprimirTicketA4(numero) : await imprimirTicketVenta(numero);
         if (!ok) {
             setErrorImprimirTicket(`El N° de Ticket "${numero}" no existe.`);
         }
@@ -777,9 +827,22 @@ export default function TicketAsistencial() {
     // el documento que el usuario está tipeando.
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
+    // La Arena imprime solo en hoja A4; los demás clientes, solo el ticket de 80mm.
+    const formatoImpresion = form.laArena ? "a4" : "80mm";
+
+    // Casillas de edad según el paciente cargado (fechaNacimiento viene de su registro en
+    // RegistroAsistencial). Sin paciente no se marca ninguna; los menores de 18 tampoco marcan
+    // ADULTO (< 5 AÑOS / ADOLESCENTE siguen sin autocompletarse).
+    const edadPaciente = getEdadDesdeFecha(form.fechaNacimiento);
+    const esAdultoMayor = edadPaciente !== null && edadPaciente >= EDAD_ADULTO_MAYOR;
+    const esAdulto = edadPaciente !== null && edadPaciente >= EDAD_ADULTO && !esAdultoMayor;
+
     return (
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
-            <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-4 gap-y-3 gap-x-4">
+            <SectionFieldset
+                legend="Información del Examen"
+                className={`grid ${form.laArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
+            >
                 <InputsRadioGroup
                     name="tipoDocumento"
                     value={form.tipoDocumento}
@@ -791,7 +854,7 @@ export default function TicketAsistencial() {
                         { label: "Pasaporte", value: "PASAPORTE" },
                         { label: "Sin DNI", value: "SIN DNI" },
                     ]}
-                    className="xl:col-span-4"
+                    className="xl:col-span-full"
                 />
                 {form.tipoDocumento == "SIN DNI" ?
                     <BuscadorPacienteSinDni
@@ -827,14 +890,23 @@ export default function TicketAsistencial() {
                     disabled
                     onKeyUp={handleSearch}
                 />
-                <InputTextOneLine
-                    label="Código Vendedor"
-                    name="codVendedor"
-                    value={form?.codVendedor}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    required
-                    error={errors.codVendedor}
+                {!form.laArena && (
+                    <InputTextOneLine
+                        label="Código Vendedor"
+                        name="codVendedor"
+                        value={form?.codVendedor}
+                        onChange={handleChangeNumberDecimals}
+                        onKeyUp={handleSearch}
+                        required
+                        error={errors.codVendedor}
+                    />
+                )}
+                <InputCheckbox
+                    label="La Arena"
+                    name="laArena"
+                    checked={form.laArena}
+                    onChange={handleCheckBoxChange}
+                    className="font-semibold w-fit"
                 />
             </SectionFieldset>
 
@@ -855,28 +927,32 @@ export default function TicketAsistencial() {
                     error={errors.empresa}
                     labelWidth="120px"
                 />
-                <SelectField
-                    label="Método de pago"
-                    name="metodoPago"
-                    value={form.metodoPago}
-                    onChange={handleChangeSimple}
-                    options={METODOS_PAGO}
-                    inline
-                    labelWidth="120px"
-                    required
-                    error={errors.metodoPago}
-                />
-                <SelectField
-                    label="Autorizado por"
-                    name="autorizadoPor"
-                    value={form.autorizadoPor}
-                    onChange={handleChangeSimple}
-                    options={AUTORIZADO_POR}
-                    inline
-                    labelWidth="120px"
-                    required
-                    error={errors.autorizadoPor}
-                />
+                {!form.laArena && (
+                    <>
+                        <SelectField
+                            label="Método de pago"
+                            name="metodoPago"
+                            value={form.metodoPago}
+                            onChange={handleChangeSimple}
+                            options={METODOS_PAGO}
+                            inline
+                            labelWidth="120px"
+                            required
+                            error={errors.metodoPago}
+                        />
+                        <SelectField
+                            label="Autorizado por"
+                            name="autorizadoPor"
+                            value={form.autorizadoPor}
+                            onChange={handleChangeSimple}
+                            options={AUTORIZADO_POR}
+                            inline
+                            labelWidth="120px"
+                            required
+                            error={errors.autorizadoPor}
+                        />
+                    </>
+                )}
                 <div className="flex flex-wrap items-center gap-6">
                     <p className="w-[120px] font-semibold">Edad:</p>
                     <InputCheckbox
@@ -898,17 +974,14 @@ export default function TicketAsistencial() {
                     <InputCheckbox
                         label="ADULTO"
                         name="adulto"
-                        checked={form.adulto}
+                        checked={esAdulto}
                         disabled
-                    // onChange={handleCheckBoxChange}
                     />
                     <InputCheckbox
                         label="ADULTO MAYOR"
                         name="adultoMayor"
-                        checked={form.adultoMayor}
-                        // onChange={handleCheckBoxChange}
+                        checked={esAdultoMayor}
                         disabled
-                        className="opacity-60"
                     />
                 </div>
                 <EmpleadoComboBox
@@ -921,6 +994,7 @@ export default function TicketAsistencial() {
                 />
             </SectionFieldset>
 
+            {!form.laArena && (<>
             <SectionFieldset legend="Agregar Servicios Ticket" className="grid grid-cols-1 xl:grid-cols-[1fr_150px] gap-x-6 gap-y-3">
                 <div className="grid grid-cols-1 gap-y-3">
                     <div className="flex items-center gap-2">
@@ -1065,7 +1139,7 @@ export default function TicketAsistencial() {
                 </table>
 
             </SectionFieldset>
-
+            </>)}
 
             <BotonesForm
                 form={form}
@@ -1084,12 +1158,14 @@ export default function TicketAsistencial() {
                                     setErrorImprimirTicket("");
                                     handleChangeNumberDecimals(e);
                                 }}
-                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket()}
+                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket(formatoImpresion)}
                                 className={`border rounded px-2 py-1 text-base w-24 ${errorImprimirTicket ? "border-red-500 bg-red-50" : ""}`}
                             />
+                            {/* Excluyentes: La Arena imprime solo en A4; el resto, solo el ticket de 80mm. */}
                             <button
                                 type="button"
-                                onClick={handleImprimirTicket}
+                                onClick={() => handleImprimirTicket(formatoImpresion)}
+                                title="Imprimir ticket"
                                 className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
                             >
                                 <FontAwesomeIcon icon={faPrint} />

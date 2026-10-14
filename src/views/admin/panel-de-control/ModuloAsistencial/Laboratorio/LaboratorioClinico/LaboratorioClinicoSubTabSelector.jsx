@@ -9,14 +9,14 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
       id: 0,
-      permission: "Hematología - Bioquímica - ECO",
+      permission: "Hematologia Bioquimica ECO",
       label: "Hematología - Bioquímica - ECO",
       icon: faDroplet,
       component: HematologiaBioquimicaECO
     },
     {
       id: 1,
-      permission: "Hematograma",
+      permission: "Hemograma",
       label: "Hemograma",
       icon: faVial,
       component: Hematologia
