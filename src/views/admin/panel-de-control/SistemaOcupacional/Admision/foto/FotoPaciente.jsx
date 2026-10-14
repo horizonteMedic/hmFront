@@ -6,7 +6,12 @@ import { Submit } from '../model/Submit';
 
 const MAX_WIDTH = 800; // se reduce la foto para no enviar archivos enormes
 
-const FotoPaciente = ({ close, DNI, Foto, setFoto }) => {
+// `subir(base64)` permite que otro módulo (p. ej. asistencial) registre la foto en su propio endpoint;
+// por defecto se guarda como archivo de empleado, igual que antes.
+const FotoPaciente = ({
+    close, DNI, Foto, setFoto,
+    subir = (base64) => Submit({ dni: DNI, tipoA: 'FOTO_PACIENTE', nombre: 'FotoPaciente.png', base64 })
+}) => {
     const videoRef = useRef(null);
     const streamRef = useRef(null);
 
@@ -122,13 +127,7 @@ const FotoPaciente = ({ close, DNI, Foto, setFoto }) => {
             showConfirmButton: false,
             didOpen: () => Swal.showLoading()
         });
-        const datos = {
-            dni: DNI,
-            tipoA: 'FOTO_PACIENTE',
-            nombre: 'FotoPaciente.png',
-            base64: captured.substring(captured.indexOf(',') + 1)
-        };
-        Submit(datos)
+        subir(captured.substring(captured.indexOf(',') + 1))
             .then((res) => {
                 if (res.id) {
                     Swal.fire('Exito', `${res.mensaje}`, 'success');

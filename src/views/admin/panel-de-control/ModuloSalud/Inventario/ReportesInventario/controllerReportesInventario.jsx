@@ -6,6 +6,7 @@ const columnas = [
     { key: "nombre", label: "Nombre", ancho: 42 },
     { key: "presentacion", label: "Presentación", ancho: 22 },
     { key: "uso", label: "Uso", ancho: 36 },
+    { key: "unidades", label: "Unidades", ancho: 12 },
     { key: "stockActual", label: "Stock Actual", ancho: 14 },
     { key: "precioUnitario", label: "Precio Unitario (S/)", ancho: 18 },
     { key: "activo", label: "Activo", ancho: 10 },

@@ -12,7 +12,12 @@ const signer =
   lastName:  "Smith"
 };
 
-const NewPad = ({close, DNI, Firma, setFirma}) => {
+// `subir(base64)` permite que otro módulo (p. ej. asistencial) registre la firma en su propio endpoint;
+// por defecto se guarda como archivo de empleado, igual que antes.
+const NewPad = ({
+    close, DNI, Firma, setFirma,
+    subir = (base64) => Submit({ dni: DNI, tipoA: "FIRMAP", nombre: "FirmaPaciente.png", base64 })
+}) => {
    const [device, setDevice] = useState(null);
    const signatory = useContext(SignerContext);
 
@@ -186,14 +191,7 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
             });
             const base64WithoutHeader = base64.substring(base64.indexOf(',') + 1);
         
-            const datos = {
-              dni: DNI,
-              tipoA: "FIRMAP",
-              nombre: "FirmaPaciente.png",
-              base64: base64WithoutHeader
-            };
-        
-            Submit(datos)
+            subir(base64WithoutHeader)
               .then((res) => {
                 if (res.id) {
                   Swal.fire('Exito',`${res.mensaje}`,'success')
