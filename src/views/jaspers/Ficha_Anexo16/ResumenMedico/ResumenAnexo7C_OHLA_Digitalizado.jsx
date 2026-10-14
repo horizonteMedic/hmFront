@@ -407,8 +407,9 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, 168 - 35);
   yTexto += filaAltura;
 
-  // Foto del paciente (filas DNI → Puesto, columna derecha)
-  if (data.urlFotoPaciente) {
+  // Foto del paciente (filas DNI → Puesto, columna derecha) — solo para LA ARENA S.A.
+  const esLaArena = datosFinales.empresa.toUpperCase().includes('LA ARENA S.A.') || datosFinales.contrata.toUpperCase().includes('LA ARENA S.A.');
+  if (data.urlFotoPaciente && esLaArena) {
     try {
       const fotoResp = await fetch(data.urlFotoPaciente);
       if (fotoResp.ok) {

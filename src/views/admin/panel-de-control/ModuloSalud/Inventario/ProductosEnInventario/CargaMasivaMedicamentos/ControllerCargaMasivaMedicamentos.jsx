@@ -1,9 +1,9 @@
-import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { postJson } from "../../../utils/apiSalud";
 import { descargarLibro } from "../../../utils/descargarLibro";
 import { nombreSeguro } from "../../../utils/excelReporte";
 import { normalizar } from "../../../utils/filtrarPorTexto";
+import { leerFilas, numero, texto } from "./celdasExcel";
 
 const URL_MASIVO = "/api/medicamentos/masivo";
 
@@ -17,22 +17,15 @@ const columnas = [
     { campo: "precioUnitario", etiqueta: "PRECIO UNITARIO", alias: ["PRECIO", "P. UNITARIO"], ancho: 18 },
 ];
 
-const ETIQUETA_ESTADO = { success: "REGISTRADO", error: "ERROR", invalida: "INVÁLIDA", pendiente: "PENDIENTE" };
-
-const texto = (valor) => String(valor ?? "").trim();
-
-// Número de una celda: vale un número de Excel o un texto como "2,5" o "S/ 2.50". Devuelve null si está
-// vacía y, si no es un número, el texto tal cual (para poder mostrarlo en la fila inválida).
-const numero = (valor) => {
-    if (typeof valor === "number") return valor;
-    const celda = texto(valor);
-    if (!celda) return null;
-    const limpio = celda.replace(/[^\d.,-]/g, "").replace(",", ".");
-    return /\d/.test(limpio) && !Number.isNaN(Number(limpio)) ? Number(limpio) : celda;
+const ETIQUETA_ESTADO = {
+    error: "ERROR",
+    invalida: "INVÁLIDA",
+    pendiente: "PENDIENTE",
+    sinCambios: "SIN CAMBIOS",
 };
 
 // Mensaje del primer dato inválido de la fila, o "" si está completa. Unidades y precio son opcionales.
-const errorDeFila = ({ nombre, presentacion, unidades, precioUnitario }) => {
+export const errorDeFila = ({ nombre, presentacion, unidades, precioUnitario }) => {
     if (!nombre) return "Falta el nombre";
     if (!presentacion) return "Falta la presentación";
     if (unidades !== null && !(Number.isInteger(unidades) && unidades >= 0)) return "Las unidades deben ser un número entero (0 o más)";
@@ -41,12 +34,12 @@ const errorDeFila = ({ nombre, presentacion, unidades, precioUnitario }) => {
 };
 
 // El backend no valida duplicados: con el mismo nombre y presentación crearía otra fila
-const claveMedicamento = ({ nombre, presentacion }) => `${normalizar(nombre).trim()}|${normalizar(presentacion).trim()}`;
+export const claveMedicamento = ({ nombre, presentacion }) => `${normalizar(nombre).trim()}|${normalizar(presentacion).trim()}`;
 
-const estilarEncabezado = (hoja) =>
+export const estilarEncabezado = (hoja) =>
     hoja.getRow(1).eachCell((celda) => {
         celda.font = { bold: true };
-        celda.alignment = { horizontal: "center", vertical: "middle" };
+        celda.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         celda.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
     });
 
@@ -65,41 +58,28 @@ export const descargarPlantillaMedicamentos = async () => {
 // avisa de posibles duplicados con `existentes` (los medicamentos que la campaña ya tiene) o con filas
 // anteriores del mismo archivo.
 export const leerExcelMedicamentos = async (archivo, existentes) => {
-    const libro = XLSX.read(await archivo.arrayBuffer(), { type: "array" });
-    const filas = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]], { defval: "" });
     const vistos = new Set(existentes.map(claveMedicamento));
 
-    return filas
-        .map((fila) => {
-            const celdas = Object.fromEntries(Object.entries(fila).map(([clave, valor]) => [normalizar(clave).trim(), valor]));
-            return Object.fromEntries(
-                columnas.map(({ campo, etiqueta, alias = [] }) => {
-                    const encabezado = [etiqueta, ...alias].map(normalizar).find((e) => e in celdas);
-                    return [campo, celdas[encabezado]];
-                })
-            );
-        })
-        .filter((crudo) => Object.values(crudo).some((valor) => texto(valor) !== ""))
-        .map((crudo) => {
-            const medicamento = {
-                nombre: texto(crudo.nombre),
-                presentacion: texto(crudo.presentacion),
-                uso: texto(crudo.uso),
-                unidades: numero(crudo.unidades),
-                precioUnitario: numero(crudo.precioUnitario),
-            };
-            const error = errorDeFila(medicamento);
-            if (error) return { ...medicamento, estado: "invalida", mensaje: error };
+    return (await leerFilas(archivo, columnas)).map((crudo) => {
+        const medicamento = {
+            nombre: texto(crudo.nombre),
+            presentacion: texto(crudo.presentacion),
+            uso: texto(crudo.uso),
+            unidades: numero(crudo.unidades),
+            precioUnitario: numero(crudo.precioUnitario),
+        };
+        const error = errorDeFila(medicamento);
+        if (error) return { ...medicamento, estado: "invalida", mensaje: error };
 
-            const clave = claveMedicamento(medicamento);
-            const repetido = vistos.has(clave);
-            vistos.add(clave);
-            return {
-                ...medicamento,
-                estado: "pendiente",
-                mensaje: repetido ? "Posible duplicado: ya existe en la campaña o se repite en el archivo" : "",
-            };
-        });
+        const clave = claveMedicamento(medicamento);
+        const repetido = vistos.has(clave);
+        vistos.add(clave);
+        return {
+            ...medicamento,
+            estado: "pendiente",
+            mensaje: repetido ? "Posible duplicado: ya existe en la campaña o se repite en el archivo" : "",
+        };
+    });
 };
 
 // ¿Es este fallo el de esta fila? El backend informa el medicamento por su nombre (`nombresPa`).
@@ -141,16 +121,25 @@ export const guardarCargaMasivaMedicamentos = async (filas, campaniaId, token) =
     return { resultados, sinFila, respuesta };
 };
 
-export const exportarResultadosMedicamentos = async (resultados, codigoCampania) => {
+// Excel con el resultado de una carga: las `columnas` de cada fila más su estado y su mensaje.
+// `etiquetaExito` es cómo se llama el estado de las filas que salieron bien.
+export const exportarResultados = async (columnasDeFila, resultados, prefijoArchivo, codigoCampania, etiquetaExito = "REGISTRADO") => {
     const libro = new ExcelJS.Workbook();
     const hoja = libro.addWorksheet("RESULTADO");
-    hoja.addRow([...columnas.map((c) => c.etiqueta), "ESTADO", "MENSAJE"]);
+    hoja.addRow([...columnasDeFila.map((c) => c.etiqueta), "ESTADO", "MENSAJE"]);
     resultados.forEach((fila) =>
-        hoja.addRow([...columnas.map((c) => fila[c.campo]), ETIQUETA_ESTADO[fila.estado], fila.mensaje || ""])
+        hoja.addRow([
+            ...columnasDeFila.map((c) => fila[c.campo]),
+            fila.estado === "success" ? etiquetaExito : ETIQUETA_ESTADO[fila.estado],
+            fila.mensaje || "",
+        ])
     );
     estilarEncabezado(hoja);
-    hoja.columns = [...columnas.map((c) => ({ width: c.ancho })), { width: 14 }, { width: 50 }];
+    hoja.columns = [...columnasDeFila.map((c) => ({ width: c.ancho })), { width: 14 }, { width: 50 }];
 
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    await descargarLibro(libro, `Resultado_CargaMasivaMedicamentos_${nombreSeguro(codigoCampania)}_${fecha}.xlsx`);
+    await descargarLibro(libro, `${prefijoArchivo}_${nombreSeguro(codigoCampania)}_${fecha}.xlsx`);
 };
+
+export const exportarResultadosMedicamentos = (resultados, codigoCampania) =>
+    exportarResultados(columnas, resultados, "Resultado_CargaMasivaMedicamentos", codigoCampania);

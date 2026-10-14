@@ -135,7 +135,14 @@ export default function ProductosEnInventario({ campania }) {
                 <AjusteStockModal token={token} usuario={usuario} medicamento={modal.medicamento} onClose={cerrar} onGuardado={recargar} />
             )}
             {modal?.tipo === "masiva" && (
-                <CargaMasivaMedicamentos token={token} campania={campania} existentes={medicamentos} onClose={cerrar} onCargado={recargar} />
+                <CargaMasivaMedicamentos
+                    token={token}
+                    usuario={usuario}
+                    campania={campania}
+                    existentes={medicamentos}
+                    onClose={cerrar}
+                    onCargado={recargar}
+                />
             )}
         </div>
     );
