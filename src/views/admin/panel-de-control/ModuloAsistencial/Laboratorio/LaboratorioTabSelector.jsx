@@ -12,14 +12,14 @@ export default function LaboratorioTabSelector({ tieneVista }) {
     const tabsConfig = [
         {
             id: 0,
-            permission: "Laboratorio Clinico Formulario",
+            permission: "Laboratorio Clinico",
             label: "Laboratorio Clínico",
             icon: faFlask,
             component: LaboratorioClinicoSubTabSelector
         },
         {
             id: 1,
-            permission: "Laboratorio Clinico Formulario",
+            permission: "Analisis Bioquimicos",
             label: "Análisis Bioquímicos",
             icon: faFilter,
             component: AnalisisBioquimicosSubTabSelector

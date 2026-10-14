@@ -146,7 +146,6 @@ export default function EmpleadoComboBox({
             safeEmpleados.find((emp) => mismo(emp.username, id)) ??
             (userName ? safeEmpleados.find((emp) => mismo(emp.nombres, userName)) : undefined);
         if (!equivalente?.username) return;
-        console.warn(`EmpleadoComboBox: el usuario de la sesión "${id}" no coincide con el username "${equivalente.username}" de listaEmpleados; se usa este último.`);
         onChange({
             target: {
                 name: idField,
