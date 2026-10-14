@@ -12,13 +12,6 @@ export const FORMULARIO_VACIO = {
 
 const porNombre = (a, b) => (a.nombre ?? "").localeCompare(b.nombre ?? "", "es");
 
-// El backend maneja las «unidades» (UND) de cada medicamento. Si en su respuesta falta `stockActual` o
-// `unidades`, la que falta toma el valor de la otra: así la pantalla siempre cuenta con el stock disponible.
-const conStock = (medicamento) => {
-    const stock = medicamento.stockActual ?? medicamento.unidades ?? 0;
-    return { ...medicamento, stockActual: stock, unidades: medicamento.unidades ?? stock };
-};
-
 // Medicamentos activos de UNA campaña. Cada campaña tiene los suyos (el mismo medicamento puede existir en
 // varias, con stock independiente): sin `campaniaId` el backend trae los de todas mezcladas, por eso nunca
 // se piden sin él.
@@ -28,11 +21,11 @@ export const getMedicamentos = async (campaniaId, token) => {
         token,
         "No se pudo cargar la lista de medicamentos"
     );
-    return medicamentos.map(conStock).sort(porNombre);
+    return medicamentos.sort(porNombre);
 };
 
-export const getMedicamento = async (id, token) =>
-    conStock(await getJson(`${URL_MEDICAMENTOS}/${id}`, token, "No se pudo cargar el detalle del medicamento"));
+export const getMedicamento = (id, token) =>
+    getJson(`${URL_MEDICAMENTOS}/${id}`, token, "No se pudo cargar el detalle del medicamento");
 
 const formatoMoneda = new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" });
 
@@ -69,11 +62,15 @@ export const crearMedicamento = (formulario, campaniaId, token) =>
 export const editarMedicamento = (id, formulario, token) =>
     putJson(`${URL_MEDICAMENTOS}/${id}`, cuerpoMedicamento(formulario), token, "No se pudo editar el medicamento");
 
-// Suma `cantidad` al stock del medicamento. Lote y fecha de vencimiento son obligatorios para el backend.
-export const registrarIngresoStock = (medicamentoId, { cantidad, lote, fechaVencimiento, motivo }, usuarioRegistro, token) =>
+// El backend solo acepta ajustes de los cargos FARMACIA, SUPERVISOR o ADMIN.
+const CARGO_AJUSTE = "FARMACIA";
+
+// Ajuste manual del stock, una medida extraordinaria para corregir un error de carga. `diferencia` lleva el
+// signo: positiva suma, negativa resta. Siempre corrige también las unidades del medicamento.
+export const ajustarStock = (medicamentoId, { diferencia, motivo }, usuarioRegistro, token) =>
     postJson(
-        `/api/inventario/medicamentos/${medicamentoId}/ingresos`,
-        { cantidad: Number(cantidad), lote: lote.trim(), fechaVencimiento, usuarioRegistro, motivo: motivo.trim() },
+        `/api/inventario/medicamentos/${medicamentoId}/ajustes`,
+        { diferencia, corregirUnidades: true, usuarioRegistro, cargoUsuarioRegistro: CARGO_AJUSTE, motivo: motivo.trim() },
         token,
-        "No se pudo registrar el ingreso de stock"
+        "No se pudo registrar el ajuste de stock"
     );

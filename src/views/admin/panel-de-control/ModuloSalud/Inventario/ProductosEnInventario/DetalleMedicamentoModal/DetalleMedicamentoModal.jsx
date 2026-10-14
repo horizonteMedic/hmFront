@@ -65,8 +65,8 @@ export default function DetalleMedicamentoModal({ id, token, onClose, onEditar }
                     <Campo label="Presentación" value={medicamento.presentacion} />
                     <Campo label="Uso" value={medicamento.uso} />
                     <Campo label="Precio unitario" value={formatearPrecio(medicamento.precioUnitario)} />
-                    <Campo label="Stock actual" value={medicamento.stockActual} />
-                    {medicamento.unidades !== medicamento.stockActual && <Campo label="Unidades (UND)" value={medicamento.unidades} />}
+                    <Campo label="Unidades (UND)" value={medicamento.unidades} />
+                    <Campo label="Stock actual" value={medicamento.stockActual ?? 0} />
                 </div>
             ) : (
                 <p className={`text-center ${fallo ? "text-red-500" : "text-gray-500"}`}>

@@ -1,12 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlusMinus } from "@fortawesome/free-solid-svg-icons";
 import { formatearPrecio } from "./controllerProductosEnInventario";
 
 const ENCABEZADO = "px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500";
-const SECUNDARIA = "hidden md:table-cell"; // en pantallas chicas solo quedan Nombre, Presentación, Stock y el «+»
+const SECUNDARIA = "hidden md:table-cell"; // en pantallas chicas solo quedan Nombre, Presentación, Stock y el botón de ajuste
 
-// Clic en la fila: ver el detalle. El «+» de la última columna abre el ingreso de stock sin abrir el detalle.
-export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyText, onSeleccionar, onIngresarStock }) {
+// Clic en la fila: ver el detalle. El botón «±» de la última columna abre el ajuste de stock sin abrir el detalle.
+export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyText, onSeleccionar, onAjustarStock }) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full min-w-full">
@@ -23,7 +23,8 @@ export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyTe
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                     {medicamentos.map((medicamento, i) => {
-                        const sinStock = medicamento.stockActual <= 0;
+                        const stock = medicamento.stockActual ?? 0;
+                        const sinStock = stock <= 0;
                         return (
                             <tr
                                 key={medicamento.id}
@@ -39,20 +40,20 @@ export default function MedicamentosTabla({ medicamentos, numeroInicial, emptyTe
                                     {formatearPrecio(medicamento.precioUnitario)}
                                 </td>
                                 <td className={`px-3 py-3 font-semibold ${sinStock ? "text-red-600" : "text-gray-700"}`} title={sinStock ? "Sin stock" : undefined}>
-                                    {medicamento.stockActual}
+                                    {stock}
                                 </td>
                                 <td className="px-2 py-3 text-center">
                                     <button
                                         type="button"
-                                        title="Agregar stock"
-                                        aria-label={`Agregar stock a ${medicamento.nombre}`}
+                                        title="Ajustar stock"
+                                        aria-label={`Ajustar stock de ${medicamento.nombre}`}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onIngresarStock(medicamento);
+                                            onAjustarStock(medicamento);
                                         }}
                                         className="azul-btn inline-flex h-7 w-7 items-center justify-center rounded-full"
                                     >
-                                        <FontAwesomeIcon icon={faPlus} className="text-xs" />
+                                        <FontAwesomeIcon icon={faPlusMinus} className="text-xs" />
                                     </button>
                                 </td>
                             </tr>

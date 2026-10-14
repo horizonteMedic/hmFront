@@ -5,7 +5,12 @@ import Swal from 'sweetalert2';
 import { Submit } from '../model/Submit';
 import { getFetch } from '../../../getFetch/getFetch.js';
 
-const NewHuellaFut = ({close, DNI, Huella, setHuella}) => {
+// `subir(base64)` permite que otro módulo (p. ej. asistencial) registre la huella en su propio endpoint;
+// por defecto se guarda como archivo de empleado, igual que antes.
+const NewHuellaFut = ({
+    close, DNI, Huella, setHuella,
+    subir = (base64) => Submit({ dni: DNI, tipoA: "HUELLA", nombre: "HuellaPaciente.png", base64 })
+}) => {
     const SERVER_URL = "http://127.0.0.1:15270/fpoperation";
     const [statusMsg, setStatusMsg] = useState("");
     const [statusColor, setStatusColor] = useState("blue");
@@ -240,13 +245,7 @@ const NewHuellaFut = ({close, DNI, Huella, setHuella}) => {
           }
         });
       const base64WithoutHeader = base64.substring(base64.indexOf(',') + 1);
-      const datos = {
-        dni: DNI,
-        tipoA: "HUELLA",
-        nombre: "HuellaPaciente.png",
-        base64: base64WithoutHeader
-      }
-      Submit(datos)
+      subir(base64WithoutHeader)
       .then((res) => {
         if (res.id) {
           Swal.fire('Exito',`${res.mensaje}`,'success') 

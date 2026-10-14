@@ -12,6 +12,7 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte } from "./controllerRegistroAsistencial";
+import ArchivosPaciente from "./ArchivosPaciente/ArchivosPaciente";
 import {
     ComboboxProfesión,
     ComboboxDepartamentos,
@@ -564,7 +565,9 @@ export default function RegistroAsistencial() {
                 />
             </SectionFieldset>
 
-                    
+            {/* ===== SECCIÓN: FIRMA, HUELLA Y FOTO (por N° de Historia Clínica) ===== */}
+            <ArchivosPaciente numeroHistoriaClinica={form.NHCL} token={token} />
+
             {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
             {hayRegistroCargado && (
                 <AuditoriaRegistro
