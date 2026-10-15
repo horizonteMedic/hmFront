@@ -440,8 +440,9 @@ export default async function ResumenAnexo7CP_Digitalizado(data = {}, docExisten
   dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, 168 - 30);
   yTexto += filaAltura;
 
-  // Foto del paciente (cubre filas 1-5, columna derecha)
-  if (data.urlFotoPaciente) {
+  // Foto del paciente (cubre filas 1-5, columna derecha) — solo para LA ARENA S.A.
+  const esLaArena = datosFinales.empresa.toUpperCase().includes('LA ARENA S.A.') || datosFinales.contrata.toUpperCase().includes('LA ARENA S.A.');
+  if (data.urlFotoPaciente && esLaArena) {
     try {
       const fotoResp = await fetch(data.urlFotoPaciente);
       if (fotoResp.ok) {
