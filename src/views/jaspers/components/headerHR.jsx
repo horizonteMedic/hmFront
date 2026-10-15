@@ -1,5 +1,5 @@
 // views/jaspers/components/headerHR.js
-import drawQrRedondeado from "./drawQrRedondeado";
+import drawQr from "./drawQr";
 
 // opciones.qr = true → en lugar del cuadro de color se dibuja un QR con el N° de orden
 const headerHR = (doc, datos, opciones = {}) => {
@@ -34,8 +34,10 @@ const headerHR = (doc, datos, opciones = {}) => {
   console.log("colorValido", colorValido);
   if (opciones.qr) {
     if (datos.orden) {
-      const qrSize = 17;
-      drawQrRedondeado(doc, datos.orden, pageW - margin - qrSize, yOffset + 1, qrSize);
+      // Entre la línea superior (y=10) y el N° de orden (y≈29.4) quedan ~19 mm:
+      // QR de 16 mm centrado ahí deja ~2 módulos de zona de silencio arriba y abajo
+      const qrSize = 16;
+      drawQr(doc, datos.orden, pageW - margin - qrSize, yOffset + 1.8, qrSize);
     }
   } else if (colorValido) {
     // color = datos.codigoColor || "#008f39";
