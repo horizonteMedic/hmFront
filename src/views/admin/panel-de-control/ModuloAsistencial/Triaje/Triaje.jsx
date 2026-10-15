@@ -69,6 +69,9 @@ export default function TriajeAsistencial() {
         ocupacional: true,
         asistencial: false,
 
+        // Cliente La Arena: cambia el criterio de validación de Sat. O2 (solo UI, no se envía al backend).
+        laArena: false,
+
         // Ticket / identificación del paciente
         ticketId: null,
         pacienteId: null,
@@ -132,6 +135,7 @@ export default function TriajeAsistencial() {
         handleChangeNumberDecimals,
         handleClear,
         handleChangeSimple,
+        handleCheckBoxChange,
     } = useForm(initialFormState, { storageKey: 'triaje_asistencial' });
 
     const {
@@ -302,6 +306,14 @@ export default function TriajeAsistencial() {
                     edited={isFieldEdited('fechaExamen')}
                     onRevert={() => revertField('fechaExamen')}
                     labelWidth="120px"
+                />
+                <InputCheckbox
+                    label="La Arena"
+                    name="laArena"
+                    checked={form.laArena}
+                    onChange={handleCheckBoxChange}
+                    disabled={camposDeshabilitados}
+                    className="font-semibold w-fit"
                 />
             </SectionFieldset>
             <DatosPersonalesLaboralesAsistencial form={form} />

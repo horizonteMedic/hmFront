@@ -181,14 +181,19 @@ const formFromHistoriaPropia = (data, today) => ({
     spg_fracturas: data.fracturas ?? "",
     spg_sitio_anatomico: data.sitioAnatomico ?? "",
     observaciones: data.observaciones ?? "",
-
-
+    // Examen / diagnóstico / tratamiento: editables y se envían al guardar, así que también se completan
+    // desde un registro previo (ver OpenModalHistorialPrevio).
+    examenFisico: data.examenFisico ?? "",
+    examenesAuxiliares: data.examenesAuxiliares ?? "",
+    diagnostico: data.diagnostico ?? "",
+    tratamiento: data.tratamiento ?? "",
+    seguimientoYControl: data.seguimientoYControl ?? "",
 });
 
-// Campos de SOLO LECTURA que el backend arma a partir de OTROS módulos (AntecedentesPatologicos y la
-// consulta del ticket): no se envían al guardar (son readOnly en el DTO). Pertenecen al paciente/ticket,
-// no a esta Historia Clínica, así que solo se cargan con el ticket buscado y NUNCA al completar con un
-// registro previo (ver OpenModalHistorialPrevio).
+// Campos de SOLO LECTURA que el backend arma a partir de OTROS módulos (AntecedentesPatologicos): no se
+// envían al guardar (son readOnly en el DTO). Pertenecen al paciente, no a esta Historia Clínica, así que
+// solo se cargan con el ticket buscado y NUNCA al completar con un registro previo (ver
+// OpenModalHistorialPrevio).
 const formFromInformativos = (data) => ({
     numeroHistoriaClinica: data.numeroHistoriaClinica ?? data.paciente?.numeroHistoriaClinica ?? "",
     grupo_sanguineo: data.grupoSanguineo ?? "",
@@ -206,11 +211,6 @@ const formFromInformativos = (data) => ({
         diasHospitalizacion: q.diasHospitalizacion ?? "",
         complicaciones: q.complicaciones ?? "",
     })),
-    examenFisico: data.examenFisico ?? "",
-    examenesAuxiliares: data.examenesAuxiliares ?? "",
-    diagnostico: data.diagnostico ?? "",
-    tratamiento: data.tratamiento ?? "",
-    seguimientoYControl: data.seguimientoYControl ?? "",
     // Vacunas ya registradas (con id para poder eliminarlas). Las nuevas se agregan en vacunasNuevas.
     vacunas: (Array.isArray(data.vacunas) ? data.vacunas : []).map((v) => ({
         id: v.id,
@@ -252,6 +252,8 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...formFromPaciente(paciente),
         ...formFromHistoria(data, today),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
+        // Un registro NUEVO siempre abre con la fecha de hoy; la fecha guardada solo manda si ya existe.
+        ...(tieneRegistro ? {} : { fecha_apertura_hcl: today }),
         n_hcl: String(numeroTicket),
         // Si ya hay Historia Clínica, el bloque IMPRIMIR queda apuntando a este ticket.
         ticketImprimir: tieneRegistro ? String(numeroTicket) : "",
@@ -312,6 +314,8 @@ const OpenModalHistorialPrevio = async (numeroTicket, token, set, today, listaEm
         // del ticket actual. Es un registro NUEVO: sin id ni auditoría.
         ...formFromHistoriaPropia(registro, today),
         ...resolverMedico(registro.doctorAsignado, listaEmpleados, prev),
+        // La fecha de apertura es la de ESTE formulario (hoy), no la del registro que se copia.
+        fecha_apertura_hcl: prev.fecha_apertura_hcl || today,
         id: null,
         tieneRegistro: false,
         userRegistro: "",
@@ -437,11 +441,30 @@ export const EliminarVacuna = async (idVacuna, token, onSuccess = () => { }) => 
     }
 };
 
-// Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar): lo usa la
-// cabecera del reporte.
+// Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar). OJO: `selectedSede`
+// solo se llena cuando el usuario elige una sede en el Navbar (al iniciar sesión queda en null), así que
+// por sí sola no basta para rotular el reporte: ver sedeDelTicket.
 const nombreSedeActual = () => {
     const { userlogued, selectedSede } = useAuthStore.getState();
-    return userlogued?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede ?? "";
+    return userlogued?.sedes?.find((sede) => String(sede.cod_sede) === String(selectedSede))?.nombre_sede ?? "";
+};
+
+// Sede que rotula el reporte: la del TICKET (infoTicket.sede), que es donde se atendió al paciente y no
+// depende de lo que haya elegido el usuario en el Navbar. Puede llegar como nombre o como código de sede
+// (el ticket se emite con serieTicket = cod_sede): si es un código de las sedes del usuario se muestra su
+// nombre; si no hay nada, se usa la sede de la sesión actual.
+const sedeDelTicket = (ticket) => {
+    const { userlogued } = useAuthStore.getState();
+    const sedes = Array.isArray(userlogued?.sedes) ? userlogued.sedes : [];
+    const norm = (valor) => String(valor ?? "").trim().toUpperCase();
+    const nombrePorCodigo = (codigo) => (norm(codigo) ? sedes.find((sede) => norm(sede.cod_sede) === norm(codigo))?.nombre_sede : "");
+
+    return (
+        nombrePorCodigo(ticket?.sede) ||
+        String(ticket?.sede ?? "").trim() ||
+        nombrePorCodigo(ticket?.serieTicket) ||
+        nombreSedeActual()
+    );
 };
 
 // Datos que consume el Jasper: mismos nombres de campo del formulario, armados con los mappers de
@@ -454,7 +477,7 @@ const construirDatosImpresion = (data) => {
         // El reporte rotula "Apellidos y nombres" y lleva la ocupación (el formulario no la muestra).
         nombreCompleto: `${paciente?.apellidos ?? ""} ${paciente?.nombres ?? ""}`.trim(),
         ocupacion: paciente?.ocupacion ?? "",
-        sede: nombreSedeActual(),
+        sede: sedeDelTicket(data.infoTicket),
         numeroTicket: data.numeroTicket ?? "",
         nombre_medico: data.doctorAsignado ?? "",
     };

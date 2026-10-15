@@ -366,14 +366,15 @@ export default async function HistoriaClinicaAdultoMayor_Digitalizado(data = {},
     await filaFlex(fila.map(({ etiqueta, campo }) => ({ etiqueta, valor: data[campo], ancho })));
   }
 
-  // ----- Antecedentes quirúrgicos (solo si hay registros) -----
+  // ----- Antecedentes quirúrgicos (siempre se imprime, como la tabla del formulario) -----
   const quirurgicos = Array.isArray(data.quirurgicos) ? data.quirurgicos : [];
-  if (quirurgicos.length > 0) {
-    await seccion("ANTECEDENTES QUIRÚRGICOS", ALTO_FILA * 2);
-    await filaFlex(COLUMNAS_QUIRURGICOS.map(({ etiqueta, ancho }) => ({ etiqueta, ancho })));
-    for (const registro of quirurgicos) {
-      await filaFlex(COLUMNAS_QUIRURGICOS.map(({ campo, ancho }) => ({ valor: registro[campo], ancho })));
-    }
+  await seccion("ANTECEDENTES QUIRÚRGICOS", ALTO_FILA * 3);
+  await filaFlex(COLUMNAS_QUIRURGICOS.map(({ etiqueta, ancho }) => ({ etiqueta, ancho })));
+  if (quirurgicos.length === 0) {
+    await filaFlex([{ valor: "No hay antecedentes quirúrgicos registrados", ancho: ANCHO }]);
+  }
+  for (const registro of quirurgicos) {
+    await filaFlex(COLUMNAS_QUIRURGICOS.map(({ campo, ancho }) => ({ valor: registro[campo], ancho })));
   }
 
   // ----- Medicamentos -----
