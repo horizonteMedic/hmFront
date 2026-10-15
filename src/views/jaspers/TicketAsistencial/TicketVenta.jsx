@@ -51,6 +51,8 @@ export default async function TicketVenta({
     documentoIdentidad = "",
     nombres = "",
     edad = null,
+    cargo = "",
+    area = "",
     medico = "",
     fecha = "",
     numeroTicket = "",
@@ -79,6 +81,8 @@ export default async function TicketVenta({
 
     const razonSocialLineas = medir(8, RAZON_SOCIAL, ancho - margenLateral * 2);
     const nombreLineas = medir(9, nombres, ancho - margenLateral * 2 - 24);
+    const cargoLineas = medir(9, cargo || "-", ancho - anchoValor - margenLateral);
+    const areaLineas = medir(9, area || "-", ancho - anchoValor - margenLateral);
     const medicoLineas = medir(9, medico || "-", ancho - anchoValor - margenLateral);
     const itemsMedidos = items.map((item) => ({
         item,
@@ -101,6 +105,8 @@ export default async function TicketVenta({
     altoDoc += Math.max(nombreLineas.length * 4.2, 5) + 2; // paciente
     altoDoc += 6; // documento
     altoDoc += 6; // edad
+    altoDoc += Math.max(cargoLineas.length * 4.2, 5) + 1; // cargo
+    altoDoc += Math.max(areaLineas.length * 4.2, 5) + 1; // área
     altoDoc += Math.max(medicoLineas.length * 4.2, 5) + 3; // médico
     altoDoc += 6; // separador
     altoDoc += 5; // fecha
@@ -177,6 +183,21 @@ export default async function TicketVenta({
     doc.setFont("helvetica", "normal");
     doc.text(edad !== null && edad !== undefined && edad !== "" ? `${edad} años` : "-", anchoValor, y);
     y += 6;
+
+    // ── Cargo y Área (el valor puede ocupar varias líneas) ────────────────────
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("Cargo:", margenLateral, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(cargoLineas, anchoValor, y);
+    y += Math.max(cargoLineas.length * 4.2, 5) + 1;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("Área:", margenLateral, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(areaLineas, anchoValor, y);
+    y += Math.max(areaLineas.length * 4.2, 5) + 1;
 
     // ── Médico (el valor arranca en la misma columna que las filas de arriba) ─
     doc.setFont("helvetica", "bold");

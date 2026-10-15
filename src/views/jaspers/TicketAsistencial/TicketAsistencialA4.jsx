@@ -79,7 +79,9 @@ export default async function TicketAsistencialA4({
     documentoIdentidad = "",
     nombres = "",
     edad = null,
-    empresa = "", 
+    empresa = "",
+    cargo = "",
+    area = "",
     medico = "",
 } = {}) {
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -159,7 +161,15 @@ export default async function TicketAsistencialA4({
         ],
         y
     );
-    y = fila(doc, [{ etiqueta: "Empresa", texto: valor(empresa) }], y); 
+    y = fila(doc, [{ etiqueta: "Empresa", texto: valor(empresa) }], y);
+    y = fila(
+        doc,
+        [
+            { etiqueta: "Cargo", texto: valor(cargo) },
+            { etiqueta: "Área", texto: valor(area) },
+        ],
+        y
+    );
     y = fila(doc, [{ etiqueta: "Doctor", texto: valor(medico) }], y);
 
     // ── Cierre (al pie de la hoja, o a continuación si el contenido llega hasta ahí) ──

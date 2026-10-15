@@ -390,6 +390,8 @@ export default function TicketAsistencial() {
         // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
         laArena: false,
 
+        cargo: "",
+        area: "",
         metodoPago: "",
         autorizadoPor: "",
 
@@ -686,6 +688,8 @@ export default function TicketAsistencial() {
             operador: userlogued || null,
             modoPago: !esLaArena && form.metodoPago ? form.metodoPago : null,
             empresa: form.empresa || null,
+            cargo: form.cargo?.trim() || null,
+            area: form.area?.trim() || null,
             codigoVendedor: !esLaArena && form.codVendedor ? Number(form.codVendedor) : null,
             autoriza: !esLaArena && form.autorizadoPor ? form.autorizadoPor : null,
             contenidos: esLaArena
@@ -724,7 +728,7 @@ export default function TicketAsistencial() {
                 </p>
             `,
             showCancelButton: true,
-            confirmButtonText: esLaArena ? "Hoja A4" : "Ticket 80mm",
+            confirmButtonText: "Si, imprimir",
             cancelButtonText: "No imprimir",
         }).then((result) => {
             if (!result.isConfirmed) return;
@@ -755,6 +759,8 @@ export default function TicketAsistencial() {
             documentoIdentidad: ticket.pacienteDni,
             nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
             edad: ticket.pacienteEdad,
+            cargo: ticket.cargo,
+            area: ticket.area,
             medico: ticket.medico,
             fecha: ticket.fechaTicket,
             numeroTicket: ticket.numeroTicket,
@@ -797,6 +803,8 @@ export default function TicketAsistencial() {
             nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
             edad: ticket.pacienteEdad,
             empresa: ticket.empresa,
+            cargo: ticket.cargo,
+            area: ticket.area,
             metodoPago: METODOS_PAGO.find((m) => m.value === ticket.modoPago)?.label ?? ticket.modoPago,
             autorizadoPor: AUTORIZADO_POR.find((a) => a.value === ticket.autoriza)?.label ?? ticket.autoriza,
             medico: ticket.medico,
@@ -926,6 +934,20 @@ export default function TicketAsistencial() {
                     onSelect={(emp) => setForm((f) => ({ ...f, empresa: emp.mensaje ?? "" }))}
                     error={errors.empresa}
                     labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Cargo"
+                    name="cargo"
+                    value={form.cargo}
+                    labelWidth="120px"
+                    onChange={handleChange}
+                />
+                <InputTextOneLine
+                    label="Área"
+                    name="area"
+                    value={form.area}
+                    labelWidth="120px"
+                    onChange={handleChange}
                 />
                 {!form.laArena && (
                     <>
