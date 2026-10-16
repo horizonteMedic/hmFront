@@ -9,6 +9,7 @@ import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import AvisoError from "../AvisoError";
 import { etiquetaMedicamento } from "../inventarioUtils";
 import { ObtenerListaMedicamentos } from "../Medicamentos/controllerMedicamentos";
 import SelectorInventario from "../SelectorInventario";
@@ -34,6 +35,9 @@ const lineaVacia = {
     cantidad: "",
 };
 
+// Ancho común de todas las etiquetas del formulario. "Medicamento :" es la más larga y con 110px quedaba justa.
+const ANCHO_ETIQUETA = "120px";
+
 export default function IngresoStock() {
     const { token, userlogued } = useSessionData();
     const { inventarios, inventarioId, setInventarioId, inventarioActual, errorInventarios, cargarInventarios } = useInventarios(token);
@@ -51,6 +55,8 @@ export default function IngresoStock() {
     );
 
     const totalUnidades = items.reduce((total, item) => total + item.cantidad, 0);
+    // Sin ningún medicamento agregado no hay nada que revisar ni registrar: el detalle y los botones quedan bloqueados.
+    const hayItems = items.length > 0;
 
     const cargarMedicamentos = async () => {
         const res = await ObtenerListaMedicamentos(token, true);
@@ -144,117 +150,116 @@ export default function IngresoStock() {
     ];
 
     return (
-        <div className="space-y-4 px-4 pb-4">
-            <SectionFieldset legend="Datos del Ingreso" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SelectorInventario
-                    inventarios={inventarios}
-                    inventarioId={inventarioId}
-                    onChange={(e) => setInventarioId(e.target.value)}
-                    error={errorInventarios}
-                    onRetry={cargarInventarios}
-                />
-                <InputTextOneLine
-                    label="Referencia"
-                    name="referencia"
-                    labelWidth="110px"
-                    value={form.referencia}
-                    onChange={onChange}
-                />
-            </SectionFieldset>
-
-            <SectionFieldset legend="Agregar Medicamento" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {errorMedicamentos && (
-                    <div className="md:col-span-2 flex items-center justify-between gap-4 p-3 rounded border border-red-300 bg-red-50 text-red-700">
-                        <span>{errorMedicamentos}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start px-4 pb-4">
+            <div className="space-y-4 min-w-0">
+                <SectionFieldset legend="Agregar Medicamento" className="space-y-4">
+                    <AvisoError mensaje={errorMedicamentos} onRetry={cargarMedicamentos} className="" />
+                    <div>
+                        <AutocompleteInput
+                            label="Medicamento"
+                            id="medicamentoIngreso"
+                            labelWidth={ANCHO_ETIQUETA}
+                            value={form.medicamentoTexto}
+                            options={opcionesMedicamento}
+                            searchKey="etiqueta"
+                            nextFocusId="numeroLote"
+                            onChange={onChangeMedicamento}
+                            onSelect={onSelectMedicamento}
+                        />
+                        {errores.medicamento && <p className="mt-1 text-sm text-red-600">{errores.medicamento}</p>}
+                    </div>
+                    <InputTextOneLine
+                        label="N° Lote"
+                        name="numeroLote"
+                        labelWidth={ANCHO_ETIQUETA}
+                        value={form.numeroLote}
+                        onChange={onChange}
+                    />
+                    <InputTextOneLine
+                        label="Vencimiento"
+                        name="fechaVencimiento"
+                        type="date"
+                        labelWidth={ANCHO_ETIQUETA}
+                        value={form.fechaVencimiento}
+                        onChange={onChangeFecha}
+                        required
+                        error={errores.fechaVencimiento}
+                    />
+                    <InputTextOneLine
+                        label="Cantidad"
+                        name="cantidad"
+                        labelWidth={ANCHO_ETIQUETA}
+                        value={form.cantidad}
+                        onChange={onChangeCantidad}
+                        required
+                        error={errores.cantidad}
+                    />
+                    <div className="flex items-start">
                         <button
                             type="button"
-                            onClick={cargarMedicamentos}
-                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded transition-all duration-150 ease-out active:scale-95"
+                            onClick={handleAgregar}
+                            className="
+                                bg-blue-600 hover:bg-blue-700
+                                text-white text-base px-6 py-2 rounded
+                                flex items-center gap-2
+                                transition-all duration-150 ease-out
+                                hover:shadow-lg
+                                active:scale-95 active:shadow-inner"
                         >
-                            Reintentar
+                            <FontAwesomeIcon icon={faPlus} /> Agregar
                         </button>
                     </div>
-                )}
-                <div className="md:col-span-2">
-                    <AutocompleteInput
-                        label="Medicamento"
-                        id="medicamentoIngreso"
-                        value={form.medicamentoTexto}
-                        options={opcionesMedicamento}
-                        searchKey="etiqueta"
-                        nextFocusId="numeroLote"
-                        onChange={onChangeMedicamento}
-                        onSelect={onSelectMedicamento}
-                    />
-                    {errores.medicamento && <p className="mt-1 text-sm text-red-600">{errores.medicamento}</p>}
-                </div>
-                <InputTextOneLine
-                    label="N° Lote"
-                    name="numeroLote"
-                    labelWidth="110px"
-                    value={form.numeroLote}
-                    onChange={onChange}
-                />
-                <InputTextOneLine
-                    label="Vencimiento"
-                    name="fechaVencimiento"
-                    type="date"
-                    labelWidth="110px"
-                    value={form.fechaVencimiento}
-                    onChange={onChangeFecha}
-                    required
-                    error={errores.fechaVencimiento}
-                />
-                <InputTextOneLine
-                    label="Cantidad"
-                    name="cantidad"
-                    labelWidth="110px"
-                    value={form.cantidad}
-                    onChange={onChangeCantidad}
-                    required
-                    error={errores.cantidad}
-                />
-                <div className="flex items-start">
+                </SectionFieldset>
+            </div>
+
+            <div className="space-y-4 min-w-0">
+                <div className="flex justify-end">
                     <button
                         type="button"
-                        onClick={handleAgregar}
+                        onClick={() => setModalMasivo(true)}
+                        disabled={!inventarioActual || medicamentos.length === 0}
                         className="
                             bg-blue-600 hover:bg-blue-700
                             text-white text-base px-6 py-2 rounded
                             flex items-center gap-2
                             transition-all duration-150 ease-out
                             hover:shadow-lg
-                            active:scale-95 active:shadow-inner"
+                            active:scale-95 active:shadow-inner
+                            disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <FontAwesomeIcon icon={faPlus} /> Agregar
+                        <FontAwesomeIcon icon={faFileExcel} /> Ingreso Masivo
                     </button>
                 </div>
-            </SectionFieldset>
 
-            <BotonesForm hideEdit hidePrint saveLabel="Registrar Ingreso" handleSave={handleSave} handleClear={handleLimpiar}>
-                <button
-                    type="button"
-                    onClick={() => setModalMasivo(true)}
-                    disabled={!inventarioActual || medicamentos.length === 0}
-                    className="
-                        bg-blue-600 hover:bg-blue-700
-                        text-white text-base px-6 py-2 rounded
-                        flex items-center gap-2
-                        transition-all duration-150 ease-out
-                        hover:shadow-lg
-                        active:scale-95 active:shadow-inner
-                        disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <FontAwesomeIcon icon={faFileExcel} /> Ingreso Masivo
-                </button>
-            </BotonesForm>
+                <SectionFieldset legend="Detalle del Ingreso" className="space-y-4">
+                    <SelectorInventario
+                        inventarios={inventarios}
+                        inventarioId={inventarioId}
+                        onChange={(e) => setInventarioId(e.target.value)}
+                        error={errorInventarios}
+                        onRetry={cargarInventarios}
+                        labelWidth={ANCHO_ETIQUETA}
+                    />
+                    <InputTextOneLine
+                        label="Referencia"
+                        name="referencia"
+                        labelWidth={ANCHO_ETIQUETA}
+                        value={form.referencia}
+                        onChange={onChange}
+                    />
+                    <div
+                        aria-disabled={!hayItems}
+                        className={`transition-opacity duration-150 ${hayItems ? "" : "opacity-50 pointer-events-none select-none"}`}
+                    >
+                        <TablaTemplate columns={columnas} data={items} height={300} emptyText="Aún no se agregó ningún medicamento" />
+                        <p className="mt-2 text-right font-semibold">
+                            {items.length} lote(s) · {totalUnidades} unidades
+                        </p>
+                    </div>
+                </SectionFieldset>
 
-            <SectionFieldset legend="Detalle del Ingreso">
-                <TablaTemplate columns={columnas} data={items} height={300} emptyText="Aún no se agregó ningún medicamento" />
-                <p className="mt-2 text-right font-semibold">
-                    {items.length} lote(s) · {totalUnidades} unidades
-                </p>
-            </SectionFieldset>
+                <BotonesForm hideEdit hidePrint disabled={!hayItems} saveLabel="Registrar Ingreso" handleSave={handleSave} handleClear={handleLimpiar} />
+            </div>
 
             <ModalIngresoStockMasivo
                 isOpen={modalMasivo}

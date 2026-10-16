@@ -10,6 +10,7 @@ export default function AutocompleteInput({
     onSelect,          // (item) => void
     onChange,          // (value: string) => void — opcional, para limpiar form al borrar
     nextFocusId,       // id del siguiente campo a enfocar tras seleccionar
+    labelWidth,        // opcional: ancho fijo de la etiqueta, para alinearla con los InputTextOneLine del formulario
 }) {
     const [filtered, setFiltered] = useState([]);
 
@@ -28,8 +29,14 @@ export default function AutocompleteInput({
     };
 
     return (
-        <div className="flex w-full justify-center items-center gap-2">
-            <p className="font-semibold">{label}:</p>
+        <div className={`flex w-full justify-center items-center ${labelWidth ? "gap-4" : "gap-2"}`}>
+            {labelWidth ? (
+                <label htmlFor={id} className="font-semibold" style={{ minWidth: labelWidth, maxWidth: labelWidth }}>
+                    {label} :
+                </label>
+            ) : (
+                <p className="font-semibold">{label}:</p>
+            )}
             <div className="relative flex-grow flex items-center">
                 <input
                     autoComplete="off"

@@ -55,7 +55,7 @@ export const CrearItemIngreso = (form, medicamento) => ({
 
 const construirBody = (inventario, referencia, items) => ({
     inventarioId: Number(inventario.id),
-    referencia: limpiarTexto(referencia) || null,
+    referencia: limpiarTexto(referencia),
     items: items.map(({ medicamentoId, nombre, numeroLote, fechaVencimiento, cantidad }) => ({
         medicamentoId,
         nombre,

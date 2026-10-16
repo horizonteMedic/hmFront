@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
-import BotonesForm from "../../../../../components/templates/BotonesForm";
+import SelectorColumnas from "../../../../../components/reusableComponents/SelectorColumnas";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
-import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { usePagination } from "../../../../../utils/listUtils";
@@ -16,33 +15,21 @@ import PaginadorTabla from "../PaginadorTabla";
 import SelectorInventario from "../SelectorInventario";
 import { useConsultaInventario } from "../useConsultaInventario";
 import { useInventarios } from "../useInventarios";
-import {
-    OTRA_PRESENTACION,
-    ObtenerListaMedicamentos,
-    ObtenerTiposMedicamento,
-    RegistrarMedicamento,
-    ValidarMedicamento,
-    opcionesPresentacion,
-} from "./controllerMedicamentos";
+import { ObtenerListaMedicamentos, ObtenerTiposMedicamento } from "./controllerMedicamentos";
 import ModalCargaMasivaMedicamentos from "./ModalCargaMasivaMedicamentos/ModalCargaMasivaMedicamentos";
+import ModalRegistrarMedicamento from "./ModalRegistrarMedicamento/ModalRegistrarMedicamento";
 
-const initialFormState = {
-    nombre: "",
-    presentacion: "",
-    presentacionOtro: "",
-    tipoMedicamento: "",
-    stockMinimo: "",
-};
-
+// Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas.
 const columnas = [
-    { label: "Nombre", accessor: "nombre", width: "19%" },
-    { label: "Presentación", accessor: "presentacion", width: "11%" },
-    { label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "11%" },
-    { label: "Mínimo", accessor: "stockMinimo", width: "7%" },
-    { label: "Actual", width: "7%", render: (row) => row.stockActual ?? "—" },
-    { label: "Reservado", width: "8%", render: (row) => row.stockReservado ?? "—" },
-    { label: "Disponible", width: "9%", render: (row) => <strong>{row.stockDisponible ?? "—"}</strong> },
+    { id: "nombre", label: "Nombre", accessor: "nombre", width: "17%" },
+    { id: "presentacion", label: "Presentación", accessor: "presentacion", width: "10%" },
+    { id: "tipo", label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "10%" },
+    { id: "stockMinimo", label: "Stock Mínimo", accessor: "stockMinimo", width: "9%" },
+    { id: "stockActual", label: "Stock Actual", width: "8%", render: (row) => row.stockActual ?? "—" },
+    { id: "stockReservado", label: "Stock Reservado", width: "10%", render: (row) => row.stockReservado ?? "—" },
+    { id: "stockDisponible", label: "Stock Disponible", width: "10%", render: (row) => <strong>{row.stockDisponible ?? "—"}</strong> },
     {
+        id: "estado",
         label: "Estado",
         width: "8%",
         render: (row) => (
@@ -51,25 +38,33 @@ const columnas = [
             </span>
         ),
     },
-    { label: "Registrado por", width: "10%", render: (row) => row.usuarioRegistroNombre || row.usuarioRegistro },
-    { label: "Fecha de Registro", width: "10%", render: (row) => formatearFechaHora(row.fechaRegistro) },
+    { id: "usuarioRegistro", label: "Registrado por", width: "9%", render: (row) => row.usuarioRegistroNombre || row.usuarioRegistro },
+    { id: "fechaRegistro", label: "Fecha de Registro", width: "9%", render: (row) => formatearFechaHora(row.fechaRegistro) },
 ];
+
+// Columnas que la tabla trae ocultas; el usuario puede mostrarlas desde "Columnas".
+const COLUMNAS_OCULTAS_INICIALES = ["stockMinimo", "stockActual", "stockReservado"];
 
 export default function Medicamentos() {
     const { token, userlogued } = useSessionData();
     const { inventarios, inventarioId, setInventarioId, cargandoInventarios, errorInventarios, cargarInventarios } = useInventarios(token);
-    const { form, handleChange, handleChangeSimple, handleChangeNumberDecimals, handleClear } = useForm(initialFormState);
 
     // El catálogo es único; lo que cambia con el inventario elegido es el stock que se muestra de cada medicamento.
     const { datos: medicamentos, cargando, error: errorMedicamentos, ejecutar } = useConsultaInventario();
     const [tipos, setTipos] = useState([]);
     const [errorTipos, setErrorTipos] = useState("");
-    const [errores, setErrores] = useState({});
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroTipo, setFiltroTipo] = useState("");
+    const [columnasOcultas, setColumnasOcultas] = useState(COLUMNAS_OCULTAS_INICIALES);
+    const [modalRegistro, setModalRegistro] = useState(false);
     const [modalMasivo, setModalMasivo] = useState(false);
 
     const opcionesTipo = useMemo(() => tipos.map((tipo) => ({ value: String(tipo.codigo), label: tipo.descripcion })), [tipos]);
+
+    const columnasVisibles = useMemo(() => columnas.filter((columna) => !columnasOcultas.includes(columna.id)), [columnasOcultas]);
+
+    const alternarColumna = (id) =>
+        setColumnasOcultas((actuales) => (actuales.includes(id) ? actuales.filter((oculta) => oculta !== id) : [...actuales, id]));
 
     const medicamentosFiltrados = useMemo(() => {
         const texto = normalizarTexto(filtroNombre);
@@ -114,134 +109,61 @@ export default function Medicamentos() {
         if (!cargandoInventarios) cargarMedicamentos();
     }, [inventarioId, cargandoInventarios]);
 
-    // Al corregir un campo se le quita el mensaje de error.
-    const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
-
-    const onChange = (e) => {
-        handleChange(e);
-        limpiarError(e.target.name);
-    };
-
-    const onChangeNumero = (e) => {
-        handleChangeNumberDecimals(e, 0);
-        limpiarError(e.target.name);
-    };
-
-    // El select no usa handleChange: este pone el valor en mayúsculas y restaura el cursor, algo que
-    // un <select> no soporta.
-    const onChangeSelect = (e) => {
-        handleChangeSimple(e);
-        limpiarError(e.target.name);
-        if (e.target.name === "presentacion") limpiarError("presentacionOtro");
-    };
-
-    const handleSave = async () => {
-        const erroresForm = ValidarMedicamento(form, medicamentos);
-        setErrores(erroresForm);
-        if (Object.keys(erroresForm).length > 0) return;
-
-        const registrado = await RegistrarMedicamento(form, token, userlogued);
-        if (!registrado) return;
-
-        handleClear();
-        setErrores({});
-        cargarMedicamentos();
-    };
-
-    const handleLimpiar = () => {
-        handleClear();
-        setErrores({});
-    };
+    // Sin los tipos no se puede registrar ni cargar medicamentos (el tipo es obligatorio).
+    const sinTipos = tipos.length === 0;
 
     return (
         <div className="space-y-4 px-4 pb-4">
-            <SectionFieldset legend="Registrar Medicamento" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputTextOneLine
-                    label="Nombre"
-                    name="nombre"
-                    labelWidth="110px"
-                    value={form.nombre}
-                    onChange={onChange}
-                    required
-                    error={errores.nombre}
-                />
-                <SelectField
-                    label="Presentación"
-                    name="presentacion"
-                    value={form.presentacion}
-                    onChange={onChangeSelect}
-                    options={opcionesPresentacion}
-                    inline
-                    labelWidth="110px"
-                    required
-                    error={errores.presentacion}
-                />
-                {form.presentacion === OTRA_PRESENTACION && (
-                    <InputTextOneLine
-                        label="Especifique"
-                        name="presentacionOtro"
-                        labelWidth="110px"
-                        value={form.presentacionOtro}
-                        onChange={onChange}
-                        required
-                        error={errores.presentacionOtro}
-                    />
-                )}
-                <SelectField
-                    label="Tipo"
-                    name="tipoMedicamento"
-                    value={form.tipoMedicamento}
-                    onChange={onChangeSelect}
-                    options={opcionesTipo}
-                    inline
-                    labelWidth="110px"
-                    required
-                    error={errores.tipoMedicamento}
-                />
-                <InputTextOneLine
-                    label="Stock Mínimo"
-                    name="stockMinimo"
-                    labelWidth="110px"
-                    value={form.stockMinimo}
-                    onChange={onChangeNumero}
-                    required
-                    error={errores.stockMinimo}
-                />
-            </SectionFieldset>
-
-            <BotonesForm hideEdit hidePrint saveLabel="Registrar" handleSave={handleSave} handleClear={handleLimpiar}>
-                <button
-                    type="button"
-                    onClick={() => setModalMasivo(true)}
-                    disabled={tipos.length === 0}
-                    className="
-                        bg-blue-600 hover:bg-blue-700
-                        text-white text-base px-6 py-2 rounded
-                        flex items-center gap-2
-                        transition-all duration-150 ease-out
-                        hover:shadow-lg
-                        active:scale-95 active:shadow-inner
-                        disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <FontAwesomeIcon icon={faFileExcel} /> Registro Masivo
-                </button>
-            </BotonesForm>
-
             <SectionFieldset legend="Medicamentos Registrados">
                 <AvisoError mensaje={errorMedicamentos || errorTipos} onRetry={reintentar} />
 
-                <div className="mb-3">
-                    <SelectorInventario
-                        inventarios={inventarios}
-                        inventarioId={inventarioId}
-                        onChange={(e) => setInventarioId(e.target.value)}
-                        error={errorInventarios}
-                        onRetry={cargarInventarios}
-                    />
-                    <p className="mt-1 text-sm text-gray-500">El stock (actual, reservado y disponible) es el del inventario elegido; por defecto, el central.</p>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div title="El stock (actual, reservado y disponible) es el del inventario elegido; por defecto, el central.">
+                        <SelectorInventario
+                            compacto
+                            inventarios={inventarios}
+                            inventarioId={inventarioId}
+                            onChange={(e) => setInventarioId(e.target.value)}
+                            error={errorInventarios}
+                            onRetry={cargarInventarios}
+                        />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setModalRegistro(true)}
+                            disabled={sinTipos}
+                            className="
+                                bg-emerald-600 hover:bg-emerald-700
+                                text-white text-base px-6 py-2 rounded
+                                flex items-center gap-2
+                                transition-all duration-150 ease-out
+                                hover:shadow-lg
+                                active:scale-95 active:shadow-inner
+                                disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <FontAwesomeIcon icon={faPlus} /> Agregar nuevo
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setModalMasivo(true)}
+                            disabled={sinTipos}
+                            className="
+                                bg-blue-600 hover:bg-blue-700
+                                text-white text-base px-6 py-2 rounded
+                                flex items-center gap-2
+                                transition-all duration-150 ease-out
+                                hover:shadow-lg
+                                active:scale-95 active:shadow-inner
+                                disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <FontAwesomeIcon icon={faPlus} /> Masivo
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] items-start gap-4 mb-3">
                     <InputTextOneLine
                         label="Buscar"
                         name="filtroNombre"
@@ -259,10 +181,11 @@ export default function Medicamentos() {
                         inline
                         labelWidth="110px"
                     />
+                    <SelectorColumnas columnas={columnas} ocultas={columnasOcultas} onToggle={alternarColumna} />
                 </div>
 
                 <TablaTemplate
-                    columns={columnas}
+                    columns={columnasVisibles}
                     data={paginatedData}
                     height={450}
                     emptyText={cargando || cargandoInventarios ? "Cargando medicamentos..." : "No hay medicamentos registrados"}
@@ -270,6 +193,16 @@ export default function Medicamentos() {
 
                 <PaginadorTabla paginacion={paginacion} total={medicamentosFiltrados.length} etiqueta="medicamentos" />
             </SectionFieldset>
+
+            <ModalRegistrarMedicamento
+                isOpen={modalRegistro}
+                onRequestClose={() => setModalRegistro(false)}
+                opcionesTipo={opcionesTipo}
+                medicamentos={medicamentos}
+                token={token}
+                usuario={userlogued}
+                onSuccess={cargarMedicamentos}
+            />
 
             <ModalCargaMasivaMedicamentos
                 isOpen={modalMasivo}
