@@ -3,7 +3,16 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta, formatearHora } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
+import { mensajeDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
+import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
+import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
+import {
+    ConfirmarImpresionConComplementos,
+    GuardarComplementos,
+    armarResultadoGuardado,
+    validarComplementos,
+} from "../ComplementosLaArena/controllerComplementos";
 
 const baseUrl = "/asistencial/historia-asistencial/historia-mujer-o-varon-adulto";
 
@@ -192,7 +201,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
 
     LoadingDefault("Validando datos");
 
-    const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+    // El Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints): se
+    // buscan en paralelo para mostrarlos si ya se guardaron. Sin registro (o si falla) devuelven null y el
+    // formulario no se altera.
+    const [res, descanso, informeAccidente] = await Promise.all([
+        getFetch(`${baseUrl}/ticket/${numeroTicket}`, token),
+        ObtenerDescanso(numeroTicket, token),
+        ObtenerInformeAccidente(numeroTicket, token),
+    ]);
     Swal.close();
 
     const data = unwrap(res);
@@ -209,8 +225,12 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...prev,
         ...formFromPaciente(paciente, data.infoTicket),
         ...formFromHistoria(data, today),
+        ...formFromTicketInfo(data.infoTicket),
+        ...formFromDescanso(descanso),
+        ...formFromInformeAccidente(informeAccidente),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         n_hcl: String(numeroTicket),
+        numeroHistoriaClinica: String(data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? ""),
         // Si ya hay Historia Clínica, el bloque IMPRIMIR queda apuntando a este ticket.
         ticketImprimir: tieneRegistro ? String(numeroTicket) : "",
         tieneRegistro,
@@ -339,19 +359,68 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
         return;
     }
 
+    // Diagnóstico y Tratamiento son obligatorios: se valida antes de guardar cualquier cosa (también los
+    // complementos de La Arena, que se guardan primero).
+    const errorClinico = mensajeDiagnosticoTratamiento(form);
+    if (errorClinico) {
+        await Swal.fire("Datos incompletos", errorClinico, "warning");
+        return;
+    }
+
+    // Descanso Médico / Informe de Accidente (La Arena): un descanso a medio llenar se avisa antes de guardar
+    // nada, y los que traen datos se guardan antes que la Historia (ver GuardarComplementos).
+    const errorComplementos = validarComplementos(form);
+    if (errorComplementos) {
+        await Swal.fire("Datos incompletos", errorComplementos, "warning");
+        return;
+    }
+    const guardados = await GuardarComplementos(form, token, userlogued);
+    if (!guardados) return;
+
     const body = construirBody(form);
     const query = new URLSearchParams({ usuario: userlogued ?? "" });
     // Se captura antes de limpiar: el formulario se vacía al terminar de guardar.
     const numeroTicket = form.n_hcl;
+    const imprimirHistoria = () => PrintHojaR(numeroTicket, token, datosFooter);
+    // Con complementos guardados, el mensaje de éxito ofrece imprimir cada documento (si no, el "¿Desea imprimir?" de siempre).
+    const { mensaje, opciones } = armarResultadoGuardado({
+        mensaje: "Historia Clínica de la Mujer y el Varón Adulto registrada correctamente.",
+        guardados,
+        numeroTicket,
+        token,
+        datosFooter,
+        obtenerDatosHC: ObtenerDatosComplementos,
+        imprimirHistoria,
+    });
 
     await RegistrarServicioAsistencialDefault(
         token,
         body,
         `${baseUrl}?${query.toString()}`,
         limpiar,
-        "Historia Clínica de la Mujer y el Varón Adulto registrada correctamente.",
-        () => PrintHojaR(numeroTicket, token, datosFooter)
+        mensaje,
+        imprimirHistoria,
+        opciones
     );
+};
+
+// Datos de la Historia Clínica GUARDADA de un ticket que imprimen el Descanso Médico y el Informe de Accidente,
+// con los nombres de campo del formulario. null si el ticket no existe.
+export const ObtenerDatosComplementos = async (numeroTicket, token) => {
+    const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+    const data = unwrap(res);
+    const paciente = pacienteDe(data);
+    if (res?.error || !data || !paciente) return null;
+
+    return {
+        ...formFromPaciente(paciente, data.infoTicket),
+        ...formFromHistoria(data, ""),
+        ...formFromTicketInfo(data.infoTicket),
+        n_hcl: String(numeroTicket),
+        numeroHistoriaClinica: String(data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? ""),
+        nombre_medico: data.doctorAsignado ?? "",
+        tieneRegistro: tieneHistoria(data),
+    };
 };
 
 // Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar): lo usa la
@@ -384,11 +453,11 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const data = unwrap(res);
 
         if (res?.error || !data || !pacienteDe(data)) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
             return;
         }
         if (!tieneHistoria(data)) {
-            Swal.fire(
+            await Swal.fire(
                 "Sin Historia Clínica",
                 `El ticket N° ${numeroTicket} todavía no tiene una Historia Clínica registrada.`,
                 "warning"
@@ -399,7 +468,7 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const modulo = await jasperModules[rutaJasper]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasper} no exporta una función por defecto`);
-            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            await Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
             return;
         }
 
@@ -407,12 +476,24 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);
-        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
     }
 };
 
-// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Con
+// "La Arena" marcado el mensaje ofrece además imprimir el Descanso Médico y el Informe de Accidente del ticket.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laArena = false) => {
+    if (laArena) {
+        await ConfirmarImpresionConComplementos({
+            numeroTicket,
+            token,
+            datosFooter,
+            obtenerDatosHC: ObtenerDatosComplementos,
+            imprimirHistoria: () => PrintHojaR(numeroTicket, token, datosFooter),
+        });
+        return;
+    }
+
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;

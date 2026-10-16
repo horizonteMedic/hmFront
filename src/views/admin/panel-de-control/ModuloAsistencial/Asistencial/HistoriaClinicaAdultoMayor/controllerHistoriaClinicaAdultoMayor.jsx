@@ -3,8 +3,16 @@ import { deleteData, getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
-import { completarSellosFirma } from "../../../../../utils/registroAsistencialUtils";
+import { mensajeDiagnosticoTratamiento, obtenerDigitalizacionMedico } from "../../../../../utils/registroAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
+import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
+import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
+import {
+    ConfirmarImpresionConComplementos,
+    GuardarComplementos,
+    armarResultadoGuardado,
+    validarComplementos,
+} from "../ComplementosLaArena/controllerComplementos";
 
 const baseUrl = "/asistencial/historia-asistencial/historia-adulto-mayor";
 
@@ -41,24 +49,29 @@ const numeroONull = (value) => {
 // Cáncer y Mordedura de animales además piden especificar: sus claves son "cancer" / "mordeduraAnimales"
 // y el detalle llega aparte en tipoCancer / descripcionMordedura (el ítem también se marca si solo
 // llega el detalle).
-// Sin clave equivalente hoy en AntecedentesPatologicos (quedan sin marcar): osteoporosis,
-// hospitalización, accidentes, osteoartrosis y riesgo ocupacional.
+// Interv. quirúrgica además se marca si el paciente tiene antecedentes quirúrgicos registrados.
 const AP_CLAVES = {
     ap_hipertension: ["hipertensionArterial"],
     ap_diabetes: ["diabetes"],
     ap_obesidad: ["obesidad"],
     ap_infarto_cardiaco: ["ima", "insuficienciaCardiaca"],
     ap_acv: ["acv"],
+    ap_osteoporosis: ["osteoporosis"],
+    ap_hospitalizacion: ["hospitalizacionUlt3Anios"],
     ap_transfusion: ["transfusionSanguinea"],
+    ap_interv_quirurgica: ["intervQuirurgica"],
+    ap_accidentes: ["accidentes"],
     ap_cancer: ["cancer"],
     ap_mordedura_animales: ["mordeduraAnimales"],
     ap_tuberculosis: ["tuberculosis", "tbc"],
     ap_its_vih: ["its", "ets", "vih"],
     ap_hepatitis_b: ["hepatitis"],
     ap_malaria: ["paludismoMalaria"],
+    ap_osteoartrosis: ["osteoartrosis"],
     ap_glaucoma: ["glaucoma"],
-    ap_convulsiones: ["epilepsiaConvulsiones"],
+    ap_convulsiones: ["convulsiones", "epilepsiaConvulsiones"],
     ap_depresion: ["depresion"],
+    ap_riesgo_ocupacional: ["riesgoOcupacional"],
 };
 
 const normalizar = (valor) =>
@@ -94,7 +107,7 @@ const formFromAntecedentes = (data) => {
     return {
         ...Object.fromEntries(Object.entries(marcados).map(([campo, marcado]) => [campo, siNo(marcado)])),
         ap_cancer: siNo(marcados.ap_cancer || Boolean(tipoCancer)),
-        ap_interv_quirurgica: siNo(quirurgicos.length > 0),
+        ap_interv_quirurgica: siNo(marcados.ap_interv_quirurgica || quirurgicos.length > 0),
         ap_mordedura_animales: siNo(marcados.ap_mordedura_animales || Boolean(mordedura)),
         tipoCancer: data.tipoCancer ?? "",
         descripcionMordedura: data.descripcionMordedura ?? "",
@@ -234,7 +247,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
 
     LoadingDefault("Validando datos");
 
-    const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+    // El Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints): se
+    // buscan en paralelo para mostrarlos si ya se generaron. Sin registro (o si falla) devuelven null y el
+    // formulario no se altera.
+    const [res, descanso, informeAccidente] = await Promise.all([
+        getFetch(`${baseUrl}/ticket/${numeroTicket}`, token),
+        ObtenerDescanso(numeroTicket, token),
+        ObtenerInformeAccidente(numeroTicket, token),
+    ]);
     Swal.close();
 
     const data = unwrap(res);
@@ -251,6 +271,9 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...prev,
         ...formFromPaciente(paciente),
         ...formFromHistoria(data, today),
+        ...formFromTicketInfo(data.infoTicket),
+        ...formFromDescanso(descanso),
+        ...formFromInformeAccidente(informeAccidente),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         // Un registro NUEVO siempre abre con la fecha de hoy; la fecha guardada solo manda si ya existe.
         ...(tieneRegistro ? {} : { fecha_apertura_hcl: today }),
@@ -397,18 +420,66 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
         return;
     }
 
+    // Diagnóstico y Tratamiento son obligatorios: se valida antes de guardar cualquier cosa (también los
+    // complementos de La Arena, que se guardan primero).
+    const errorClinico = mensajeDiagnosticoTratamiento(form);
+    if (errorClinico) {
+        await Swal.fire("Datos incompletos", errorClinico, "warning");
+        return;
+    }
+
+    // Descanso Médico / Informe de Accidente (La Arena): un descanso a medio llenar se avisa antes de guardar
+    // nada, y los que traen datos se guardan antes que la Historia (ver GuardarComplementos).
+    const errorComplementos = validarComplementos(form);
+    if (errorComplementos) {
+        await Swal.fire("Datos incompletos", errorComplementos, "warning");
+        return;
+    }
+    const guardados = await GuardarComplementos(form, token, userlogued);
+    if (!guardados) return;
+
     const query = new URLSearchParams({ usuario: userlogued ?? "" });
     // Se captura antes de limpiar: el formulario se vacía al terminar de guardar.
     const numeroTicket = form.n_hcl;
+    const imprimirHistoria = () => PrintHojaR(numeroTicket, token, datosFooter);
+    // Con complementos guardados, el mensaje de éxito ofrece imprimir cada documento (si no, el "¿Desea imprimir?" de siempre).
+    const { mensaje, opciones } = armarResultadoGuardado({
+        mensaje: "Historia Clínica del Adulto Mayor registrada correctamente.",
+        guardados,
+        numeroTicket,
+        token,
+        datosFooter,
+        obtenerDatosHC: ObtenerDatosComplementos,
+        imprimirHistoria,
+    });
 
     await RegistrarServicioAsistencialDefault(
         token,
         construirBody(form),
         `${baseUrl}?${query.toString()}`,
         limpiar,
-        "Historia Clínica del Adulto Mayor registrada correctamente.",
-        () => PrintHojaR(numeroTicket, token, datosFooter)
+        mensaje,
+        imprimirHistoria,
+        opciones
     );
+};
+
+// Datos de la Historia Clínica GUARDADA de un ticket que imprimen el Descanso Médico y el Informe de Accidente,
+// con los nombres de campo del formulario. null si el ticket no existe.
+export const ObtenerDatosComplementos = async (numeroTicket, token) => {
+    const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+    const data = unwrap(res);
+    const paciente = pacienteDe(data);
+    if (res?.error || !data || !paciente) return null;
+
+    return {
+        ...formFromPaciente(paciente),
+        ...formFromHistoria(data, ""),
+        ...formFromTicketInfo(data.infoTicket),
+        n_hcl: String(numeroTicket),
+        nombre_medico: data.doctorAsignado ?? "",
+        tieneRegistro: tieneHistoria(data),
+    };
 };
 
 // Elimina una vacuna ya registrada: DELETE .../vacuna/{idVacuna}. Es inmediato (no espera a "Guardar").
@@ -483,24 +554,6 @@ const construirDatosImpresion = (data) => {
     };
 };
 
-// Sello digitalizado del médico asignado (SELLOFIRMADOCASIG) para la firma del reporte. El GET no trae
-// "digitalizacion", así que se arma en el front como en el Triaje y los laboratorios asistenciales
-// (completarSellosFirma: username -> empleado -> DNI -> archivo SELLOFIRMA). "doctorAsignado" viaja como
-// NOMBRE, y esa utilidad busca por username: se resuelve por nombre contra listaEmpleados. Sin sello (o si
-// algo falla) el reporte se imprime igual con la línea para firmar a mano.
-const obtenerDigitalizacionMedico = async (doctorAsignado, token) => {
-    if (!doctorAsignado) return [];
-    try {
-        const { listaEmpleados } = useAuthStore.getState();
-        const nombre = String(doctorAsignado).trim().toUpperCase();
-        const empleado = (listaEmpleados || []).find((emp) => String(emp.nombres ?? "").trim().toUpperCase() === nombre);
-        return await completarSellosFirma({ doctorAsignado: empleado?.username }, token);
-    } catch (error) {
-        console.error("No se pudo obtener el sello del médico:", error);
-        return [];
-    }
-};
-
 // Imprime la Historia Clínica GUARDADA de un ticket: GET .../ticket/{numeroTicket} y Jasper.
 export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
     LoadingDefault("Cargando Formato a Imprimir");
@@ -510,11 +563,11 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const data = unwrap(res);
 
         if (res?.error || !data || !pacienteDe(data)) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
             return;
         }
         if (!tieneHistoria(data)) {
-            Swal.fire(
+            await Swal.fire(
                 "Sin Historia Clínica",
                 `El ticket N° ${numeroTicket} todavía no tiene una Historia Clínica del Adulto Mayor registrada.`,
                 "warning"
@@ -525,21 +578,35 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const modulo = await jasperModules[rutaJasper]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasper} no exporta una función por defecto`);
-            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            await Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
             return;
         }
 
+        // El GET no trae "digitalizacion": el sello del médico asignado (viaja como NOMBRE) se arma en el
+        // front como en el Triaje y los laboratorios asistenciales.
         const digitalizacion = await obtenerDigitalizacionMedico(data.doctorAsignado, token);
         await modulo.default({ ...construirDatosImpresion(data), digitalizacion, ...datosFooter });
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);
-        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
     }
 };
 
-// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Con
+// "La Arena" marcado el mensaje ofrece además imprimir el Descanso Médico y el Informe de Accidente del ticket.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laArena = false) => {
+    if (laArena) {
+        await ConfirmarImpresionConComplementos({
+            numeroTicket,
+            token,
+            datosFooter,
+            obtenerDatosHC: ObtenerDatosComplementos,
+            imprimirHistoria: () => PrintHojaR(numeroTicket, token, datosFooter),
+        });
+        return;
+    }
+
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;

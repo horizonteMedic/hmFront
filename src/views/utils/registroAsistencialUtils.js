@@ -90,6 +90,22 @@ export const auditoriaFromRegistro = (registro) => ({
   fechaActualizacion: fechaHoraISO(registro.fechaActualizacion),
 });
 
+// Diagnóstico y Tratamiento son obligatorios en las Historias Clínicas asistenciales (Adulto Mayor, Mujer y
+// Varón Adulto). Devuelve { campo: mensaje } de los que faltan ({} si están completos).
+export const erroresDiagnosticoTratamiento = (form) => {
+  const errores = {};
+  if (!String(form.diagnostico ?? "").trim()) errores.diagnostico = "El diagnóstico es obligatorio.";
+  if (!String(form.tratamiento ?? "").trim()) errores.tratamiento = "El tratamiento es obligatorio.";
+  return errores;
+};
+
+// Mensaje del guardado cuando falta alguno de los dos (o null si están completos).
+export const mensajeDiagnosticoTratamiento = (form) => {
+  const nombres = { diagnostico: "Diagnóstico", tratamiento: "Tratamiento" };
+  const faltan = Object.keys(erroresDiagnosticoTratamiento(form)).map((campo) => nombres[campo]);
+  return faltan.length ? `Debe completar los campos obligatorios: ${faltan.join(" y ")}.` : null;
+};
+
 // Datos del paciente por N° de Ticket. null si el ticket no existe.
 export const buscarPacientePorTicket = async (numeroTicket, token) => {
   try {
@@ -390,6 +406,67 @@ export const completarSellosFirma = async (registro, token) => {
 };
 
 /**
+ * SELLOFIRMADOCASIG del médico cuando el formulario solo conoce su NOMBRE (p. ej. "doctorAsignado" de la
+ * Historia Clínica del Adulto Mayor): el nombre se resuelve contra listaEmpleados de la sesión y de ahí
+ * sale el username que busca completarSellosFirma. Sin sello (o si algo falla) devuelve [] y el reporte
+ * se imprime igual, con la línea para firmar a mano.
+ */
+export const obtenerDigitalizacionMedico = async (nombreMedico, token) => {
+  if (!nombreMedico) return [];
+  try {
+    const { listaEmpleados } = useAuthStore.getState();
+    const nombre = String(nombreMedico).trim().toUpperCase();
+    const empleado = (listaEmpleados || []).find((emp) => String(emp.nombres ?? "").trim().toUpperCase() === nombre);
+    return await completarSellosFirma({ doctorAsignado: empleado?.username }, token);
+  } catch (error) {
+    console.error("No se pudo obtener el sello del médico:", error);
+    return [];
+  }
+};
+
+/**
+ * FIRMAP y HUELLA del trabajador (paciente) por DNI, del mismo archivo que usan Admisión y los
+ * consentimientos (GET detalleUrlArchivosEmpleados/{dni}/{tipo}). Los que no existan se omiten y el
+ * reporte deja el espacio para firmar a mano.
+ */
+export const obtenerDigitalizacionPaciente = async (dni, token) => {
+  const documento = String(dni ?? "").trim();
+  if (!documento) return [];
+  const tipos = ["FIRMAP", "HUELLA"];
+  const respuestas = await Promise.all(
+    tipos.map((tipo) => getFetch(`${archivoEmpleadoUrl}/${documento}/${tipo}`, token).catch(() => null))
+  );
+  return tipos.flatMap((nombreDigitalizacion, i) =>
+    respuestas[i]?.id === 1 && respuestas[i].mensaje ? [{ nombreDigitalizacion, url: respuestas[i].mensaje }] : []
+  );
+};
+
+/**
+ * CMP del médico cuando el formulario solo conoce su NOMBRE: se resuelve contra listaEmpleados y se lee
+ * del empleado (GET empleado/{id}, campo `cip`). Si el médico es quien tiene la sesión abierta, manda el
+ * `cmp` de su sesión. "" si no se encuentra (el reporte lo deja en blanco).
+ */
+export const obtenerCmpMedico = async (nombreMedico, token) => {
+  if (!nombreMedico) return "";
+  try {
+    const { listaEmpleados, userlogued } = useAuthStore.getState();
+    const nombre = String(nombreMedico).trim().toUpperCase();
+    const empleado = (listaEmpleados || []).find((emp) => String(emp.nombres ?? "").trim().toUpperCase() === nombre);
+    if (!empleado) return "";
+
+    const esUsuarioActual = String(empleado.username ?? "").trim().toUpperCase() === String(userlogued?.sub ?? "").trim().toUpperCase();
+    const cmpSesion = esUsuarioActual ? String(userlogued?.datos?.cmp ?? "").trim() : "";
+    if (cmpSesion || !empleado.idEmpleado) return cmpSesion;
+
+    const datosEmpleado = await getFetch(`${empleadoUrl}/${empleado.idEmpleado}`, token);
+    return String(datosEmpleado?.cip ?? "").trim();
+  } catch (error) {
+    console.error("No se pudo obtener el CMP del médico:", error);
+    return "";
+  }
+};
+
+/**
  * `ajustarDatos` de imprimirReporteTicket para reportes con endpoint REAL. Sobre la mezcla genérica
  * (pensada para plantillas ocupacionales) corrige:
  *  - numeroTicket: lo usa la cabecera asistencial.
@@ -416,6 +493,28 @@ export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = tr
 const nombreSedeActual = () => {
   const { userlogued, selectedSede } = useAuthStore.getState();
   return userlogued?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede ?? "";
+};
+
+/**
+ * Sede que rotula un reporte asistencial: la del TICKET (`ticket.sede`), que es donde se atendió al
+ * paciente y no depende de la sede que el usuario haya elegido en el Navbar (queda en null hasta que la
+ * elige). `ticket.sede` puede llegar como nombre o como código de sede (el ticket se emite con
+ * serieTicket = cod_sede): si es un código de las sedes del usuario se muestra su nombre. Si el ticket no
+ * trae nada, se usa la sede de la sesión.
+ */
+export const sedeDelTicket = (ticket) => {
+  const { userlogued, selectedSede } = useAuthStore.getState();
+  const sedes = Array.isArray(userlogued?.sedes) ? userlogued.sedes : [];
+  const norm = (valor) => String(valor ?? "").trim().toUpperCase();
+  const nombrePorCodigo = (codigo) => (norm(codigo) ? sedes.find((sede) => norm(sede.cod_sede) === norm(codigo))?.nombre_sede : "");
+
+  return (
+    nombrePorCodigo(ticket?.sede) ||
+    String(ticket?.sede ?? "").trim() ||
+    nombrePorCodigo(ticket?.serieTicket) ||
+    nombrePorCodigo(selectedSede) ||
+    ""
+  );
 };
 
 // Los Jasper de laboratorio ocupacional leen los datos del paciente con nombres distintos según la
