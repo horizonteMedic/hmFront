@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight, faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import { SelectField } from "../../../../../components/reusableComponents/InputSelect";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
@@ -10,10 +10,16 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { usePagination } from "../../../../../utils/listUtils";
+import AvisoError from "../AvisoError";
 import { normalizarTexto } from "../inventarioUtils";
+import PaginadorTabla from "../PaginadorTabla";
+import SelectorInventario from "../SelectorInventario";
+import { useConsultaInventario } from "../useConsultaInventario";
+import { useInventarios } from "../useInventarios";
 import {
     OTRA_PRESENTACION,
-    ObtenerCatalogoMedicamentos,
+    ObtenerListaMedicamentos,
+    ObtenerTiposMedicamento,
     RegistrarMedicamento,
     ValidarMedicamento,
     opcionesPresentacion,
@@ -29,31 +35,35 @@ const initialFormState = {
 };
 
 const columnas = [
-    { label: "Nombre", accessor: "nombre", width: "24%" },
-    { label: "Presentación", accessor: "presentacion", width: "16%" },
-    { label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "14%" },
-    { label: "Stock Mínimo", accessor: "stockMinimo", width: "10%" },
+    { label: "Nombre", accessor: "nombre", width: "19%" },
+    { label: "Presentación", accessor: "presentacion", width: "11%" },
+    { label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "11%" },
+    { label: "Mínimo", accessor: "stockMinimo", width: "7%" },
+    { label: "Actual", width: "7%", render: (row) => row.stockActual ?? "—" },
+    { label: "Reservado", width: "8%", render: (row) => row.stockReservado ?? "—" },
+    { label: "Disponible", width: "9%", render: (row) => <strong>{row.stockDisponible ?? "—"}</strong> },
     {
         label: "Estado",
-        width: "9%",
+        width: "8%",
         render: (row) => (
             <span className={`px-2 py-0.5 rounded text-sm font-semibold ${row.activo ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-600"}`}>
                 {row.activo ? "Activo" : "Inactivo"}
             </span>
         ),
     },
-    { label: "Registrado por", accessor: "usuarioRegistro", width: "13%" },
-    { label: "Fecha de Registro", width: "14%", render: (row) => formatearFechaHora(row.fechaRegistro) },
+    { label: "Registrado por", width: "10%", render: (row) => row.usuarioRegistroNombre || row.usuarioRegistro },
+    { label: "Fecha de Registro", width: "10%", render: (row) => formatearFechaHora(row.fechaRegistro) },
 ];
 
 export default function Medicamentos() {
     const { token, userlogued } = useSessionData();
+    const { inventarios, inventarioId, setInventarioId, cargandoInventarios, errorInventarios, cargarInventarios } = useInventarios(token);
     const { form, handleChange, handleChangeSimple, handleChangeNumberDecimals, handleClear } = useForm(initialFormState);
 
-    const [medicamentos, setMedicamentos] = useState([]);
+    // El catálogo es único; lo que cambia con el inventario elegido es el stock que se muestra de cada medicamento.
+    const { datos: medicamentos, cargando, error: errorMedicamentos, ejecutar } = useConsultaInventario();
     const [tipos, setTipos] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [errorCarga, setErrorCarga] = useState("");
+    const [errorTipos, setErrorTipos] = useState("");
     const [errores, setErrores] = useState({});
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroTipo, setFiltroTipo] = useState("");
@@ -69,23 +79,40 @@ export default function Medicamentos() {
         });
     }, [medicamentos, filtroNombre, filtroTipo]);
 
-    const { currentPage, setCurrentPage, recordsPerPage, totalPages, visiblePages, paginatedData, handleChangeRecordsPerPage } =
-        usePagination(medicamentosFiltrados, 10);
+    const paginacion = usePagination(medicamentosFiltrados, 10);
+    const { setCurrentPage, paginatedData } = paginacion;
 
     // Al cambiar un filtro la lista puede quedar más corta que la página actual.
     useEffect(() => {
         setCurrentPage(1);
     }, [filtroNombre, filtroTipo]);
 
-    const cargar = async () => {
-        setCargando(true);
-        await ObtenerCatalogoMedicamentos(token, setMedicamentos, setTipos, setErrorCarga);
-        setCargando(false);
+    const cargarTipos = async () => {
+        const res = await ObtenerTiposMedicamento(token);
+        if (!res.ok) {
+            setErrorTipos(res.mensaje);
+            return;
+        }
+        setErrorTipos("");
+        setTipos(Array.isArray(res.resultado) ? res.resultado : []);
+    };
+
+    const cargarMedicamentos = () => ejecutar(() => ObtenerListaMedicamentos(token, false, inventarioId));
+
+    const reintentar = () => {
+        cargarTipos();
+        cargarMedicamentos();
     };
 
     useEffect(() => {
-        cargar();
+        cargarTipos();
     }, []);
+
+    // Se espera a saber qué inventario se muestra (por defecto el central) para pedir el catálogo con su stock. Si
+    // los inventarios no cargaron, igual se pide el catálogo, sin stock, para poder registrar medicamentos.
+    useEffect(() => {
+        if (!cargandoInventarios) cargarMedicamentos();
+    }, [inventarioId, cargandoInventarios]);
 
     // Al corregir un campo se le quita el mensaje de error.
     const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
@@ -118,7 +145,7 @@ export default function Medicamentos() {
 
         handleClear();
         setErrores({});
-        cargar();
+        cargarMedicamentos();
     };
 
     const handleLimpiar = () => {
@@ -201,18 +228,18 @@ export default function Medicamentos() {
             </BotonesForm>
 
             <SectionFieldset legend="Medicamentos Registrados">
-                {errorCarga && (
-                    <div className="flex items-center justify-between gap-4 mb-3 p-3 rounded border border-red-300 bg-red-50 text-red-700">
-                        <span>{errorCarga}</span>
-                        <button
-                            type="button"
-                            onClick={cargar}
-                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded transition-all duration-150 ease-out active:scale-95"
-                        >
-                            Reintentar
-                        </button>
-                    </div>
-                )}
+                <AvisoError mensaje={errorMedicamentos || errorTipos} onRetry={reintentar} />
+
+                <div className="mb-3">
+                    <SelectorInventario
+                        inventarios={inventarios}
+                        inventarioId={inventarioId}
+                        onChange={(e) => setInventarioId(e.target.value)}
+                        error={errorInventarios}
+                        onRetry={cargarInventarios}
+                    />
+                    <p className="mt-1 text-sm text-gray-500">El stock (actual, reservado y disponible) es el del inventario elegido; por defecto, el central.</p>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                     <InputTextOneLine
@@ -238,50 +265,10 @@ export default function Medicamentos() {
                     columns={columnas}
                     data={paginatedData}
                     height={450}
-                    emptyText={cargando ? "Cargando medicamentos..." : "No hay medicamentos registrados"}
+                    emptyText={cargando || cargandoInventarios ? "Cargando medicamentos..." : "No hay medicamentos registrados"}
                 />
 
-                <div className="flex flex-col md:flex-row items-center justify-between gap-3 mt-3">
-                    <div className="flex items-center gap-2">
-                        <span>Mostrar</span>
-                        <select className="border border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-                            <option value={10}>10</option>
-                            <option value={25}>25</option>
-                            <option value={50}>50</option>
-                            <option value={-1}>Todos</option>
-                        </select>
-                        <span>de {medicamentosFiltrados.length} medicamentos</span>
-                    </div>
-
-                    <div className="flex justify-center">
-                        <button
-                            type="button"
-                            onClick={() => setCurrentPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="mx-1 px-3 py-1 !bg-[#fc6b03] text-white rounded-md disabled:opacity-50"
-                        >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                        </button>
-                        {visiblePages.map((page) => (
-                            <button
-                                key={page}
-                                type="button"
-                                onClick={() => setCurrentPage(page)}
-                                className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? "!bg-[#233245] text-white" : "bg-gray-200"}`}
-                            >
-                                {page}
-                            </button>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={() => setCurrentPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="mx-1 px-3 py-1 !bg-[#fc6b03] text-white rounded-md disabled:opacity-50"
-                        >
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </button>
-                    </div>
-                </div>
+                <PaginadorTabla paginacion={paginacion} total={medicamentosFiltrados.length} etiqueta="medicamentos" />
             </SectionFieldset>
 
             <ModalCargaMasivaMedicamentos
@@ -291,7 +278,7 @@ export default function Medicamentos() {
                 medicamentos={medicamentos}
                 token={token}
                 usuario={userlogued}
-                onSuccess={cargar}
+                onSuccess={cargarMedicamentos}
             />
         </div>
     );

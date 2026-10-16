@@ -40,24 +40,23 @@ const presentacionDelForm = (form) =>
 
 const ordenarPorNombre =(a, b) => String(a.nombre ?? "").localeCompare(String(b.nombre ?? ""), "es");
 
-// Carga el catálogo y los tipos en paralelo. Si algo falla deja el mensaje en `setErrorCarga` (la pantalla
-// lo muestra con un botón de reintento) y conserva lo que ya estaba cargado.
-export const ObtenerCatalogoMedicamentos = async (token, setMedicamentos, setTipos, setErrorCarga) => {
-    const [medicamentos, tipos] = await Promise.all([
-        consultarInventario(medicamentosUrl, token, "No se pudo cargar la lista de medicamentos."),
-        consultarInventario(tiposMedicamentoUrl, token, "No se pudo cargar los tipos de medicamento."),
-    ]);
+// Catálogo de medicamentos. Devuelve la respuesta normalizada { ok, resultado, mensaje } con los medicamentos ya
+// ordenados por nombre. Con `inventarioId` cada medicamento trae además su stock en ese inventario
+// (stockActual, stockReservado y stockDisponible); sin él, el backend no calcula stock.
+export const ObtenerListaMedicamentos = async (token, soloActivos = false, inventarioId = "") => {
+    const query = new URLSearchParams();
+    if (soloActivos) query.set("activo", "true");
+    if (inventarioId) query.set("inventarioId", inventarioId);
 
-    const fallo = [medicamentos, tipos].find((res) => !res.ok);
-    setErrorCarga(fallo ? fallo.mensaje : "");
-
-    if (medicamentos.ok) {
-        setMedicamentos([...(Array.isArray(medicamentos.resultado) ? medicamentos.resultado : [])].sort(ordenarPorNombre));
-    }
-    if (tipos.ok) {
-        setTipos(Array.isArray(tipos.resultado) ? tipos.resultado : []);
-    }
+    const filtros = query.toString();
+    const url = filtros ? `${medicamentosUrl}?${filtros}` : medicamentosUrl;
+    const res = await consultarInventario(url, token, "No se pudo cargar la lista de medicamentos.");
+    if (!res.ok) return res;
+    return { ...res, resultado: [...(Array.isArray(res.resultado) ? res.resultado : [])].sort(ordenarPorNombre) };
 };
+
+export const ObtenerTiposMedicamento = (token) =>
+    consultarInventario(tiposMedicamentoUrl, token, "No se pudo cargar los tipos de medicamento.");
 
 // { campo: mensaje } solo con lo que falta o es inválido; vacío si el formulario está listo para enviar.
 export const ValidarMedicamento = (form, medicamentos) => {
