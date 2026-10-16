@@ -1,8 +1,9 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
-import { consultarInventario, enviarInventario, escaparHtml, inventarioUrl, limpiarTexto } from "../inventarioUtils";
+import { consultarInventario, enviarInventario, inventarioUrl, limpiarTexto } from "../inventarioUtils";
 
 const retirosUrl = `${inventarioUrl}/retiros`;
+const lotesUrl = `${inventarioUrl}/stock/lotes`;
 
 // Con este motivo el backend exige explicar qué pasó en la observación.
 export const MOTIVO_OTRO = "OTRO";
@@ -18,6 +19,24 @@ export const ObtenerRetiros = ({ inventarioId, desde, hasta }, token) => {
     if (hasta) query.set("hasta", hasta);
 
     return consultarInventario(`${retirosUrl}?${query}`, token, "No se pudo cargar el historial de retiros.");
+};
+
+// Lotes vencidos del inventario que todavía tienen unidades, del que venció primero al último. El backend no tiene un
+// endpoint para listarlos solos: se piden todos los lotes con los vencidos incluidos (sin filtrar por medicamento) y
+// aquí se quedan los vencidos.
+export const ObtenerLotesVencidos = async (inventarioId, token) => {
+    const query = new URLSearchParams({ inventarioId, incluirVencidos: true });
+    const res = await consultarInventario(`${lotesUrl}?${query}`, token, "No se pudieron cargar los lotes vencidos.");
+    if (!res.ok) return res;
+
+    const vencidos = (Array.isArray(res.resultado) ? res.resultado : [])
+        .filter((lote) => lote.vencido && lote.cantidadActual > 0)
+        .sort(
+            (a, b) =>
+                String(a.fechaVencimiento ?? "").localeCompare(String(b.fechaVencimiento ?? "")) ||
+                String(a.medicamentoNombre ?? "").localeCompare(String(b.medicamentoNombre ?? ""), "es")
+        );
+    return { ...res, resultado: vencidos };
 };
 
 // { campo: mensaje } solo con lo que falta o es inválido. `lote` es el lote elegido (para avisar antes de
@@ -45,19 +64,21 @@ export const ValidarRetiro = (form, lote) => {
     return errores;
 };
 
+// Envía un retiro de un lote, sin confirmaciones ni mensajes, y devuelve { ok, resultado, mensaje, status }. Lo usa el
+// retiro de vencidos, que retira varios lotes seguidos y informa el resultado al final.
+export const EnviarRetiroLote = ({ loteId, cantidad, motivo, observacion }, token, usuario) => {
+    const url = `${retirosUrl}?usuario=${encodeURIComponent(usuario ?? "")}`;
+    const body = { loteId: Number(loteId), cantidad: Number(cantidad), motivo, observacion: limpiarTexto(observacion) || null };
+
+    return enviarInventario(url, body, token, "Ocurrió un error al retirar el lote.");
+};
+
 // Devuelve true si el retiro quedó registrado, para que la pantalla limpie el formulario y recargue.
 export const RegistrarRetiro = async (form, lote, token, usuario) => {
-    const body = {
-        loteId: Number(form.loteId),
-        cantidad: Number(form.cantidad),
-        motivo: form.motivo,
-        observacion: limpiarTexto(form.observacion) || null,
-    };
-
     // Un retiro descuenta stock y no se puede deshacer desde aquí: se confirma antes.
     const { isConfirmed } = await Swal.fire({
         title: "Registrar retiro",
-        text: `Se retirarán ${body.cantidad} unidades del lote ${lote.numeroLote || "sin número"} de "${form.medicamentoTexto}" por ${body.motivo}. ¿Desea continuar?`,
+        text: `Se retirarán ${Number(form.cantidad)} unidades del lote ${lote.numeroLote || "sin número"} de "${form.medicamentoTexto}" por ${form.motivo}. ¿Desea continuar?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, retirar",
@@ -65,10 +86,8 @@ export const RegistrarRetiro = async (form, lote, token, usuario) => {
     });
     if (!isConfirmed) return false;
 
-    const url = `${retirosUrl}?usuario=${encodeURIComponent(usuario ?? "")}`;
-
     LoadingDefault("Registrando Retiro");
-    const res = await enviarInventario(url, body, token, "Ocurrió un error al registrar el retiro.");
+    const res = await EnviarRetiroLote(form, token, usuario);
     Swal.close();
 
     if (!res.ok) {
@@ -77,47 +96,5 @@ export const RegistrarRetiro = async (form, lote, token, usuario) => {
     }
 
     await Swal.fire("Éxito", "Retiro registrado correctamente.", "success");
-    return true;
-};
-
-// Ejecuta a mano la tarea que retira los lotes vencidos de todos los inventarios (el backend la corre solo; esto
-// sirve para no esperar a la siguiente ejecución). Devuelve true si se ejecutó, aunque no hubiera nada que retirar.
-export const RetirarVencidos = async (token, usuario) => {
-    const { isConfirmed } = await Swal.fire({
-        title: "Retirar vencidos",
-        text: "Se retirarán de todos los inventarios los lotes que ya vencieron y se liberarán sus reservas. ¿Desea continuar?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, retirar",
-        cancelButtonText: "Cancelar",
-    });
-    if (!isConfirmed) return false;
-
-    const url = `${retirosUrl}/vencidos?usuario=${encodeURIComponent(usuario ?? "")}`;
-
-    LoadingDefault("Retirando Vencidos");
-    const res = await enviarInventario(url, undefined, token, "Ocurrió un error al retirar los vencidos.");
-    Swal.close();
-
-    if (!res.ok) {
-        await Swal.fire("Error", res.mensaje, "error");
-        return false;
-    }
-
-    const { lotesRetirados = 0, unidadesRetiradas = 0, unidadesReservadasLiberadas = 0 } = res.resultado ?? {};
-    if (lotesRetirados === 0) {
-        await Swal.fire("Sin vencidos", "No hay lotes vencidos para retirar.", "info");
-        return true;
-    }
-
-    await Swal.fire({
-        title: "Éxito",
-        html: `<div style="text-align:left">
-            Lotes retirados: <b>${escaparHtml(lotesRetirados)}</b><br>
-            Unidades retiradas: <b>${escaparHtml(unidadesRetiradas)}</b><br>
-            Unidades reservadas liberadas: <b>${escaparHtml(unidadesReservadasLiberadas)}</b>
-        </div>`,
-        icon: "success",
-    });
     return true;
 };

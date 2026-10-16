@@ -10,24 +10,52 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { usePagination } from "../../../../../utils/listUtils";
 import AvisoError from "../AvisoError";
+import InfoTooltip from "../InfoTooltip";
 import { normalizarTexto } from "../inventarioUtils";
 import PaginadorTabla from "../PaginadorTabla";
 import SelectorInventario from "../SelectorInventario";
+import { AYUDA_STOCK_DISPONIBLE, AYUDA_STOCK_FISICO, AYUDA_STOCK_MINIMO, AYUDA_STOCK_RESERVADO } from "../textosAyudaStock";
 import { useConsultaInventario } from "../useConsultaInventario";
 import { useInventarios } from "../useInventarios";
 import { ObtenerListaMedicamentos, ObtenerTiposMedicamento } from "./controllerMedicamentos";
 import ModalCargaMasivaMedicamentos from "./ModalCargaMasivaMedicamentos/ModalCargaMasivaMedicamentos";
 import ModalRegistrarMedicamento from "./ModalRegistrarMedicamento/ModalRegistrarMedicamento";
 
-// Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas.
+// Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas. `label` es el texto simple
+// (selector de columnas) y `encabezado`, si existe, lo que se ve en la cabecera de la tabla (con su "i" de ayuda). Los
+// encabezados largos se parten en dos líneas.
 const columnas = [
     { id: "nombre", label: "Nombre", accessor: "nombre", width: "17%" },
     { id: "presentacion", label: "Presentación", accessor: "presentacion", width: "10%" },
     { id: "tipo", label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "10%" },
-    { id: "stockMinimo", label: "Stock Mínimo", accessor: "stockMinimo", width: "9%" },
-    { id: "stockActual", label: "Stock Actual", width: "8%", render: (row) => row.stockActual ?? "—" },
-    { id: "stockReservado", label: "Stock Reservado", width: "10%", render: (row) => row.stockReservado ?? "—" },
-    { id: "stockDisponible", label: "Stock Disponible", width: "10%", render: (row) => <strong>{row.stockDisponible ?? "—"}</strong> },
+    {
+        id: "stockMinimo",
+        label: "Stock Mínimo",
+        encabezado: <>Stock Mínimo<InfoTooltip texto={AYUDA_STOCK_MINIMO} /></>,
+        accessor: "stockMinimo",
+        width: "9%",
+    },
+    {
+        id: "stockFisico",
+        label: "Stock Físico",
+        encabezado: <>Stock Físico<InfoTooltip texto={AYUDA_STOCK_FISICO} /></>,
+        width: "8%",
+        render: (row) => row.stockActual ?? "—",
+    },
+    {
+        id: "stockReservado",
+        label: "Stock Reservado",
+        encabezado: <>Stock Reservado<InfoTooltip texto={AYUDA_STOCK_RESERVADO} /></>,
+        width: "10%",
+        render: (row) => row.stockReservado ?? "—",
+    },
+    {
+        id: "stockDisponible",
+        label: "Stock Disponible",
+        encabezado: <>Stock Disponible<InfoTooltip texto={AYUDA_STOCK_DISPONIBLE} /></>,
+        width: "10%",
+        render: (row) => <strong>{row.stockDisponible ?? "—"}</strong>,
+    },
     {
         id: "estado",
         label: "Estado",
@@ -43,7 +71,10 @@ const columnas = [
 ];
 
 // Columnas que la tabla trae ocultas; el usuario puede mostrarlas desde "Columnas".
-const COLUMNAS_OCULTAS_INICIALES = ["stockMinimo", "stockActual", "stockReservado"];
+const COLUMNAS_OCULTAS_INICIALES = ["stockMinimo", "stockFisico", "stockReservado"];
+
+// Ancho común de las etiquetas de la barra de filtros, para que las cajas empiecen en la misma columna.
+const ANCHO_ETIQUETA = "110px";
 
 export default function Medicamentos() {
     const { token, userlogued } = useSessionData();
@@ -61,7 +92,13 @@ export default function Medicamentos() {
 
     const opcionesTipo = useMemo(() => tipos.map((tipo) => ({ value: String(tipo.codigo), label: tipo.descripcion })), [tipos]);
 
-    const columnasVisibles = useMemo(() => columnas.filter((columna) => !columnasOcultas.includes(columna.id)), [columnasOcultas]);
+    const columnasVisibles = useMemo(
+        () =>
+            columnas
+                .filter((columna) => !columnasOcultas.includes(columna.id))
+                .map(({ encabezado, ...columna }) => ({ ...columna, label: encabezado ?? columna.label })),
+        [columnasOcultas]
+    );
 
     const alternarColumna = (id) =>
         setColumnasOcultas((actuales) => (actuales.includes(id) ? actuales.filter((oculta) => oculta !== id) : [...actuales, id]));
@@ -116,20 +153,21 @@ export default function Medicamentos() {
         <div className="space-y-4 px-4 pb-4">
             <SectionFieldset legend="Medicamentos Registrados">
                 <AvisoError mensaje={errorMedicamentos || errorTipos} onRetry={reintentar} />
+                <AvisoError mensaje={errorInventarios} onRetry={cargarInventarios} />
 
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                    <div title="El stock (actual, reservado y disponible) es el del inventario elegido; por defecto, el central.">
+                {/* Una sola cuadrícula para toda la barra: el inventario ocupa la columna de "Buscar" (llega hasta donde
+                    termina esa caja) y los botones de registro van a la derecha, sobre "Columnas". */}
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] items-start gap-4 mb-3">
+                    <div title="El stock (físico, reservado y disponible) es el del inventario elegido; por defecto, el central.">
                         <SelectorInventario
-                            compacto
                             inventarios={inventarios}
                             inventarioId={inventarioId}
                             onChange={(e) => setInventarioId(e.target.value)}
-                            error={errorInventarios}
-                            onRetry={cargarInventarios}
+                            labelWidth={ANCHO_ETIQUETA}
                         />
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="md:col-span-2 flex flex-wrap items-center justify-end gap-3">
                         <button
                             type="button"
                             onClick={() => setModalRegistro(true)}
@@ -161,13 +199,11 @@ export default function Medicamentos() {
                             <FontAwesomeIcon icon={faPlus} /> Masivo
                         </button>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] items-start gap-4 mb-3">
                     <InputTextOneLine
                         label="Buscar"
                         name="filtroNombre"
-                        labelWidth="110px"
+                        labelWidth={ANCHO_ETIQUETA}
                         value={filtroNombre}
                         onChange={(e) => setFiltroNombre(e.target.value)}
                     />
@@ -179,7 +215,7 @@ export default function Medicamentos() {
                         options={opcionesTipo}
                         placeholder="Todos"
                         inline
-                        labelWidth="110px"
+                        labelWidth={ANCHO_ETIQUETA}
                     />
                     <SelectorColumnas columnas={columnas} ocultas={columnasOcultas} onToggle={alternarColumna} />
                 </div>

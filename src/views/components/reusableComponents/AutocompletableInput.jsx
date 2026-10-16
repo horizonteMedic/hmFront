@@ -10,7 +10,8 @@ export default function AutocompleteInput({
     onSelect,          // (item) => void
     onChange,          // (value: string) => void — opcional, para limpiar form al borrar
     nextFocusId,       // id del siguiente campo a enfocar tras seleccionar
-    labelWidth,        // opcional: ancho fijo de la etiqueta, para alinearla con los InputTextOneLine del formulario
+    labelWidth,        // opcional: ancho fijo de la etiqueta; con él, etiqueta y caja se ven igual que las de InputTextOneLine
+    required = false,  // opcional: marca la etiqueta con "*" (solo en el modo con labelWidth)
 }) {
     const [filtered, setFiltered] = useState([]);
 
@@ -32,7 +33,8 @@ export default function AutocompleteInput({
         <div className={`flex w-full justify-center items-center ${labelWidth ? "gap-4" : "gap-2"}`}>
             {labelWidth ? (
                 <label htmlFor={id} className="font-semibold" style={{ minWidth: labelWidth, maxWidth: labelWidth }}>
-                    {label} :
+                    {label}
+                    {required && <span className="text-red-500 ml-0.5">*</span>} :
                 </label>
             ) : (
                 <p className="font-semibold">{label}:</p>
@@ -59,7 +61,7 @@ export default function AutocompleteInput({
                         }
                     }}
                     onBlur={() => setTimeout(() => setFiltered([]), 100)}
-                    className="border border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full"
+                    className={`border border-gray-300 py-1 focus:outline-none w-full ${labelWidth ? "px-2 rounded" : "px-3 mb-1 rounded-md"}`}
                 />
                 {value && filtered.length > 0 && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
