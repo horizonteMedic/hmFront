@@ -1,4 +1,5 @@
 import {
+  InputCheckbox,
   InputTextOneLine,
   InputTextArea,
   SectionFieldset,
@@ -14,10 +15,14 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { erroresDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { ConfirmarImpresion, EliminarVacuna, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaAdultoMayor";
+import { actualizarDescanso } from "../DescansoMedico/controllerDescansoMedico";
 import InmunizacionesAdultoMayor from "./InmunizacionesAdultoMayor";
 import AntecedentesQuirurgicosAdultoMayor from "./AntecedentesQuirurgicosAdultoMayor";
+import DescansoMedico from "../DescansoMedico/DescansoMedico";
+import InformeAccidente from "../InformeAccidente/InformeAccidente";
 
 // Campos propios que el usuario puede editar (para resaltar/revertir cambios). Los antecedentes
 // personales/familiares y el bloque clínico (examen físico, diagnóstico…) vienen de OTROS módulos en
@@ -150,6 +155,8 @@ export default function HistoriaClinicaAdultoMayor() {
     ticketImprimir: "",
     numeroHistoriaClinica: "",
     fecha_apertura_hcl: today,
+    // Cliente La Arena: muestra el Descanso Médico y el Informe de Accidente (solo UI, no se envía a la Historia Clínica).
+    laArena: false,
 
     // Datos Personales (solo lectura: vienen del paciente)
     domicilio: "",
@@ -240,16 +247,36 @@ export default function HistoriaClinicaAdultoMayor() {
     // Observaciones
     observaciones: "",
 
-    // Examen / Diagnóstico (solo lectura, los entrega el backend)
+    // Examen / Diagnóstico (el backend los entrega prellenados; se editan y se guardan con la Historia)
     examenFisico: "",
     examenesAuxiliares: "",
     diagnostico: "",
     tratamiento: "",
     seguimientoYControl: "",
+    // true tras un intento de guardar: recién ahí se muestran los errores de campos obligatorios (Diagnóstico y
+    // Tratamiento). Vuelve a false con cualquier limpieza/búsqueda, porque parten del estado inicial.
+    intentoGuardar: false,
 
     // Médico que Certifica
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Descanso Médico (registro aparte de la Historia Clínica, ver ../DescansoMedico/controllerDescansoMedico)
+    descansoRegistrado: false,
+    descansoFechaInicio: today,
+    descansoDias: "",
+    descansoFechaFin: "",
+    descansoTipoEvento: "",
+    // Datos del ticket que imprime el Descanso Médico (solo lectura)
+    ticketEmpresa: "",
+    ticketArea: "",
+    ticketCargo: "",
+    ticketSede: "",
+    ticketFecha: "",
+
+    // Informe de Accidente (registro aparte de la Historia Clínica, ver ../InformeAccidente/controllerInformeAccidente)
+    accidenteRegistrado: false,
+    accidenteCircunstancias: "",
 
     // Campos de DatosPersonalesLaborales
     dni: "",
@@ -269,6 +296,7 @@ export default function HistoriaClinicaAdultoMayor() {
     handleChangeSimple,
     handleChangeNumberDecimals,
     handleRadioButton,
+    handleCheckBoxChange,
     handleClear,
   } = useForm(initialFormState, { storageKey: "hc_adulto_mayor_ticket" });
 
@@ -293,18 +321,34 @@ export default function HistoriaClinicaAdultoMayor() {
     fechaHoraActual: getFechaHoraActual(),
   });
 
+  // Tras guardar el formulario se limpia, pero "La Arena" se conserva: es la elección de trabajo del usuario
+  // (como al buscar otro ticket) y de ella depende ver los botones de impresión del descanso y del accidente.
+  const limpiarTrasGuardar = () => setForm({ ...initialFormState, laArena: form.laArena });
+
+  // Diagnóstico y Tratamiento obligatorios: el error inline aparece tras intentar guardar y desaparece al completar el campo.
+  const errores = form.intentoGuardar ? erroresDiagnosticoTratamiento(form) : {};
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, datosFooter);
+    setForm((f) => ({ ...f, intentoGuardar: true }));
+    SubmitDataService(form, token, userlogued, limpiarTrasGuardar, datosFooter);
   };
 
+  // Con "La Arena" marcado, el mensaje de impresión ofrece también el Descanso Médico y el Informe de Accidente.
   const handlePrint = () => {
-    ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
+    ConfirmarImpresion(form.ticketImprimir, token, datosFooter, form.laArena);
+  };
+
+  // Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
+  // se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET.
+  const handleChangeDescanso = (campo, valor) => {
+    setForm((f) => ({ ...f, ...actualizarDescanso(f, campo, valor) }));
   };
 
   // ===== Búsqueda con botón / enter =====
   const executeSearch = () => {
     const numeroTicket = form.n_hcl;
-    setForm({ ...initialFormState, n_hcl: numeroTicket });
+    // "La Arena" es una elección del usuario para esta sesión de trabajo: no se desmarca al buscar otro ticket.
+    setForm({ ...initialFormState, n_hcl: numeroTicket, laArena: form.laArena });
     VerifyTR(numeroTicket, token, setForm, today, listaEmpleados);
   };
 
@@ -415,6 +459,14 @@ export default function HistoriaClinicaAdultoMayor() {
           value={form.numeroHistoriaClinica}
           disabled
           labelWidth="120px"
+        />
+        {/* Es una elección de trabajo, no un dato de la Historia Clínica: no se bloquea con el registro. */}
+        <InputCheckbox
+          label="La Arena"
+          name="laArena"
+          checked={form.laArena}
+          onChange={handleCheckBoxChange}
+          className="font-semibold w-fit"
         />
       </SectionFieldset>
 
@@ -643,12 +695,13 @@ export default function HistoriaClinicaAdultoMayor() {
         />
       </SectionFieldset>
 
-      {/* Solo lectura: el backend los arma desde la consulta del paciente; no se guardan desde aquí. */}
-      <SectionFieldset legend="Examen, Diagnóstico y Tratamiento (solo lectura)" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      {/* El backend los arma desde la consulta del paciente, pero se editan aquí y se guardan con la Historia.
+          Diagnóstico y Tratamiento son obligatorios. */}
+      <SectionFieldset legend="Examen, Diagnóstico y Tratamiento" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <InputTextArea label="Examen Físico" name="examenFisico" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("examenFisico")} onRevert={() => revertField("examenFisico")} value={form.examenFisico} rows={3} />
         <InputTextArea label="Examenes Auxiliares" name="examenesAuxiliares" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("examenesAuxiliares")} onRevert={() => revertField("examenesAuxiliares")} value={form.examenesAuxiliares} rows={3} />
-        <InputTextArea label="Diagnostico" name="diagnostico" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("diagnostico")} onRevert={() => revertField("diagnostico")} value={form.diagnostico} rows={3} />
-        <InputTextArea label="Tratamiento" name="tratamiento" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("tratamiento")} onRevert={() => revertField("tratamiento")} value={form.tratamiento} rows={3} />
+        <InputTextArea label="Diagnóstico" name="diagnostico" required error={errores.diagnostico} onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("diagnostico")} onRevert={() => revertField("diagnostico")} value={form.diagnostico} rows={3} />
+        <InputTextArea label="Tratamiento" name="tratamiento" required error={errores.tratamiento} onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("tratamiento")} onRevert={() => revertField("tratamiento")} value={form.tratamiento} rows={3} />
         <InputTextArea
           label="Seguimiento y Control"
           name="seguimientoYControl"
@@ -673,6 +726,13 @@ export default function HistoriaClinicaAdultoMayor() {
           onRevert={revertMedico}
         />
       </SectionFieldset>
+
+      {form.laArena && (
+        <>
+          <DescansoMedico form={form} onChange={handleChangeDescanso} disabled={camposDeshabilitados} />
+          <InformeAccidente form={form} onChange={handleChange} disabled={camposDeshabilitados} />
+        </>
+      )}
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
       {hayRegistroCargado && (

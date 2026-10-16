@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBacterium, faBoxesStacked, faNotesMedical, faSearch, faStethoscope, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBacterium, faBoxesStacked, faNotesMedical, faSearch, faStethoscope, faTruckMedical, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabSelector";
 import TriajeAsistencial from "./Triaje/Triaje";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector";
+import HojaReferencia from "./HojaReferencia/HojaReferencia";
 import ReportesTabSelector from "./Reportes/ReportesTabSelector";
 import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 
@@ -18,8 +19,9 @@ const sections = [
     { tab: 3, vista: "Antecedentes Patologicos", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
     { tab: 4, vista: "Historia Asistencial", label: "Historia Asistencial", icon: faNotesMedical, component: AsistencialTabSelector },
     { tab: 5, vista: "Laboratorio Asistencial", label: "Laboratorio", icon: faVial, component: LaboratorioTabSelector },
-    { tab: 6, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
-    { tab: 7, vista: "Inventario Asistencial", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
+    { tab: 6, vista: "Hoja de Referencia", label: "Hoja de Referencia", icon: faTruckMedical, component: HojaReferencia },
+    { tab: 7, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
+    { tab: 8, vista: "Inventario Asistencial", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
 ];
 
 const ModuloAsistencial = () => {

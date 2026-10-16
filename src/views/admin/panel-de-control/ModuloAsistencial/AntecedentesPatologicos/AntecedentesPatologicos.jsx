@@ -44,6 +44,7 @@ const CAMPOS_EDITABLES = [
 
 // Enfermedades a marcar (Antecedentes Patológicos Personales)
 const ENFERMEDADES = [
+    ["accidentes", "Accidentes"],
     ["acv", "ACV (Acc. Cerebro Vascular)"],
     ["alergias", "Alergias"],
     ["amigdalitisCronica", "Amigdalitis crónica"],
@@ -88,15 +89,16 @@ const ENFERMEDADES = [
     ["hepatitis", "Hepatitis"],
     ["hernias", "Hernias"],
     ["hipertensionArterial", "Hipertensión Arterial"],
+    ["hospitalizacionUlt3Anios", "Hospitalización Últ 3 años"],
     ["ima", "IMA (Infarto agudo al miocardio)"],
     ["infUrinariasRepetidas", "Inf. Urinarias repetidas"],
     ["insuficienciaCardiaca", "Insuficiencia Cardíaca"],
     ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
     ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
+    ["intervQuirurgica", "Interv. Quirúrgica"],
     ["intoxicaciones", "Intoxicaciones"],
     ["its", "ITS"],
     ["litiasisUrinaria", "Litiasis Urinaria"],
-    ["malaria", "Malaria"],
     ["meningitis", "Meningitis"],
     ["migrana", "Migraña"],
     ["neoplasias", "Neoplasias"],
