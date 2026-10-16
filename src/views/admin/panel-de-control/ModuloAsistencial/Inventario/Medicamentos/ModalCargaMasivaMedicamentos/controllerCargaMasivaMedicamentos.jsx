@@ -3,7 +3,7 @@ import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { enviarInventario, inventarioUrl, limpiarTexto, normalizarTexto } from "../../inventarioUtils";
-import { claveMedicamento } from "../controllerMedicamentos";
+import { STOCK_MINIMO_MIN, claveMedicamento } from "../controllerMedicamentos";
 
 const medicamentosMasivoUrl = `${inventarioUrl}/medicamentos/masivo`;
 
@@ -49,7 +49,7 @@ const generarPlantilla = async (tipos) => {
         "Complete la hoja MEDICAMENTOS desde la fila 2. No cambie ni borre los encabezados.",
         "NOMBRE y PRESENTACION son obligatorios (por ejemplo: PARACETAMOL 500 MG / TABLETA).",
         "TIPO: elija una opción del desplegable (o escriba el código o el nombre de la tabla de abajo).",
-        "STOCK MINIMO: número entero. Si lo deja vacío se registra 0. Sirve para avisar cuándo reponer.",
+        `STOCK MINIMO: obligatorio, número entero de ${STOCK_MINIMO_MIN} o más. Sirve para avisar cuándo reponer.`,
         "No puede repetir un medicamento con el mismo nombre y presentación, ni uno ya registrado.",
         "El usuario y la fecha de registro los asigna el sistema.",
     ];
@@ -83,10 +83,10 @@ const generarPlantilla = async (tipos) => {
             type: "whole",
             operator: "greaterThanOrEqual",
             allowBlank: true,
-            formulae: [0],
+            formulae: [STOCK_MINIMO_MIN],
             showErrorMessage: true,
             errorTitle: "Stock mínimo no válido",
-            error: "Ingrese un número entero (0 o más).",
+            error: `Ingrese un número entero (${STOCK_MINIMO_MIN} o más).`,
         };
     }
 
@@ -138,7 +138,10 @@ const errorDeFila = ({ nombre, presentacion, tipoTexto, tipo, stockTexto, stockM
     if (!presentacion) return "Falta la presentación";
     if (!tipoTexto) return "Falta el tipo";
     if (!tipo) return `Tipo no válido: "${tipoTexto}"`;
-    if (stockTexto && !(Number.isInteger(stockMinimo) && stockMinimo >= 0)) return "El stock mínimo debe ser un número entero (0 o más)";
+    if (!stockTexto) return "Falta el stock mínimo";
+    if (!(Number.isInteger(stockMinimo) && stockMinimo >= STOCK_MINIMO_MIN)) {
+        return `El stock mínimo debe ser un número entero (${STOCK_MINIMO_MIN} o más)`;
+    }
     return "";
 };
 
@@ -172,7 +175,7 @@ export const LeerExcelMedicamentos = async (archivo, tipos, existentes) => {
             if (!nombre && !presentacion && !tipoTexto && !stockTexto) return;
 
             const tipo = buscarTipo(tipoTexto, tipos);
-            // El stock mínimo vacío vale 0; "abc" o "2.5" quedan como inválidos.
+            // "abc" o "2.5" quedan como inválidos; vacío se reporta aparte en errorDeFila.
             const stockMinimo = stockTexto ? Number(stockTexto.replace(",", ".")) : 0;
 
             let error = errorDeFila({ nombre, presentacion, tipoTexto, tipo, stockTexto, stockMinimo });

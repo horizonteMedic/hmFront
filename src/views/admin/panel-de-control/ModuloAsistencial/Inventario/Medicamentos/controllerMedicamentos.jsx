@@ -9,7 +9,36 @@ const tiposMedicamentoUrl = `${medicamentosUrl}/tipos`;
 // ni espacios). Es el mismo criterio con el que el backend rechaza los duplicados.
 export const claveMedicamento = (nombre, presentacion) => `${normalizarTexto(nombre)}|${normalizarTexto(presentacion)}`;
 
-const ordenarPorNombre = (a, b) => String(a.nombre ?? "").localeCompare(String(b.nombre ?? ""), "es");
+// Valor mínimo permitido del stock mínimo (el formulario y el registro masivo lo exigen).
+export const STOCK_MINIMO_MIN = 1;
+
+// Presentaciones del desplegable. "OTRO" abre un campo de texto para escribir una que no esté en la lista.
+export const OTRA_PRESENTACION = "OTRO";
+export const opcionesPresentacion = [
+    "TABLETA",
+    "CÁPSULA",
+    "JARABE",
+    "SUSPENSIÓN",
+    "SOLUCIÓN",
+    "AMPOLLA",
+    "INYECTABLE",
+    "FRASCO",
+    "SOBRE",
+    "GOTAS",
+    "CREMA",
+    "UNGÜENTO",
+    "GEL",
+    "SUPOSITORIO",
+    "ÓVULO",
+    "AEROSOL",
+    OTRA_PRESENTACION,
+].map((presentacion) => ({ value: presentacion, label: presentacion }));
+
+// Presentación que se guarda: la elegida, o el texto escrito cuando se eligió "OTRO".
+const presentacionDelForm = (form) =>
+    form.presentacion === OTRA_PRESENTACION ? limpiarTexto(form.presentacionOtro) : limpiarTexto(form.presentacion);
+
+const ordenarPorNombre =(a, b) => String(a.nombre ?? "").localeCompare(String(b.nombre ?? ""), "es");
 
 // Carga el catálogo y los tipos en paralelo. Si algo falla deja el mensaje en `setErrorCarga` (la pantalla
 // lo muestra con un botón de reintento) y conserva lo que ya estaba cargado.
@@ -34,13 +63,17 @@ export const ObtenerCatalogoMedicamentos = async (token, setMedicamentos, setTip
 export const ValidarMedicamento = (form, medicamentos) => {
     const errores = {};
     const nombre = limpiarTexto(form.nombre);
-    const presentacion = limpiarTexto(form.presentacion);
+    const presentacion = presentacionDelForm(form);
+    const stockMinimo = String(form.stockMinimo ?? "").trim();
 
     if (!nombre) errores.nombre = "Ingrese el nombre del medicamento";
-    if (!presentacion) errores.presentacion = "Ingrese la presentación (tableta, crema, frasco...)";
+    if (!form.presentacion) errores.presentacion = "Seleccione la presentación";
+    else if (!presentacion) errores.presentacionOtro = "Escriba la presentación";
     if (!form.tipoMedicamento) errores.tipoMedicamento = "Seleccione el tipo de medicamento";
-    if (form.stockMinimo !== "" && !/^\d+$/.test(String(form.stockMinimo))) {
-        errores.stockMinimo = "Ingrese un número entero (0 o más)";
+    if (!stockMinimo) {
+        errores.stockMinimo = "Ingrese el stock mínimo";
+    } else if (!/^\d+$/.test(stockMinimo) || Number(stockMinimo) < STOCK_MINIMO_MIN) {
+        errores.stockMinimo = `Ingrese un número entero (${STOCK_MINIMO_MIN} o más)`;
     }
 
     if (nombre && presentacion) {
@@ -55,10 +88,9 @@ export const ValidarMedicamento = (form, medicamentos) => {
 
 const construirBody = (form) => ({
     nombre: limpiarTexto(form.nombre),
-    presentacion: limpiarTexto(form.presentacion),
+    presentacion: presentacionDelForm(form),
     tipoMedicamento: Number(form.tipoMedicamento),
-    // El stock mínimo es opcional: vacío = 0 (sin aviso de reposición).
-    stockMinimo: Number(form.stockMinimo) || 0,
+    stockMinimo: Number(form.stockMinimo),
 });
 
 // Devuelve true si el medicamento quedó registrado, para que la pantalla limpie el formulario y recargue.

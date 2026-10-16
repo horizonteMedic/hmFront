@@ -11,12 +11,19 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { usePagination } from "../../../../../utils/listUtils";
 import { normalizarTexto } from "../inventarioUtils";
-import { ObtenerCatalogoMedicamentos, RegistrarMedicamento, ValidarMedicamento } from "./controllerMedicamentos";
+import {
+    OTRA_PRESENTACION,
+    ObtenerCatalogoMedicamentos,
+    RegistrarMedicamento,
+    ValidarMedicamento,
+    opcionesPresentacion,
+} from "./controllerMedicamentos";
 import ModalCargaMasivaMedicamentos from "./ModalCargaMasivaMedicamentos/ModalCargaMasivaMedicamentos";
 
 const initialFormState = {
     nombre: "",
     presentacion: "",
+    presentacionOtro: "",
     tipoMedicamento: "",
     stockMinimo: "",
 };
@@ -98,6 +105,7 @@ export default function Medicamentos() {
     const onChangeSelect = (e) => {
         handleChangeSimple(e);
         limpiarError(e.target.name);
+        if (e.target.name === "presentacion") limpiarError("presentacionOtro");
     };
 
     const handleSave = async () => {
@@ -130,15 +138,28 @@ export default function Medicamentos() {
                     required
                     error={errores.nombre}
                 />
-                <InputTextOneLine
+                <SelectField
                     label="Presentación"
                     name="presentacion"
-                    labelWidth="110px"
                     value={form.presentacion}
-                    onChange={onChange}
+                    onChange={onChangeSelect}
+                    options={opcionesPresentacion}
+                    inline
+                    labelWidth="110px"
                     required
                     error={errores.presentacion}
                 />
+                {form.presentacion === OTRA_PRESENTACION && (
+                    <InputTextOneLine
+                        label="Especifique"
+                        name="presentacionOtro"
+                        labelWidth="110px"
+                        value={form.presentacionOtro}
+                        onChange={onChange}
+                        required
+                        error={errores.presentacionOtro}
+                    />
+                )}
                 <SelectField
                     label="Tipo"
                     name="tipoMedicamento"
@@ -156,6 +177,7 @@ export default function Medicamentos() {
                     labelWidth="110px"
                     value={form.stockMinimo}
                     onChange={onChangeNumero}
+                    required
                     error={errores.stockMinimo}
                 />
             </SectionFieldset>
