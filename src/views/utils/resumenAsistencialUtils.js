@@ -53,6 +53,8 @@ export const datosTriajeResumen = (triaje) => {
     peso: conUnidad(triaje?.pesoKg, "kg"),
     // La talla del Triaje asistencial se guarda en metros (ver ReporteTriajeAsistencial).
     talla: conUnidad(triaje?.tallaCm, "m"),
+    // "PC" de la hoja: perímetro del cuello (TriajeAsistencialDTO.perimetroCuelloCm).
+    perimetroCuelloCm: conUnidad(triaje?.perimetroCuelloCm, "cm"),
     anamnesis: triaje?.anamnesis ?? "",
   };
 };

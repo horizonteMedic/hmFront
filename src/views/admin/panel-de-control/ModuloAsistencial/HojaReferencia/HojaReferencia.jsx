@@ -199,10 +199,7 @@ export default function HojaReferencia() {
     if (e.key === "Enter") executeSearch();
   };
 
-  const opcionesOrigen = opcionesDe(
-    catalogos?.establecimientoOrigenDefault ? [catalogos.establecimientoOrigenDefault] : [],
-    form.establecimientoOrigen
-  );
+  
   const opcionesArea = opcionesDe(catalogos?.areasAtencion ?? [], form.areaAtencion);
   const opcionesCondicion = opcionesDe(catalogos?.condiciones ?? [], form.condicion);
   const opcionesEspecialidad = opcionesDe(ESPECIALIDADES, form.especialidad);
@@ -239,15 +236,12 @@ export default function HojaReferencia() {
           />
           <SearchButton onClick={executeSearch} disabled={hayRegistroCargado} className="lg:hidden" />
         </div>
-        <SelectField
+        <InputTextOneLine
           label="Establecimiento de Origen"
           name="establecimientoOrigen"
           value={form.establecimientoOrigen}
-          onChange={handleChangeSimple}
-          options={opcionesOrigen}
-          inline
           labelWidth="180px"
-          {...editable("establecimientoOrigen")}
+          disabled
         />
         <InputTextOneLine
           label="Establecimiento de Destino"

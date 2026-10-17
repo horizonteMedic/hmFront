@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,6 +30,20 @@ const ModuloAsistencial = () => {
     const navigate = useNavigate();
 
     const Vista = useAuthStore((state) => state.listView);
+    const sedesUsuario = useAuthStore((state) => state.userlogued?.sedes);
+    const selectedSede = useAuthStore((state) => state.selectedSede);
+    const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
+
+    // El login deja selectedSede en null y solo SistemaOcupacional le pone un valor; al entrar
+    // directo a este módulo quedaba vacío (el ticket se guardaba sin serieTicket ni sede, aunque
+    // el selector del Navbar mostrara una). Misma regla que SistemaOcupacional: la elegida si
+    // sigue siendo válida; si no, T-NP o la primera sede del usuario.
+    useEffect(() => {
+        if (!Array.isArray(sedesUsuario) || sedesUsuario.length === 0) return;
+        if (sedesUsuario.some((sede) => sede.cod_sede === selectedSede)) return;
+        const sedeTNP = sedesUsuario.find((sede) => sede.cod_sede === "T-NP");
+        setSelectedSede(sedeTNP?.cod_sede || sedesUsuario[0].cod_sede);
+    }, [sedesUsuario, selectedSede, setSelectedSede]);
 
     const tieneVista = (nombreVista) => {
         return Vista.some((item) => item === nombreVista);

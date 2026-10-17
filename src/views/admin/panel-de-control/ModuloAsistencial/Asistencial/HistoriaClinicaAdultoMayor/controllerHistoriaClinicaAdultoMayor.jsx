@@ -3,7 +3,11 @@ import { deleteData, getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
-import { mensajeDiagnosticoTratamiento, obtenerDigitalizacionMedico } from "../../../../../utils/registroAsistencialUtils";
+import {
+    enterCancelaSinSeleccion,
+    mensajeDiagnosticoTratamiento,
+    obtenerDigitalizacionMedico,
+} from "../../../../../utils/registroAsistencialUtils";
 import {
     armarAntecedentesResumen,
     datosTriajeResumen,
@@ -18,6 +22,7 @@ import {
     ConfirmarImpresionConComplementos,
     GuardarComplementos,
     armarResultadoGuardado,
+    esArenaDe,
     validarComplementos,
 } from "../ComplementosLaArena/controllerComplementos";
 
@@ -282,6 +287,9 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...formFromPaciente(paciente),
         ...formFromHistoria(data, today),
         ...formFromTicketInfo(data.infoTicket),
+        // La Arena la define el ticket (esArena), no el formulario: de ahí dependen Receta, Descanso Médico,
+        // Informe de Accidente, Resumen Asistencial y las opciones de impresión.
+        esArena: esArenaDe(data),
         ...formFromDescanso(descanso),
         ...formFromInformeAccidente(informeAccidente),
         ...formFromReceta(receta),
@@ -323,6 +331,8 @@ const OpenModalHistorialPrevio = async (numeroTicket, token, set, today, listaEm
     }, {});
 
     const resultadoModal = await Swal.fire({
+        // Enter sin elegir ningún registro cancela (no «usa» nada).
+        ...enterCancelaSinSeleccion(),
         title: "Historia Clínica previa del paciente",
         html: `<p style="margin:0 0 4px;color:#64748b;font-size:12px;">Selecciona un registro anterior para completar el formulario actual.</p>`,
         input: "radio",
@@ -487,6 +497,7 @@ export const ObtenerDatosComplementos = async (numeroTicket, token) => {
         ...formFromPaciente(paciente),
         ...formFromHistoria(data, ""),
         ...formFromTicketInfo(data.infoTicket),
+        esArena: esArenaDe(data),
         n_hcl: String(numeroTicket),
         nombre_medico: data.doctorAsignado ?? "",
         tieneRegistro: tieneHistoria(data),
@@ -715,10 +726,21 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
     }
 };
 
-// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Con
-// "La Arena" marcado el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laArena = false) => {
-    if (laArena) {
+// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Si el ticket es
+// de La Arena el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
+// El N° escrito en el bloque IMPRIMIR puede ser de otro ticket que el cargado en pantalla, así que "La Arena" se
+// consulta (esArena) en el ticket que se va a imprimir y no en el formulario.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+    if (!numeroTicket) {
+        await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
+        return;
+    }
+
+    LoadingDefault("Consultando ticket");
+    const historia = await ObtenerDatosComplementos(numeroTicket, token);
+    Swal.close();
+
+    if (historia?.esArena) {
         await ConfirmarImpresionConComplementos({
             numeroTicket,
             token,
@@ -726,11 +748,6 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laAre
             obtenerDatosHC: ObtenerDatosComplementos,
             imprimirHistoria: () => PrintHojaR(numeroTicket, token, datosFooter),
         });
-        return;
-    }
-
-    if (!numeroTicket) {
-        await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;
     }
 

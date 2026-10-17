@@ -12,7 +12,7 @@ import { useMedicamentosReceta } from "./useMedicamentosReceta";
 const ANCHO_ETIQUETA = "150px";
 
 /**
- * Receta (reserva de medicamentos) de las Historias Clínicas del módulo (solo con "La Arena" marcado).
+ * Receta (reserva de medicamentos) de las Historias Clínicas del módulo (solo en tickets de La Arena).
  *
  * No tiene botón propio: se guarda con el Guardar de la Historia Clínica y solo RESERVA el stock; farmacia la entrega
  * desde Inventario > Entrega por Ticket. El estado vive en el formulario de la Historia (campos `receta*`, ver
@@ -20,8 +20,9 @@ const ANCHO_ETIQUETA = "150px";
  *
  * Bloqueados (solo informativos): N° de ticket, Entregado, Usuario, Fecha y hora de creación e Inventario. Una receta
  * ya entregada queda de solo lectura; `disabled` la bloquea también (registro existente sin "Habilitar edición").
+ * `acciones` (opcional) son los botones o sellos de la barra del título (ver ComplementoDesplegable).
  */
-export default function Receta({ form, setForm, token, usuario, disabled = false }) {
+export default function Receta({ form, setForm, token, usuario, disabled = false, acciones = null }) {
     const { cargando, error, inventario, medicamentos, recargar } = useMedicamentosReceta(token, form.ticketSede, Boolean(form.pacienteId));
     const [errores, setErrores] = useState({});
 
@@ -103,7 +104,7 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
     ];
 
     return (
-        <SectionFieldset legend="Receta (Reserva de Medicamentos)" className="space-y-3">
+        <SectionFieldset legend="Receta (Reserva de Medicamentos)" className="space-y-3" actions={acciones}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine label="Entregado" name="recetaEntregado" value={entregada ? "SÍ" : "NO"} disabled labelWidth={ANCHO_ETIQUETA} />
                 <InputTextOneLine

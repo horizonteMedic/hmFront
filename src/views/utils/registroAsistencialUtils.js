@@ -106,6 +106,34 @@ export const mensajeDiagnosticoTratamiento = (form) => {
   return faltan.length ? `Debe completar los campos obligatorios: ${faltan.join(" y ")}.` : null;
 };
 
+// Opciones para un modal de SweetAlert2 con `input: "radio"` y botón Cancelar: Enter sin ninguna opción marcada
+// CANCELA, en vez de «confirmar» (por defecto el foco abre sobre el botón de confirmar y Enter solo mostraba el aviso
+// de validación). El foco inicial queda en «Cancelar» para que se vea así. Con una opción marcada Enter confirma como
+// siempre; el clic en el botón de confirmar sin elegir sigue mostrando el aviso.
+// Uso: `Swal.fire({ ...enterCancelaSinSeleccion(), input: "radio", ... })`.
+export const enterCancelaSinSeleccion = () => {
+  let controlador = null;
+
+  const alPulsar = (event, popup) => {
+    if (event.key !== "Enter" || event.isComposing) return;
+    if (popup.querySelector(".swal2-radio input:checked")) return;
+    // En fase de captura y sin dejarlo llegar al manejador de SweetAlert2, que lo trataría como «confirmar».
+    event.preventDefault();
+    event.stopPropagation();
+    Swal.clickCancel();
+  };
+
+  return {
+    focusConfirm: false,
+    focusCancel: true,
+    didOpen: (popup) => {
+      controlador = new AbortController();
+      popup.addEventListener("keydown", (event) => alPulsar(event, popup), { capture: true, signal: controlador.signal });
+    },
+    willClose: () => controlador?.abort(),
+  };
+};
+
 // Datos del paciente por N° de Ticket. null si el ticket no existe.
 export const buscarPacientePorTicket = async (numeroTicket, token) => {
   try {

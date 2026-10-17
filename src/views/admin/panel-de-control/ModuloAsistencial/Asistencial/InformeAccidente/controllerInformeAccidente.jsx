@@ -10,7 +10,7 @@ import {
 } from "../../../../../utils/registroAsistencialUtils";
 
 // Informe médico de accidentes del ticket (InformeAccidenteAsistencialDTO). Lo comparten las Historias
-// Clínicas del módulo: solo se muestra con el checkbox "La Arena" marcado y se guarda junto con la Historia
+// Clínicas del módulo: solo se muestra en tickets de La Arena (esArena) y se guarda junto con la Historia
 // Clínica (su botón Guardar), no por separado (ver controllerComplementos).
 //   GET  .../ticket/{numeroTicket}  -> el informe registrado (404 / id null si todavía no hay).
 //   POST ...?usuario=               -> { numeroTicket, circunstancias } (crea o edita).

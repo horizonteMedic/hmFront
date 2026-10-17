@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileMedical } from "@fortawesome/free-solid-svg-icons";
 
 // Botón "Resumen Asistencial" de las Historias Clínicas: imprime la hoja de Historia Clínica del ticket
-// buscado. Es un extra del cliente La Arena: el formulario solo lo monta con ese checkbox marcado.
+// buscado. Es un extra del cliente La Arena: el formulario solo lo monta en tickets de La Arena (esArena).
 export default function BotonResumenAsistencial({ onClick }) {
   return (
     <button

@@ -2,10 +2,11 @@ import Swal from "sweetalert2";
 import { SubmitData } from "../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { getToday } from "../../../../../utils/helpers";
 import { obtenerDigitalizacionMedico, obtenerRegistroPorTicket, sedeDelTicket } from "../../../../../utils/registroAsistencialUtils";
 
 // Descanso médico del ticket (DescansoMedicoAsistencialDTO). Lo comparten las Historias Clínicas del
-// módulo (Adulto Mayor, Mujer y Varón Adulto): solo se muestra con el checkbox "La Arena" marcado y se
+// módulo (Adulto Mayor, Mujer y Varón Adulto): solo se muestra en tickets de La Arena (esArena) y se
 // guarda junto con la Historia Clínica (su botón Guardar), no por separado (ver controllerComplementos).
 //   GET  .../ticket/{numeroTicket}  -> el descanso registrado (404 / id null si todavía no hay).
 //   POST ...?usuario=               -> { numeroTicket, fechaInicio, cantidadDias, fechaFin, tipoEvento }.
@@ -75,6 +76,15 @@ export const actualizarDescanso = (form, campo, valor) => {
     }
     return siguiente;
 };
+
+// Campos del descanso en blanco (inicio hoy, resto vacío): el estado de partida de la sección. Sirve para descartar
+// un descanso que se empezó a llenar (ver ComplementosDesplegables).
+export const descansoVacio = () => ({
+    descansoFechaInicio: getToday(),
+    descansoDias: "",
+    descansoFechaFin: "",
+    descansoTipoEvento: "",
+});
 
 // ¿El formulario trae un descanso para guardar? La fecha de inicio no cuenta: siempre viene con "hoy" por
 // defecto. Con cualquiera de los otros datos el descanso debe estar completo (ver validarDescanso).

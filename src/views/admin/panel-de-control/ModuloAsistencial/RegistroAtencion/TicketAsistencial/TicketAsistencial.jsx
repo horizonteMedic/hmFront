@@ -374,7 +374,7 @@ export default function TicketAsistencial() {
 
     const today = getToday();
 
-    const { token, userlogued, selectedSede, userName } = useSessionData();
+    const { token, userlogued, userCompleto, selectedSede, userName } = useSessionData();
 
     const initialFormState = {
         // Datos básicos
@@ -388,7 +388,8 @@ export default function TicketAsistencial() {
         codVendedor: "",
 
         // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
-        laArena: false,
+        // Se guarda en el ticket (esArena) y de ahí lo toman Triaje y las Historias Clínicas.
+        esArena: false,
 
         cargo: "",
         area: "",
@@ -446,7 +447,7 @@ export default function TicketAsistencial() {
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
-        setForm({ ...initialFormState, tipoDocumento: value, laArena: form.laArena });
+        setForm({ ...initialFormState, tipoDocumento: value, esArena: form.esArena });
     };
 
     const handleSeleccionarPacienteSinDni = (item) => {
@@ -644,7 +645,7 @@ export default function TicketAsistencial() {
     const validateForm = () => {
         const next = {};
         if (!form.empresa?.trim()) next.empresa = "La empresa es obligatoria.";
-        if (!form.laArena) {
+        if (!form.esArena) {
             if (!form.metodoPago) next.metodoPago = "El método de pago es obligatorio.";
             if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
             if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
@@ -668,8 +669,8 @@ export default function TicketAsistencial() {
         }
         if (!validateForm()) return;
         // Con La Arena marcado esos campos están ocultos: aunque tengan datos de antes, no se envían.
-        const esLaArena = !!form.laArena;
-        if (!esLaArena && !form.ticketItems?.length) {
+        const esArena = !!form.esArena;
+        if (!esArena && !form.ticketItems?.length) {
             Swal.fire("Error", "Agregue al menos un servicio al ticket.", "error");
             return;
         }
@@ -685,14 +686,18 @@ export default function TicketAsistencial() {
             fechaTicket: form.fecha,
             horaTicket,
             serieTicket: selectedSede || "",
+            // selectedSede es el código (cod_sede); el ticket guarda además el nombre de la sede.
+            sede: userCompleto?.sedes?.find((s) => String(s.cod_sede) === String(selectedSede))?.nombre_sede || null,
             operador: userlogued || null,
-            modoPago: !esLaArena && form.metodoPago ? form.metodoPago : null,
+            // Triaje y las Historias Clínicas leen de aquí si el ticket es de La Arena.
+            esArena,
+            modoPago: !esArena && form.metodoPago ? form.metodoPago : null,
             empresa: form.empresa || null,
             cargo: form.cargo?.trim() || null,
             area: form.area?.trim() || null,
-            codigoVendedor: !esLaArena && form.codVendedor ? Number(form.codVendedor) : null,
-            autoriza: !esLaArena && form.autorizadoPor ? form.autorizadoPor : null,
-            contenidos: esLaArena
+            codigoVendedor: !esArena && form.codVendedor ? Number(form.codVendedor) : null,
+            autoriza: !esArena && form.autorizadoPor ? form.autorizadoPor : null,
+            contenidos: esArena
                 ? []
                 : (form.ticketItems || []).map((item) => ({
                     codigoServicio: item.cod || null,
@@ -732,7 +737,7 @@ export default function TicketAsistencial() {
             cancelButtonText: "No imprimir",
         }).then((result) => {
             if (!result.isConfirmed) return;
-            if (esLaArena) imprimirTicketA4(numeroTicketCreado);
+            if (esArena) imprimirTicketA4(numeroTicketCreado);
             else imprimirTicketVenta(numeroTicketCreado);
         });
     };
@@ -836,7 +841,7 @@ export default function TicketAsistencial() {
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
     // La Arena imprime solo en hoja A4; los demás clientes, solo el ticket de 80mm.
-    const formatoImpresion = form.laArena ? "a4" : "80mm";
+    const formatoImpresion = form.esArena ? "a4" : "80mm";
 
     // Casillas de edad según el paciente cargado (fechaNacimiento viene de su registro en
     // RegistroAsistencial). Sin paciente no se marca ninguna; los menores de 18 tampoco marcan
@@ -849,7 +854,7 @@ export default function TicketAsistencial() {
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
             <SectionFieldset
                 legend="Información del Examen"
-                className={`grid ${form.laArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
+                className={`grid ${form.esArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
             >
                 <InputsRadioGroup
                     name="tipoDocumento"
@@ -898,7 +903,7 @@ export default function TicketAsistencial() {
                     disabled
                     onKeyUp={handleSearch}
                 />
-                {!form.laArena && (
+                {!form.esArena && (
                     <InputTextOneLine
                         label="Código Vendedor"
                         name="codVendedor"
@@ -911,8 +916,8 @@ export default function TicketAsistencial() {
                 )}
                 <InputCheckbox
                     label="La Arena"
-                    name="laArena"
-                    checked={form.laArena}
+                    name="esArena"
+                    checked={form.esArena}
                     onChange={handleCheckBoxChange}
                     className="font-semibold w-fit"
                 />
@@ -949,7 +954,7 @@ export default function TicketAsistencial() {
                     labelWidth="120px"
                     onChange={handleChange}
                 />
-                {!form.laArena && (
+                {!form.esArena && (
                     <>
                         <SelectField
                             label="Método de pago"
@@ -1016,7 +1021,7 @@ export default function TicketAsistencial() {
                 />
             </SectionFieldset>
 
-            {!form.laArena && (<>
+            {!form.esArena && (<>
             <SectionFieldset legend="Agregar Servicios Ticket" className="grid grid-cols-1 xl:grid-cols-[1fr_150px] gap-x-6 gap-y-3">
                 <div className="grid grid-cols-1 gap-y-3">
                     <div className="flex items-center gap-2">

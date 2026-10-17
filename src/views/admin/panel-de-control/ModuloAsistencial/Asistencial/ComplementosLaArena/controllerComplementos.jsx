@@ -1,8 +1,15 @@
 import Swal from "sweetalert2";
 import { MostrarOpcionesImpresion } from "../../../../../utils/functionUtils";
-import { GuardarDescanso, ImprimirDescansoPorTicket, hayDatosDescanso, validarDescanso } from "../DescansoMedico/controllerDescansoMedico";
+import { GuardarDescanso, ImprimirDescansoPorTicket, descansoVacio, hayDatosDescanso, validarDescanso } from "../DescansoMedico/controllerDescansoMedico";
 import { GuardarInformeAccidente, ImprimirInformeAccidentePorTicket, hayInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
-import { GuardarReceta, ImprimirRecetaPorTicket, hayReceta, validarReceta } from "../Receta/controllerReceta";
+import {
+    GuardarReceta,
+    ImprimirRecetaPorTicket,
+    RECETA_ESTADO_INICIAL,
+    hayLineaSinAgregar,
+    hayReceta,
+    validarReceta,
+} from "../Receta/controllerReceta";
 
 // Complementos de La Arena de las Historias Clínicas del módulo (Adulto Mayor, Mujer y Varón Adulto): la Receta
 // (reserva de medicamentos), el Descanso Médico y el Informe de Accidente. No tienen botón propio: se guardan junto
@@ -35,18 +42,46 @@ const COMPLEMENTOS = {
 
 const IMPRIMIBLES = Object.keys(COMPLEMENTOS).filter((clave) => COMPLEMENTOS[clave].imprimir);
 
-// Qué complementos trae el formulario para guardar. Solo cuentan con "La Arena" marcado (si no, sus secciones
+// Si el ticket es de La Arena. Lo define el ticket (esArena, se marca al registrarlo en Ticket Asistencial) y el
+// backend lo entrega en la respuesta de la Historia Clínica; ningún formulario lo edita. `data` es esa respuesta
+// (esArena de la Historia, o el de su infoTicket). Un ticket anterior a este campo no lo trae: cuenta como no.
+export const esArenaDe = (data) => Boolean(data?.esArena ?? data?.infoTicket?.esArena);
+
+// Qué complementos trae el formulario para guardar. Solo cuentan en un ticket de La Arena (si no, sus secciones
 // están ocultas y lo que haya quedado escrito no se envía).
 export const complementosPorGuardar = (form) => ({
-    receta: Boolean(form.laArena) && hayReceta(form),
-    descanso: Boolean(form.laArena) && hayDatosDescanso(form),
-    accidente: Boolean(form.laArena) && hayInformeAccidente(form),
+    receta: Boolean(form.esArena) && hayReceta(form),
+    descanso: Boolean(form.esArena) && hayDatosDescanso(form),
+    accidente: Boolean(form.esArena) && hayInformeAccidente(form),
 });
+
+// Qué complementos ya tienen algo en el formulario (registrado en el ticket o escrito). Las secciones solo se ven
+// tras pulsar «Generar», salvo estas: se muestran siempre para que nada escrito (p. ej. un medicamento sin agregar,
+// que bloquearía el guardado) ni nada ya registrado quede oculto.
+export const complementosConContenido = (form) => ({
+    receta: Boolean(form.recetaEstado) || (form.recetaItems ?? []).length > 0 || hayLineaSinAgregar(form),
+    descanso: Boolean(form.descansoRegistrado) || hayDatosDescanso(form),
+    accidente: Boolean(form.accidenteRegistrado) || hayInformeAccidente(form),
+});
+
+// Qué complementos ya existen en el ticket (se cargaron al buscarlo). No se pueden quitar: el backend no los da de baja.
+export const complementosRegistrados = (form) => ({
+    receta: Boolean(form.recetaEstado),
+    descanso: Boolean(form.descansoRegistrado),
+    accidente: Boolean(form.accidenteRegistrado),
+});
+
+// Campos del formulario de cada complemento en blanco: lo que se restablece al quitar uno que todavía no se registró.
+export const camposVaciosComplemento = {
+    receta: () => ({ ...RECETA_ESTADO_INICIAL }),
+    descanso: descansoVacio,
+    accidente: () => ({ accidenteCircunstancias: "" }),
+};
 
 // Primer problema de los complementos (o null): un descanso a medio llenar, o un medicamento de la receta escrito
 // pero sin agregar, se avisan antes de guardar nada.
 export const validarComplementos = (form) => {
-    if (!form.laArena) return null;
+    if (!form.esArena) return null;
     if (complementosPorGuardar(form).descanso) {
         const errorDescanso = validarDescanso(form);
         if (errorDescanso) return errorDescanso;
@@ -90,7 +125,7 @@ export const armarResultadoGuardado = ({ mensaje, guardados, ...impresion }) => 
     };
 };
 
-// Botón IMPRIMIR N° TICKET con "La Arena" marcado: en lugar de la confirmación simple, el mensaje ofrece un
+// Botón IMPRIMIR N° TICKET en un ticket de La Arena: en lugar de la confirmación simple, el mensaje ofrece un
 // botón por documento (Historia Clínica, Receta, Descanso Médico e Informe de Accidente) del ticket indicado. Cada
 // complemento avisa si ese ticket todavía no lo tiene.
 export const ConfirmarImpresionConComplementos = async ({ numeroTicket, ...impresion }) => {

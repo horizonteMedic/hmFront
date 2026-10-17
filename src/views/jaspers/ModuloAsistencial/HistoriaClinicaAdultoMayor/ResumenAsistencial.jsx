@@ -136,15 +136,15 @@ export default async function ResumenAsistencial(data = {}, docExistente = null)
   const VITALES = [
     [
       ["P/A:", data.presionArterial],
-      ["P:", data.pulso],
       ["FC:", data.frecuenciaCardiaca],
       ["R:", data.frecuenciaRespiratoria],
+      ["Sat O2:", data.saturacionO2],
     ],
     [
       ["Tº:", data.temperatura],
-      ["Sat O2:", data.saturacionO2],
       ["Peso:", data.peso],
       ["Talla:", data.talla],
+      ["PC:", data.perimetroCuelloCm],
     ],
   ];
   const filasVitales = (yInicio) => {

@@ -4,7 +4,7 @@ import { obtenerCmpMedico, obtenerDigitalizacionMedico, obtenerRegistroPorTicket
 import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioUrl, limpiarTexto, normalizarTexto } from "../../Inventario/inventarioUtils";
 
 // Receta (reserva de medicamentos) del ticket (RecetaAsistencialDTO). La comparten las Historias Clínicas del
-// módulo: solo se muestra con el checkbox "La Arena" marcado y se guarda junto con la Historia Clínica (su botón
+// módulo: solo se muestra en tickets de La Arena (esArena) y se guarda junto con la Historia Clínica (su botón
 // Guardar), no por separado (ver controllerComplementos). Solo RESERVA el stock: farmacia la entrega (o la anula)
 // desde Inventario > Entrega por Ticket. Una vez guardada se imprime desde el mensaje de éxito o desde el botón
 // IMPRIMIR N° TICKET, junto al Descanso Médico y al Informe de Accidente (ver ImprimirRecetaPorTicket).
@@ -16,7 +16,7 @@ import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioU
 // ticket (el central si la sede no tiene uno) y se muestra bloqueado.
 //
 // Campos del formulario que usa (cada Historia Clínica los toma de RECETA_ESTADO_INICIAL):
-//   n_hcl, pacienteId, ticketSede, laArena, y todos los `receta*` de abajo.
+//   n_hcl, pacienteId, ticketSede, esArena, y todos los `receta*` de abajo.
 const recetasUrl = "/asistencial/recetas";
 
 // Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por eso se
@@ -117,7 +117,7 @@ export const formFromReceta = (receta) => {
 export const recetaBloqueada = (form) => form.recetaEstado === "entregada";
 
 // ¿Queda algo escrito en la línea que todavía no se agregó a la receta?
-const hayLineaSinAgregar = (form) =>
+export const hayLineaSinAgregar = (form) =>
     Boolean(form.recetaMedicamentoId || limpiarTexto(form.recetaMedicamentoTexto) || String(form.recetaCantidad ?? "").trim() || limpiarTexto(form.recetaIndicacion));
 
 // { campo: mensaje } solo con lo que falta o es inválido para agregar la línea. Pedir más de lo disponible NO se

@@ -289,10 +289,10 @@ export const GetSat = async (event, triaje, set) => {
         }
         // Criterio La Arena: normal desde 93%; por debajo se acepta el valor y el diagnóstico
         // indica el grado de hipoxia (severa < 85, moderada 85-88, leve 89-92).
-        const hipoxia = triaje.laArena ? GetHipoxiaLaArena(Saturacion) : null
+        const hipoxia = triaje.esArena ? GetHipoxiaLaArena(Saturacion) : null
         if (hipoxia) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + `- SATURACIÓN DE OXIGENO: ${hipoxia}.` + "\n" }))
-        } else if (Saturacion >= (triaje.laArena ? 93 : 90) && Saturacion <= 100) {
+        } else if (Saturacion >= (triaje.esArena ? 93 : 90) && Saturacion <= 100) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- SATURACIÓN DE OXIGENO: NORMAL.' + "\n" }))
         } else if (Saturacion >= 101) {
             set(d => ({ ...d, sat02: '' }))

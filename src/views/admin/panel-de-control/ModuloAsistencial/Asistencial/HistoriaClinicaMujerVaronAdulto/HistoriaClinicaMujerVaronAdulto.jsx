@@ -15,11 +15,8 @@ import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { ConfirmarImpresion, PrintResumenAsistencial, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaMujerVaronAdulto";
-import { actualizarDescanso } from "../DescansoMedico/controllerDescansoMedico";
-import DescansoMedico from "../DescansoMedico/DescansoMedico";
-import InformeAccidente from "../InformeAccidente/InformeAccidente";
 import BotonResumenAsistencial from "../ComplementosLaArena/BotonResumenAsistencial";
-import Receta from "../Receta/Receta";
+import ComplementosDesplegables from "../ComplementosLaArena/ComplementosDesplegables";
 import { RECETA_ESTADO_INICIAL } from "../Receta/controllerReceta";
 import { DatosPersonalesLaborales } from "../../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
@@ -80,8 +77,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     ticketImprimir: "",
     numeroHistoriaClinica: "",
     fecha_apertura_hcl: today,
-    // Cliente La Arena: muestra el Descanso Médico y el Informe de Accidente (solo UI, no se envía a la Historia Clínica).
-    laArena: false,
+    // Cliente La Arena: lo define el ticket (esArena, se marca en Ticket Asistencial) y se carga al buscarlo. Habilita
+    // Receta, Descanso Médico, Informe de Accidente y Resumen Asistencial (solo UI, no se envía a la Historia Clínica).
+    esArena: false,
 
     // Datos Generales
     nombre_padre: "",
@@ -250,39 +248,29 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     fechaHoraActual: getFechaHoraActual(),
   });
 
-  // Tras guardar el formulario se limpia, pero "La Arena" se conserva: es la elección de trabajo del usuario
-  // (como al buscar otro ticket) y de ella depende ver los botones de impresión del descanso y del accidente.
-  const limpiarTrasGuardar = () => setForm({ ...initialFormState, laArena: form.laArena });
-
   // Diagnóstico y Tratamiento obligatorios: el error inline aparece tras intentar guardar y desaparece al completar el campo.
   const errores = form.intentoGuardar ? erroresDiagnosticoTratamiento(form) : {};
 
   const handleSave = () => {
     setForm((f) => ({ ...f, intentoGuardar: true }));
-    SubmitDataService(form, token, userlogued, limpiarTrasGuardar, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, datosFooter);
   };
 
-  // Con "La Arena" marcado, el mensaje de impresión ofrece también la Receta, el Descanso Médico y el Informe de Accidente.
+  // Si el ticket impreso es de La Arena (esArena), el mensaje de impresión ofrece también la Receta, el Descanso
+  // Médico y el Informe de Accidente. El N° puede ser de otro ticket que el cargado, así que se consulta al imprimir.
   const handlePrint = () => {
-    ConfirmarImpresion(form.ticketImprimir, token, datosFooter, form.laArena);
+    ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
   };
 
-  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo con "La Arena".
+  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo en tickets de La Arena.
   const handleResumenAsistencial = () => {
     PrintResumenAsistencial(form.n_hcl, token, datosFooter);
-  };
-
-  // Receta, Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
-  // se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET.
-  const handleChangeDescanso = (campo, valor) => {
-    setForm((f) => ({ ...f, ...actualizarDescanso(f, campo, valor) }));
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       const numeroTicket = form.n_hcl;
-      // "La Arena" es una elección del usuario para esta sesión de trabajo: no se desmarca al buscar otro ticket.
-      setForm({ ...initialFormState, n_hcl: numeroTicket, laArena: form.laArena });
+      setForm({ ...initialFormState, n_hcl: numeroTicket });
       VerifyTR(numeroTicket, token, setForm, today, listaEmpleados);
     }
   };
@@ -317,14 +305,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           onRevert={() => revertField("fecha_apertura_hcl")}
           labelWidth="120px"
         />
-        {/* Es una elección de trabajo, no un dato de la Historia Clínica: no se bloquea con el registro. */}
-        <InputCheckbox
-          label="La Arena"
-          name="laArena"
-          checked={form.laArena}
-          onChange={handleCheckBoxChange}
-          className="font-semibold w-fit"
-        />
+        {/* Solo informativo: viene del ticket (esArena), no se edita aquí. */}
+        <InputCheckbox label="La Arena" name="esArena" checked={form.esArena} disabled className="font-semibold w-fit" />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} laborales={false} />
@@ -731,12 +713,17 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         />
       </SectionFieldset>
 
-      {form.laArena && (
-        <>
-          <DescansoMedico form={form} onChange={handleChangeDescanso} disabled={camposDeshabilitados} />
-          <InformeAccidente form={form} onChange={handleChange} disabled={camposDeshabilitados} />
-          <Receta form={form} setForm={setForm} token={token} usuario={userlogued} disabled={camposDeshabilitados} />
-        </>
+      {/* Receta, Descanso Médico e Informe de Accidente (La Arena): aparecen al pulsar «Generar…», se guardan con el
+          Guardar de la Historia Clínica y se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET. */}
+      {form.esArena && (
+        <ComplementosDesplegables
+          form={form}
+          setForm={setForm}
+          onChange={handleChange}
+          token={token}
+          usuario={userlogued}
+          disabled={camposDeshabilitados}
+        />
       )}
 
       {hayRegistroCargado && (
@@ -762,7 +749,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         printLabel="IMPRIMIR N° TICKET"
         handleChangeNumberDecimals={handleChangeNumberDecimals}
       >
-        {form.laArena && <BotonResumenAsistencial onClick={handleResumenAsistencial} />}
+        {form.esArena && <BotonResumenAsistencial onClick={handleResumenAsistencial} />}
       </BotonesForm>
     </div>
   );
