@@ -83,6 +83,19 @@ export const ConfirmarCambioInventarioEntrega = async (cantidadItems) => {
     return isConfirmed;
 };
 
+// Cerrar el formulario descarta lo que se haya agregado al detalle, así que antes se pide confirmar.
+export const ConfirmarCerrarEntrega = async (cantidadItems) => {
+    const { isConfirmed } = await Swal.fire({
+        title: "Cerrar sin registrar",
+        text: `Hay ${cantidadItems} medicamento(s) en el detalle que no se han entregado. Si cierra, se descartarán. ¿Desea continuar?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cerrar",
+        cancelButtonText: "Seguir editando",
+    });
+    return isConfirmed;
+};
+
 // Entrega todos los medicamentos del detalle en una sola entrega (POST /entregas-area/masivo). Es todo o nada: si a un
 // medicamento le falta stock, el backend no entrega ninguno. El backend descuenta primero del lote que vence antes (FEFO)
 // y la respuesta trae el número de la entrega y de qué lotes salió cada medicamento.

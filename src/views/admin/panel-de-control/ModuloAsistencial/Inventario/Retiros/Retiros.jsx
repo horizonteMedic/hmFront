@@ -14,26 +14,35 @@ import PaginadorTabla from "../PaginadorTabla";
 import SelectorInventario from "../SelectorInventario";
 import { useConsultaInventario } from "../useConsultaInventario";
 import { useInventarios } from "../useInventarios";
+import { conOrden, ordenarPorColumna, useOrdenTabla } from "../useOrdenTabla";
 import { ObtenerMotivosRetiro, ObtenerRetiros } from "./controllerRetiros";
 import ModalRegistrarRetiro from "./ModalRegistrarRetiro/ModalRegistrarRetiro";
 import ModalRetirarVencidos from "./ModalRetirarVencidos/ModalRetirarVencidos";
 
-const columnas = [
-    { label: "Fecha", width: "12%", render: (row) => formatearFechaHora(row.fechaRegistro) },
+// Cada columna lleva un `id` y se ordena al pulsar su cabecera: por su `accessor` o, si se dibuja con `render`,
+// por lo que devuelva su `valorOrden`.
+const columnas = conOrden([
+    { id: "fecha", label: "Fecha", width: "12%", valorOrden: (row) => row.fechaRegistro, render: (row) => formatearFechaHora(row.fechaRegistro) },
     {
+        id: "medicamento",
         label: "Medicamento",
         width: "24%",
+        valorOrden: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
         render: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
     },
     {
+        id: "lote",
         label: "Lote",
         width: "16%",
+        valorOrden: (row) => row.numeroLote,
         render: (row) => `${row.numeroLote || "Sin lote"} · ${formatearFechaCorta(row.fechaVencimiento) || "—"}`,
     },
-    { label: "Cantidad", accessor: "cantidad", width: "8%" },
+    { id: "cantidad", label: "Cantidad", accessor: "cantidad", width: "8%" },
     {
+        id: "motivo",
         label: "Motivo",
         width: "13%",
+        valorOrden: (row) => row.motivo,
         render: (row) => (
             <span>
                 {row.motivo}
@@ -41,9 +50,9 @@ const columnas = [
             </span>
         ),
     },
-    { label: "Observación", width: "17%", render: (row) => row.observacion || "—" },
-    { label: "Usuario", accessor: "usuarioRegistro", width: "10%" },
-];
+    { id: "observacion", label: "Observación", width: "17%", valorOrden: (row) => row.observacion, render: (row) => row.observacion || "—" },
+    { id: "usuario", label: "Usuario", accessor: "usuarioRegistro", width: "10%" },
+]);
 
 // Ancho común de las etiquetas de la barra de filtros, para que las cajas empiecen en la misma columna.
 const ANCHO_ETIQUETA = "110px";
@@ -70,12 +79,19 @@ export default function Retiros() {
     const [filtroMotivo, setFiltroMotivo] = useState("");
     const [modalRegistro, setModalRegistro] = useState(false);
     const [modalVencidos, setModalVencidos] = useState(false);
+    const { orden, alternarOrden } = useOrdenTabla();
 
     const opcionesMotivo = useMemo(() => motivos.datos.map((motivo) => ({ value: motivo, label: motivo })), [motivos.datos]);
 
+    // Si se ordenó por una cabecera, ese orden manda sobre toda la lista (no solo la página).
     const retirosFiltrados = useMemo(
-        () => historial.datos.filter((retiro) => !filtroMotivo || retiro.motivo === filtroMotivo),
-        [historial.datos, filtroMotivo]
+        () =>
+            ordenarPorColumna(
+                historial.datos.filter((retiro) => !filtroMotivo || retiro.motivo === filtroMotivo),
+                columnas,
+                orden
+            ),
+        [historial.datos, filtroMotivo, orden]
     );
 
     const paginacion = usePagination(retirosFiltrados, 10);
@@ -105,7 +121,7 @@ export default function Retiros() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [filtroMotivo]);
+    }, [filtroMotivo, orden]);
 
     return (
         <div className="space-y-4 px-4 pb-4">
@@ -183,6 +199,8 @@ export default function Retiros() {
                     columns={columnas}
                     data={paginatedData}
                     height={450}
+                    sort={orden}
+                    onSort={alternarOrden}
                     emptyText={historial.cargando ? "Cargando retiros..." : "No hay retiros para los filtros elegidos"}
                 />
 

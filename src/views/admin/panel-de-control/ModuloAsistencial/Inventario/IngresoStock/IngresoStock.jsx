@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faPlus } from "@fortawesome/free-solid-svg-icons";
-import AutocompleteInput from "../../../../../components/reusableComponents/AutocompletableInput";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -10,11 +9,22 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import AvisoError from "../AvisoError";
-import { etiquetaMedicamento } from "../inventarioUtils";
+import BuscadorMedicamentoStock from "../BuscadorMedicamentoStock";
+import InputCelda from "../InputCelda";
 import { ObtenerListaMedicamentos } from "../Medicamentos/controllerMedicamentos";
 import SelectorInventario from "../SelectorInventario";
+import { ObtenerStockResumen } from "../Stock/controllerStock";
+import { useConsultaInventario } from "../useConsultaInventario";
 import { useInventarios } from "../useInventarios";
-import { CrearItemIngreso, RegistrarIngresoStock, ValidarItemIngreso } from "./controllerIngresoStock";
+import { conOrden, useOrdenEstable, useOrdenTabla } from "../useOrdenTabla";
+import {
+    CrearItemIngreso,
+    DetalleIngresoValido,
+    NormalizarItemsIngreso,
+    RegistrarIngresoStock,
+    ValidarItemIngreso,
+    ValidarItemsIngreso,
+} from "./controllerIngresoStock";
 import ModalIngresoStockMasivo from "./ModalIngresoStockMasivo/ModalIngresoStockMasivo";
 
 const initialFormState = {
@@ -49,14 +59,35 @@ export default function IngresoStock() {
     const [errores, setErrores] = useState({});
     const [modalMasivo, setModalMasivo] = useState(false);
 
-    const opcionesMedicamento = useMemo(
-        () => medicamentos.map((medicamento) => ({ id: medicamento.id, etiqueta: etiquetaMedicamento(medicamento) })),
-        [medicamentos]
-    );
+    const stock = useConsultaInventario();
 
-    const totalUnidades = items.reduce((total, item) => total + item.cantidad, 0);
+    // Se puede ingresar stock de cualquier medicamento, tenga o no saldo en el inventario elegido: los que
+    // aún no aparecen en el stock se muestran con 0 disponibles.
+    const filasMedicamento = useMemo(() => {
+        const stockPorMedicamento = new Map(stock.datos.map((fila) => [String(fila.medicamentoId), fila]));
+        return medicamentos.map(
+            (medicamento) =>
+                stockPorMedicamento.get(String(medicamento.id)) ?? {
+                    medicamentoId: medicamento.id,
+                    nombre: medicamento.nombre,
+                    presentacion: medicamento.presentacion,
+                    cantidadDisponible: 0,
+                    cantidadReservada: 0,
+                    proximoVencimiento: null,
+                }
+        );
+    }, [medicamentos, stock.datos]);
+    const medicamentoStock = filasMedicamento.find((fila) => String(fila.medicamentoId) === form.medicamentoId) ?? null;
+
+    // La cantidad de una fila se edita como texto, así que puede estar vacía mientras se corrige.
+    const totalUnidades = items.reduce((total, item) => total + (Number(item.cantidad) || 0), 0);
     // Sin ningún medicamento agregado no hay nada que revisar ni registrar: el detalle y los botones quedan bloqueados.
     const hayItems = items.length > 0;
+
+    // Lote, vencimiento y cantidad se editan en la tabla: cada cambio se revisa y lo inválido se marca en rojo.
+    const erroresItems = useMemo(() => ValidarItemsIngreso(items), [items]);
+    const filasConError = Object.keys(erroresItems).length;
+    const { orden, alternarOrden } = useOrdenTabla();
 
     const cargarMedicamentos = async () => {
         const res = await ObtenerListaMedicamentos(token, true);
@@ -68,9 +99,18 @@ export default function IngresoStock() {
         setMedicamentos(res.resultado);
     };
 
+    const cargarStock = () => {
+        if (inventarioId) stock.ejecutar(() => ObtenerStockResumen(inventarioId, token));
+    };
+
     useEffect(() => {
         cargarMedicamentos();
     }, []);
+
+    // El disponible depende del inventario elegido: al cambiarlo se vuelve a consultar.
+    useEffect(() => {
+        cargarStock();
+    }, [inventarioId]);
 
     // Al corregir un campo se le quita el mensaje de error.
     const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
@@ -97,8 +137,8 @@ export default function IngresoStock() {
         limpiarError("medicamento");
     };
 
-    const onSelectMedicamento = (opcion) => {
-        setForm((prev) => ({ ...prev, medicamentoTexto: opcion.etiqueta, medicamentoId: String(opcion.id) }));
+    const onSelectMedicamento = (fila, etiqueta) => {
+        setForm((prev) => ({ ...prev, medicamentoTexto: etiqueta, medicamentoId: String(fila.medicamentoId) }));
         limpiarError("medicamento");
     };
 
@@ -114,13 +154,22 @@ export default function IngresoStock() {
 
     const quitarItem = (uid) => setItems((prev) => prev.filter((item) => item.uid !== uid));
 
+    const editarItem = (uid, cambios) => setItems((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...cambios } : item)));
+
     const handleSave = async () => {
-        const registrado = await RegistrarIngresoStock({ inventario: inventarioActual, referencia: form.referencia, items }, token, userlogued);
+        if (!(await DetalleIngresoValido(items))) return;
+
+        const registrado = await RegistrarIngresoStock(
+            { inventario: inventarioActual, referencia: form.referencia, items: NormalizarItemsIngreso(items) },
+            token,
+            userlogued
+        );
         if (!registrado) return;
 
         handleClear();
         setItems([]);
         setErrores({});
+        cargarStock();
     };
 
     const handleLimpiar = () => {
@@ -129,14 +178,57 @@ export default function IngresoStock() {
         setErrores({});
     };
 
-    const columnas = [
-        { label: "Medicamento", accessor: "medicamento", width: "38%" },
-        { label: "N° Lote", width: "18%", render: (row) => row.numeroLote || "—" },
-        { label: "Vencimiento", width: "16%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
-        { label: "Cantidad", accessor: "cantidad", width: "12%" },
+    // El lote, el vencimiento y la cantidad se editan en la misma tabla. Cada cabecera ordena por lo que tenga la fila.
+    const columnas = conOrden([
+        { id: "medicamento", label: "Medicamento", accessor: "medicamento", width: "26%" },
         {
+            id: "numeroLote",
+            label: "N° Lote",
+            width: "19%",
+            valorOrden: (row) => row.numeroLote,
+            render: (row) => (
+                <InputCelda
+                    value={row.numeroLote ?? ""}
+                    onChange={(e) => editarItem(row.uid, { numeroLote: e.target.value.toUpperCase() })}
+                    error={erroresItems[row.uid]?.numeroLote}
+                    aria-label="N° Lote"
+                />
+            ),
+        },
+        {
+            id: "fechaVencimiento",
+            label: "Vencimiento",
+            width: "23%",
+            valorOrden: (row) => row.fechaVencimiento,
+            render: (row) => (
+                <InputCelda
+                    type="date"
+                    value={row.fechaVencimiento ?? ""}
+                    onChange={(e) => editarItem(row.uid, { fechaVencimiento: e.target.value })}
+                    error={erroresItems[row.uid]?.fechaVencimiento}
+                    aria-label="Vencimiento"
+                />
+            ),
+        },
+        {
+            id: "cantidad",
+            label: "Cantidad",
+            width: "14%",
+            valorOrden: (row) => (row.cantidad === "" ? null : Number(row.cantidad)),
+            render: (row) => (
+                <InputCelda
+                    inputMode="numeric"
+                    value={row.cantidad}
+                    onChange={(e) => editarItem(row.uid, { cantidad: e.target.value.replace(/\D/g, "") })}
+                    error={erroresItems[row.uid]?.cantidad}
+                    aria-label="Cantidad"
+                />
+            ),
+        },
+        {
+            id: "accion",
             label: "Acción",
-            width: "10%",
+            width: "18%",
             render: (row) => (
                 <button
                     type="button"
@@ -147,26 +239,35 @@ export default function IngresoStock() {
                 </button>
             ),
         },
-    ];
+    ]);
+
+    const itemsOrdenados = useOrdenEstable(items, columnas, orden);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start px-4 pb-4">
             <div className="space-y-4 min-w-0">
                 <SectionFieldset legend="Agregar Medicamento" className="space-y-4">
                     <AvisoError mensaje={errorMedicamentos} onRetry={cargarMedicamentos} className="" />
-                    <div>
-                        <AutocompleteInput
-                            label="Medicamento"
+                    <AvisoError mensaje={stock.error} onRetry={cargarStock} className="" />
+                    <div className="space-y-2">
+                        <BuscadorMedicamentoStock
                             id="medicamentoIngreso"
                             labelWidth={ANCHO_ETIQUETA}
-                            value={form.medicamentoTexto}
-                            options={opcionesMedicamento}
-                            searchKey="etiqueta"
-                            nextFocusId="numeroLote"
-                            onChange={onChangeMedicamento}
+                            filas={filasMedicamento}
+                            texto={form.medicamentoTexto}
+                            onTextoChange={onChangeMedicamento}
                             onSelect={onSelectMedicamento}
+                            nextFocusId="numeroLote"
+                            placeholder={stock.cargando ? "Cargando stock..." : "Escriba para buscar..."}
+                            error={errores.medicamento}
                         />
-                        {errores.medicamento && <p className="mt-1 text-sm text-red-600">{errores.medicamento}</p>}
+                        {medicamentoStock && !stock.cargando && (
+                            <p className="text-sm text-gray-600">
+                                Disponible: <strong>{medicamentoStock.cantidadDisponible}</strong>
+                                {medicamentoStock.cantidadReservada > 0 ? ` (${medicamentoStock.cantidadReservada} reservadas por recetas)` : ""}
+                                {medicamentoStock.proximoVencimiento ? ` · Próximo vencimiento: ${formatearFechaCorta(medicamentoStock.proximoVencimiento)}` : ""}
+                            </p>
+                        )}
                     </div>
                     <InputTextOneLine
                         label="N° Lote"
@@ -251,7 +352,19 @@ export default function IngresoStock() {
                         aria-disabled={!hayItems}
                         className={`transition-opacity duration-150 ${hayItems ? "" : "opacity-50 pointer-events-none select-none"}`}
                     >
-                        <TablaTemplate columns={columnas} data={items} height={300} emptyText="Aún no se agregó ningún medicamento" />
+                        <TablaTemplate
+                            columns={columnas}
+                            data={itemsOrdenados}
+                            height={300}
+                            sort={orden}
+                            onSort={alternarOrden}
+                            emptyText="Aún no se agregó ningún medicamento"
+                        />
+                        {filasConError > 0 && (
+                            <p className="mt-2 text-sm text-red-600">
+                                {filasConError} fila(s) con datos inválidos, marcadas en rojo. Pase el mouse sobre la caja para ver el motivo.
+                            </p>
+                        )}
                         <p className="mt-2 text-right font-semibold">
                             {items.length} lote(s) · {totalUnidades} unidades
                         </p>
@@ -269,7 +382,10 @@ export default function IngresoStock() {
                 medicamentos={medicamentos}
                 token={token}
                 usuario={userlogued}
-                onSuccess={() => setForm((prev) => ({ ...prev, referencia: "" }))}
+                onSuccess={() => {
+                    setForm((prev) => ({ ...prev, referencia: "" }));
+                    cargarStock();
+                }}
             />
         </div>
     );

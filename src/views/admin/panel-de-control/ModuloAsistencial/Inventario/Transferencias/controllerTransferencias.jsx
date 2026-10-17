@@ -64,6 +64,19 @@ export const ConfirmarCambioOrigen = async (cantidadItems) => {
     return isConfirmed;
 };
 
+// Cerrar el formulario descarta lo que se haya agregado al detalle, así que antes se pide confirmar.
+export const ConfirmarCerrarTransferencia = async (cantidadItems) => {
+    const { isConfirmed } = await Swal.fire({
+        title: "Cerrar sin registrar",
+        text: `Hay ${cantidadItems} lote(s) en el detalle que no se han transferido. Si cierra, se descartarán. ¿Desea continuar?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cerrar",
+        cancelButtonText: "Seguir editando",
+    });
+    return isConfirmed;
+};
+
 // Envía la transferencia y devuelve true si quedó registrada, para que la pantalla limpie el formulario y recargue.
 export const RegistrarTransferencia = async ({ origen, destino, observacion, items }, token, usuario) => {
     if (!origen || !destino) {
