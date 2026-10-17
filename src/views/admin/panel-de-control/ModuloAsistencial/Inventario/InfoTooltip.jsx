@@ -5,7 +5,12 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 // encabezados de las tablas, que tienen fondo oscuro, y abre el texto hacia abajo, centrado bajo el icono.
 export default function InfoTooltip({ texto }) {
     return (
-        <span className="group relative inline-flex align-middle ml-1.5 outline-none" tabIndex={0} aria-label={texto}>
+        <span
+            className="group relative inline-flex align-middle ml-1.5 outline-none"
+            tabIndex={0}
+            aria-label={texto}
+            onClick={(e) => e.stopPropagation()}
+        >
             <FontAwesomeIcon icon={faCircleInfo} className="text-sm text-sky-300 group-hover:text-white group-focus:text-white cursor-help" />
             <span
                 role="tooltip"

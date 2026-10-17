@@ -1,6 +1,5 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import CatalogoTabSelector, { PERMISOS_CATALOGO } from "./CatalogoTabSelector";
-import EntregaTicket from "./EntregaTicket/EntregaTicket";
 import Kardex from "./Kardex/Kardex";
 import OperacionesTabSelector, { PERMISOS_OPERACIONES } from "./OperacionesTabSelector";
 import Stock from "./Stock/Stock";
@@ -19,24 +18,18 @@ export default function InventarioTabSelector({ tieneVista }) {
         },
         {
             id: 1,
-            permission: "Entrega Ticket Asistencial",
-            label: "Entrega por Ticket",
-            component: EntregaTicket
-        },
-        {
-            id: 2,
             permission: PERMISOS_OPERACIONES,
             label: "Operaciones",
             component: OperacionesTabSelector
         },
         {
-            id: 3,
+            id: 2,
             permission: "Kardex Asistencial",
             label: "Kardex",
             component: Kardex
         },
         {
-            id: 4,
+            id: 3,
             permission: PERMISOS_CATALOGO,
             label: "Catálogo",
             component: CatalogoTabSelector

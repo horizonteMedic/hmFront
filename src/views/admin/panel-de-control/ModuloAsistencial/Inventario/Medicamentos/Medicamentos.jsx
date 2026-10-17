@@ -17,13 +17,15 @@ import SelectorInventario from "../SelectorInventario";
 import { AYUDA_STOCK_DISPONIBLE, AYUDA_STOCK_FISICO, AYUDA_STOCK_MINIMO, AYUDA_STOCK_RESERVADO } from "../textosAyudaStock";
 import { useConsultaInventario } from "../useConsultaInventario";
 import { useInventarios } from "../useInventarios";
+import { conOrden, ordenarPorColumna, useOrdenTabla } from "../useOrdenTabla";
 import { ObtenerListaMedicamentos, ObtenerTiposMedicamento } from "./controllerMedicamentos";
 import ModalCargaMasivaMedicamentos from "./ModalCargaMasivaMedicamentos/ModalCargaMasivaMedicamentos";
 import ModalRegistrarMedicamento from "./ModalRegistrarMedicamento/ModalRegistrarMedicamento";
 
 // Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas. `label` es el texto simple
 // (selector de columnas) y `encabezado`, si existe, lo que se ve en la cabecera de la tabla (con su "i" de ayuda). Los
-// encabezados largos se parten en dos líneas.
+// encabezados largos se parten en dos líneas. Al pulsar la cabecera se ordena por el `accessor` de la columna o, si se
+// dibuja con `render`, por lo que devuelva su `valorOrden`.
 const columnas = [
     { id: "nombre", label: "Nombre", accessor: "nombre", width: "17%" },
     { id: "presentacion", label: "Presentación", accessor: "presentacion", width: "10%" },
@@ -40,6 +42,7 @@ const columnas = [
         label: "Stock Físico",
         encabezado: <>Stock Físico<InfoTooltip texto={AYUDA_STOCK_FISICO} /></>,
         width: "8%",
+        valorOrden: (row) => row.stockActual,
         render: (row) => row.stockActual ?? "—",
     },
     {
@@ -47,6 +50,7 @@ const columnas = [
         label: "Stock Reservado",
         encabezado: <>Stock Reservado<InfoTooltip texto={AYUDA_STOCK_RESERVADO} /></>,
         width: "10%",
+        valorOrden: (row) => row.stockReservado,
         render: (row) => row.stockReservado ?? "—",
     },
     {
@@ -54,20 +58,34 @@ const columnas = [
         label: "Stock Disponible",
         encabezado: <>Stock Disponible<InfoTooltip texto={AYUDA_STOCK_DISPONIBLE} /></>,
         width: "10%",
+        valorOrden: (row) => row.stockDisponible,
         render: (row) => <strong>{row.stockDisponible ?? "—"}</strong>,
     },
     {
         id: "estado",
         label: "Estado",
         width: "8%",
+        valorOrden: (row) => (row.activo ? 1 : 0),
         render: (row) => (
             <span className={`px-2 py-0.5 rounded text-sm font-semibold ${row.activo ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-600"}`}>
                 {row.activo ? "Activo" : "Inactivo"}
             </span>
         ),
     },
-    { id: "usuarioRegistro", label: "Registrado por", width: "9%", render: (row) => row.usuarioRegistroNombre || row.usuarioRegistro },
-    { id: "fechaRegistro", label: "Fecha de Registro", width: "9%", render: (row) => formatearFechaHora(row.fechaRegistro) },
+    {
+        id: "usuarioRegistro",
+        label: "Registrado por",
+        width: "9%",
+        valorOrden: (row) => row.usuarioRegistroNombre || row.usuarioRegistro,
+        render: (row) => row.usuarioRegistroNombre || row.usuarioRegistro,
+    },
+    {
+        id: "fechaRegistro",
+        label: "Fecha de Registro",
+        width: "9%",
+        valorOrden: (row) => row.fechaRegistro,
+        render: (row) => formatearFechaHora(row.fechaRegistro),
+    },
 ];
 
 // Columnas que la tabla trae ocultas; el usuario puede mostrarlas desde "Columnas".
@@ -89,35 +107,42 @@ export default function Medicamentos() {
     const [columnasOcultas, setColumnasOcultas] = useState(COLUMNAS_OCULTAS_INICIALES);
     const [modalRegistro, setModalRegistro] = useState(false);
     const [modalMasivo, setModalMasivo] = useState(false);
+    const { orden, alternarOrden, quitarOrden } = useOrdenTabla();
 
     const opcionesTipo = useMemo(() => tipos.map((tipo) => ({ value: String(tipo.codigo), label: tipo.descripcion })), [tipos]);
 
     const columnasVisibles = useMemo(
         () =>
-            columnas
-                .filter((columna) => !columnasOcultas.includes(columna.id))
-                .map(({ encabezado, ...columna }) => ({ ...columna, label: encabezado ?? columna.label })),
+            conOrden(columnas.filter((columna) => !columnasOcultas.includes(columna.id))).map(({ encabezado, ...columna }) => ({
+                ...columna,
+                label: encabezado ?? columna.label,
+            })),
         [columnasOcultas]
     );
 
-    const alternarColumna = (id) =>
+    // Una columna oculta no puede seguir ordenando la tabla: no se vería por qué las filas están así.
+    const alternarColumna = (id) => {
+        if (orden?.id === id) quitarOrden();
         setColumnasOcultas((actuales) => (actuales.includes(id) ? actuales.filter((oculta) => oculta !== id) : [...actuales, id]));
+    };
 
+    // Si se ordenó por una cabecera, ese orden manda sobre toda la lista (no solo la página).
     const medicamentosFiltrados = useMemo(() => {
         const texto = normalizarTexto(filtroNombre);
-        return medicamentos.filter((medicamento) => {
+        const filas = medicamentos.filter((medicamento) => {
             if (filtroTipo && String(medicamento.tipoMedicamento) !== filtroTipo) return false;
             return !texto || normalizarTexto(`${medicamento.nombre} ${medicamento.presentacion}`).includes(texto);
         });
-    }, [medicamentos, filtroNombre, filtroTipo]);
+        return ordenarPorColumna(filas, columnas, orden);
+    }, [medicamentos, filtroNombre, filtroTipo, orden]);
 
     const paginacion = usePagination(medicamentosFiltrados, 10);
     const { setCurrentPage, paginatedData } = paginacion;
 
-    // Al cambiar un filtro la lista puede quedar más corta que la página actual.
+    // Al cambiar un filtro o el orden la lista puede quedar más corta que la página actual.
     useEffect(() => {
         setCurrentPage(1);
-    }, [filtroNombre, filtroTipo]);
+    }, [filtroNombre, filtroTipo, orden]);
 
     const cargarTipos = async () => {
         const res = await ObtenerTiposMedicamento(token);
@@ -224,6 +249,8 @@ export default function Medicamentos() {
                     columns={columnasVisibles}
                     data={paginatedData}
                     height={450}
+                    sort={orden}
+                    onSort={alternarOrden}
                     emptyText={cargando || cargandoInventarios ? "Cargando medicamentos..." : "No hay medicamentos registrados"}
                 />
 
