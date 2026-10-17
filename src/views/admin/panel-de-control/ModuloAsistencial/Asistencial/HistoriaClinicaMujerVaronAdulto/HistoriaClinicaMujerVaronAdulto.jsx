@@ -14,12 +14,13 @@ import { erroresDiagnosticoTratamiento } from "../../../../../utils/registroAsis
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileMedical } from "@fortawesome/free-solid-svg-icons";
 import { ConfirmarImpresion, PrintResumenAsistencial, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaMujerVaronAdulto";
 import { actualizarDescanso } from "../DescansoMedico/controllerDescansoMedico";
 import DescansoMedico from "../DescansoMedico/DescansoMedico";
 import InformeAccidente from "../InformeAccidente/InformeAccidente";
+import BotonResumenAsistencial from "../ComplementosLaArena/BotonResumenAsistencial";
+import Receta from "../Receta/Receta";
+import { RECETA_ESTADO_INICIAL } from "../Receta/controllerReceta";
 import { DatosPersonalesLaborales } from "../../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
@@ -193,6 +194,9 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     accidenteRegistrado: false,
     accidenteCircunstancias: "",
 
+    // Receta / reserva de medicamentos (registro aparte de la Historia Clínica, ver ../Receta/controllerReceta)
+    ...RECETA_ESTADO_INICIAL,
+
     // Campos de DatosPersonalesLaborales
     norden: "",
     fecha: today,
@@ -258,17 +262,17 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     SubmitDataService(form, token, userlogued, limpiarTrasGuardar, datosFooter);
   };
 
-  // Con "La Arena" marcado, el mensaje de impresión ofrece también el Descanso Médico y el Informe de Accidente.
+  // Con "La Arena" marcado, el mensaje de impresión ofrece también la Receta, el Descanso Médico y el Informe de Accidente.
   const handlePrint = () => {
     ConfirmarImpresion(form.ticketImprimir, token, datosFooter, form.laArena);
   };
 
-  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada).
+  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo con "La Arena".
   const handleResumenAsistencial = () => {
     PrintResumenAsistencial(form.n_hcl, token, datosFooter);
   };
 
-  // Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
+  // Receta, Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
   // se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET.
   const handleChangeDescanso = (campo, valor) => {
     setForm((f) => ({ ...f, ...actualizarDescanso(f, campo, valor) }));
@@ -731,6 +735,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         <>
           <DescansoMedico form={form} onChange={handleChangeDescanso} disabled={camposDeshabilitados} />
           <InformeAccidente form={form} onChange={handleChange} disabled={camposDeshabilitados} />
+          <Receta form={form} setForm={setForm} token={token} usuario={userlogued} disabled={camposDeshabilitados} />
         </>
       )}
 
@@ -757,19 +762,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         printLabel="IMPRIMIR N° TICKET"
         handleChangeNumberDecimals={handleChangeNumberDecimals}
       >
-        <button
-          type="button"
-          onClick={handleResumenAsistencial}
-          className="
-            bg-violet-600 hover:bg-violet-700
-            text-white text-base px-6 py-2 rounded
-            flex items-center gap-2
-            transition-all duration-150 ease-out
-            hover:shadow-lg
-            active:scale-95 active:shadow-inner"
-        >
-          <FontAwesomeIcon icon={faFileMedical} /> Resumen Asistencial
-        </button>
+        {form.laArena && <BotonResumenAsistencial onClick={handleResumenAsistencial} />}
       </BotonesForm>
     </div>
   );

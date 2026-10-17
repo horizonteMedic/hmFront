@@ -17,12 +17,21 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { erroresDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
-import { ConfirmarImpresion, EliminarVacuna, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaAdultoMayor";
+import {
+  ConfirmarImpresion,
+  EliminarVacuna,
+  PrintResumenAsistencial,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerHistoriaClinicaAdultoMayor";
 import { actualizarDescanso } from "../DescansoMedico/controllerDescansoMedico";
 import InmunizacionesAdultoMayor from "./InmunizacionesAdultoMayor";
 import AntecedentesQuirurgicosAdultoMayor from "./AntecedentesQuirurgicosAdultoMayor";
 import DescansoMedico from "../DescansoMedico/DescansoMedico";
 import InformeAccidente from "../InformeAccidente/InformeAccidente";
+import BotonResumenAsistencial from "../ComplementosLaArena/BotonResumenAsistencial";
+import Receta from "../Receta/Receta";
+import { RECETA_ESTADO_INICIAL } from "../Receta/controllerReceta";
 
 // Campos propios que el usuario puede editar (para resaltar/revertir cambios). Los antecedentes
 // personales/familiares y el bloque clínico (examen físico, diagnóstico…) vienen de OTROS módulos en
@@ -278,6 +287,9 @@ export default function HistoriaClinicaAdultoMayor() {
     accidenteRegistrado: false,
     accidenteCircunstancias: "",
 
+    // Receta / reserva de medicamentos (registro aparte de la Historia Clínica, ver ../Receta/controllerReceta)
+    ...RECETA_ESTADO_INICIAL,
+
     // Campos de DatosPersonalesLaborales
     dni: "",
     nombres: "",
@@ -333,12 +345,17 @@ export default function HistoriaClinicaAdultoMayor() {
     SubmitDataService(form, token, userlogued, limpiarTrasGuardar, datosFooter);
   };
 
-  // Con "La Arena" marcado, el mensaje de impresión ofrece también el Descanso Médico y el Informe de Accidente.
+  // Con "La Arena" marcado, el mensaje de impresión ofrece también la Receta, el Descanso Médico y el Informe de Accidente.
   const handlePrint = () => {
     ConfirmarImpresion(form.ticketImprimir, token, datosFooter, form.laArena);
   };
 
-  // Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
+  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo con "La Arena".
+  const handleResumenAsistencial = () => {
+    PrintResumenAsistencial(form.n_hcl, token, datosFooter);
+  };
+
+  // Receta, Descanso Médico e Informe de Accidente (La Arena): se guardan con el Guardar de la Historia Clínica y
   // se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET.
   const handleChangeDescanso = (campo, valor) => {
     setForm((f) => ({ ...f, ...actualizarDescanso(f, campo, valor) }));
@@ -731,6 +748,7 @@ export default function HistoriaClinicaAdultoMayor() {
         <>
           <DescansoMedico form={form} onChange={handleChangeDescanso} disabled={camposDeshabilitados} />
           <InformeAccidente form={form} onChange={handleChange} disabled={camposDeshabilitados} />
+          <Receta form={form} setForm={setForm} token={token} usuario={userlogued} disabled={camposDeshabilitados} />
         </>
       )}
 
@@ -758,7 +776,9 @@ export default function HistoriaClinicaAdultoMayor() {
         printField="ticketImprimir"
         printLabel="IMPRIMIR N° TICKET"
         handleChangeNumberDecimals={handleChangeNumberDecimals}
-      />
+      >
+        {form.laArena && <BotonResumenAsistencial onClick={handleResumenAsistencial} />}
+      </BotonesForm>
     </div>
   );
 }

@@ -1,12 +1,19 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta, formatearHora } from "../../../../../utils/formatDateUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
 import { mensajeDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
+import {
+    armarAntecedentesResumen,
+    datosTriajeResumen,
+    horaDeTicket,
+    obtenerTriajeDeTicket,
+} from "../../../../../utils/resumenAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
 import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
 import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
+import { ObtenerReceta, formFromReceta } from "../Receta/controllerReceta";
 import {
     ConfirmarImpresionConComplementos,
     GuardarComplementos,
@@ -23,7 +30,6 @@ const rutaJasper =
     "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/HistoriaClinicaMujerVaronAdulto_Digitalizado.jsx";
 const rutaJasperResumen =
     "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaMujerVaronAdulto/ResumenAsistencial.jsx";
-const triajeUrl = "/asistencial/triaje";
 
 const unwrap = (res) => (res && typeof res === "object" && "resultado" in res ? res.resultado : res);
 
@@ -201,13 +207,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
 
     LoadingDefault("Validando datos");
 
-    // El Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints): se
-    // buscan en paralelo para mostrarlos si ya se guardaron. Sin registro (o si falla) devuelven null y el
+    // La Receta, el Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints):
+    // se buscan en paralelo para mostrarlos si ya se guardaron. Sin registro (o si falla) devuelven null y el
     // formulario no se altera.
-    const [res, descanso, informeAccidente] = await Promise.all([
+    const [res, descanso, informeAccidente, receta] = await Promise.all([
         getFetch(`${baseUrl}/ticket/${numeroTicket}`, token),
         ObtenerDescanso(numeroTicket, token),
         ObtenerInformeAccidente(numeroTicket, token),
+        ObtenerReceta(numeroTicket, token),
     ]);
     Swal.close();
 
@@ -228,6 +235,7 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...formFromTicketInfo(data.infoTicket),
         ...formFromDescanso(descanso),
         ...formFromInformeAccidente(informeAccidente),
+        ...formFromReceta(receta),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         n_hcl: String(numeroTicket),
         numeroHistoriaClinica: String(data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? ""),
@@ -404,7 +412,7 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     );
 };
 
-// Datos de la Historia Clínica GUARDADA de un ticket que imprimen el Descanso Médico y el Informe de Accidente,
+// Datos de la Historia Clínica GUARDADA de un ticket que imprimen la Receta, el Descanso Médico y el Informe de Accidente,
 // con los nombres de campo del formulario. null si el ticket no existe.
 export const ObtenerDatosComplementos = async (numeroTicket, token) => {
     const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
@@ -481,7 +489,7 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
 };
 
 // Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Con
-// "La Arena" marcado el mensaje ofrece además imprimir el Descanso Médico y el Informe de Accidente del ticket.
+// "La Arena" marcado el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
 export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laArena = false) => {
     if (laArena) {
         await ConfirmarImpresionConComplementos({
@@ -531,9 +539,8 @@ const AP_ETIQUETAS = {
     ap_transfusion_sanguinea: "Transfusión sanguínea",
 };
 
-// "Antecedentes familiares y patológicos" de la hoja: los patológicos marcados y el texto de cada
-// familiar, tal como están en el formulario (si el Triaje trae su propio texto, va primero).
-const resumenAntecedentes = (historia, triaje) => {
+// Antecedentes patológicos marcados en el formulario, redactados para la hoja.
+const patologicosDe = (historia) => {
     const patologicos = Object.entries(AP_ETIQUETAS)
         .filter(([campo]) => historia[campo])
         .map(([, etiqueta]) => etiqueta);
@@ -541,38 +548,7 @@ const resumenAntecedentes = (historia, triaje) => {
         const detalle = String(historia.ap_alergia_medicamentos_especificar ?? "").trim();
         patologicos.push(detalle ? `Alergia a medicamentos (${detalle})` : "Alergia a medicamentos");
     }
-
-    const familiares = [
-        ["Padre", historia.padre],
-        ["Madre", historia.madre],
-        ["Hermanos", historia.hermanos],
-        ["Hijos", historia.hijos],
-        ["Esposa/Cónyuge", historia.esposaConyuge],
-    ]
-        .filter(([, valor]) => String(valor ?? "").trim())
-        .map(([nombre, valor]) => `${nombre}: ${String(valor).trim()}`);
-
-    return [
-        String(triaje?.antecedentes ?? "").trim(),
-        patologicos.length ? `Patológicos: ${patologicos.join(", ")}.` : "",
-        familiares.length ? `Familiares: ${familiares.join("; ")}.` : "",
-    ]
-        .filter(Boolean)
-        .join("\n");
-};
-
-// "horaTicket" (LocalTime) puede llegar como "HH:mm:ss", [h, m, s] o { hour, minute }.
-const horaDeTicket = (hora) => {
-    if (!hora) return "";
-    const pad = (n) => String(n).padStart(2, "0");
-    if (typeof hora === "string") return formatearHora(hora);
-    const [h, m] = Array.isArray(hora) ? hora : [hora.hour, hora.minute];
-    return Number.isFinite(Number(h)) && Number.isFinite(Number(m)) ? `${pad(h)}:${pad(m)}` : "";
-};
-
-const conUnidad = (valor, unidad) => {
-    const v = String(valor ?? "").trim();
-    return v ? `${v} ${unidad}` : "";
+    return patologicos;
 };
 
 // Sede donde se emitió el ticket (TicketDTO.sede). Puede llegar como nombre o como código de sede
@@ -599,10 +575,6 @@ const construirDatosResumen = (data, triaje, numeroTicket) => {
     const paciente = pacienteDe(data);
     const ticket = data.infoTicket ?? {};
     const historia = formFromHistoria(data, "");
-    const presion =
-        triaje?.presionSistolica != null && triaje?.presionDiastolica != null
-            ? `${triaje.presionSistolica}/${triaje.presionDiastolica} mmHg`
-            : "";
 
     return {
         ...formFromPaciente(paciente, ticket),
@@ -613,19 +585,9 @@ const construirDatosResumen = (data, triaje, numeroTicket) => {
         numeroHistoriaClinica: data.numeroHistoriaClinica ?? paciente?.numeroHistoriaClinica ?? "",
         fecha: ticket.fechaTicket ?? "",
         horaIngreso: horaDeTicket(ticket.horaTicket),
-        // Signos vitales (Triaje). La hoja tiene "P" (pulso) y "FC": el Triaje solo registra la
-        // frecuencia cardiaca, así que "P" queda en blanco.
-        presionArterial: presion,
-        pulso: "",
-        frecuenciaCardiaca: conUnidad(triaje?.frecuenciaCardiaca, "x'"),
-        frecuenciaRespiratoria: conUnidad(triaje?.frecuenciaRespiratoria, "x'"),
-        temperatura: conUnidad(triaje?.temperaturaC, "°C"),
-        saturacionO2: conUnidad(triaje?.saturacionO2, "%"),
-        peso: conUnidad(triaje?.pesoKg, "kg"),
-        // La talla del Triaje asistencial se guarda en metros (ver ReporteTriajeAsistencial).
-        talla: conUnidad(triaje?.tallaCm, "m"),
-        anamnesis: triaje?.anamnesis ?? "",
-        antecedentes: resumenAntecedentes(historia, triaje),
+        // Signos vitales y anamnesis (Triaje)
+        ...datosTriajeResumen(triaje),
+        antecedentes: armarAntecedentesResumen({ triaje, patologicos: patologicosDe(historia), historia }),
         examenFisico: historia.examenFisico,
         examenesAuxiliares: historia.examenesAuxiliares,
         diagnostico: historia.diagnostico,
@@ -655,8 +617,7 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         }
 
         // Sin Triaje (o con error) los signos vitales simplemente quedan en blanco.
-        const resTriaje = await getFetch(`${triajeUrl}/numero-ticket/${numeroTicket}`, token);
-        const triaje = resTriaje && !resTriaje.error ? unwrap(resTriaje) : null;
+        const triaje = await obtenerTriajeDeTicket(numeroTicket, token);
 
         const modulo = await jasperModules[rutaJasperResumen]();
         if (typeof modulo.default !== "function") {

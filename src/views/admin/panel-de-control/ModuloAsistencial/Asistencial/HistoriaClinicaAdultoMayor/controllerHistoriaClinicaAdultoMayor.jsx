@@ -4,9 +4,16 @@ import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../..
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
 import { mensajeDiagnosticoTratamiento, obtenerDigitalizacionMedico } from "../../../../../utils/registroAsistencialUtils";
+import {
+    armarAntecedentesResumen,
+    datosTriajeResumen,
+    horaDeTicket,
+    obtenerTriajeDeTicket,
+} from "../../../../../utils/resumenAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
 import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
 import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
+import { ObtenerReceta, formFromReceta } from "../Receta/controllerReceta";
 import {
     ConfirmarImpresionConComplementos,
     GuardarComplementos,
@@ -21,6 +28,8 @@ const baseUrl = "/asistencial/historia-asistencial/historia-adulto-mayor";
 const jasperModules = import.meta.glob("../../../../../jaspers/ModuloAsistencial/HistoriaClinicaAdultoMayor/*.jsx");
 const rutaJasper =
     "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaAdultoMayor/HistoriaClinicaAdultoMayor_Digitalizado.jsx";
+const rutaJasperResumen =
+    "../../../../../jaspers/ModuloAsistencial/HistoriaClinicaAdultoMayor/ResumenAsistencial.jsx";
 
 const unwrap = (res) => (res && typeof res === "object" && "resultado" in res ? res.resultado : res);
 
@@ -247,13 +256,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
 
     LoadingDefault("Validando datos");
 
-    // El Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints): se
-    // buscan en paralelo para mostrarlos si ya se generaron. Sin registro (o si falla) devuelven null y el
+    // La Receta, el Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints):
+    // se buscan en paralelo para mostrarlos si ya se guardaron. Sin registro (o si falla) devuelven null y el
     // formulario no se altera.
-    const [res, descanso, informeAccidente] = await Promise.all([
+    const [res, descanso, informeAccidente, receta] = await Promise.all([
         getFetch(`${baseUrl}/ticket/${numeroTicket}`, token),
         ObtenerDescanso(numeroTicket, token),
         ObtenerInformeAccidente(numeroTicket, token),
+        ObtenerReceta(numeroTicket, token),
     ]);
     Swal.close();
 
@@ -274,6 +284,7 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         ...formFromTicketInfo(data.infoTicket),
         ...formFromDescanso(descanso),
         ...formFromInformeAccidente(informeAccidente),
+        ...formFromReceta(receta),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         // Un registro NUEVO siempre abre con la fecha de hoy; la fecha guardada solo manda si ya existe.
         ...(tieneRegistro ? {} : { fecha_apertura_hcl: today }),
@@ -464,7 +475,7 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     );
 };
 
-// Datos de la Historia Clínica GUARDADA de un ticket que imprimen el Descanso Médico y el Informe de Accidente,
+// Datos de la Historia Clínica GUARDADA de un ticket que imprimen la Receta, el Descanso Médico y el Informe de Accidente,
 // con los nombres de campo del formulario. null si el ticket no existe.
 export const ObtenerDatosComplementos = async (numeroTicket, token) => {
     const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
@@ -593,8 +604,119 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
     }
 };
 
+// Etiqueta impresa de cada antecedente personal marcado "SI" en el formulario, y el campo de solo lectura
+// con su detalle (tipo de cáncer / descripción de la mordedura).
+const AP_ETIQUETAS = {
+    ap_hipertension: "Hipertensión arterial",
+    ap_diabetes: "Diabetes",
+    ap_obesidad: "Obesidad / Sobrepeso",
+    ap_infarto_cardiaco: "Infarto cardiaco / ICC",
+    ap_acv: "ACV",
+    ap_osteoporosis: "Osteoporosis",
+    ap_hospitalizacion: "Hospitalización últ. 3 años",
+    ap_transfusion: "Transfusión",
+    ap_interv_quirurgica: "Intervención quirúrgica",
+    ap_accidentes: "Accidentes",
+    ap_cancer: "Cáncer",
+    ap_tuberculosis: "Tuberculosis",
+    ap_its_vih: "ITS - VIH - SIDA",
+    ap_hepatitis_b: "Hepatitis B",
+    ap_malaria: "Malaria",
+    ap_osteoartrosis: "Osteoartrosis",
+    ap_glaucoma: "Glaucoma",
+    ap_convulsiones: "Convulsiones",
+    ap_depresion: "Depresión",
+    ap_riesgo_ocupacional: "Riesgo ocupacional",
+    ap_mordedura_animales: "Mordedura de animales",
+};
+const AP_DETALLE = { ap_cancer: "tipoCancer", ap_mordedura_animales: "descripcionMordedura" };
+
+// Antecedentes patológicos marcados en el formulario (más la reacción adversa a medicamentos), redactados para la hoja.
+const patologicosDe = (historia) => {
+    const patologicos = Object.entries(AP_ETIQUETAS)
+        .filter(([campo]) => historia[campo] === "SI")
+        .map(([campo, etiqueta]) => {
+            const detalle = String(historia[AP_DETALLE[campo]] ?? "").trim();
+            return detalle ? `${etiqueta} (${detalle})` : etiqueta;
+        });
+    if (historia.reaccion_adversa_medicamentos === "SI") {
+        const detalle = String(historia.reaccion_adversa_medicamentos_cual ?? "").trim();
+        patologicos.push(detalle ? `Reacción adversa a medicamentos (${detalle})` : "Reacción adversa a medicamentos");
+    }
+    return patologicos;
+};
+
+// Datos que consume el reporte Resumen Asistencial: paciente + ticket + Historia Clínica (puede no existir
+// todavía: en ese caso solo trae paciente y ticket y los campos clínicos quedan en blanco) + signos vitales y
+// anamnesis del Triaje del mismo ticket (si lo hay).
+const construirDatosResumen = (data, triaje, numeroTicket) => {
+    const paciente = pacienteDe(data);
+    const ticket = data.infoTicket ?? {};
+    const historia = formFromHistoria(data, "");
+
+    return {
+        ...formFromPaciente(paciente),
+        nombreCompleto: `${paciente?.apellidos ?? ""} ${paciente?.nombres ?? ""}`.trim(),
+        ocupacion: paciente?.ocupacion ?? "",
+        empresa: ticket.empresa ?? "",
+        direccion: paciente?.direccion ?? "",
+        celular: paciente?.celular ?? "",
+        sede: sedeDelTicket(ticket),
+        numeroTicket: data.numeroTicket ?? ticket.numeroTicket ?? numeroTicket,
+        numeroHistoriaClinica: historia.numeroHistoriaClinica,
+        fecha: ticket.fechaTicket ?? "",
+        horaIngreso: horaDeTicket(ticket.horaTicket),
+        // Signos vitales y anamnesis (Triaje)
+        ...datosTriajeResumen(triaje),
+        antecedentes: armarAntecedentesResumen({ triaje, patologicos: patologicosDe(historia), historia }),
+        examenFisico: historia.examenFisico,
+        examenesAuxiliares: historia.examenesAuxiliares,
+        diagnostico: historia.diagnostico,
+        tratamiento: historia.tratamiento,
+        cita: historia.seguimientoYControl || formatearFechaCorta(triaje?.fechaCita ?? ""),
+    };
+};
+
+// Botón "Resumen Asistencial": imprime la hoja de Historia Clínica del ticket (paciente, signos vitales del
+// Triaje y lo registrado en la Historia Clínica). No exige que la Historia Clínica ya esté guardada: sin ella
+// imprime la hoja con los datos del paciente y los renglones en blanco.
+export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) => {
+    if (!numeroTicket) {
+        await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
+        return;
+    }
+
+    LoadingDefault("Cargando Resumen Asistencial");
+
+    try {
+        const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
+        const data = unwrap(res);
+
+        if (res?.error || !data || !pacienteDe(data)) {
+            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            return;
+        }
+
+        // Sin Triaje (o con error) los signos vitales simplemente quedan en blanco.
+        const triaje = await obtenerTriajeDeTicket(numeroTicket, token);
+
+        const modulo = await jasperModules[rutaJasperResumen]();
+        if (typeof modulo.default !== "function") {
+            console.error(`El módulo ${rutaJasperResumen} no exporta una función por defecto`);
+            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            return;
+        }
+
+        await modulo.default({ ...construirDatosResumen(data, triaje, numeroTicket), ...datosFooter });
+        Swal.close();
+    } catch (error) {
+        console.error("Error al generar el reporte:", error);
+        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+    }
+};
+
 // Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Con
-// "La Arena" marcado el mensaje ofrece además imprimir el Descanso Médico y el Informe de Accidente del ticket.
+// "La Arena" marcado el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
 export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, laArena = false) => {
     if (laArena) {
         await ConfirmarImpresionConComplementos({
