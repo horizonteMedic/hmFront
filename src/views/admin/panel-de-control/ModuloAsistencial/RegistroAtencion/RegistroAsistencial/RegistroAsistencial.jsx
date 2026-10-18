@@ -179,7 +179,7 @@ function AutocompleteOneLine({
     );
 }
 
-export default function RegistroAsistencial() {
+export default function RegistroAsistencial({ onPacienteRegistrado }) {
 
     const today = getToday();
 
@@ -292,7 +292,7 @@ export default function RegistroAsistencial() {
     };
 
     const handleSave = () => {
-        SubmitDataService(form, token, handleClear, userlogued);
+        SubmitDataService(form, token, handleClear, userlogued, onPacienteRegistrado);
     };
 
     // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado (DNI,

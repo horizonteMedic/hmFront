@@ -52,11 +52,13 @@ const DESCUENTOS = [
 
 // Buscador de pacientes sin DNI: autocompletado por nombres/apellidos contra
 // /buscarPacientes; al elegir un resultado se bloquea el input con el paciente elegido.
-function BuscadorPacienteSinDni({ token, locked, selectedLabel, onSelect, onClear }) {
-    const [query, setQuery] = useState("");
+// `initialQuery` precarga la consulta (apellidos + nombres del paciente recién registrado) y
+// `preferredId` es ese paciente: Enter lo elige de los resultados sin tener que hacer clic.
+function BuscadorPacienteSinDni({ token, locked, selectedLabel, onSelect, onClear, initialQuery = "", preferredId = null }) {
+    const [query, setQuery] = useState(initialQuery);
     const [resultados, setResultados] = useState([]);
     const [buscando, setBuscando] = useState(false);
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(Boolean(initialQuery));
     const boxRef = useRef(null);
     const debounceRef = useRef(null);
 
@@ -137,6 +139,13 @@ function BuscadorPacienteSinDni({ token, locked, selectedLabel, onSelect, onClea
                         setShow(true);
                     }}
                     onFocus={() => setShow(true)}
+                    autoFocus={Boolean(initialQuery)}
+                    onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        const elegido = preferredId != null && resultados.find((r) => r.id === preferredId);
+                        if (elegido) handlePick(elegido);
+                    }}
                 />
                 {show && query.trim().length >= 2 && (
                     <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-56 overflow-y-auto shadow-lg">
@@ -370,7 +379,7 @@ function ModalNuevoServicio({ open, value, onChange, onClose, onSave, saving }) 
     );
 }
 
-export default function TicketAsistencial() {
+export default function TicketAsistencial({ pacienteReciente = null, onPacienteRecienteAplicado = () => { } }) {
 
     const today = getToday();
 
@@ -449,6 +458,42 @@ export default function TicketAsistencial() {
         setErrorImprimirTicket("");
         setForm({ ...initialFormState, tipoDocumento: value, esArena: form.esArena });
     };
+
+    // Precarga del paciente recién guardado en la pestaña Registro: DNI/Pasaporte quedan escritos
+    // (basta Enter para cargar al paciente) y, sin documento, el buscador arranca con apellidos y
+    // nombres tal como se registraron. Es un paciente distinto al del formulario, así que se
+    // parte de un formulario limpio, igual que al cambiar el tipo de documento. `key` fuerza el
+    // remontaje del buscador y dispara el foco; 0 = todavía no hay precarga.
+    const [precarga, setPrecarga] = useState({ key: 0, textoSinDni: "", pacienteId: null });
+
+    useEffect(() => {
+        if (!pacienteReciente) return;
+        const { id, tipoDocumento, numeroDocumento, nombres, apellidos } = pacienteReciente;
+        const sinDocumento = tipoDocumento === "SIN_DOCUMENTO";
+
+        setPacienteSeleccionado(null);
+        setErrors({});
+        setErrorImprimirTicket("");
+        setForm((f) => ({
+            ...initialFormState,
+            esArena: f.esArena,
+            tipoDocumento: sinDocumento ? "SIN DNI" : tipoDocumento,
+            documentoIdentidad: sinDocumento ? "" : numeroDocumento,
+        }));
+        setPrecarga((p) => ({
+            key: p.key + 1,
+            textoSinDni: sinDocumento ? `${apellidos} ${nombres}`.trim() : "",
+            pacienteId: id ?? null,
+        }));
+        onPacienteRecienteAplicado();
+    }, [pacienteReciente]);
+
+    // Con DNI/Pasaporte precargado el foco queda en el campo para que Enter busque de inmediato
+    // (en Sin DNI el buscador se enfoca solo, por autoFocus).
+    useEffect(() => {
+        if (precarga.key === 0 || precarga.textoSinDni) return;
+        document.getElementsByName("documentoIdentidad")[0]?.focus();
+    }, [precarga.key]);
 
     const handleSeleccionarPacienteSinDni = (item) => {
         setPacienteSeleccionado({
@@ -871,6 +916,9 @@ export default function TicketAsistencial() {
                 />
                 {form.tipoDocumento == "SIN DNI" ?
                     <BuscadorPacienteSinDni
+                        key={precarga.key}
+                        initialQuery={precarga.textoSinDni}
+                        preferredId={precarga.pacienteId}
                         token={token}
                         locked={!!pacienteSeleccionado}
                         selectedLabel={pacienteSeleccionado?.label ?? ""}

@@ -374,6 +374,21 @@ export default function HistoriaClinicaAdultoMayor() {
     if (e.key === "Enter") executeSearch();
   };
 
+  // ===== Síndromes y Problemas Geriátricos =====
+  // El "N° de caídas" solo aplica si hubo caídas: se habilita con "Caídas" o "Caídas en el último año" en SI. Con
+  // ambos en NO (o sin responder) queda bloqueado y se vacía, para no dejar guardado un número que ya no corresponde.
+  const hayCaidas = (f) => f.spg_caidas === "SI" || f.spg_caidas_ultimo_ano === "SI";
+  const caidasHabilitado = hayCaidas(form);
+
+  const handleRadioSindrome = (e, value) => {
+    const { name } = e.target;
+    handleRadioButton(e, value);
+    if (name === "spg_caidas" || name === "spg_caidas_ultimo_ano") {
+      // Se encadena tras el cambio del radio (los updaters se aplican en orden), así que `f` ya trae el nuevo valor.
+      setForm((f) => (hayCaidas(f) ? f : { ...f, spg_n_caidas: "" }));
+    }
+  };
+
   // ===== Inmunizaciones =====
   const handleChangeVacunaNueva = (index, campo, valor) => {
     // Una vacuna no puede tener fecha posterior a hoy: el selector ya la limita, y la escrita a mano se rechaza.
@@ -666,7 +681,7 @@ export default function HistoriaClinicaAdultoMayor() {
       <SectionFieldset legend="Síndromes y Problemas Geriátricos" className="space-y-3">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3 items-start">
           <RadioTable items={SINDROMES_IZQUIERDA} {...radioEditableProps} />
-          <RadioTable items={SINDROMES_DERECHA} {...radioEditableProps} />
+          <RadioTable items={SINDROMES_DERECHA} {...radioEditableProps} handleRadioButton={handleRadioSindrome} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
@@ -675,7 +690,7 @@ export default function HistoriaClinicaAdultoMayor() {
             name="spg_n_caidas"
             value={form.spg_n_caidas}
             onChange={handleChangeNumberDecimals}
-            disabled={camposDeshabilitados}
+            disabled={camposDeshabilitados || !caidasHabilitado}
             edited={isFieldEdited("spg_n_caidas")}
             onRevert={() => revertField("spg_n_caidas")}
             labelWidth="120px"

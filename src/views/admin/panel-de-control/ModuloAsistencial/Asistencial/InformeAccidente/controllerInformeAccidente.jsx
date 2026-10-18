@@ -129,10 +129,21 @@ export const ImprimirInformeAccidentePorTicket = async (numeroTicket, token, dat
             numeroHistoriaClinica: hc.numeroHistoriaClinica || informe.numeroHistoriaClinica || "",
             sede: hc.ticketSede,
             fecha: hc.ticketFecha || hc.fecha_apertura_hcl,
-            // "nombres" ya viene como "Nombres Apellidos".
-            nombres: hc.nombres,
-            apellidos: "",
+            // El reporte rotula "Apellidos y nombres": cada Historia entrega `nombreCompleto` así ("nombres" va como
+            // "Nombres Apellidos", que queda de respaldo).
+            nombreCompleto: hc.nombreCompleto || hc.nombres,
             dni: hc.dni,
+            edad: hc.edad,
+            sexo: hc.sexo,
+            estadoCivil: hc.estadoCivil,
+            fechaNacimiento: hc.fechaNacimiento,
+            lugarNacimiento: hc.lugarNacimiento,
+            nivelEstudios: hc.nivelEstudios,
+            // Datos laborales del ticket (mismos que imprime el Descanso Médico).
+            ocupacion: hc.ocupacion || hc.ticketCargo,
+            empresa: hc.empresa || hc.ticketEmpresa,
+            area: hc.ticketArea,
+            cargo: hc.ticketCargo,
             medico: hc.nombre_medico,
             cmp,
             diagnosticos: hc.diagnostico,

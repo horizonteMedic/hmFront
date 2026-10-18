@@ -340,6 +340,9 @@ export default async function HistoriaClinicaAdultoMayor_Digitalizado(data = {},
     { etiqueta: "Raza:", valor: data.raza, ancho: 63 },
     { etiqueta: "Grupo sanguíneo:", valor: data.grupo_sanguineo, ancho: 64 },
   ]);
+  // Subtítulo del bloque del familiar, con el formato de los demás títulos (barra gris, negrita, mayúsculas). Reserva
+  // espacio para sus 2 filas, para que no quede solo al pie de una página.
+  await seccion("Datos del Familiar o Cuidador", ALTO_FILA * 2);
   await filaFlex([{ etiqueta: "Familiar o cuidador responsable:", valor: data.familiar_responsable, ancho: ANCHO }]);
   await filaFlex([
     { etiqueta: "Edad:", valor: data.edad_familiar, ancho: 35 },

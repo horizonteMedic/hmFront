@@ -516,6 +516,9 @@ export const ObtenerDatosComplementos = async (numeroTicket, token) => {
         ...formFromPaciente(paciente),
         ...formFromHistoria(data, ""),
         ...formFromTicketInfo(data.infoTicket),
+        // Para los reportes que rotulan "Apellidos y nombres" (Informe de Accidente): "nombres" va como "Nombres Apellidos".
+        nombreCompleto: `${paciente?.apellidos ?? ""} ${paciente?.nombres ?? ""}`.trim(),
+        ocupacion: paciente?.ocupacion ?? "",
         esArena: esArenaDe(data),
         n_hcl: String(numeroTicket),
         nombre_medico: data.doctorAsignado ?? "",

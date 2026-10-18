@@ -6,6 +6,11 @@ export default function RegistroAtencionTabSelector({ tieneVista }) {
 
     const [activeTab, setActiveTab] = useState(0);
 
+    // Último paciente guardado en Registro: el Ticket lo precarga (DNI/pasaporte, o nombres y
+    // apellidos si no tiene documento) para no volver a pedírselo al paciente. Se vacía cuando
+    // el Ticket lo aplica, así no se reaplica cada vez que se cambia de pestaña.
+    const [pacienteReciente, setPacienteReciente] = useState(null);
+
     useEffect(
         () => {
             // Encontrar el primer tab permitido
@@ -57,8 +62,13 @@ export default function RegistroAtencionTabSelector({ tieneVista }) {
                 <div className="max-w-full">
                     {/* {activeTab === 0 && <FichaAptitudAnexo2 MedicosMulti={MedicosMulti} />}
                     {activeTab === 1 && <FichaAptitudAnexo16 MedicosMulti={MedicosMulti} />} */}
-                    {activeTab === 0 && <RegistroAsistencial/>}
-                    {activeTab === 1 && <TicketAsistencial/>} 
+                    {activeTab === 0 && <RegistroAsistencial onPacienteRegistrado={setPacienteReciente} />}
+                    {activeTab === 1 && (
+                        <TicketAsistencial
+                            pacienteReciente={pacienteReciente}
+                            onPacienteRecienteAplicado={() => setPacienteReciente(null)}
+                        />
+                    )}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.
