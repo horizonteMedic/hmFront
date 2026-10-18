@@ -3,7 +3,14 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
-import { enterCancelaSinSeleccion, mensajeDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
+import {
+    enterCancelaSinSeleccion,
+    esFechaFutura,
+    mensajeDiagnosticoTratamiento,
+    mensajeEdadFueraDeRango,
+    MENSAJE_FECHA_VACUNA_FUTURA,
+    RANGO_EDAD_HC,
+} from "../../../../../utils/registroAsistencialUtils";
 import {
     armarAntecedentesResumen,
     datosTriajeResumen,
@@ -258,6 +265,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
             "Este paciente ya cuenta con una Historia Clínica de la Mujer y el Varón Adulto.",
             "warning"
         );
+        return;
+    }
+
+    // Esta Historia Clínica es solo para 18 a 59 años (el backend lo valida al guardar): un registro nuevo de un
+    // paciente fuera del rango no se puede llenar y el formulario queda bloqueado (ver HistoriaClinicaMujerVaronAdulto).
+    const errorEdad = mensajeEdadFueraDeRango(paciente.edad, RANGO_EDAD_HC.mujerVaronAdulto);
+    if (errorEdad) {
+        await Swal.fire("Paciente fuera del rango de edad", errorEdad, "warning");
     } else {
         await OpenModalHistorialPrevio(numeroTicket, token, set, today, listaEmpleados);
     }
@@ -378,6 +393,16 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     const errorClinico = mensajeDiagnosticoTratamiento(form);
     if (errorClinico) {
         await Swal.fire("Datos incompletos", errorClinico, "warning");
+        return;
+    }
+
+    // Las fechas de las vacunas no pueden ser posteriores a hoy (el formulario ya lo impide al escribirlas; esto
+    // cubre lo que haya quedado guardado en el navegador).
+    const hayFechaVacunaFutura = Object.keys(form).some(
+        (campo) => /^vacuna_.+_fecha$/.test(campo) && esFechaFutura(form[campo])
+    );
+    if (hayFechaVacunaFutura) {
+        await Swal.fire("Fecha no válida", MENSAJE_FECHA_VACUNA_FUTURA, "warning");
         return;
     }
 

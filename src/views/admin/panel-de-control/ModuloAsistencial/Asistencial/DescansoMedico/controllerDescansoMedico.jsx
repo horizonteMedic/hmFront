@@ -24,8 +24,6 @@ const baseUrl = "/asistencial/descanso-medico";
 const jasperModules = import.meta.glob("../../../../../jaspers/ModuloAsistencial/DescansoMedico/DescansoMedico.jsx");
 const rutaJasper = "../../../../../jaspers/ModuloAsistencial/DescansoMedico/DescansoMedico.jsx";
 
-// El backend guarda el tipo de evento como texto libre; estos son los que se manejan hoy.
-export const TIPOS_EVENTO = ["ENFERMEDAD COMÚN", "ACCIDENTE DE TRABAJO"];
 
 // ===== Fechas (yyyy-MM-dd) =====
 // Todo se calcula en UTC para que el cambio de horario local no corra el día.

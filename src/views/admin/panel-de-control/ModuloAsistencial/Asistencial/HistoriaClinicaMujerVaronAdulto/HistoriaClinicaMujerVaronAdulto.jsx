@@ -7,14 +7,26 @@ import {
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import AvisoError from "../../../../../components/reusableComponents/AvisoError";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
-import { erroresDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
+import {
+  RANGO_EDAD_HC,
+  avisarFechaVacunaFutura,
+  erroresDiagnosticoTratamiento,
+  esFechaFutura,
+  mensajeEdadFueraDeRango,
+} from "../../../../../utils/registroAsistencialUtils";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
-import { ConfirmarImpresion, PrintResumenAsistencial, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaMujerVaronAdulto";
+import {
+  ConfirmarImpresion,
+  PrintResumenAsistencial,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerHistoriaClinicaMujerVaronAdulto";
 import BotonResumenAsistencial from "../ComplementosLaArena/BotonResumenAsistencial";
 import ComplementosDesplegables from "../ComplementosLaArena/ComplementosDesplegables";
 import { RECETA_ESTADO_INICIAL } from "../Receta/controllerReceta";
@@ -230,7 +242,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
   const {
     edicionHabilitada,
     habilitarEdicion,
-    camposDeshabilitados,
+    camposDeshabilitados: camposDeshabilitadosRegistro,
     isFieldEdited,
     revertField,
     revertFields,
@@ -243,6 +255,12 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
   const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
+  // Un registro NUEVO de un paciente fuera del rango de edad (18 a 59) no se puede llenar ni guardar: el
+  // formulario queda bloqueado, con el aviso, hasta buscar otro ticket o limpiar. Uno ya guardado se sigue viendo.
+  const errorEdad =
+    hayRegistroCargado && !form.tieneRegistro ? mensajeEdadFueraDeRango(form.edad, RANGO_EDAD_HC.mujerVaronAdulto) : "";
+  const camposDeshabilitados = camposDeshabilitadosRegistro || Boolean(errorEdad);
+
   const auditoria = buildAuditoria(form, {
     usuarioActual: userlogued,
     fechaHoraActual: getFechaHoraActual(),
@@ -252,6 +270,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
   const errores = form.intentoGuardar ? erroresDiagnosticoTratamiento(form) : {};
 
   const handleSave = () => {
+    if (errorEdad) return;
     setForm((f) => ({ ...f, intentoGuardar: true }));
     SubmitDataService(form, token, userlogued, handleClear, datosFooter);
   };
@@ -265,6 +284,15 @@ export default function HistoriaClinicaMujerVaronAdulto() {
   // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo en tickets de La Arena.
   const handleResumenAsistencial = () => {
     PrintResumenAsistencial(form.n_hcl, token, datosFooter);
+  };
+
+  // Fechas de las vacunas: no pueden ser posteriores a hoy. El selector ya las limita (max); la escrita a mano se rechaza.
+  const handleChangeFechaVacuna = (e) => {
+    if (esFechaFutura(e.target.value)) {
+      avisarFechaVacunaFutura();
+      return;
+    }
+    handleChangeSimple(e);
   };
 
   const handleSearch = (e) => {
@@ -284,6 +312,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
       />
+
+      <AvisoError mensaje={errorEdad} className="mb-0" />
 
       <SectionFieldset legend="Header" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputTextOneLine
@@ -613,25 +643,25 @@ export default function HistoriaClinicaMujerVaronAdulto() {
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">DT</td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_1_dosis" value={form.vacuna_dt_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_2_dosis" value={form.vacuna_dt_2_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_3_dosis" value={form.vacuna_dt_3_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">HVB</td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_1_dosis" value={form.vacuna_hvb_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_2_dosis" value={form.vacuna_hvb_2_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_3_dosis" value={form.vacuna_hvb_3_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">ANTIAMARILICA</td>
                   <td className="border border-gray-300 p-0.5" colSpan="1"><input type="text" name="vacuna_antiamarilica_1_dosis" value={form.vacuna_antiamarilica_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5" colSpan="1"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5" colSpan="1"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
               </tbody>
             </table>
@@ -742,7 +772,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
         handleEdit={habilitarEdicion}
         handleClear={handleClear}
-        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideSave={(form.tieneRegistro && !edicionHabilitada) || Boolean(errorEdad)}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
         handlePrint={handlePrint}
         printField="ticketImprimir"

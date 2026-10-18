@@ -1,5 +1,5 @@
 import { InputTextOneLine, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
-import { TIPOS_EVENTO, diasEntre } from "./controllerDescansoMedico";
+import { diasEntre } from "./controllerDescansoMedico";
 
 /**
  * Descanso Médico de las Historias Clínicas del módulo (solo en tickets de La Arena).
@@ -10,11 +10,7 @@ import { TIPOS_EVENTO, diasEntre } from "./controllerDescansoMedico";
  * `acciones` (opcional) son los botones o sellos de la barra del título (ver ComplementoDesplegable).
  */
 export default function DescansoMedico({ form, onChange, disabled = false, acciones = null }) {
-    // Un tipo de evento ya guardado que no está en la lista (p. ej. cargado desde otro sistema) se conserva.
-    const tipos = !form.descansoTipoEvento || TIPOS_EVENTO.includes(form.descansoTipoEvento)
-        ? TIPOS_EVENTO
-        : [...TIPOS_EVENTO, form.descansoTipoEvento];
-
+     
     const finAnteriorAlInicio =
         Boolean(form.descansoFechaFin) && (diasEntre(form.descansoFechaInicio, form.descansoFechaFin) ?? 1) < 1;
 
@@ -50,24 +46,15 @@ export default function DescansoMedico({ form, onChange, disabled = false, accio
                     error={finAnteriorAlInicio ? "La fecha fin no puede ser anterior a la fecha de inicio." : ""}
                     labelWidth="130px"
                 />
-                <div className="flex items-center gap-4">
-                    <label className="font-semibold" style={{ minWidth: "130px", maxWidth: "130px" }} htmlFor="descansoTipoEvento">
-                        Tipo de Evento :
-                    </label>
-                    <select
-                        id="descansoTipoEvento"
-                        name="descansoTipoEvento"
-                        value={form.descansoTipoEvento}
-                        onChange={(e) => onChange("descansoTipoEvento", e.target.value)}
-                        disabled={disabled}
-                        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : "bg-white"}`}
-                    >
-                        <option value="">-- Seleccione --</option>
-                        {tipos.map((tipo) => (
-                            <option key={tipo} value={tipo}>{tipo}</option>
-                        ))}
-                    </select>
-                </div>
+                <InputTextOneLine
+                    label="Tipo de Evento:"
+                    name="descansoTipoEvento"
+                    type="text"
+                    value={form.descansoTipoEvento}
+                    onChange={(e) => onChange("descansoTipoEvento", e.target.value)}
+                    disabled={disabled}
+                    labelWidth="130px"
+                /> 
             </div>
 
             <p className="text-sm italic text-gray-600">

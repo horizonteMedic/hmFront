@@ -6,7 +6,7 @@ import {
   RegistrarServicioAsistencialDefault,
 } from "./functionUtils";
 import { formatearFechaCorta } from "./formatDateUtils";
-import { convertirGenero, getSign } from "./helpers";
+import { convertirGenero, getSign, getToday } from "./helpers";
 import { useAuthStore } from "../../store/auth";
 
 /**
@@ -104,6 +104,32 @@ export const mensajeDiagnosticoTratamiento = (form) => {
   const nombres = { diagnostico: "Diagnóstico", tratamiento: "Tratamiento" };
   const faltan = Object.keys(erroresDiagnosticoTratamiento(form)).map((campo) => nombres[campo]);
   return faltan.length ? `Debe completar los campos obligatorios: ${faltan.join(" y ")}.` : null;
+};
+
+// Fecha de una vacuna (Inmunizaciones de las Historias Clínicas): no puede ser posterior a hoy. `fecha` viene de un
+// <input type="date"> (yyyy-MM-dd), que se compara como texto; vacío = sin fecha, no es futura.
+export const MENSAJE_FECHA_VACUNA_FUTURA = "La fecha de la vacuna no puede ser mayor a la fecha actual.";
+
+export const esFechaFutura = (fecha) => Boolean(fecha) && String(fecha) > getToday();
+
+export const avisarFechaVacunaFutura = () => Swal.fire("Fecha no válida", MENSAJE_FECHA_VACUNA_FUTURA, "warning");
+
+// Cada Historia Clínica asistencial admite un rango de edad (Mujer/Varón Adulto 18-59, Adulto Mayor 60 a más) y el
+// backend rechaza el guardado fuera de él. Devuelve el aviso para mostrarlo apenas se consulta el ticket, o "" si
+// la edad entra en el rango (o no se conoce: entonces decide el backend). `destino` completa la frase
+// "la historia clínica del ... es para pacientes ...".
+export const mensajeEdadFueraDeRango = (edad, { min = 0, max = Infinity, destino }) => {
+  if (edad === null || edad === undefined || String(edad).trim() === "") return "";
+  const anios = Number(edad);
+  if (!Number.isFinite(anios) || (anios >= min && anios <= max)) return "";
+  const rango = Number.isFinite(max) ? `de ${min} a ${max} años` : `de ${min} años a más`;
+  return `El paciente tiene ${anios} años; ${destino} es para pacientes ${rango}.`;
+};
+
+// Rango de edad de cada Historia Clínica (los mismos que valida el backend al guardar).
+export const RANGO_EDAD_HC = {
+  adultoMayor: { min: 60, destino: "la historia clínica del adulto mayor" },
+  mujerVaronAdulto: { min: 18, max: 59, destino: "la historia clínica del varón o mujer adulto" },
 };
 
 // Opciones para un modal de SweetAlert2 con `input: "radio"` y botón Cancelar: Enter sin ninguna opción marcada

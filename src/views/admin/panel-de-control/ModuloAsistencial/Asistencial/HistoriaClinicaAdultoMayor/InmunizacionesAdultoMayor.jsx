@@ -14,6 +14,8 @@ export default function InmunizacionesAdultoMayor({
     vacunas = [],
     vacunasNuevas = [],
     disabled = false,
+    // Fecha más alta que admite el selector (yyyy-MM-dd): una vacuna no puede ser posterior a hoy.
+    fechaMaxima,
     onChangeNueva,
     onAgregar,
     onQuitar,
@@ -65,6 +67,7 @@ export default function InmunizacionesAdultoMayor({
                                 label="Fecha"
                                 name={`fechaVacunaNueva_${index}`}
                                 type="date"
+                                max={fechaMaxima}
                                 value={v.fecha}
                                 onChange={(e) => onChangeNueva(index, "fecha", e.target.value)}
                                 disabled={disabled}

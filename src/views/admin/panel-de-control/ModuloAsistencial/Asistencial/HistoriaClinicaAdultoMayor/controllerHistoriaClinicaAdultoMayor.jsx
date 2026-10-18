@@ -5,8 +5,12 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../../utils/helpers";
 import {
     enterCancelaSinSeleccion,
+    esFechaFutura,
     mensajeDiagnosticoTratamiento,
+    mensajeEdadFueraDeRango,
+    MENSAJE_FECHA_VACUNA_FUTURA,
     obtenerDigitalizacionMedico,
+    RANGO_EDAD_HC,
 } from "../../../../../utils/registroAsistencialUtils";
 import {
     armarAntecedentesResumen,
@@ -309,6 +313,14 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
 
     if (tieneRegistro) {
         Swal.fire("Alerta", "Este paciente ya cuenta con una Historia Clínica de Adulto Mayor.", "warning");
+        return;
+    }
+
+    // Esta Historia Clínica es solo para 60 años a más (el backend lo valida al guardar): un registro nuevo de un
+    // paciente fuera del rango no se puede llenar y el formulario queda bloqueado (ver HistoriaClinicaAdultoMayor).
+    const errorEdad = mensajeEdadFueraDeRango(paciente.edad, RANGO_EDAD_HC.adultoMayor);
+    if (errorEdad) {
+        await Swal.fire("Paciente fuera del rango de edad", errorEdad, "warning");
     } else {
         await OpenModalHistorialPrevio(numeroTicket, token, set, today, listaEmpleados);
     }
@@ -446,6 +458,13 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     const errorClinico = mensajeDiagnosticoTratamiento(form);
     if (errorClinico) {
         await Swal.fire("Datos incompletos", errorClinico, "warning");
+        return;
+    }
+
+    // Las vacunas nuevas no pueden tener fecha posterior a hoy (el formulario ya lo impide al escribirla; esto
+    // cubre lo que haya quedado guardado en el navegador).
+    if ((form.vacunasNuevas ?? []).some((vacuna) => esFechaFutura(vacuna.fecha))) {
+        await Swal.fire("Fecha no válida", MENSAJE_FECHA_VACUNA_FUTURA, "warning");
         return;
     }
 

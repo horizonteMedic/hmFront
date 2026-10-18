@@ -11,6 +11,7 @@ export default function InputTextOneLine({
   onBlur,
   disabled = false,
   type = "text",
+  max,
   labelWidth = "80px",
   labelOnTop = false,
   className = "",
@@ -51,6 +52,7 @@ export default function InputTextOneLine({
         <div className="w-full flex items-center gap-1.5">
           <input
             type={type}
+            max={max}
             className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
               } ${stateClasses} ${inputClassName}`}
             id={name}

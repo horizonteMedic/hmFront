@@ -7,6 +7,7 @@ import {
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import AvisoError from "../../../../../components/reusableComponents/AvisoError";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -15,7 +16,13 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
-import { erroresDiagnosticoTratamiento } from "../../../../../utils/registroAsistencialUtils";
+import {
+  RANGO_EDAD_HC,
+  avisarFechaVacunaFutura,
+  erroresDiagnosticoTratamiento,
+  esFechaFutura,
+  mensajeEdadFueraDeRango,
+} from "../../../../../utils/registroAsistencialUtils";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
   ConfirmarImpresion,
@@ -312,7 +319,7 @@ export default function HistoriaClinicaAdultoMayor() {
   const {
     edicionHabilitada,
     habilitarEdicion,
-    camposDeshabilitados,
+    camposDeshabilitados: camposDeshabilitadosRegistro,
     isFieldEdited,
     revertField,
     revertFields,
@@ -325,6 +332,12 @@ export default function HistoriaClinicaAdultoMayor() {
 
   const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
+  // Un registro NUEVO de un paciente fuera del rango de edad (60 a más) no se puede llenar ni guardar: el
+  // formulario queda bloqueado, con el aviso, hasta buscar otro ticket o limpiar. Uno ya guardado se sigue viendo.
+  const errorEdad =
+    hayRegistroCargado && !form.tieneRegistro ? mensajeEdadFueraDeRango(form.edad, RANGO_EDAD_HC.adultoMayor) : "";
+  const camposDeshabilitados = camposDeshabilitadosRegistro || Boolean(errorEdad);
+
   const auditoria = buildAuditoria(form, {
     usuarioActual: userlogued,
     fechaHoraActual: getFechaHoraActual(),
@@ -334,6 +347,7 @@ export default function HistoriaClinicaAdultoMayor() {
   const errores = form.intentoGuardar ? erroresDiagnosticoTratamiento(form) : {};
 
   const handleSave = () => {
+    if (errorEdad) return;
     setForm((f) => ({ ...f, intentoGuardar: true }));
     SubmitDataService(form, token, userlogued, handleClear, datosFooter);
   };
@@ -362,6 +376,11 @@ export default function HistoriaClinicaAdultoMayor() {
 
   // ===== Inmunizaciones =====
   const handleChangeVacunaNueva = (index, campo, valor) => {
+    // Una vacuna no puede tener fecha posterior a hoy: el selector ya la limita, y la escrita a mano se rechaza.
+    if (campo === "fecha" && esFechaFutura(valor)) {
+      avisarFechaVacunaFutura();
+      return;
+    }
     setForm((f) => ({
       ...f,
       vacunasNuevas: f.vacunasNuevas.map((v, i) => (i === index ? { ...v, [campo]: valor } : v)),
@@ -431,6 +450,8 @@ export default function HistoriaClinicaAdultoMayor() {
         onLimpiar={handleClear}
       />
 
+      <AvisoError mensaje={errorEdad} className="mb-0" />
+
       {/* ===== SECCIÓN: DATOS GENERALES ===== */}
       <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
         <div className="flex gap-x-3 w-full">
@@ -440,11 +461,11 @@ export default function HistoriaClinicaAdultoMayor() {
             value={form.n_hcl}
             onChange={handleChangeNumberDecimals}
             onKeyUp={handleSearch}
-            disabled={hayRegistroCargado}
+            disabled={hayRegistroCargado && !errorEdad}
             labelWidth="120px"
             className="w-full"
           />
-          <SearchButton onClick={executeSearch} disabled={hayRegistroCargado} className="lg:hidden" />
+          <SearchButton onClick={executeSearch} disabled={hayRegistroCargado && !errorEdad} className="lg:hidden" />
         </div>
         <InputTextOneLine
           label="Fecha Apertura"
@@ -632,6 +653,7 @@ export default function HistoriaClinicaAdultoMayor() {
           vacunas={form.vacunas}
           vacunasNuevas={form.vacunasNuevas}
           disabled={camposDeshabilitados}
+          fechaMaxima={today}
           onChangeNueva={handleChangeVacunaNueva}
           onAgregar={handleAgregarVacunaNueva}
           onQuitar={handleQuitarVacunaNueva}
@@ -756,7 +778,7 @@ export default function HistoriaClinicaAdultoMayor() {
         saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
         handleEdit={habilitarEdicion}
         handleClear={handleClear}
-        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideSave={(form.tieneRegistro && !edicionHabilitada) || Boolean(errorEdad)}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
         handlePrint={handlePrint}
         printField="ticketImprimir"
