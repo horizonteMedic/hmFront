@@ -40,7 +40,10 @@ import Swal from 'sweetalert2';
 
 const today = getToday();
 
-export default function Triaje() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador ni muestra la tabla de pacientes, y avisa con `onGuardado` al registrar el triaje.
+export default function Triaje({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const { token, selectedSede } = useSessionData();
     const debounceTimeout = useRef(null);
 
@@ -53,7 +56,7 @@ export default function Triaje() {
         nOrden: true,
         conclusionesCie10: "",
         // Información del paciente
-        nro: '',
+        nro: embebido ? String(nOrdenInicial) : '',
         nomExam: '',
         empresa: '',
         contrata: '',
@@ -92,7 +95,7 @@ export default function Triaje() {
         setForm,
         handleChange,
         handleChangeNumber,
-    } = useForm(initialFormState, { storageKey: 'triaje' });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : 'triaje' });
 
     // Estados adicionales para la tabla y UI
     const [refresh, setRefresh] = useState(0);
@@ -105,10 +108,17 @@ export default function Triaje() {
 
     // Cargar tabla inicial
     useEffect(() => {
-        if (form.codigo === '' && form.nombresBusqueda === '') {
+        if (!embebido && form.codigo === '' && form.nombresBusqueda === '') {
             GetTable(form.codigo, form.nombresBusqueda, selectedSede, token, setTablehc);
         }
-    }, [form.codigo, form.nombresBusqueda, refresh, selectedSede, token]);
+    }, [embebido, form.codigo, form.nombresBusqueda, refresh, selectedSede, token]);
+
+    // Incrustado: busca la orden recibida (datos del paciente si aún no hay triaje; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR({ nro: String(nOrdenInicial) }, getFetch, token, setForm, selectedSede, setHabilitarTR, setHabilitar);
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     // Handlers específicos
     const handleTriajeChange = (e) => {
@@ -148,6 +158,7 @@ export default function Triaje() {
 
     const refreshtable = () => {
         setRefresh((prev) => prev + 1);
+        onGuardado?.();
     };
 
     // Calcular resumen de pacientes para la fecha seleccionada
@@ -221,7 +232,7 @@ export default function Triaje() {
     return (
         <div className="flex flex-col md:flex-row w-full">
             {/* Columna 1 - Formulario */}
-            <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[45%]">
+            <div className={`bg-white rounded p-4 w-full ${embebido ? '' : 'min-w-[400px] md:w-[45%]'}`}>
                 <form className="space-y-3 text-md" onSubmit={(e) => e.preventDefault()}>
                     {/* Sección: Tipo de paciente y búsqueda */}
                     <SectionFieldset legend="Información del Paciente" className="space-y-3">
@@ -257,6 +268,7 @@ export default function Triaje() {
                                 name="nro"
                                 value={form.nro}
                                 onChange={handleChangeNumber}
+                                disabled={embebido}
                                 onKeyUp={(event) => {
                                     if (event.key === 'Enter') {
                                         handleTR();
@@ -592,176 +604,180 @@ export default function Triaje() {
                                 >
                                     <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        Clean(setForm);
-                                        setHabilitarEdicion(false);
-                                    }}
-                                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
-                                </button>
+                                {!embebido && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            Clean(setForm);
+                                            setHabilitarEdicion(false);
+                                        }}
+                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                    >
+                                        <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
+                                    </button>
+                                )}
                             </div>
                         </section>
                     </SectionFieldset>
                 </form>
             </div>
 
-            {/* Columna 2 - Tabla de pacientes */}
-            <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[55%]">
-                {/* Filtro de búsqueda */}
-                <SectionFieldset legend="Últimos Agregados & Hojas de Ruta" className="mb-2">
-                    <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
-                        <InputTextOneLine
-                            label="Código"
-                            name="codigo"
-                            value={form.codigo}
-                            onKeyUp={(event) => {
-                                SearchHC(event, form, setTablehc, selectedSede, token);
-                            }}
-                            onChange={handleCodigoChange}
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Nombres"
-                            name="nombresBusqueda"
-                            value={form.nombresBusqueda}
-                            onChange={(e) => {
-                                handleNombreChange(
-                                    e,
-                                    setForm,
-                                    setTablehc,
-                                    selectedSede,
-                                    token,
-                                    debounceTimeout
-                                );
-                            }}
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Fecha"
-                            type="date"
-                            value={resumenFecha}
-                            onChange={(e) => setResumenFecha(e.target.value)}
-                            labelWidth="120px"
-                        />
-                        <div className="flex gap-3 items-center">
-                            <InputCheckbox
-                                label="Pacientes"
-                                name="tipoPaciente"
-                                checked={form.tipoPaciente}
-                                onChange={handleBusquedaChange}
+            {/* Columna 2 - Tabla de pacientes (no va incrustado) */}
+            {!embebido && (
+                <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[55%]">
+                    {/* Filtro de búsqueda */}
+                    <SectionFieldset legend="Últimos Agregados & Hojas de Ruta" className="mb-2">
+                        <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
+                            <InputTextOneLine
+                                label="Código"
+                                name="codigo"
+                                value={form.codigo}
+                                onKeyUp={(event) => {
+                                    SearchHC(event, form, setTablehc, selectedSede, token);
+                                }}
+                                onChange={handleCodigoChange}
+                                labelWidth="120px"
                             />
-                            <InputCheckbox
-                                label="Ocupacional"
-                                name="tipoOcupacional"
-                                checked={form.tipoOcupacional}
-                                onChange={handleBusquedaChange}
+                            <InputTextOneLine
+                                label="Nombres"
+                                name="nombresBusqueda"
+                                value={form.nombresBusqueda}
+                                onChange={(e) => {
+                                    handleNombreChange(
+                                        e,
+                                        setForm,
+                                        setTablehc,
+                                        selectedSede,
+                                        token,
+                                        debounceTimeout
+                                    );
+                                }}
+                                labelWidth="120px"
                             />
+                            <InputTextOneLine
+                                label="Fecha"
+                                type="date"
+                                value={resumenFecha}
+                                onChange={(e) => setResumenFecha(e.target.value)}
+                                labelWidth="120px"
+                            />
+                            <div className="flex gap-3 items-center">
+                                <InputCheckbox
+                                    label="Pacientes"
+                                    name="tipoPaciente"
+                                    checked={form.tipoPaciente}
+                                    onChange={handleBusquedaChange}
+                                />
+                                <InputCheckbox
+                                    label="Ocupacional"
+                                    name="tipoOcupacional"
+                                    checked={form.tipoOcupacional}
+                                    onChange={handleBusquedaChange}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </SectionFieldset>
+                    </SectionFieldset>
 
-                {/* Número de historia clínica destacado */}
-                {form.nroHistorial && (
-                    <div className="bg-blue-50 text-gray-500 text-2xl font-extrabold rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
-                        <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#222' }}>
-                            {form.nroHistorial}
-                        </span>
-                    </div>
-                )}
-
-                <div className="">
-                    {/* Texto informativo arriba de la tabla */}
-                    <div className="bg-blue-50 flex justify-between p-4 mb-2">
-                        <div className="bg-blue-50 text-gray-500">
-                            (Click izquierdo para importar datos | Click derecho para imprimir)
-                        </div>
-                        <div className="flex gap-6 font-semibold">
-                            <span className="text-gray-700">
-                                Pacientes completados:{' '}
-                                <span className="text-green-600">{completados}</span>
-                            </span>
-                            <span className="text-gray-700">
-                                Pacientes faltantes:{' '}
-                                <span className="text-red-600">{faltantes}</span>
+                    {/* Número de historia clínica destacado */}
+                    {form.nroHistorial && (
+                        <div className="bg-blue-50 text-gray-500 text-2xl font-extrabold rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
+                            <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#222' }}>
+                                {form.nroHistorial}
                             </span>
                         </div>
-                    </div>
-                    <div
-                        className="overflow-x-auto overflow-y-auto"
-                        style={{ maxHeight: '535px' }}
-                    >
-                        <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
-                            <thead>
-                                <tr className="bg-gradient-to-r from-blue-100 to-blue-300 text-center">
-                                    <th className="font-bold">N°</th>
-                                    <th>Nombre</th>
-                                    <th>Fecha</th>
-                                    <th>Empresa</th>
-                                    <th>Contrata</th>
-                                    <th>T.Examen</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tablehc.length == 0 && (
-                                    <tr>
-                                        <td
-                                            className="border border-gray-300 px-2 py-1 mb-1 text-center"
-                                            colSpan={7}
+                    )}
+
+                    <div className="">
+                        {/* Texto informativo arriba de la tabla */}
+                        <div className="bg-blue-50 flex justify-between p-4 mb-2">
+                            <div className="bg-blue-50 text-gray-500">
+                                (Click izquierdo para importar datos | Click derecho para imprimir)
+                            </div>
+                            <div className="flex gap-6 font-semibold">
+                                <span className="text-gray-700">
+                                    Pacientes completados:{' '}
+                                    <span className="text-green-600">{completados}</span>
+                                </span>
+                                <span className="text-gray-700">
+                                    Pacientes faltantes:{' '}
+                                    <span className="text-red-600">{faltantes}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div
+                            className="overflow-x-auto overflow-y-auto"
+                            style={{ maxHeight: '535px' }}
+                        >
+                            <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr className="bg-gradient-to-r from-blue-100 to-blue-300 text-center">
+                                        <th className="font-bold">N°</th>
+                                        <th>Nombre</th>
+                                        <th>Fecha</th>
+                                        <th>Empresa</th>
+                                        <th>Contrata</th>
+                                        <th>T.Examen</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tablehc.length == 0 && (
+                                        <tr>
+                                            <td
+                                                className="border border-gray-300 px-2 py-1 mb-1 text-center"
+                                                colSpan={7}
+                                            >
+                                                Cargando...
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {tablehc.map((row, i) => (
+                                        <tr
+                                            key={i}
+                                            className={`text-center cursor-pointer transition-all duration-200
+                          ${row.color === 'AMARILLO'
+                                                    ? 'bg-[#ffff00]'
+                                                    : row.color === 'VERDE'
+                                                        ? 'bg-[#00ff00]'
+                                                        : row.color === 'ROJO'
+                                                            ? 'bg-[#ff6767]'
+                                                            : ''
+                                                }
+                          ${hoveredRow !== null && hoveredRow !== i
+                                                    ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
+                                                    : ''
+                                                }`}
+                                            style={{ zIndex: 1, position: 'relative' }}
+                                            onClick={() => handleRowClick(row)}
+                                            onContextMenu={(e) => handleRowContextMenu(e, row)}
+                                            onMouseEnter={() => setHoveredRow(i)}
+                                            onMouseLeave={() => setHoveredRow(null)}
                                         >
-                                            Cargando...
-                                        </td>
-                                    </tr>
-                                )}
-                                {tablehc.map((row, i) => (
-                                    <tr
-                                        key={i}
-                                        className={`text-center cursor-pointer transition-all duration-200
-                      ${row.color === 'AMARILLO'
-                                                ? 'bg-[#ffff00]'
-                                                : row.color === 'VERDE'
-                                                    ? 'bg-[#00ff00]'
-                                                    : row.color === 'ROJO'
-                                                        ? 'bg-[#ff6767]'
-                                                        : ''
-                                            }
-                      ${hoveredRow !== null && hoveredRow !== i
-                                                ? 'relative after:content-[""] after:absolute after:inset-0 after:bg-black after:opacity-25 after:pointer-events-none'
-                                                : ''
-                                            }`}
-                                        style={{ zIndex: 1, position: 'relative' }}
-                                        onClick={() => handleRowClick(row)}
-                                        onContextMenu={(e) => handleRowContextMenu(e, row)}
-                                        onMouseEnter={() => setHoveredRow(i)}
-                                        onMouseLeave={() => setHoveredRow(null)}
-                                    >
-                                        <td className="font-bold border-b border-gray-200 py-1">
-                                            {row.n_orden}
-                                        </td>
-                                        <td className="border-b border-gray-200 py-1">{row.nombres}</td>
-                                        <td className="border-b border-gray-200 py-1">
-                                            {row.fecha_apertura_po}
-                                        </td>
-                                        <td className="border-b border-gray-200 py-1">
-                                            {row.razon_empresa}
-                                        </td>
-                                        <td className="border-b border-gray-200 py-1">
-                                            {row.razon_contrata}
-                                        </td>
-                                        <td className="border-b border-gray-200 py-1">
-                                            {row.nom_examen}
-                                        </td>
-                                        <td className="border-b border-gray-200 py-1">{row.estado}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            <td className="font-bold border-b border-gray-200 py-1">
+                                                {row.n_orden}
+                                            </td>
+                                            <td className="border-b border-gray-200 py-1">{row.nombres}</td>
+                                            <td className="border-b border-gray-200 py-1">
+                                                {row.fecha_apertura_po}
+                                            </td>
+                                            <td className="border-b border-gray-200 py-1">
+                                                {row.razon_empresa}
+                                            </td>
+                                            <td className="border-b border-gray-200 py-1">
+                                                {row.razon_contrata}
+                                            </td>
+                                            <td className="border-b border-gray-200 py-1">
+                                                {row.nom_examen}
+                                            </td>
+                                            <td className="border-b border-gray-200 py-1">{row.estado}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

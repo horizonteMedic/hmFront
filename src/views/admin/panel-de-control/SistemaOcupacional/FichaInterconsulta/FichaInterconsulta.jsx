@@ -58,7 +58,8 @@ const Especialidades = [
     "Psicología",
     "Medicina Física y Rehabilitación",
     "Emergencia y Desastres",
-    "Asistencia Social"
+    "Asistencia Social",
+    "Espirometria"
 ]
 
 
