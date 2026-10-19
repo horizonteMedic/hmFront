@@ -1,4 +1,5 @@
 import {
+  InputCheckbox,
   InputTextOneLine,
   InputTextArea,
   SectionFieldset,
@@ -6,15 +7,29 @@ import {
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import AvisoError from "../../../../../components/reusableComponents/AvisoError";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import {
+  RANGO_EDAD_HC,
+  avisarFechaVacunaFutura,
+  erroresDiagnosticoTratamiento,
+  esFechaFutura,
+  mensajeEdadFueraDeRango,
+} from "../../../../../utils/registroAsistencialUtils";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileMedical } from "@fortawesome/free-solid-svg-icons";
-import { ConfirmarImpresion, PrintResumenAsistencial, SubmitDataService, VerifyTR } from "./controllerHistoriaClinicaMujerVaronAdulto";
+import {
+  ConfirmarImpresion,
+  PrintResumenAsistencial,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerHistoriaClinicaMujerVaronAdulto";
+import BotonResumenAsistencial from "../ComplementosLaArena/BotonResumenAsistencial";
+import ComplementosDesplegables from "../ComplementosLaArena/ComplementosDesplegables";
+import { RECETA_ESTADO_INICIAL } from "../Receta/controllerReceta";
 import { DatosPersonalesLaborales } from "../../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
@@ -72,7 +87,11 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     // Header
     n_hcl: "",
     ticketImprimir: "",
+    numeroHistoriaClinica: "",
     fecha_apertura_hcl: today,
+    // Cliente La Arena: lo define el ticket (esArena, se marca en Ticket Asistencial) y se carga al buscarlo. Habilita
+    // Receta, Descanso Médico, Informe de Accidente y Resumen Asistencial (solo UI, no se envía a la Historia Clínica).
+    esArena: false,
 
     // Datos Generales
     nombre_padre: "",
@@ -152,18 +171,41 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     vigilancia_hipertension: false,
     vigilancia_violencia: false,
 
-    // Examen / Diagnóstico (solo lectura, informativo del ticket)
+    // Examen / Diagnóstico (informativo del ticket, editable). Diagnóstico y Tratamiento son obligatorios.
     examenFisico: "",
     examenesAuxiliares: "",
     diagnostico: "",
     tratamiento: "",
     seguimientoYControl: "",
+    // true tras un intento de guardar: recién ahí se muestran los errores de campos obligatorios (Diagnóstico y
+    // Tratamiento). Vuelve a false con cualquier limpieza/búsqueda, porque parten del estado inicial.
+    intentoGuardar: false,
 
 
 
     // Médico que Certifica
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Descanso Médico (registro aparte de la Historia Clínica, ver ../DescansoMedico/controllerDescansoMedico)
+    descansoRegistrado: false,
+    descansoFechaInicio: today,
+    descansoDias: "",
+    descansoFechaFin: "",
+    descansoTipoEvento: "",
+    // Datos del ticket que imprime el Descanso Médico (solo lectura)
+    ticketEmpresa: "",
+    ticketArea: "",
+    ticketCargo: "",
+    ticketSede: "",
+    ticketFecha: "",
+
+    // Informe de Accidente (registro aparte de la Historia Clínica, ver ../InformeAccidente/controllerInformeAccidente)
+    accidenteRegistrado: false,
+    accidenteCircunstancias: "",
+
+    // Receta / reserva de medicamentos (registro aparte de la Historia Clínica, ver ../Receta/controllerReceta)
+    ...RECETA_ESTADO_INICIAL,
 
     // Campos de DatosPersonalesLaborales
     norden: "",
@@ -200,7 +242,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
   const {
     edicionHabilitada,
     habilitarEdicion,
-    camposDeshabilitados,
+    camposDeshabilitados: camposDeshabilitadosRegistro,
     isFieldEdited,
     revertField,
     revertFields,
@@ -213,22 +255,44 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
   const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
+  // Un registro NUEVO de un paciente fuera del rango de edad (18 a 59) no se puede llenar ni guardar: el
+  // formulario queda bloqueado, con el aviso, hasta buscar otro ticket o limpiar. Uno ya guardado se sigue viendo.
+  const errorEdad =
+    hayRegistroCargado && !form.tieneRegistro ? mensajeEdadFueraDeRango(form.edad, RANGO_EDAD_HC.mujerVaronAdulto) : "";
+  const camposDeshabilitados = camposDeshabilitadosRegistro || Boolean(errorEdad);
+
   const auditoria = buildAuditoria(form, {
     usuarioActual: userlogued,
     fechaHoraActual: getFechaHoraActual(),
   });
 
+  // Diagnóstico y Tratamiento obligatorios: el error inline aparece tras intentar guardar y desaparece al completar el campo.
+  const errores = form.intentoGuardar ? erroresDiagnosticoTratamiento(form) : {};
+
   const handleSave = () => {
+    if (errorEdad) return;
+    setForm((f) => ({ ...f, intentoGuardar: true }));
     SubmitDataService(form, token, userlogued, handleClear, datosFooter);
   };
 
+  // Si el ticket impreso es de La Arena (esArena), el mensaje de impresión ofrece también la Receta, el Descanso
+  // Médico y el Informe de Accidente. El N° puede ser de otro ticket que el cargado, así que se consulta al imprimir.
   const handlePrint = () => {
     ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
   };
 
-  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada).
+  // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo en tickets de La Arena.
   const handleResumenAsistencial = () => {
     PrintResumenAsistencial(form.n_hcl, token, datosFooter);
+  };
+
+  // Fechas de las vacunas: no pueden ser posteriores a hoy. El selector ya las limita (max); la escrita a mano se rechaza.
+  const handleChangeFechaVacuna = (e) => {
+    if (esFechaFutura(e.target.value)) {
+      avisarFechaVacunaFutura();
+      return;
+    }
+    handleChangeSimple(e);
   };
 
   const handleSearch = (e) => {
@@ -248,6 +312,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
       />
+
+      <AvisoError mensaje={errorEdad} className="mb-0" />
 
       <SectionFieldset legend="Header" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputTextOneLine
@@ -269,6 +335,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           onRevert={() => revertField("fecha_apertura_hcl")}
           labelWidth="120px"
         />
+        {/* Solo informativo: viene del ticket (esArena), no se edita aquí. */}
+        <InputCheckbox label="La Arena" name="esArena" checked={form.esArena} disabled className="font-semibold w-fit" />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} laborales={false} />
@@ -575,25 +643,25 @@ export default function HistoriaClinicaMujerVaronAdulto() {
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">DT</td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_1_dosis" value={form.vacuna_dt_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_1_fecha" value={form.vacuna_dt_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_2_dosis" value={form.vacuna_dt_2_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_2_fecha" value={form.vacuna_dt_2_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_dt_3_dosis" value={form.vacuna_dt_3_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_dt_3_fecha" value={form.vacuna_dt_3_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">HVB</td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_1_dosis" value={form.vacuna_hvb_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_1_fecha" value={form.vacuna_hvb_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_2_dosis" value={form.vacuna_hvb_2_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_2_fecha" value={form.vacuna_hvb_2_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                   <td className="border border-gray-300 p-0.5"><input type="text" name="vacuna_hvb_3_dosis" value={form.vacuna_hvb_3_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5"><input type="date" name="vacuna_hvb_3_fecha" value={form.vacuna_hvb_3_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 font-semibold whitespace-nowrap">ANTIAMARILICA</td>
                   <td className="border border-gray-300 p-0.5" colSpan="1"><input type="text" name="vacuna_antiamarilica_1_dosis" value={form.vacuna_antiamarilica_1_dosis} onChange={handleChange} disabled={camposDeshabilitados} className="w-full min-w-[40px] text-center outline-none disabled:bg-gray-300" placeholder="Dosis" /></td>
-                  <td className="border border-gray-300 p-0.5" colSpan="1"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeSimple} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
+                  <td className="border border-gray-300 p-0.5" colSpan="1"><input type="date" name="vacuna_antiamarilica_1_fecha" value={form.vacuna_antiamarilica_1_fecha} onChange={handleChangeFechaVacuna} max={today} disabled={camposDeshabilitados} className="w-full min-w-[92px] outline-none disabled:bg-gray-300" /></td>
                 </tr>
               </tbody>
             </table>
@@ -625,8 +693,10 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           rows={3}
         />
         <InputTextArea
-          label="Diagnostico"
+          label="Diagnóstico"
           name="diagnostico"
+          required
+          error={errores.diagnostico}
           value={form.diagnostico}
           onChange={handleChange}
           disabled={camposDeshabilitados}
@@ -638,6 +708,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         <InputTextArea
           label="Tratamiento"
           name="tratamiento"
+          required
+          error={errores.tratamiento}
           value={form.tratamiento}
           onChange={handleChange}
           disabled={camposDeshabilitados}
@@ -671,6 +743,19 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         />
       </SectionFieldset>
 
+      {/* Receta, Descanso Médico e Informe de Accidente (La Arena): aparecen al pulsar «Generar…», se guardan con el
+          Guardar de la Historia Clínica y se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET. */}
+      {form.esArena && (
+        <ComplementosDesplegables
+          form={form}
+          setForm={setForm}
+          onChange={handleChange}
+          token={token}
+          usuario={userlogued}
+          disabled={camposDeshabilitados}
+        />
+      )}
+
       {hayRegistroCargado && (
         <AuditoriaRegistro
           mostrarEdicion={form.tieneRegistro}
@@ -687,26 +772,14 @@ export default function HistoriaClinicaMujerVaronAdulto() {
         saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
         handleEdit={habilitarEdicion}
         handleClear={handleClear}
-        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideSave={(form.tieneRegistro && !edicionHabilitada) || Boolean(errorEdad)}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
         handlePrint={handlePrint}
         printField="ticketImprimir"
         printLabel="IMPRIMIR N° TICKET"
         handleChangeNumberDecimals={handleChangeNumberDecimals}
       >
-        <button
-          type="button"
-          onClick={handleResumenAsistencial}
-          className="
-            bg-violet-600 hover:bg-violet-700
-            text-white text-base px-6 py-2 rounded
-            flex items-center gap-2
-            transition-all duration-150 ease-out
-            hover:shadow-lg
-            active:scale-95 active:shadow-inner"
-        >
-          <FontAwesomeIcon icon={faFileMedical} /> Resumen Asistencial
-        </button>
+        {form.esArena && <BotonResumenAsistencial onClick={handleResumenAsistencial} />}
       </BotonesForm>
     </div>
   );

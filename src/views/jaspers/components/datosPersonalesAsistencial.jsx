@@ -4,6 +4,7 @@ import FilaEtiquetaValorAsistencial from "./filaEtiquetaValorAsistencial.jsx";
 
 // Cada celda: ancho como fracción del ancho total y valorX = distancia desde el borde izquierdo de la
 // celda hasta donde empieza el valor (fija por celda, para alinear columnas como en Riesgo).
+// `laboral` marca los datos laborales (Empresa, Ocupación), que se omiten con `laborales: false`.
 const FILAS = [
   [{ etiqueta: "Apellidos y nombres:", campo: "nombreCompleto", ancho: 1, valorX: 40 }],
   [
@@ -17,11 +18,23 @@ const FILAS = [
   ],
   [{ etiqueta: "Lugar de nacimiento:", campo: "lugarNacimiento", ancho: 1, valorX: 38 }],
   [
-    { etiqueta: "Ocupación:", campo: "ocupacion", ancho: 0.5, valorX: 25 },
+    { etiqueta: "Ocupación:", campo: "ocupacion", ancho: 0.5, valorX: 25, laboral: true },
     { etiqueta: "Nivel de estudio:", campo: "nivelEstudios", ancho: 0.5, valorX: 35 },
   ],
-  [{ etiqueta: "Empresa:", campo: "empresa", ancho: 1, valorX: 20 }],
+  [{ etiqueta: "Empresa:", campo: "empresa", ancho: 1, valorX: 20, laboral: true }],
 ];
+
+// Sin datos laborales se quitan sus celdas y las filas que quedan vacías; en las demás, las celdas
+// restantes se reparten el ancho de la fila.
+const filasVisibles = (laborales) =>
+  laborales
+    ? FILAS
+    : FILAS.map((fila) => fila.filter((celda) => !celda.laboral))
+        .filter((fila) => fila.length > 0)
+        .map((fila) => {
+          const total = fila.reduce((suma, celda) => suma + celda.ancho, 0);
+          return fila.map((celda) => ({ ...celda, ancho: celda.ancho / total }));
+        });
 
 const texto = (v) => String(v ?? "").trim();
 const fechaCorta = (v) => formatearFechaCorta(texto(v)) || texto(v);
@@ -30,7 +43,7 @@ const SEXO = { M: "MASCULINO", F: "FEMENINO" };
 const DatosPersonalesAsistencial = (
   doc,
   datos = {},
-  { x = 15, y = 43, ancho = 180, titulo = "DATOS PERSONALES" } = {}
+  { x = 15, y = 43, ancho = 180, titulo = "DATOS PERSONALES", laborales = true } = {}
 ) => {
   const edad = texto(datos.edad);
   const valores = {
@@ -48,7 +61,7 @@ const DatosPersonalesAsistencial = (
 
   let yPos = TituloSeccionAsistencial(doc, titulo, { x, y, ancho });
 
-  FILAS.forEach((fila) => {
+  filasVisibles(laborales).forEach((fila) => {
     yPos = FilaEtiquetaValorAsistencial(
       doc,
       fila.map(({ etiqueta, campo, ancho: fraccion, valorX }) => ({

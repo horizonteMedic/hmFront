@@ -1,21 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBacterium, faNotesMedical, faSearch, faStethoscope, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+import { faBacterium, faBoxesStacked, faNotesMedical, faSearch, faStethoscope, faTruckMedical, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabSelector";
 import TriajeAsistencial from "./Triaje/Triaje";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos";
+import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector";
+import HojaReferencia from "./HojaReferencia/HojaReferencia";
 import ReportesTabSelector from "./Reportes/ReportesTabSelector";
+import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 
 const sections = [
     { tab: 1, vista: "Registro de Atencion", label: "Registro de Atención", icon: faUserCheck, component: RegistroAtencionTabSelector },
     { tab: 2, vista: "Triaje Asistencial", label: "Triaje", icon: faStethoscope, component: TriajeAsistencial },
     { tab: 3, vista: "Antecedentes Patologicos", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
     { tab: 4, vista: "Historia Asistencial", label: "Historia Asistencial", icon: faNotesMedical, component: AsistencialTabSelector },
-    { tab: 5, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
+    { tab: 5, vista: "Laboratorio Asistencial", label: "Laboratorio", icon: faVial, component: LaboratorioTabSelector },
+    { tab: 6, vista: "Hoja de Referencia", label: "Hoja de Referencia", icon: faTruckMedical, component: HojaReferencia },
+    { tab: 7, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
+    { tab: 8, vista: "Inventario Asistencial", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
 ];
 
 const ModuloAsistencial = () => {
@@ -24,6 +30,20 @@ const ModuloAsistencial = () => {
     const navigate = useNavigate();
 
     const Vista = useAuthStore((state) => state.listView);
+    const sedesUsuario = useAuthStore((state) => state.userlogued?.sedes);
+    const selectedSede = useAuthStore((state) => state.selectedSede);
+    const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
+
+    // El login deja selectedSede en null y solo SistemaOcupacional le pone un valor; al entrar
+    // directo a este módulo quedaba vacío (el ticket se guardaba sin serieTicket ni sede, aunque
+    // el selector del Navbar mostrara una). Misma regla que SistemaOcupacional: la elegida si
+    // sigue siendo válida; si no, T-NP o la primera sede del usuario.
+    useEffect(() => {
+        if (!Array.isArray(sedesUsuario) || sedesUsuario.length === 0) return;
+        if (sedesUsuario.some((sede) => sede.cod_sede === selectedSede)) return;
+        const sedeTNP = sedesUsuario.find((sede) => sede.cod_sede === "T-NP");
+        setSelectedSede(sedeTNP?.cod_sede || sedesUsuario[0].cod_sede);
+    }, [sedesUsuario, selectedSede, setSelectedSede]);
 
     const tieneVista = (nombreVista) => {
         return Vista.some((item) => item === nombreVista);

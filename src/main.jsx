@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Ticket/Ticket.jsx";
+import Ficha from "./views/jaspers/ModuloAsistencial/DescansoMedico/DescansoMedicoPrueba.jsx";
 
 
 
@@ -53,6 +53,7 @@ import useAppVersionChecker from "./views/hooks/useAppVersionChecker.jsx";
 import Valorizacion from "./views/admin/panel-de-control/Valorizacion/Valorizacion.jsx";
 import ModuloAsistencial from "./views/admin/panel-de-control/ModuloAsistencial/ModuloAsistencial.jsx";
 import ModuloSalud from "./views/admin/panel-de-control/ModuloSalud/ModuloSalud.jsx";
+import AuditoriaProtocolos from "./views/admin/panel-de-control/AuditoriaProtocolos/AuditoriaProtocolos.jsx";
 // import * as pdfjsLib from "pdfjs-dist";
 
 // pdfjsLib.disableWorker = true;
@@ -158,6 +159,7 @@ const AppContent = () => {
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
           <Route path="/ModuloAsistencial" element={<ModuloAsistencial />} />
           <Route path="/ModuloSalud" element={<ModuloSalud />} />
+          <Route path="/AuditoriaProtocolos" element={<AuditoriaProtocolos />} />
           {/* <Route path="/odontologia" element={<Odontologia />} />
           <Route
             path="/SistemaOcupacional/odontologia"

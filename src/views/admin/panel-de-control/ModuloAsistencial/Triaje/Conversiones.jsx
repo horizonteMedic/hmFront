@@ -267,6 +267,15 @@ export const GetPA = async (event, triaje, set) => {
     }
 }
 
+// Grado de hipoxia según el criterio La Arena; null si la saturación es normal (>= 93%).
+// Los umbrales son continuos para cubrir valores con decimales (p. ej. 92.5 = leve).
+export const GetHipoxiaLaArena = (saturacion) => {
+    if (saturacion < 85) return 'HIPOXIA SEVERA'
+    if (saturacion < 89) return 'HIPOXIA MODERADA'
+    if (saturacion < 93) return 'HIPOXIA LEVE'
+    return null
+}
+
 export const GetSat = async (event, triaje, set) => {
     if (!triaje.sat02) {
         return
@@ -278,20 +287,12 @@ export const GetSat = async (event, triaje, set) => {
             await Swal.fire('Valor Absurdo', 'Ingrese otro dato por favor.', 'error')
             return
         }
-        // if (Saturacion < 85) {
-        //     set(d => ({ ...d, sat02: '' }))
-        //     await Swal.fire('HIPOXIA SEVERA','Ingrese otro dato por favor.','error')
-        //     return
-        // } else if (Saturacion >= 85 && Saturacion <= 88) {
-        //     set(d => ({ ...d, sat02: '' }))
-        //     await Swal.fire('HIPOXIA MODERADA','Ingrese otro dato por favor.','error')
-        //     return
-        // } else if (Saturacion >= 89 && Saturacion <= 92) {
-        //     set(d => ({ ...d, sat02: '' }))
-        //     await Swal.fire('HIPOXIA LEVE','Ingrese otro dato por favor.','error')
-        //     return
-        // } 
-        else if (Saturacion >= 90 && Saturacion <= 100) {
+        // Criterio La Arena: normal desde 93%; por debajo se acepta el valor y el diagnóstico
+        // indica el grado de hipoxia (severa < 85, moderada 85-88, leve 89-92).
+        const hipoxia = triaje.esArena ? GetHipoxiaLaArena(Saturacion) : null
+        if (hipoxia) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + `- SATURACIÓN DE OXIGENO: ${hipoxia}.` + "\n" }))
+        } else if (Saturacion >= (triaje.esArena ? 93 : 90) && Saturacion <= 100) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- SATURACIÓN DE OXIGENO: NORMAL.' + "\n" }))
         } else if (Saturacion >= 101) {
             set(d => ({ ...d, sat02: '' }))

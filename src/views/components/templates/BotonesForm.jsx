@@ -18,6 +18,7 @@ export default function BotonesForm({
     printField = "norden",
     printLabel = "IMPRIMIR",
     printSlot = null,
+    disabled = false,   // atenúa y bloquea los botones de guardar, editar y limpiar
     children,
 }) {
     return (
@@ -27,7 +28,9 @@ export default function BotonesForm({
                     <button
                         type="button"
                         onClick={handleSave}
+                        disabled={disabled}
                         className="
+                            disabled:opacity-50 disabled:cursor-not-allowed
                             bg-emerald-600 hover:bg-emerald-700
                             text-white text-base px-6 py-2 rounded
                             flex items-center gap-2
@@ -43,7 +46,9 @@ export default function BotonesForm({
                     <button
                         type="button"
                         onClick={handleEdit}
+                        disabled={disabled}
                         className="
+                        disabled:opacity-50 disabled:cursor-not-allowed
                         bg-blue-600 hover:bg-blue-700
                         text-white text-base px-6 py-2 rounded
                         flex items-center gap-2
@@ -59,7 +64,9 @@ export default function BotonesForm({
                     <button
                         type="button"
                         onClick={handleClear}
+                        disabled={disabled}
                         className="
+                        disabled:opacity-50 disabled:cursor-not-allowed
                         bg-amber-500 hover:bg-amber-600  
                         text-white text-base px-6 py-2 rounded
                         flex items-center gap-2

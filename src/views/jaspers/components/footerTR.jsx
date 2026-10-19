@@ -11,9 +11,10 @@ function footerTR(doc,datos) {
   const contenidoAncho = 180; // Ancho aproximado del contenido
   const inicioX = (pageWidth - contenidoAncho) / 2; // Centrar el contenido
 
-   // Línea divisora púrpura antes del footer (centrada)
+   // Línea divisora púrpura antes del footer (centrada); `datos.colorLinea` ([r, g, b]) permite otro color
   const lineY = baseY - 3.6; // 5mm antes del contenido del footer
-   doc.setDrawColor(52, 2, 153); // Color #340299 en RGB
+  const colorLinea = datos && typeof datos === 'object' && Array.isArray(datos.colorLinea) ? datos.colorLinea : [52, 2, 153]; // #340299
+   doc.setDrawColor(...colorLinea);
    doc.setLineWidth(0.5); // Grosor de la línea
    doc.line(inicioX, lineY, inicioX + contenidoAncho, lineY); // Línea horizontal centrada
 

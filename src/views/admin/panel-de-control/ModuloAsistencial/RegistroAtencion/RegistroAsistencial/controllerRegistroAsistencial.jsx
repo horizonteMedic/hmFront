@@ -39,7 +39,9 @@ const toSexoCode = (sexo) => {
 // Es un upsert en el backend (busca por id y luego por documento), así que siempre se
 // envía el mismo payload. En edición, tipoDocumento/numeroDocumento/numeroHistoriaClinica
 // se ignoran ahí -- para corregir el documento hay que usar PUT /{id}/documento.
-export const SubmitDataService = async (form, token, limpiar = () => { }, userlogued = "") => {
+// `onRegistrado` recibe el paciente tal como quedó registrado (id, tipo/número de documento,
+// nombres y apellidos) para que el Ticket lo precargue sin volver a pedir los datos.
+export const SubmitDataService = async (form, token, limpiar = () => { }, userlogued = "", onRegistrado = () => { }) => {
   if (!form.nombres || !form.apellidos) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -93,6 +95,19 @@ export const SubmitDataService = async (form, token, limpiar = () => { }, userlo
       </p>
     `,
   });
+
+  const paciente = res.resultado;
+  onRegistrado({
+    id: paciente.id ?? form.idDatos ?? null,
+    tipoDocumento: form.tipoDocumento,
+    numeroDocumento:
+      form.tipoDocumento === "SIN_DOCUMENTO"
+        ? ""
+        : String(paciente.numeroDocumento ?? form.documentoIdentidad ?? ""),
+    nombres: paciente.nombres ?? form.nombres ?? "",
+    apellidos: paciente.apellidos ?? form.apellidos ?? "",
+  });
+
   limpiar();
 };
 

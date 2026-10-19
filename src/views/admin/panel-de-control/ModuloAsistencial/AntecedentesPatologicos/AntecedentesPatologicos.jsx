@@ -29,6 +29,8 @@ const CAMPOS_EDITABLES = [
     "etapaVida",
     "observaciones",
     "otrasPatologias",
+    "tipoCancer",
+    "descripcionMordedura",
     "reaccionAdversaMedicamentosEspecificar",
     "dosisVacunas",
     "padre",
@@ -42,6 +44,7 @@ const CAMPOS_EDITABLES = [
 
 // Enfermedades a marcar (Antecedentes Patológicos Personales)
 const ENFERMEDADES = [
+    ["accidentes", "Accidentes"],
     ["acv", "ACV (Acc. Cerebro Vascular)"],
     ["alergias", "Alergias"],
     ["amigdalitisCronica", "Amigdalitis crónica"],
@@ -55,6 +58,7 @@ const ENFERMEDADES = [
     ["cariesGingivitis", "Caries o gingivitis"],
     ["colecistitis", "Colecistitis"],
     ["columna", "Columna"],
+    ["convulsiones", "Convulsiones"],
     ["dengue", "Dengue"],
     ["depresion", "Depresión"], 
     ["dermatitis", "Dermatitis"],
@@ -85,11 +89,13 @@ const ENFERMEDADES = [
     ["hepatitis", "Hepatitis"],
     ["hernias", "Hernias"],
     ["hipertensionArterial", "Hipertensión Arterial"],
+    ["hospitalizacionUlt3Anios", "Hospitalización Últ 3 años"],
     ["ima", "IMA (Infarto agudo al miocardio)"],
     ["infUrinariasRepetidas", "Inf. Urinarias repetidas"],
     ["insuficienciaCardiaca", "Insuficiencia Cardíaca"],
     ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
     ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
+    ["intervQuirurgica", "Interv. Quirúrgica"],
     ["intoxicaciones", "Intoxicaciones"],
     ["its", "ITS"],
     ["litiasisUrinaria", "Litiasis Urinaria"],
@@ -99,6 +105,8 @@ const ENFERMEDADES = [
     ["neuritisRepeticion", "Neuritis a Repetición"],
     ["obesidad", "Obesidad"],
     ["onicomicosis", "Onicomicosis"],
+    ["osteoporosis", "Osteoporosis"],
+    ["osteoartrosis", "Osteoartrosis"],
     ["otitisMedia", "Otitis Media"],
     ["paludismoMalaria", "Paludismo o malaria"],
     ["parasitosisIntestinal", "Parasitosis Intestinal"],
@@ -112,6 +120,7 @@ const ENFERMEDADES = [
     ["quemaduras", "Quemaduras"],
     ["resfriosFrecuentes", "Resfríos frecuentes"],
     ["reumatismoRepeticion", "Reumatismo a repetición"],
+    ["riesgoOcupacional", "Riesgo Ocupacional"],
     ["sarampion", "Sarampión"],
     ["sifilis", "Sífilis"],
     ["silicosis", "Silicosis"],
@@ -132,6 +141,13 @@ const ENFERMEDADES = [
     ["varicocele", "Varicocele"],
     ["vertigos", "Vértigos"],
     ["vih", "VIH"],
+];
+
+// Enfermedades que, además del checkbox, piden especificar (checkbox, label, campo de detalle).
+// Igual que "Reacción adversa a medicamentos", se muestran fuera de la grilla con su input.
+const ENFERMEDADES_CON_DETALLE = [
+    ["cancer", "Cáncer", "tipoCancer"],
+    ["mordeduraAnimales", "Mordedura de Animales", "descripcionMordedura"],
 ];
 
 const VACUNAS_COL1 = [
@@ -157,7 +173,7 @@ const chunkColumns = (arr, columnas) => {
     );
 };
 
-const ENFERMEDADES_KEYS = ENFERMEDADES.map(([key]) => key);
+const ENFERMEDADES_KEYS = [...ENFERMEDADES, ...ENFERMEDADES_CON_DETALLE].map(([key]) => key);
 const VACUNAS_KEYS = [...VACUNAS_COL1, ...VACUNAS_COL2].map(([key]) => key);
 
 export default function AntecedentesPatologicos() {
@@ -189,6 +205,9 @@ export default function AntecedentesPatologicos() {
 
         // 1. Antecedentes Patológicos Personales
         ...Object.fromEntries(ENFERMEDADES.map(([name]) => [name, false])),
+        ...Object.fromEntries(
+            ENFERMEDADES_CON_DETALLE.flatMap(([name, , detalle]) => [[name, false], [detalle, ""]])
+        ),
         otrasPatologias: "",
         reaccionAdversaMedicamentos: false,
         reaccionAdversaMedicamentosEspecificar: "",
@@ -370,6 +389,29 @@ export default function AntecedentesPatologicos() {
                         </div>
                     ))}
                 </div>
+                {ENFERMEDADES_CON_DETALLE.map(([name, label, detalle]) => (
+                    <div key={name} className="flex flex-wrap items-center gap-3 my-3">
+                        <InputCheckbox
+                            label={label}
+                            name={name}
+                            checked={form[name]}
+                            onChange={handleCheckBoxChange}
+                            disabled={camposDeshabilitados}
+                        />
+                        <div className="flex-1 min-w-[250px]">
+                            <InputTextOneLine
+                                label="Especificar"
+                                name={detalle}
+                                value={form[detalle]}
+                                onChange={handleChange}
+                                disabled={camposDeshabilitados || !form[name]}
+                                edited={isFieldEdited(detalle)}
+                                onRevert={() => revertField(detalle)}
+                                labelWidth="90px"
+                            />
+                        </div>
+                    </div>
+                ))}
                 <div className="flex flex-wrap items-center gap-3 my-3">
                     <InputCheckbox
                         label="Reacción adversa a medicamentos"

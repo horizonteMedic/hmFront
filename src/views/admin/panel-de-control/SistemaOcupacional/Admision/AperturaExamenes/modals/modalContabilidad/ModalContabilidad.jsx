@@ -49,6 +49,7 @@ const ModalContabilidad = ({ onClose, sede, token }) => {
         fechaDesde: today,
         fechaHasta: today,
         empresa: "",
+        contrata: "",
         sedeFilter: "",
     });
 
@@ -63,6 +64,7 @@ const ModalContabilidad = ({ onClose, sede, token }) => {
             fechaDesde: form.fechaDesde,
             fechaHasta: form.fechaHasta,
             empresa: form.empresa,
+            contrata: form.contrata,
             sede: form.sedeFilter,
         };
         SubmitData(data, URL_SUBMIT, token)
@@ -238,6 +240,17 @@ const ModalContabilidad = ({ onClose, sede, token }) => {
                             value={form.empresa}
                             onChange={handleChange}
                             placeholder="Todas las empresas"
+                            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none text-sm"
+                        />
+                    </div>
+                    <div className="flex flex-col flex-grow min-w-[180px]">
+                        <p className="font-semibold text-sm mb-1">Contrata <span className="text-gray-400 font-normal">(opcional)</span></p>
+                        <input
+                            type="text"
+                            name="contrata"
+                            value={form.contrata}
+                            onChange={handleChange}
+                            placeholder="Todas las contratas"
                             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none text-sm"
                         />
                     </div>

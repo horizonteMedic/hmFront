@@ -1,4 +1,4 @@
-import { addDays, addYears, format, parse, subDays } from "date-fns";
+import { addDays, addYears, differenceInYears, format, isValid, parse, subDays } from "date-fns";
 import { PDFDocument } from "pdf-lib";
 
 export function fixEncodingModern(str) {
@@ -14,6 +14,13 @@ export function getFechaHoraActual() { // 18/07/2026 09:32:15 (fecha y hora actu
 }
 export function getTimestampActual() { // 2026-07-18T09:32:15 (fecha-hora actual para enviar al backend)
     return format(new Date(), "yyyy-MM-dd'T'HH:mm:ss");
+}
+export function getEdadDesdeFecha(fechaNacimiento) {//INPUT 1960-03-15 (o 1960-03-15T00:00:00) //OUTPUT años cumplidos a hoy; null si falta o es inválida
+    if (!fechaNacimiento) return null;
+    const nacimiento = parse(String(fechaNacimiento).slice(0, 10), "yyyy-MM-dd", new Date());
+    if (!isValid(nacimiento)) return null;
+    const edad = differenceInYears(new Date(), nacimiento);
+    return edad >= 0 ? edad : null;
 }
 export function getTodayPlusOneYear() {
     return format(addYears(new Date(), 1), "yyyy-MM-dd");

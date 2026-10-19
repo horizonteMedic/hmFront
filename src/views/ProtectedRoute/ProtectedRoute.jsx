@@ -54,6 +54,7 @@ const protectedRoutes = {
   '/valorizacion': "Valorizacion",
   '/ModuloAsistencial': "Modulo Asistencial",
   '/ModuloSalud': "Modulo Salud",
+  '/AuditoriaProtocolos': "Auditoria Protocolos",
 };
 
 export function ProtectedRoute() {

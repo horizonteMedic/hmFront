@@ -26,6 +26,16 @@ const formFromPaciente = (paciente) => ({
     ocupacion: paciente?.ocupacion ?? "",
 });
 
+// Cáncer y Mordedura de animales piden especificar (tipoCancer / descripcionMordedura): el
+// checkbox queda marcado si viene en `personales` o si trae el detalle. Va después del
+// spread de enfermedades para que el detalle gane sobre `personales`.
+const detalleEnfermedades = (data, personalesSet) => ({
+    tipoCancer: data?.tipoCancer ?? "",
+    cancer: personalesSet.has("cancer") || Boolean(data?.tipoCancer),
+    descripcionMordedura: data?.descripcionMordedura ?? "",
+    mordeduraAnimales: personalesSet.has("mordeduraAnimales") || Boolean(data?.descripcionMordedura),
+});
+
 // Arma los campos clínicos del formulario a partir de un antecedente previo del paciente
 // (ver OpenModalAntecedentesPrevios). No toca datos del paciente/ticket actual (id, fecha,
 // datos personales): solo "copia hacia adelante" lo clínico, igual que
@@ -49,6 +59,7 @@ const formFromAntecedentePrevio = (registro, enfermedadesKeys, vacunasKeys) => {
         esposaConyuge: registro?.familiares?.esposaConyuge ?? "",
         ...Object.fromEntries(enfermedadesKeys.map((key) => [key, personalesSet.has(key)])),
         ...Object.fromEntries(vacunasKeys.map((key) => [key, vacunasSet.has(key)])),
+        ...detalleEnfermedades(registro, personalesSet),
     };
 };
 
@@ -263,6 +274,7 @@ export const VerifyTR = async (numeroTicket, token, set, today, enfermedadesKeys
         user_medicoFirma: data.user_medicoFirma || prev.user_medicoFirma,
         ...Object.fromEntries(enfermedadesKeys.map((key) => [key, personalesSet.has(key)])),
         ...Object.fromEntries(vacunasKeys.map((key) => [key, vacunasSet.has(key)])),
+        ...detalleEnfermedades(data, personalesSet),
         // Control de edición (useRegistroEditable) + auditoría. tieneRegistro=true solo si
         // este ticket YA tiene antecedentes guardados (data.id); si no, el ticket existe pero
         // el registro es nuevo (queda editable). Claves de auditoría mapeadas defensivamente
@@ -313,6 +325,8 @@ export const SubmitDataService = async (
         observaciones: form.observaciones ?? "",
         personales: enfermedadesKeys.filter((key) => form[key]),
         otrasPatologias: form.otrasPatologias ?? "",
+        tipoCancer: form.cancer ? form.tipoCancer ?? "" : "",
+        descripcionMordedura: form.mordeduraAnimales ? form.descripcionMordedura ?? "" : "",
         reaccionAdversaMedicamentosEspecificar: form.reaccionAdversaMedicamentos
             ? form.reaccionAdversaMedicamentosEspecificar ?? ""
             : "",

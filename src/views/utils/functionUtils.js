@@ -69,17 +69,65 @@ export const GetInfoPacNroTicketDefault = async (nro, token) => {
 };
 
 
+// Mensaje con un botón por cada impresión disponible (p. ej. la Historia Clínica y sus anexos): tras guardar
+// (título "Éxito") o al pulsar IMPRIMIR N° TICKET (`titulo` / `icono` a elección).
+// `opciones` = [{ etiqueta, accion }]; `accion` puede ser async. `mensaje` admite HTML y "\n". Al terminar una
+// impresión el mensaje se vuelve a mostrar, para poder imprimir varios documentos del mismo registro, hasta
+// pulsar "Cerrar".
+export const MostrarOpcionesImpresion = async (mensaje, opciones, { titulo = "Éxito", icono = "success" } = {}) => {
+    for (;;) {
+        let elegida = null;
+        const { isConfirmed } = await Swal.fire({
+            title: titulo,
+            icon: icono,
+            html: `
+                <p style="margin:0 0 14px;">${String(mensaje).replace(/\n/g, "<br>")}</p>
+                <p style="margin:0 0 8px;font-weight:600;">¿Qué desea imprimir?</p>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    ${opciones
+                    .map(
+                        (opcion, i) =>
+                            `<button type="button" data-opcion="${i}" style="background:#3085d6;color:#fff;border:0;border-radius:4px;padding:10px 16px;font-size:1em;cursor:pointer;">${opcion.etiqueta}</button>`
+                    )
+                    .join("")}
+                </div>`,
+            showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: "Cerrar",
+            cancelButtonColor: "#d33",
+            // La elección se resuelve por el botón de confirmar (oculto): así el resultado sale por el flujo normal.
+            preConfirm: () => elegida,
+            didOpen: (popup) => {
+                popup.querySelectorAll("[data-opcion]").forEach((boton) =>
+                    boton.addEventListener("click", () => {
+                        elegida = Number(boton.dataset.opcion);
+                        Swal.clickConfirm();
+                    })
+                );
+            },
+        });
+
+        if (!isConfirmed || elegida === null) return;
+        // Las acciones deben esperar (await) sus propios avisos (p. ej. "Sin descanso médico"): si no, estas
+        // opciones se volverían a mostrar al instante y taparían el aviso.
+        await opciones[elegida].accion();
+    }
+};
+
 // Registra un servicio del módulo asistencial (POST genérico para endpoints REST que devuelven
 // { codigo, estatus, resultado }). Maneja loading, éxito y error de forma estándar.
 // Si se pasa `onPrint`, el mensaje de éxito pregunta "¿Desea imprimir?" y lo ejecuta al confirmar
 // (después de `onSuccess`, que normalmente limpia el formulario).
+// Si se pasa `opcionesImpresion` ([{ etiqueta, accion }]) se muestra, en lugar de esa pregunta, un botón
+// por cada impresión (ver MostrarOpcionesImpresion); `onPrint` se ignora.
 export const RegistrarServicioAsistencialDefault = async (
     token,
     body,
     registrarUrl,
     onSuccess = () => { },
     mensajeExito = "Datos registrados correctamente.",
-    onPrint = null
+    onPrint = null,
+    opcionesImpresion = null
 ) => {
     try {
         LoadingDefault("Registrando Datos");
@@ -93,8 +141,17 @@ export const RegistrarServicioAsistencialDefault = async (
             (res.codigo && Number(res.codigo) >= 400);
 
         if (fallo) {
-            const detalle = res?.resultado?.detalle ?? res?.resultado?.mensaje ?? res?.mensaje ?? "";
+            // SubmitData devuelve el Response SIN parsear cuando el HTTP no es 2xx (p. ej. el 400 de validación
+            // "El paciente tiene 66 años; ..."): se lee su cuerpo para mostrar el detalle que da el backend.
+            const cuerpo = res?.ok === false ? await res.json().catch(() => null) : res;
+            const detalle = cuerpo?.resultado?.detalle ?? cuerpo?.resultado?.mensaje ?? cuerpo?.mensaje ?? "";
             Swal.fire("Error", detalle || "Ocurrió un error al registrar", "error");
+            return;
+        }
+
+        if (opcionesImpresion?.length) {
+            onSuccess();
+            await MostrarOpcionesImpresion(mensajeExito, opcionesImpresion);
             return;
         }
 

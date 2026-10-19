@@ -7,10 +7,9 @@ const serviciosGeneralesUrl = "/api/servicios-generales";
 const buscarReniecUrl = "/api/pacientes-asistencial/reniec";
 const buscarDocumentoUrl = "/api/pacientes-asistencial/documento";
 const ticketsUrl = "/api/tickets";
+const pacientesUrl = "/api/pacientes-asistencial";
 
-// Autocompletado liviano por nombres/apellidos concatenados (prefijo, mínimo 2 caracteres).
-// Pensado para dispararse en cada tecla; ya trae la ficha completa del paciente, por lo
-// que no hace falta una segunda llamada al elegir un resultado.
+
 export const BuscarPacientes = async (texto, token) => {
   const query = (texto ?? "").trim();
   if (query.length < 2) return [];
@@ -63,11 +62,7 @@ const setFormFromPaciente = (setForm, data) => {
     fechaNacimiento: data.fechaNacimiento ?? null,
   }));
 };
-
-// Consulta por DNI, mismo endpoint que RegistroAsistencial. Para el ticket el paciente debe
-// existir YA en el sistema (yaRegistrado=true): solo así tiene historia clínica y se le
-// puede generar un ticket. Si el DNI solo se encuentra en RENIEC (yaRegistrado=false), no
-// hay historia clínica -> se avisa y no se llena nada del formulario.
+ 
 export const BuscarPorDni = async (dni, token, setForm) => {
   if (!dni) return;
 
@@ -96,8 +91,7 @@ export const BuscarPorDni = async (dni, token, setForm) => {
   );
 };
 
-// Búsqueda exacta por documento (PASAPORTE), mismo endpoint que RegistroAsistencial.
-// No consulta RENIEC (solo tiene DNI peruano).
+// Búsqueda exacta por documento (PASAPORTE), mismo endpoint que RegistroAsistencial. 
 export const BuscarPorPasaporte = async (numero, token, setForm) => {
   if (!numero) return;
 
@@ -131,8 +125,8 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
 
 // Registra el ticket con todas sus líneas. El backend calcula precioTotal/total a partir
 // de cantidad, precioUnitario y descuentoLinea de cada contenido (no se envían id,
-// descripcion, unidad ni precioTotal por línea, ni id/serieTicket/numeroTicket/total del
-// ticket). "descuento" es un descuento adicional a nivel de ticket que esta pantalla no
+// descripcion, unidad ni precioTotal por línea, ni id/numeroTicket/total del ticket; sí se
+// envían serieTicket -código de sede- y sede -nombre de la sede-). "descuento" es un descuento adicional a nivel de ticket que esta pantalla no
 // gestiona, así que siempre se envía en 0.
 export const RegistrarTicket = async (body, token, usuario) => {
   const query = new URLSearchParams({ usuario: usuario ?? "" });
@@ -154,6 +148,19 @@ export const ObtenerTicketPorNumero = async (numeroTicket, token) => {
   const res = await getFetch(`${ticketsUrl}/numero/${numeroTicket}`, token);
 
   Swal.close();
+
+  if (!res || res.error || !res.resultado) return null;
+
+  return res.resultado;
+};
+
+// Ficha del paciente por id (GET /api/pacientes-asistencial/{id}). El ticket guardado no trae
+// la historia clínica ni el tipo de documento, y el reporte A4 los necesita. Devuelve null si
+// falla: el reporte se imprime igual, solo sin esos dos datos.
+export const ObtenerPacientePorId = async (pacienteId, token) => {
+  if (!pacienteId) return null;
+
+  const res = await getFetch(`${pacientesUrl}/${pacienteId}`, token);
 
   if (!res || res.error || !res.resultado) return null;
 

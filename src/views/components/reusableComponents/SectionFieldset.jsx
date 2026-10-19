@@ -7,7 +7,8 @@ export default function SectionFieldset({
     fieldsetClassName = "",
     className = "",
     collapsible = false,
-    defaultOpen = true
+    defaultOpen = true,
+    actions = null
 }) {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const open = collapsible ? isOpen : true;
@@ -49,6 +50,12 @@ export default function SectionFieldset({
                     className={`font-semibold ${open ? "mb-4" : ""} text-[10px] bg-primario py-2 px-4 text-white rounded-t flex items-center justify-between ${collapsible ? "cursor-pointer select-none" : ""}`}
                 >
                     <span>{legend}</span>
+                    {/* Botones o sellos opcionales a la derecha de la barra (no abren ni cierran la sección). */}
+                    {actions ? (
+                        <span className="ml-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            {actions}
+                        </span>
+                    ) : null}
                     {collapsible ? (
                         <span className="ml-4 text-lg font-bold">{open ? "-" : "+"}</span>
                     ) : null}

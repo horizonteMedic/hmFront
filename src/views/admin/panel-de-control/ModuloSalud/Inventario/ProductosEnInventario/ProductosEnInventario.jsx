@@ -6,9 +6,9 @@ import Paginacion from "../../components/Paginacion";
 import { filtrarPorTexto } from "../../utils/filtrarPorTexto";
 import useListaPaginada from "../../utils/useListaPaginada";
 import CargaMasivaMedicamentos from "./CargaMasivaMedicamentos/CargaMasivaMedicamentos";
+import AjusteStockModal from "./AjusteStockModal/AjusteStockModal";
 import { FloatingInput, FloatingSelect } from "./components/FloatingField";
 import DetalleMedicamentoModal from "./DetalleMedicamentoModal/DetalleMedicamentoModal";
-import IngresoStockModal from "./IngresoStockModal/IngresoStockModal";
 import MedicamentoModal from "./MedicamentoModal/MedicamentoModal";
 import MedicamentosTabla from "./MedicamentosTabla";
 import useMedicamentos from "./useMedicamentos";
@@ -23,8 +23,9 @@ const FILTRO_STOCK_OPTIONS = [
 
 const filtrarMedicamentos = (medicamentos, { nombre, presentacion, stock }) =>
     filtrarPorTexto(filtrarPorTexto(medicamentos, nombre, (m) => [m.nombre]), presentacion, (m) => [m.presentacion]).filter((m) => {
-        if (stock === "sin-stock") return m.stockActual <= 0;
-        if (stock === "con-stock") return m.stockActual > 0;
+        const actual = m.stockActual ?? 0;
+        if (stock === "sin-stock") return actual <= 0;
+        if (stock === "con-stock") return actual > 0;
         return true;
     });
 
@@ -41,7 +42,7 @@ export default function ProductosEnInventario({ campania }) {
     const usuario = useAuthStore((state) => state.userlogued?.sub ?? "");
     const { medicamentos, cargando, fallo, recargar } = useMedicamentos(token, campania);
     const [filtros, setFiltros] = useState(FILTROS_INICIALES);
-    const [modal, setModal] = useState(null); // { tipo: "crear" | "detalle" | "editar" | "ingreso" | "masiva", medicamento? }
+    const [modal, setModal] = useState(null); // { tipo: "crear" | "detalle" | "editar" | "ajuste" | "masiva", medicamento? }
 
     const filtrados = useMemo(() => filtrarMedicamentos(medicamentos, filtros), [medicamentos, filtros]);
     const paginacion = useListaPaginada(filtrados, { reiniciarCon: filtros });
@@ -100,7 +101,7 @@ export default function ProductosEnInventario({ campania }) {
                     numeroInicial={Math.max(paginacion.desde, 1)}
                     emptyText={textoVacio({ cargando, fallo, total: medicamentos.length })}
                     onSeleccionar={(medicamento) => setModal({ tipo: "detalle", medicamento })}
-                    onIngresarStock={(medicamento) => setModal({ tipo: "ingreso", medicamento })}
+                    onAjustarStock={(medicamento) => setModal({ tipo: "ajuste", medicamento })}
                 />
                 {fallo && (
                     <div className="mt-3 text-center">
@@ -130,11 +131,18 @@ export default function ProductosEnInventario({ campania }) {
                     onEditar={(medicamento) => setModal({ tipo: "editar", medicamento })}
                 />
             )}
-            {modal?.tipo === "ingreso" && (
-                <IngresoStockModal token={token} usuario={usuario} medicamento={modal.medicamento} onClose={cerrar} onGuardado={recargar} />
+            {modal?.tipo === "ajuste" && (
+                <AjusteStockModal token={token} usuario={usuario} medicamento={modal.medicamento} onClose={cerrar} onGuardado={recargar} />
             )}
             {modal?.tipo === "masiva" && (
-                <CargaMasivaMedicamentos token={token} campania={campania} existentes={medicamentos} onClose={cerrar} onCargado={recargar} />
+                <CargaMasivaMedicamentos
+                    token={token}
+                    usuario={usuario}
+                    campania={campania}
+                    existentes={medicamentos}
+                    onClose={cerrar}
+                    onCargado={recargar}
+                />
             )}
         </div>
     );

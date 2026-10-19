@@ -69,6 +69,10 @@ export default function TriajeAsistencial() {
         ocupacional: true,
         asistencial: false,
 
+        // Cliente La Arena: lo define el ticket (esArena, se marca en Ticket Asistencial) y se carga al buscarlo.
+        // Cambia el criterio de validación de Sat. O2 (solo UI, no se envía al backend).
+        esArena: false,
+
         // Ticket / identificación del paciente
         ticketId: null,
         pacienteId: null,
@@ -303,6 +307,8 @@ export default function TriajeAsistencial() {
                     onRevert={() => revertField('fechaExamen')}
                     labelWidth="120px"
                 />
+                {/* Solo informativo: viene del ticket (esArena), no se edita aquí. */}
+                <InputCheckbox label="La Arena" name="esArena" checked={form.esArena} disabled className="font-semibold w-fit" />
             </SectionFieldset>
             <DatosPersonalesLaboralesAsistencial form={form} />
 

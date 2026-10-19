@@ -40,6 +40,9 @@ const formFromTicket = (resultado) => ({
     empresa: resultado.empresa ?? "",
     contrata: resultado.contrata ?? "",
     nomExam: resultado.nomExam ?? resultado.tipoServicio ?? "",
+    // La Arena la define el ticket (esArena); tanto /api/tickets/busqueda-por-filtros como las filas de
+    // /asistencial/triaje/buscar lo traen. Un ticket anterior a este campo no lo trae: cuenta como no.
+    esArena: Boolean(resultado.esArena),
 });
 
 const formFromTriaje = (data) => ({
@@ -307,7 +310,9 @@ const validarRangos = (form) => {
     if (form.cadera < 70 || form.cadera > 180) return "No se permite este dato en Cadera";
     if (form.temperatura < 35 || form.temperatura >= 40) return "No se permite este dato en Temperatura";
     if (form.fCardiaca <= 39) return "No se permite este dato en Frecuencia Cardiaca";
-    if (form.sat02 < 92 || form.sat02 > 100) return "No se permite este dato en Sat02";
+    // La Arena: los valores de hipoxia son válidos (el diagnóstico los califica), así que no hay mínimo.
+    // El resto de clientes exige 92% como mínimo.
+    if (form.sat02 < (form.esArena ? 1 : 92) || form.sat02 > 100) return "No se permite este dato en Sat02";
     if (form.perimetroCuello < 30 || form.perimetroCuello > 55) return "No se permite este dato en Perímetro Cuello";
     if (form.sistolica < 90 || form.sistolica >= 250) return "No se permite este dato en Sistólica";
     if (form.diastolica < 60 || form.diastolica >= 150) return "No se permite este dato en Diastólica";

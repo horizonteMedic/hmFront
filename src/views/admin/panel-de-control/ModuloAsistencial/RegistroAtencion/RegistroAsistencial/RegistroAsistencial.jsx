@@ -12,6 +12,7 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte } from "./controllerRegistroAsistencial";
+import ArchivosPaciente from "./ArchivosPaciente/ArchivosPaciente";
 import {
     ComboboxProfesión,
     ComboboxDepartamentos,
@@ -178,7 +179,7 @@ function AutocompleteOneLine({
     );
 }
 
-export default function RegistroAsistencial() {
+export default function RegistroAsistencial({ onPacienteRegistrado }) {
 
     const today = getToday();
 
@@ -291,7 +292,7 @@ export default function RegistroAsistencial() {
     };
 
     const handleSave = () => {
-        SubmitDataService(form, token, handleClear, userlogued);
+        SubmitDataService(form, token, handleClear, userlogued, onPacienteRegistrado);
     };
 
     // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado (DNI,
@@ -564,7 +565,9 @@ export default function RegistroAsistencial() {
                 />
             </SectionFieldset>
 
-                    
+            {/* ===== SECCIÓN: FIRMA, HUELLA Y FOTO (por N° de Historia Clínica) ===== */}
+            <ArchivosPaciente numeroHistoriaClinica={form.NHCL} token={token} />
+
             {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
             {hayRegistroCargado && (
                 <AuditoriaRegistro

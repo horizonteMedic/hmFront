@@ -302,10 +302,12 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   yPos += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  const photoColX = tablaInicioX + 168;
+  const photoStartY = yPos;
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + 35, yPos, tablaInicioX + 35, yPos + filaAltura);
+  doc.line(tablaInicioX + 63, yPos, tablaInicioX + 63, yPos + filaAltura);
+  doc.line(tablaInicioX + 103, yPos, tablaInicioX + 103, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -369,41 +371,60 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
+  doc.text("Edad:", tablaInicioX + 37, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text((datosFinales.edad || "") + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text((datosFinales.edad || "") + " Años", tablaInicioX + 47, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.text("Sexo:", tablaInicioX + 65, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1.5);
+  doc.text(datosFinales.sexo || "", tablaInicioX + 75, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
+  doc.text("Fecha Nac.:", tablaInicioX + 105, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 165, yTexto + 1.5);
+  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 122, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Tercera fila: Domicilio
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1.5, 168 - 25);
   yTexto += filaAltura;
 
   // Cuarta fila: Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, 168 - 30);
   yTexto += filaAltura;
 
   // Quinta fila: Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, 168 - 35);
   yTexto += filaAltura;
+
+  // Foto del paciente (filas DNI → Puesto, columna derecha) — solo para LA ARENA S.A.
+  const esLaArena = datosFinales.empresa.toUpperCase().includes('LA ARENA S.A.') || datosFinales.contrata.toUpperCase().includes('LA ARENA S.A.');
+  if (data.urlFotoPaciente && esLaArena) {
+    try {
+      const fotoResp = await fetch(data.urlFotoPaciente);
+      if (fotoResp.ok) {
+        const fotoBlob = await fotoResp.blob();
+        const fotoBase64 = await new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(fotoBlob);
+        });
+        const fotoExt = /\.jpe?g/i.test(data.urlFotoPaciente) ? 'JPEG' : 'PNG';
+        doc.line(photoColX, photoStartY, photoColX, photoStartY + 4 * filaAltura);
+        doc.addImage(fotoBase64, fotoExt, photoColX, photoStartY, tablaAncho - 168, 4 * filaAltura);
+      }
+    } catch { /* foto opcional */ }
+  }
 
   // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(9);

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired, faDollarSign, faHandHoldingMedical, faHeartPulse } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired, faDollarSign, faHandHoldingMedical, faHeartPulse, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
 import "./Dashboard.css";
 
@@ -31,6 +31,7 @@ const Dashboard = ({ TotalView }) => {
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
     { to: "/ModuloAsistencial", name: "Modulo Asistencial", icon: faHandHoldingMedical, title: "Modulo Asistencial" },
     { to: "/ModuloSalud", name: "Modulo Salud", icon: faHeartPulse, title: "Modulo Salud" },
+    { to: "/AuditoriaProtocolos", name: "Auditoria Protocolos", icon: faClipboardCheck, title: "Auditoría de Protocolos" },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" },
     // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", icon: faNotesMedical, title: "Historia Ocupacional" },
     { to: "/Espirometria", name: "Espirometría", icon: faNotesMedical, title: "Espirometría" },
