@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ObtenerInventarios } from "../controllerInventarioCompartido";
+import { ObtenerInventarios } from "../../Catalogo/Inventarios/controllerInventarios";
 
 // Carga los inventarios y mantiene el elegido en las pantallas de stock. Al abrir queda seleccionado el
 // primero de la lista (el central, que ObtenerInventarios deja siempre primero); si ya había uno elegido

@@ -4,8 +4,8 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
-import AvisoError from "../../Inventario/AvisoError";
-import BuscadorMedicamentoStock from "../../Inventario/BuscadorMedicamentoStock";
+import AvisoError from "../../Inventario/Compartido/components/AvisoError";
+import BuscadorMedicamentoStock from "../../Inventario/Compartido/components/BuscadorMedicamentoStock";
 import { RECETA_LINEA_VACIA, crearItemReceta, recetaBloqueada, validarLineaReceta } from "./controllerReceta";
 import { useMedicamentosReceta } from "./useMedicamentosReceta";
 

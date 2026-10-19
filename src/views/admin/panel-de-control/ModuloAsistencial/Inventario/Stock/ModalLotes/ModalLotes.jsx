@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import TablaTemplate from "../../../../../../components/templates/TablaTemplate";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
-import { etiquetaMedicamento } from "../../inventarioUtils";
-import { useConsultaInventario } from "../../useConsultaInventario";
+import { etiquetaMedicamento } from "../../Compartido/inventarioUtils";
+import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { EstadoLote, ObtenerLotesMedicamento } from "../controllerStock";
 
 Modal.setAppElement("#root");

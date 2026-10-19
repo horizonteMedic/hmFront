@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { obtenerCmpMedico, obtenerDigitalizacionMedico, obtenerRegistroPorTicket } from "../../../../../utils/registroAsistencialUtils";
-import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioUrl, limpiarTexto, normalizarTexto } from "../../Inventario/inventarioUtils";
+import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioUrl, limpiarTexto, normalizarTexto } from "../../Inventario/Compartido/inventarioUtils";
 
 // Receta (reserva de medicamentos) del ticket (RecetaAsistencialDTO). La comparten las Historias Clínicas del
 // módulo: solo se muestra en tickets de La Arena (esArena) y se guarda junto con la Historia Clínica (su botón

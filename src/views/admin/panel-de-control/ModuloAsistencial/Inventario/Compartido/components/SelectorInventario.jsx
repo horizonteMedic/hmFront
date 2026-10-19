@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { SelectField } from "../../../../../../components/reusableComponents/InputSelect";
-import AvisoError from "../../../../../../components/reusableComponents/AvisoError";
+import AvisoError from "./AvisoError";
 
 // Select de inventario con su aviso de error y botón de reintento. Lo usan todas las pantallas de stock.
 // `excluirId` oculta un inventario de la lista (p. ej. el destino de una transferencia no puede ser el origen).

@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { agregarHoja, descargarLibro, nombreSeguro } from "../excelInventario";
-import { consultarInventario, hoyISO, inventarioUrl } from "../inventarioUtils";
+import { agregarHoja, descargarLibro, nombreSeguro } from "../Compartido/excelInventario";
+import { consultarInventario, hoyISO, inventarioUrl } from "../Compartido/inventarioUtils";
 
 const stockUrl = `${inventarioUrl}/stock`;
 

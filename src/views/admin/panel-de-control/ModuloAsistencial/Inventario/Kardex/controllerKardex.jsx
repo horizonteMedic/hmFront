@@ -1,4 +1,4 @@
-import { consultarInventario, inventarioUrl, rangoMesActual } from "../inventarioUtils";
+import { consultarInventario, inventarioUrl, rangoMesActual } from "../Compartido/inventarioUtils";
 
 const movimientosUrl = `${inventarioUrl}/stock/movimientos`;
 

@@ -1,7 +1,7 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
-import CatalogoTabSelector, { PERMISOS_CATALOGO } from "./CatalogoTabSelector";
+import CatalogoTabSelector, { PERMISOS_CATALOGO } from "./Catalogo/CatalogoTabSelector";
 import Kardex from "./Kardex/Kardex";
-import OperacionesTabSelector, { PERMISOS_OPERACIONES } from "./OperacionesTabSelector";
+import OperacionesTabSelector, { PERMISOS_OPERACIONES } from "./Operaciones/OperacionesTabSelector";
 import Stock from "./Stock/Stock";
 
 export default function InventarioTabSelector({ tieneVista }) {
