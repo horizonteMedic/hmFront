@@ -3,7 +3,7 @@ import SubTabSelector from "../../../../../components/reusableComponents/SubTabS
 import Hematologia from "./Hematologia/Hematologia";
 import HematologiaBioquimicaECO from "./HematologiaBioquimicaECO/HematologiaBioquimicaECO";
 import Hemoglobina from "./Hemoglobina/Hemoglobina";
-// import Coagulacion from "./Coagulacion/Coagulacion";
+import Coagulacion from "./Coagulacion/Coagulacion";
 
 export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -28,13 +28,13 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
       icon: faHeartbeat,
       component: Hemoglobina
     },
-    // {
-    //   id: 3,
-    //   permission: "Coagulacion",
-    //   label: "Coagulacion",
-    //   icon: faHandHoldingDroplet,
-    //   component: Coagulacion
-    // },
+    {
+      id: 3,
+      permission: "Coagulacion",
+      label: "Coagulacion",
+      icon: faHandHoldingDroplet,
+      component: Coagulacion
+    },
   ];
   return (
     <SubTabSelector

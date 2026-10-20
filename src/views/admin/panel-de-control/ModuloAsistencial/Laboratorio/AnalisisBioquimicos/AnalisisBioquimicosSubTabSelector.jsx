@@ -3,12 +3,12 @@ import SubTabSelector from "../../../../../components/reusableComponents/SubTabS
 import AcidoUrico from "./AcidoUrico/AcidoUrico";
 import PerfilHepatico from "./PerfilHepatico/PerfilHepatico";
 import PerfilRenal from "./PerfilRenal/PerfilRenal";
-// import RiesgoCoronario from "./RiesgoCoronario/RiesgoCoronario";
-// import ToleranciaGlucosa from "./ToleranciaGlucosa/ToleranciaGlucosa";
-// import GlucosaBasal from "./GlucosaBasal/GlucosaBasal";
+import RiesgoCoronario from "./RiesgoCoronario/RiesgoCoronario";
+import ToleranciaGlucosa from "./ToleranciaGlucosa/ToleranciaGlucosa";
+import GlucosaBasal from "./GlucosaBasal/GlucosaBasal";
 import PerfilLipidico from "./PerfilLipidico/PerfilLipidico";
-// import PCRUltrasensible from "./PCRUltrasensible/PCRUltrasensible";
-// import Colinesterasa from "./Colinesterasa/Colinesterasa";
+import PCRUltrasensible from "./PCRUltrasensible/PCRUltrasensible";
+import Colinesterasa from "./Colinesterasa/Colinesterasa";
 
 export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -40,41 +40,41 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       icon: faKiwiBird,
       component: PerfilHepatico
     },
-    // {
-    //   id: 4,
-    //   permission: "Riesgo Coronario",
-    //   label: "Riesgo Coronario",
-    //   icon: faCrown,
-    //   component: RiesgoCoronario
-    // },
-    // {
-    //   id: 5,
-    //   permission: "Tolerancia Glucosa",
-    //   label: "Tolerancia a la Glucosa",
-    //   icon: faCandyCane,
-    //   component: ToleranciaGlucosa
-    // },
-    // {
-    //   id: 6,
-    //   permission: "Glucosa Basal",
-    //   label: "Glucosa Basal",
-    //   icon: faGlassWater,
-    //   component: GlucosaBasal
-    // },
-    // {
-    //   id: 7,
-    //   permission: "PCR Ultrasensible",
-    //   label: "PCR ultrasensible",
-    //   icon: faHeart,
-    //   component: PCRUltrasensible
-    // },
-    // {
-    //   id: 8,
-    //   permission: "Colinesterasa",
-    //   label: "Colinesterasa",
-    //   icon: faDroplet,
-    //   component: Colinesterasa
-    // },
+    {
+      id: 4,
+      permission: "Riesgo Coronario",
+      label: "Riesgo Coronario",
+      icon: faCrown,
+      component: RiesgoCoronario
+    },
+    {
+      id: 5,
+      permission: "Tolerancia Glucosa",
+      label: "Tolerancia a la Glucosa",
+      icon: faCandyCane,
+      component: ToleranciaGlucosa
+    },
+    {
+      id: 6,
+      permission: "Glucosa Basal",
+      label: "Glucosa Basal",
+      icon: faGlassWater,
+      component: GlucosaBasal
+    },
+    {
+      id: 7,
+      permission: "PCR Ultrasensible",
+      label: "PCR ultrasensible",
+      icon: faHeart,
+      component: PCRUltrasensible
+    },
+    {
+      id: 8,
+      permission: "Colinesterasa",
+      label: "Colinesterasa",
+      icon: faDroplet,
+      component: Colinesterasa
+    },
   ];
   return (
     <SubTabSelector
