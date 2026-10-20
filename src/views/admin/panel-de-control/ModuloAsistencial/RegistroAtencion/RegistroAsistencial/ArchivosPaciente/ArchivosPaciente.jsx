@@ -16,7 +16,7 @@ import {
 const BOTONES = [
     { key: "firma", label: "Tomar Firma", icon: faSignature, color: "bg-purple-600 hover:bg-purple-700" },
     { key: "huella", label: "Tomar Huella Futronic", icon: faFingerprint, color: "bg-teal-600 hover:bg-teal-700" },
-    { key: "foto", label: "Tomar Fotografía", icon: faCamera, color: "bg-orange-500 hover:bg-orange-600" },
+    // { key: "foto", label: "Tomar Fotografía", icon: faCamera, color: "bg-orange-500 hover:bg-orange-600" },
 ];
 
 const SIN_ARCHIVOS = { firma: SIN_ARCHIVO, huella: SIN_ARCHIVO, foto: SIN_ARCHIVO };
@@ -70,7 +70,7 @@ function ArchivosPaciente({ numeroHistoriaClinica, token }) {
 
     return (
         <>
-            <SectionFieldset legend="Firma, Huella y Fotografía" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <SectionFieldset legend="Firma, Huella y Fotografía" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {BOTONES.map(({ key, label, icon, color }) => (
                     <div key={key} className="flex flex-col items-center gap-1">
                         <EstadoArchivo registrado={archivos[key].id === 1} />

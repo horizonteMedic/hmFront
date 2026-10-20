@@ -16,7 +16,7 @@ import InventarioTabSelector from "./Inventario/InventarioTabSelector";
 const sections = [
     { tab: 1, vista: "Registro de Atencion", label: "Registro de Atención", icon: faUserCheck, component: RegistroAtencionTabSelector },
     { tab: 2, vista: "Triaje Asistencial", label: "Triaje", icon: faStethoscope, component: TriajeAsistencial },
-    { tab: 3, vista: "Antecedentes Patologicos", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
+    { tab: 3, vista: "Antecedentes Patologicos Asistencial", label: "Antecedentes Patológicos", icon: faBacterium, component: AntecedentesPatologicos },
     { tab: 4, vista: "Historia Asistencial", label: "Historia Asistencial", icon: faNotesMedical, component: AsistencialTabSelector },
     { tab: 5, vista: "Laboratorio Asistencial", label: "Laboratorio", icon: faVial, component: LaboratorioTabSelector },
     { tab: 6, vista: "Hoja de Referencia", label: "Hoja de Referencia", icon: faTruckMedical, component: HojaReferencia },
