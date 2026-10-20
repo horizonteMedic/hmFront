@@ -1,7 +1,7 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import LaboratorioClinicoSubTabSelector from "./LaboratorioClinico/LaboratorioClinicoSubTabSelector";
 import AnalisisBioquimicosSubTabSelector from "./AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector";
-// import InmunologiaSubTabSelector from "./Inmunologia/InmunologiaSubTabSelector";
+import InmunologiaSubTabSelector from "./Inmunologia/InmunologiaSubTabSelector";
 // import ToxicologiaSubTabSelector from "./Toxicologia/ToxicologiaSubTabSelector";
 // import TabEnConstruccion from "./TabEnConstruccion";
 import { faCannabis, faFileAlt, faFilter, faFlask, faMicroscope, faShieldVirus, faVirusCovid } from "@fortawesome/free-solid-svg-icons";
@@ -24,13 +24,13 @@ export default function LaboratorioTabSelector({ tieneVista }) {
             icon: faFilter,
             component: AnalisisBioquimicosSubTabSelector
         },
-        // {
-        //     id: 2,
-        //     permission: "Inmunologia",
-        //     label: "Inmunología",
-        //     icon: faShieldVirus,
-        //     component: InmunologiaSubTabSelector
-        // },
+        {
+            id: 2,
+            permission: "Inmunologia",
+            label: "Inmunología",
+            icon: faShieldVirus,
+            component: InmunologiaSubTabSelector
+        },
         // {
         //     id: 3,
         //     permission: "Toxicologia",
