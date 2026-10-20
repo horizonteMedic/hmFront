@@ -11,20 +11,33 @@ const MS_POR_DIA = 86400000;
 // backend lo define y podría llamarse VENCIMIENTO, VENCIDO...). Devuelve undefined si no hay ninguno.
 export const MotivoVencimiento = (motivos) => (motivos ?? []).find((motivo) => normalizarTexto(motivo).includes("venc"));
 
-// Días que lleva vencido un lote (0 si venció hoy), a partir de su fecha "yyyy-MM-dd".
-export const DiasVencido = (fechaVencimiento) => {
+// Días que faltan para que se retire por vencimiento un lote que vence dentro de este número de días (o antes).
+export const DIAS_PROXIMOS_POR_DEFECTO = 15;
+
+// Días que faltan para que venza un lote, a partir de su fecha "yyyy-MM-dd": 0 si vence hoy y negativo si ya venció
+// (-3 = venció hace 3 días). null si la fecha no se puede interpretar.
+export const DiasParaVencimiento = (fechaVencimiento) => {
     const [anio, mes, dia] = String(fechaVencimiento ?? "").slice(0, 10).split("-").map(Number);
     if (!anio || !mes || !dia) return null;
 
     const [anioHoy, mesHoy, diaHoy] = hoyISO().split("-").map(Number);
-    return Math.max(Math.round((Date.UTC(anioHoy, mesHoy - 1, diaHoy) - Date.UTC(anio, mes - 1, dia)) / MS_POR_DIA), 0);
+    return Math.round((Date.UTC(anio, mes - 1, dia) - Date.UTC(anioHoy, mesHoy - 1, diaHoy)) / MS_POR_DIA);
 };
+
+const estaVencido = (lote) => lote.vencido || DiasParaVencimiento(lote.fechaVencimiento) < 0;
+
+// Lotes que toca retirar: los vencidos y los que vencen dentro de `dias` días o antes (0 = solo los vencidos).
+export const LotesARetirar = (lotes, dias) =>
+    lotes.filter((lote) => {
+        const faltan = DiasParaVencimiento(lote.fechaVencimiento);
+        return lote.vencido || (faltan != null && faltan <= dias);
+    });
 
 // Pide confirmar antes de retirar: descuenta stock y no se puede deshacer desde aquí.
 export const ConfirmarRetiroVencidos = async (lotes, inventario) => {
     const unidades = lotes.reduce((total, lote) => total + lote.cantidadActual, 0);
     const { isConfirmed } = await Swal.fire({
-        title: "Retirar lotes vencidos",
+        title: "Retirar lotes vencidos o por vencer",
         text: `Se retirarán ${lotes.length} lote(s), ${unidades} unidades en total, del inventario "${inventario.nombre}". Esta acción descuenta el stock. ¿Desea continuar?`,
         icon: "warning",
         showCancelButton: true,
@@ -48,11 +61,8 @@ export const RetirarLotesVencidos = async ({ lotes, motivo, onProgreso }, token,
     for (let i = 0; i < lotes.length; i++) {
         onProgreso(i);
         const lote = lotes[i];
-        const res = await EnviarRetiroLote(
-            { loteId: lote.id, cantidad: lote.cantidadActual, motivo, observacion: `LOTE VENCIDO EL ${formatearFechaCorta(lote.fechaVencimiento)}` },
-            token,
-            usuario
-        );
+        const observacion = `LOTE ${estaVencido(lote) ? "VENCIDO" : "POR VENCER"} EL ${formatearFechaCorta(lote.fechaVencimiento)}`;
+        const res = await EnviarRetiroLote({ loteId: lote.id, cantidad: lote.cantidadActual, motivo, observacion }, token, usuario);
 
         if (res.ok) {
             retirados.push({ lote, cantidad: lote.cantidadActual, fecha: new Date() });
@@ -85,12 +95,12 @@ export const DescargarListaVencidos = async (lotes, inventario) => {
     const libro = new ExcelJS.Workbook();
     const columnas = [
         ...columnasLote,
-        { etiqueta: "Vencido hace (días)", ancho: 16, valor: (lote) => DiasVencido(lote.fechaVencimiento) },
+        { etiqueta: "Días para vencimiento", ancho: 20, valor: (lote) => DiasParaVencimiento(lote.fechaVencimiento) },
         { etiqueta: "Stock actual", ancho: 13, valor: (lote) => lote.cantidadActual },
         { etiqueta: "Reservado", ancho: 12, valor: (lote) => lote.cantidadReservada },
         { etiqueta: "Disponible", ancho: 12, valor: (lote) => lote.cantidadDisponible },
     ];
-    agregarHoja(libro, "POR RETIRAR", `LOTES VENCIDOS POR RETIRAR | ${inventario.nombre} | ${formatearFechaCorta(hoyISO())}`, columnas, lotes);
+    agregarHoja(libro, "POR RETIRAR", `LOTES VENCIDOS Y POR VENCER POR RETIRAR | ${inventario.nombre} | ${formatearFechaCorta(hoyISO())}`, columnas, lotes);
 
     await descargarLibro(libro, `Vencidos_por_retirar_${nombreSeguro(inventario.nombre)}_${hoyISO()}.xlsx`);
 };
@@ -104,7 +114,7 @@ export const DescargarRelacionRetirados = async ({ retirados, fallidos }, invent
     agregarHoja(
         libro,
         "RETIRADOS",
-        titulo("LOTES VENCIDOS RETIRADOS"),
+        titulo("LOTES VENCIDOS Y POR VENCER RETIRADOS"),
         [
             ...columnasLote.map((columna) => ({ ...columna, valor: (retiro, i) => columna.valor(retiro.lote, i) })),
             { etiqueta: "Cantidad retirada", ancho: 16, valor: (retiro) => retiro.cantidad },
@@ -118,7 +128,7 @@ export const DescargarRelacionRetirados = async ({ retirados, fallidos }, invent
         agregarHoja(
             libro,
             "NO RETIRADOS",
-            titulo("LOTES VENCIDOS QUE NO SE PUDIERON RETIRAR"),
+            titulo("LOTES VENCIDOS Y POR VENCER QUE NO SE PUDIERON RETIRAR"),
             [
                 ...columnasLote.map((columna) => ({ ...columna, valor: (fallo, i) => columna.valor(fallo.lote, i) })),
                 { etiqueta: "Stock actual", ancho: 13, valor: (fallo) => fallo.lote.cantidadActual },

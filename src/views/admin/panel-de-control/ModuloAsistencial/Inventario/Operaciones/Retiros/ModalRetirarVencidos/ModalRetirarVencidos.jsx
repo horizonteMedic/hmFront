@@ -7,12 +7,14 @@ import TablaTemplate from "../../../../../../../components/templates/TablaTempla
 import { formatearFechaCorta } from "../../../../../../../utils/formatDateUtils";
 import AvisoError from "../../../Compartido/components/AvisoError";
 import { useConsultaInventario } from "../../../Compartido/hooks/useConsultaInventario";
-import { ObtenerLotesVencidos } from "../controllerRetiros";
+import { ObtenerLotesConStock } from "../controllerRetiros";
 import {
     ConfirmarRetiroVencidos,
     DescargarListaVencidos,
     DescargarRelacionRetirados,
-    DiasVencido,
+    DIAS_PROXIMOS_POR_DEFECTO,
+    DiasParaVencimiento,
+    LotesARetirar,
     MedicamentoDelLote,
     MotivoVencimiento,
     RetirarLotesVencidos,
@@ -22,6 +24,18 @@ Modal.setAppElement("#root");
 
 // Ancho común de las etiquetas, igual que en el resto de formularios de Retiros.
 const ANCHO_ETIQUETA = "110px";
+const ANCHO_ETIQUETA_DIAS = "190px";
+
+const plural = (cantidad) => `${cantidad} ${cantidad === 1 ? "día" : "días"}`;
+
+// Cuánto falta (o cuánto lleva vencido) un lote, para la columna "Días para vencimiento".
+const textoDiasParaVencimiento = (fechaVencimiento) => {
+    const dias = DiasParaVencimiento(fechaVencimiento);
+    if (dias == null) return "—";
+    if (dias < 0) return <span className="text-red-600 font-semibold">Vencido hace {plural(-dias)}</span>;
+    if (dias === 0) return <span className="text-amber-600 font-semibold">Vence hoy</span>;
+    return plural(dias);
+};
 
 const CLASES_BOTON = `
     text-white text-base px-6 py-2 rounded
@@ -32,51 +46,65 @@ const CLASES_BOTON = `
     disabled:opacity-50 disabled:cursor-not-allowed`;
 
 // Tres pasos en la misma ventana:
-//   "seleccion"   lista de los lotes vencidos, todos marcados; se desmarcan los que no se quieren retirar y se puede
-//                 descargar la lista en Excel antes de confirmar,
+//   "seleccion"   lista de los lotes vencidos y de los que vencen dentro de los días indicados (15 por defecto), todos
+//                 marcados; se desmarcan los que no se quieren retirar y se puede descargar la lista en Excel antes de
+//                 confirmar,
 //   "procesando"  retira uno por uno los marcados, con avance,
 //   "resultado"   qué se retiró y qué no, con la relación de retirados descargable en Excel.
 export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventario, motivos, token, usuario, onRetirado }) {
     const lotes = useConsultaInventario();
-    const [seleccionados, setSeleccionados] = useState(() => new Set());
+    const [diasProximos, setDiasProximos] = useState(String(DIAS_PROXIMOS_POR_DEFECTO));
+    // Se guardan los que el usuario desmarcó (no los marcados) para que cambiar los días no le deshaga la selección.
+    const [desmarcados, setDesmarcados] = useState(() => new Set());
     const [fase, setFase] = useState("seleccion");
     const [procesados, setProcesados] = useState(0);
     const [resultado, setResultado] = useState(null);
 
     const motivo = MotivoVencimiento(motivos);
 
-    const elegidos = useMemo(() => lotes.datos.filter((lote) => seleccionados.has(lote.id)), [lotes.datos, seleccionados]);
+    const diasValidos = /^\d+$/.test(diasProximos);
+    const errorDias = diasValidos ? "" : "Ingrese los días (0 o más)";
+
+    // Con los días vacíos solo se muestran los vencidos, pero el retiro queda bloqueado hasta que se corrija.
+    const visibles = useMemo(() => LotesARetirar(lotes.datos, diasValidos ? Number(diasProximos) : 0), [lotes.datos, diasProximos, diasValidos]);
+    const elegidos = useMemo(() => visibles.filter((lote) => !desmarcados.has(lote.id)), [visibles, desmarcados]);
     const unidades = elegidos.reduce((total, lote) => total + lote.cantidadActual, 0);
     const conReservas = elegidos.filter((lote) => lote.cantidadReservada > 0).length;
-    const todosMarcados = lotes.datos.length > 0 && elegidos.length === lotes.datos.length;
+    const todosMarcados = visibles.length > 0 && elegidos.length === visibles.length;
 
     const cargar = () => {
-        if (inventario) lotes.ejecutar(() => ObtenerLotesVencidos(inventario.id, token));
+        if (inventario) lotes.ejecutar(() => ObtenerLotesConStock(inventario.id, token));
     };
 
-    // Cada vez que se abre vuelve al primer paso con la lista al día.
+    // Cada vez que se abre vuelve al primer paso con la lista al día y los días por defecto.
     useEffect(() => {
         if (!isOpen) return;
         setFase("seleccion");
         setResultado(null);
         setProcesados(0);
+        setDiasProximos(String(DIAS_PROXIMOS_POR_DEFECTO));
         cargar();
     }, [isOpen]);
 
     // Al llegar la lista todos los lotes quedan marcados; el usuario desmarca los que no quiere retirar.
     useEffect(() => {
-        setSeleccionados(new Set(lotes.datos.map((lote) => lote.id)));
+        setDesmarcados(new Set());
     }, [lotes.datos]);
 
     const alternar = (lote) =>
-        setSeleccionados((prev) => {
+        setDesmarcados((prev) => {
             const siguiente = new Set(prev);
             if (siguiente.has(lote.id)) siguiente.delete(lote.id);
             else siguiente.add(lote.id);
             return siguiente;
         });
 
-    const alternarTodos = () => setSeleccionados(todosMarcados ? new Set() : new Set(lotes.datos.map((lote) => lote.id)));
+    const alternarTodos = () =>
+        setDesmarcados((prev) => {
+            const siguiente = new Set(prev);
+            visibles.forEach((lote) => (todosMarcados ? siguiente.add(lote.id) : siguiente.delete(lote.id)));
+            return siguiente;
+        });
 
     const cerrar = () => {
         if (fase === "procesando") return;
@@ -110,7 +138,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                     type="checkbox"
                     checked={todosMarcados}
                     onChange={alternarTodos}
-                    disabled={lotes.datos.length === 0}
+                    disabled={visibles.length === 0}
                     aria-label="Marcar o desmarcar todos"
                     className="w-4 h-4 cursor-pointer"
                 />
@@ -119,7 +147,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
             render: (row) => (
                 <input
                     type="checkbox"
-                    checked={seleccionados.has(row.id)}
+                    checked={!desmarcados.has(row.id)}
                     onChange={() => alternar(row)}
                     onClick={(e) => e.stopPropagation()}
                     aria-label={`Retirar ${MedicamentoDelLote(row)}, lote ${row.numeroLote || "sin lote"}`}
@@ -127,10 +155,10 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                 />
             ),
         },
-        { label: "Medicamento", width: "29%", render: (row) => MedicamentoDelLote(row) },
+        { label: "Medicamento", width: "27%", render: (row) => MedicamentoDelLote(row) },
         { label: "N° Lote", width: "14%", render: (row) => row.numeroLote || "Sin lote" },
         { label: "Vencimiento", width: "13%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
-        { label: "Vencido hace", width: "12%", render: (row) => `${DiasVencido(row.fechaVencimiento) ?? "—"} días` },
+        { label: "Días para vencimiento", width: "14%", render: (row) => textoDiasParaVencimiento(row.fechaVencimiento) },
         { label: "Actual", accessor: "cantidadActual", width: "9%" },
         { label: "Reservado", accessor: "cantidadReservada", width: "9%" },
         { label: "Disponible", accessor: "cantidadDisponible", width: "9%" },
@@ -187,13 +215,23 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                             <AvisoError mensaje={lotes.error} onRetry={cargar} className="" />
 
                             <p className="text-sm text-gray-600">
-                                Estos son los lotes vencidos con stock del inventario. Se retira todo lo que queda de cada lote marcado: desmarque los que no
-                                quiere retirar. Puede descargar la lista antes de confirmar.
+                                Estos son los lotes con stock del inventario que ya vencieron o que vencen dentro de los días indicados. Se retira todo lo que
+                                queda de cada lote marcado: desmarque los que no quiere retirar. Puede descargar la lista antes de confirmar.
                             </p>
+
+                            <InputTextOneLine
+                                label="Próximos a vencer en (días)"
+                                name="diasProximos"
+                                labelWidth={ANCHO_ETIQUETA_DIAS}
+                                className="max-w-md"
+                                value={diasProximos}
+                                onChange={(e) => setDiasProximos(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                                error={errorDias}
+                            />
 
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <p className="text-sm">
-                                    Marcados: <strong>{elegidos.length}</strong> de <strong>{lotes.datos.length}</strong> lote(s) · <strong>{unidades}</strong> unidades
+                                    Marcados: <strong>{elegidos.length}</strong> de <strong>{visibles.length}</strong> lote(s) · <strong>{unidades}</strong> unidades
                                 </p>
                                 <button
                                     type="button"
@@ -214,11 +252,11 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
 
                             <TablaTemplate
                                 columns={columnasSeleccion}
-                                data={lotes.datos}
+                                data={visibles}
                                 height={340}
                                 onRowClick={alternar}
-                                getRowClassName={(row) => (seleccionados.has(row.id) ? "" : "opacity-50")}
-                                emptyText={lotes.cargando ? "Cargando lotes vencidos..." : "No hay lotes vencidos con stock en este inventario"}
+                                getRowClassName={(row) => (desmarcados.has(row.id) ? "opacity-50" : "")}
+                                emptyText={lotes.cargando ? "Cargando lotes..." : "No hay lotes vencidos ni próximos a vencer con stock en este inventario"}
                             />
                         </>
                     )}
@@ -226,7 +264,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                     {fase === "procesando" && (
                         <div className="py-10 text-center space-y-3">
                             <FontAwesomeIcon icon={faSpinner} spin className="text-4xl text-[#233245]" />
-                            <p className="font-semibold">Retirando lotes vencidos... {procesados} de {elegidos.length}</p>
+                            <p className="font-semibold">Retirando lotes... {procesados} de {elegidos.length}</p>
                             <div className="w-full max-w-md mx-auto h-2 bg-gray-200 rounded overflow-hidden">
                                 <div
                                     className="h-full bg-emerald-600 transition-all duration-150"
@@ -274,7 +312,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                             <button
                                 type="button"
                                 onClick={handleRetirar}
-                                disabled={elegidos.length === 0 || !motivo || lotes.cargando}
+                                disabled={elegidos.length === 0 || !motivo || lotes.cargando || !diasValidos}
                                 className={`bg-red-600 hover:bg-red-700 ${CLASES_BOTON}`}
                             >
                                 <FontAwesomeIcon icon={faBoxOpen} /> Retirar {elegidos.length} lote(s)

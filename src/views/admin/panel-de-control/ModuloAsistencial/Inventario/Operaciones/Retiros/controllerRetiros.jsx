@@ -21,22 +21,22 @@ export const ObtenerRetiros = ({ inventarioId, desde, hasta }, token) => {
     return consultarInventario(`${retirosUrl}?${query}`, token, "No se pudo cargar el historial de retiros.");
 };
 
-// Lotes vencidos del inventario que todavía tienen unidades, del que venció primero al último. El backend no tiene un
-// endpoint para listarlos solos: se piden todos los lotes con los vencidos incluidos (sin filtrar por medicamento) y
-// aquí se quedan los vencidos.
-export const ObtenerLotesVencidos = async (inventarioId, token) => {
+// Lotes del inventario que todavía tienen unidades, vencidos incluidos, del que vence primero al último. El backend no
+// tiene un endpoint para listar solo los que toca retirar: se piden todos los lotes con los vencidos incluidos (sin
+// filtrar por medicamento) y el retiro de vencidos se queda con los vencidos y los próximos a vencer.
+export const ObtenerLotesConStock = async (inventarioId, token) => {
     const query = new URLSearchParams({ inventarioId, incluirVencidos: true });
-    const res = await consultarInventario(`${lotesUrl}?${query}`, token, "No se pudieron cargar los lotes vencidos.");
+    const res = await consultarInventario(`${lotesUrl}?${query}`, token, "No se pudieron cargar los lotes del inventario.");
     if (!res.ok) return res;
 
-    const vencidos = (Array.isArray(res.resultado) ? res.resultado : [])
-        .filter((lote) => lote.vencido && lote.cantidadActual > 0)
+    const conStock = (Array.isArray(res.resultado) ? res.resultado : [])
+        .filter((lote) => lote.cantidadActual > 0)
         .sort(
             (a, b) =>
                 String(a.fechaVencimiento ?? "").localeCompare(String(b.fechaVencimiento ?? "")) ||
                 String(a.medicamentoNombre ?? "").localeCompare(String(b.medicamentoNombre ?? ""), "es")
         );
-    return { ...res, resultado: vencidos };
+    return { ...res, resultado: conStock };
 };
 
 // { campo: mensaje } solo con lo que falta o es inválido. `lote` es el lote elegido (para avisar antes de
