@@ -36,7 +36,6 @@ export default function Panel4D() {
   const initialFormState = {
     numeroTicket: "",
     ticketImprimir: "",
-    panel4dId: null,
     fecha: today,
 
     pacienteId: null,
@@ -178,7 +177,7 @@ export default function Panel4D() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaboralesAsistencial form={form} />
+      <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
 
       {/* Resultados */}
       <SectionFieldset legend="Resultados">

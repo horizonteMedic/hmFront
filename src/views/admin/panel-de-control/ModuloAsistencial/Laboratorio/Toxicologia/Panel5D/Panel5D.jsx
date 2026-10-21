@@ -179,7 +179,7 @@ export default function Panel5D() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaboralesAsistencial form={form} />
+      <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
 
       {/* Resultados */}
       <SectionFieldset legend="Resultados">

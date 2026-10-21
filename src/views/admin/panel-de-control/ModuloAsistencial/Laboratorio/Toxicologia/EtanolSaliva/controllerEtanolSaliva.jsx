@@ -2,21 +2,37 @@ import Swal from "sweetalert2";
 import {
     LABORATORIO_ASISTENCIAL_URL,
     actualizarRegistroTicket,
+    ajustarDatosReporte,
     auditoriaFromRegistro,
     confirmarImpresionTicket,
+    crearLectorReporte,
     formFromTicket,
     guardarRegistroTicket,
     imprimirReporteTicket,
     verificarRegistroTicket,
 } from "../../../../../../utils/registroAsistencialUtils";
 
-// Endpoint base asumido (ver el contrato en utils/registroAsistencialUtils).
+// Endpoints REALES del backend (OpenAPI):
+//   POST {registrarUrl}                                                         registra / actualiza
+//   GET  {registrarUrl}/obtenerReporte?numeroTicket=&nameService=&esJasper=     registro del ticket
 const registrarUrl = `${LABORATORIO_ASISTENCIAL_URL}/etanol-saliva`;
 
-// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por eso
-// se declara aquí (en el controller).
-const jasperModules = import.meta.glob("../../../../../../jaspers/Toxicologia/*.jsx");
-const rutaJasper = "../../../../../../jaspers/Toxicologia/ETANOLSALIVA.jsx";
+// El reporte de Etanol en Saliva no trae un id propio del registro, así que se considera que el ticket
+// "tiene registro" cuando el reporte trae su auditoría de creación (fechaRegistro / userRegistro). El
+// OpenAPI no dice qué responde el backend cuando no hay registro: un error (404...), un `resultado`
+// vacío o sin auditoría cuentan como "sin registro".
+const leerRegistro = crearLectorReporte({
+    url: registrarUrl,
+    nameService: "etanol_saliva_asistencial",
+    tieneRegistro: (data) => Boolean(data.fechaRegistro || data.userRegistro),
+});
+const obtenerRegistroFormulario = leerRegistro(false);
+const obtenerRegistroReporte = leerRegistro(true);
+
+// Reporte Jasper asistencial (cabecera del módulo, sin datos laborales). El glob debe ser un literal
+// para que Vite pueda resolverlo en build; por eso se declara aquí (en el controller).
+const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloAsistencial/Laboratorio/Toxicologia/*.jsx");
+const rutaJasper = "../../../../../../jaspers/ModuloAsistencial/Laboratorio/Toxicologia/EtanolSaliva_Digitalizado.jsx";
 
 // ===== Mapeo Registro nuevo (datos del paciente) =====
 export const GetInfoServicio = (paciente, set, numeroTicket) => {
@@ -34,10 +50,10 @@ export const GetInfoServicioEditar = (paciente, registro, set, numeroTicket) => 
         ...prev,
         ...formFromTicket(paciente),
         numeroTicket: String(numeroTicket),
-        fecha: registro.fechaExamen,
+        fecha: registro.fechaExamen ?? prev.fecha,
 
-        resultado: registro.resultado ?? "",
         muestra: registro.muestra ?? "",
+        resultado: registro.resultado ?? "",
 
         user_medicoFirma: registro.usuarioFirma ? registro.usuarioFirma : prev.user_medicoFirma,
         user_doctorAsignado: registro.doctorAsignado ?? "",
@@ -51,22 +67,36 @@ export const GetInfoServicioEditar = (paciente, registro, set, numeroTicket) => 
 };
 
 // ===== Mapeo: Body =====
-// La auditoría (usuario/fecha de registro y actualización) la resuelve el backend con `?usuario=`.
-const construirBody = (form) => ({
+// El backend resuelve al paciente por el ticket (no lleva `pacienteId`). La auditoría se envía como la
+// declara el DTO: `userRegistro` al crear; al editar, `usuarioActualizacion` y el `userRegistro`
+// original (si no se reenvía, el UPDATE lo deja en null). Las fechas las pone el backend.
+const construirBody = (form, user, esActualizacion) => ({
     numeroTicket: Number(form.numeroTicket),
-    pacienteId: form.pacienteId ?? null,
-    fechaExamen: form.fecha,
     muestra: form.muestra,
     resultado: form.resultado,
+    fechaExamen: form.fecha,
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
+
+    ...(esActualizacion
+        ? { usuarioActualizacion: user, userRegistro: form.userRegistro || null }
+        : { userRegistro: user }),
 });
 
 // ===== Impresión =====
-// Reutiliza la plantilla Jasper de Etanol en Saliva (ocupacional): imprime el N° de Ticket como "Nro de ficha".
+// `ajustarDatosReporte` completa numeroTicket, nombre (apellidos primero), sede, historia clínica y
+// sellos de firma.
 export const PrintHojaR = (numeroTicket, token) =>
-    imprimirReporteTicket({ numeroTicket, token, url: registrarUrl, jasperModules, rutaJasper });
+    imprimirReporteTicket({
+        numeroTicket,
+        token,
+        url: registrarUrl,
+        obtenerRegistro: obtenerRegistroReporte,
+        jasperModules,
+        rutaJasper,
+        ajustarDatos: ajustarDatosReporte(numeroTicket, token),
+    });
 
 // Botón IMPRIMIR: pide confirmación y luego imprime.
 export const ConfirmarImpresion = (numeroTicket, token) =>
@@ -81,6 +111,8 @@ export const SubmitDataService = (form, token, user, limpiar) => {
         token,
         user,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
+        usuarioEnQuery: false,
         limpiar,
         buildBody: construirBody,
         mensajeExito: "Etanol en Saliva registrado correctamente.",
@@ -96,6 +128,8 @@ export const UpdateDataService = (form, token, user, limpiar) => {
         token,
         user,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
+        usuarioEnQuery: false,
         limpiar,
         buildBody: construirBody,
         mensajeExito: "Etanol en Saliva actualizado correctamente.",
@@ -109,6 +143,7 @@ export const VerifyTR = (numeroTicket, token, set) =>
         numeroTicket,
         token,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
         onNuevo: (paciente) => GetInfoServicio(paciente, set, numeroTicket),
         onExistente: (paciente, registro) => {
             GetInfoServicioEditar(paciente, registro, set, numeroTicket);

@@ -195,7 +195,7 @@ export default function Panel10D() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaboralesAsistencial form={form} />
+      <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
 
       {/* Resultados */}
       <SectionFieldset legend="Resultados">

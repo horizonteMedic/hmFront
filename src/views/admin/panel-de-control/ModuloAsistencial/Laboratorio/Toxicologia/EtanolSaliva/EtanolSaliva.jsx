@@ -171,7 +171,7 @@ export default function EtanolSaliva() {
                     labelWidth="120px"
                 />
             </SectionFieldset>
-            <DatosPersonalesLaboralesAsistencial form={form} />
+            <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
             <SectionFieldset legend="Muestra" className="grid gap-3">
                 <InputTextOneLine
                     label='Muestra'

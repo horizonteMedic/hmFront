@@ -176,7 +176,7 @@ export default function Panel2D() {
         />
       </SectionFieldset>
 
-      <DatosPersonalesLaboralesAsistencial form={form} />
+      <DatosPersonalesLaboralesAsistencial form={form} laborales={false} />
 
       {/* Resultados */}
       <SectionFieldset legend="Resultados" className='grid gap-y-3'>

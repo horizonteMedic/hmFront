@@ -2,21 +2,38 @@ import Swal from "sweetalert2";
 import {
     LABORATORIO_ASISTENCIAL_URL,
     actualizarRegistroTicket,
+    ajustarDatosReporte,
     auditoriaFromRegistro,
     confirmarImpresionTicket,
+    crearLectorReporte,
     formFromTicket,
     guardarRegistroTicket,
     imprimirReporteTicket,
     verificarRegistroTicket,
 } from "../../../../../../utils/registroAsistencialUtils";
 
-// Endpoint base asumido (ver el contrato en utils/registroAsistencialUtils).
+// Endpoints REALES del backend (OpenAPI):
+//   POST {registrarUrl}                                                         registra / actualiza
+//   GET  {registrarUrl}/obtenerReporte?numeroTicket=&nameService=&esJasper=     registro del ticket
 const registrarUrl = `${LABORATORIO_ASISTENCIAL_URL}/panel-3d`;
 
-// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por eso
-// se declara aquí (en el controller).
-const jasperModules = import.meta.glob("../../../../../../jaspers/Toxicologia/*.jsx");
-const rutaJasper = "../../../../../../jaspers/Toxicologia/Panel3d_Digitalizado.jsx";
+// El reporte de Panel 3D no trae un id propio del registro, así que se considera que el ticket
+// "tiene registro" cuando el reporte trae su auditoría de creación (fechaRegistro / userRegistro). El
+// OpenAPI no dice qué responde el backend cuando no hay registro: un error (404...), un `resultado`
+// vacío o sin auditoría cuentan como "sin registro".
+const leerRegistro = crearLectorReporte({
+    url: registrarUrl,
+    nameService: "panel_3d_asistencial",
+    tieneRegistro: (data) => Boolean(data.fechaRegistro || data.userRegistro),
+});
+const obtenerRegistroFormulario = leerRegistro(false);
+const obtenerRegistroReporte = leerRegistro(true);
+
+// Reporte Jasper asistencial (cabecera del módulo, sin datos laborales). Un solo jasper sirve a los
+// paneles de drogas y elige título y filas por `tipoPanel`. El glob debe ser un literal para que Vite
+// pueda resolverlo en build; por eso se declara aquí (en el controller).
+const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloAsistencial/Laboratorio/Toxicologia/*.jsx");
+const rutaJasper = "../../../../../../jaspers/ModuloAsistencial/Laboratorio/Toxicologia/PanelDrogas_Digitalizado.jsx";
 
 // ===== Mapeo Registro nuevo (datos del paciente) =====
 export const GetInfoServicio = (paciente, set, numeroTicket) => {
@@ -34,12 +51,12 @@ export const GetInfoServicioEditar = (paciente, registro, set, numeroTicket) => 
         ...prev,
         ...formFromTicket(paciente),
         numeroTicket: String(numeroTicket),
-        fecha: registro.fechaExamen,
+        fecha: registro.fechaExamen ?? prev.fecha,
 
-        valueM: registro.txtMarihuana ?? "NEGATIVO",
-        valueC: registro.txtCocaina ?? "NEGATIVO",
-        valueE: registro.txtExtasis ?? "NEGATIVO",
-        metodo: registro.txtMetodo ?? "INMUNOCROMATOGRAFICO",
+        valueM: registro.marihuana ?? "NEGATIVO",
+        valueC: registro.cocaina ?? "NEGATIVO",
+        valueE: registro.extasis ?? "NEGATIVO",
+        metodo: registro.metodo ?? "INMUNOCROMATOGRAFICO",
 
         user_medicoFirma: registro.usuarioFirma ? registro.usuarioFirma : prev.user_medicoFirma,
         user_doctorAsignado: registro.doctorAsignado ?? "",
@@ -53,24 +70,43 @@ export const GetInfoServicioEditar = (paciente, registro, set, numeroTicket) => 
 };
 
 // ===== Mapeo: Body =====
-// La auditoría (usuario/fecha de registro y actualización) la resuelve el backend con `?usuario=`.
-const construirBody = (form) => ({
+// El backend resuelve al paciente por el ticket (no lleva `pacienteId`). La auditoría se envía como la
+// declara el DTO: `userRegistro` al crear; al editar, `usuarioActualizacion` y el `userRegistro`
+// original (si no se reenvía, el UPDATE lo deja en null). Las fechas las pone el backend.
+const construirBody = (form, user, esActualizacion) => ({
     numeroTicket: Number(form.numeroTicket),
-    pacienteId: form.pacienteId ?? null,
+    metodo: form.metodo,
+    cocaina: form.valueC,
+    marihuana: form.valueM,
+    extasis: form.valueE,
     fechaExamen: form.fecha,
-    txtMarihuana: form.valueM,
-    txtCocaina: form.valueC,
-    txtExtasis: form.valueE,
-    txtMetodo: form.metodo,
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
+
+    ...(esActualizacion
+        ? { usuarioActualizacion: user, userRegistro: form.userRegistro || null }
+        : { userRegistro: user }),
 });
 
 // ===== Impresión =====
-// Reutiliza la plantilla Jasper de Panel 3D (ocupacional): imprime el N° de Ticket como "Nro de ficha".
-export const PrintHojaR = (numeroTicket, token) =>
-    imprimirReporteTicket({ numeroTicket, token, url: registrarUrl, jasperModules, rutaJasper });
+// `ajustarDatosReporte` completa numeroTicket, nombre (apellidos primero), sede, historia clínica y
+// sellos de firma; `tipoPanel` le dice a la plantilla qué panel imprimir.
+export const PrintHojaR = (numeroTicket, token) => {
+    const ajustarBase = ajustarDatosReporte(numeroTicket, token);
+    return imprimirReporteTicket({
+        numeroTicket,
+        token,
+        url: registrarUrl,
+        obtenerRegistro: obtenerRegistroReporte,
+        jasperModules,
+        rutaJasper,
+        ajustarDatos: async (paciente, registro) => ({
+            ...(await ajustarBase(paciente, registro)),
+            tipoPanel: "3D",
+        }),
+    });
+};
 
 // Botón IMPRIMIR: pide confirmación y luego imprime.
 export const ConfirmarImpresion = (numeroTicket, token) =>
@@ -85,6 +121,8 @@ export const SubmitDataService = (form, token, user, limpiar) => {
         token,
         user,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
+        usuarioEnQuery: false,
         limpiar,
         buildBody: construirBody,
         mensajeExito: "Panel 3D registrado correctamente.",
@@ -100,6 +138,8 @@ export const UpdateDataService = (form, token, user, limpiar) => {
         token,
         user,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
+        usuarioEnQuery: false,
         limpiar,
         buildBody: construirBody,
         mensajeExito: "Panel 3D actualizado correctamente.",
@@ -113,6 +153,7 @@ export const VerifyTR = (numeroTicket, token, set) =>
         numeroTicket,
         token,
         url: registrarUrl,
+        obtenerRegistro: obtenerRegistroFormulario,
         onNuevo: (paciente) => GetInfoServicio(paciente, set, numeroTicket),
         onExistente: (paciente, registro) => {
             GetInfoServicioEditar(paciente, registro, set, numeroTicket);
