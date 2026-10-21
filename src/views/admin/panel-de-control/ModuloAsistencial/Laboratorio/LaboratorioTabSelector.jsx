@@ -24,13 +24,13 @@ export default function LaboratorioTabSelector({ tieneVista }) {
             icon: faFilter,
             component: AnalisisBioquimicosSubTabSelector
         },
-        /*{
+        {
             id: 2,
             permission: "Inmunologia",
             label: "Inmunología",
             icon: faShieldVirus,
             component: InmunologiaSubTabSelector
-        },*/
+        },
         {
             id: 3,
             permission: "Toxicologia",
