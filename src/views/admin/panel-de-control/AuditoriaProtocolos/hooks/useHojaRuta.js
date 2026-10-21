@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ErrorBusqueda, getHojaRuta } from "./controllerAuditoriaProtocolos";
+import { ErrorBusqueda, getHojaRuta } from "../services/hojaRutaService";
 
 const ESTADO_INICIAL = { hoja: null, cargando: false, error: "" };
 
