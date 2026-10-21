@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta, formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { consultarInventario, inventarioUrl } from "../../Inventario/Compartido/inventarioUtils";
-import { agregarHojaTabla, descargarLibro, nuevoLibro } from "./excelMedicamentos";
+import { agregarHojaTabla, descargarLibro, nuevoLibro } from "../Compartido/excelReporte";
 
 const historialesUrl = `${inventarioUrl}/historiales`;
 
