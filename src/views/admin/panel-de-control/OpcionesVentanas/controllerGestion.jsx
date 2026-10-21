@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { URLAzure } from "../../../../../config/config";
+import { URLAzure } from "../../../config/config";
 
 // URLs de los endpoints
 const opcionesInterfazUrl = "/api/v01/ct/opcionesInterfaz";
