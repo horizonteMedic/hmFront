@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired, faDollarSign, faHandHoldingMedical, faHeartPulse, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired, faDollarSign, faHandHoldingMedical, faHeartPulse, faClipboardCheck, faSliders } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
 import "./Dashboard.css";
 
@@ -25,6 +25,7 @@ const Dashboard = ({ TotalView }) => {
   const filteredCards = [
     { to: "/roles", name: "Menú de Roles", icon: faCodeBranch, title: "Roles" },
     { to: "/accesos", name: "Menú de Accesos", icon: faUserLock, title: "Accesos" },
+    { to: "/gestion-opciones", name: "Gestion de Opciones del Sistema", icon: faSliders, title: "Gestión de Opciones del Sistema" },
     { to: "/reporte-pacientes", name: "Reportes", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/valorizacion", name: "Valorizacion", icon: faDollarSign, title: "Valorizacion" },

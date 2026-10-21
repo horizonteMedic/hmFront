@@ -1,6 +1,8 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import LaboratorioClinicoSubTabSelector from "./LaboratorioClinico/LaboratorioClinicoSubTabSelector";
 import AnalisisBioquimicosSubTabSelector from "./AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector";
+import ConsentimientosSubTabSelector from "./Consentimientos/ConsentimientosSubTabSelector";
+import ManipuladoresSubTabSelector from "./Manipuladores/ManipuladoresSubTabSelector";
 import InmunologiaSubTabSelector from "./Inmunologia/InmunologiaSubTabSelector";
 import ToxicologiaSubTabSelector from "./Toxicologia/ToxicologiaSubTabSelector";
 import TabEnConstruccion from "./TabEnConstruccion";
@@ -22,13 +24,13 @@ export default function LaboratorioTabSelector({ tieneVista }) {
             icon: faFilter,
             component: AnalisisBioquimicosSubTabSelector
         },
-        {
+        /*{
             id: 2,
             permission: "Inmunologia",
             label: "Inmunología",
             icon: faShieldVirus,
             component: InmunologiaSubTabSelector
-        },
+        },*/
         {
             id: 3,
             permission: "Toxicologia",
@@ -36,20 +38,20 @@ export default function LaboratorioTabSelector({ tieneVista }) {
             icon: faCannabis,
             component: ToxicologiaSubTabSelector
         },
-        // {
-        //     id: 4,
-        //     permission: "Consentimientos",
-        //     label: "Consentimientos",
-        //     icon: faFileAlt,
-        //     component: TabEnConstruccion
-        // },
-        // {
-        //     id: 5,
-        //     permission: "Manipuladores",
-        //     label: "Manipuladores",
-        //     icon: faMicroscope,
-        //     component: TabEnConstruccion
-        // },
+        {
+            id: 4,
+            permission: "Consentimientos",
+            label: "Consentimientos",
+            icon: faFileAlt,
+            component: ConsentimientosSubTabSelector
+        },
+        {
+            id: 5,
+            permission: "Manipuladores",
+            label: "Manipuladores",
+            icon: faMicroscope,
+            component: ManipuladoresSubTabSelector
+        },
         // {
         //     id: 6,
         //     permission: "Pruebas Covid",

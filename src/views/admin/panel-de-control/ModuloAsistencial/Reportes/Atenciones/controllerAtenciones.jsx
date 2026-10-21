@@ -11,6 +11,7 @@ const NOMBRE_REPORTE = "Registro de atenciones";
 
 // Alto de fila y tamaño de la firma (en píxeles) para que la imagen entre en su celda.
 const ALTURA_FILA = 50;
+const ALTO_LINEA = 13;
 const FIRMA_ANCHO = 130;
 const FIRMA_ALTO = 55;
 const DESCARGAS_SIMULTANEAS = 6;
@@ -21,11 +22,18 @@ const esUrlDeImagen = (texto) => /^(https?:\/\/|data:image\/)/i.test(texto);
 const fechaLegible = (fecha) => formatearFechaCorta(fecha) || String(fecha ?? "");
 const horaLegible = (hora) => formatearHora(hora) || String(hora ?? "");
 
+// Todas las medicinas de la atención en una sola celda, una por línea: "AMOXICILINA 500 MG x10".
+const textoMedicinas = (medicinas) =>
+    (Array.isArray(medicinas) ? medicinas : [])
+        .map(({ nombre, cantidad }) => (cantidad == null ? nombre : `${nombre} x${cantidad}`))
+        .join("\n");
+
 const columnas = [
     { key: "item", label: "N°", width: 6 },
     { key: "fecha", label: "Fecha", width: 12 },
     { key: "hora", label: "Hora", width: 8 },
-    { key: "dni", label: "DNI", width: 12 },
+    { key: "tipoDocumento", label: "Tipo de documento", width: 16 },
+    { key: "numeroDocumento", label: "Documento", width: 14 },
     { key: "apellidosNombres", label: "Apellidos y Nombres", width: 34 },
     { key: "peso", label: "Peso", width: 9, numero: true, formato: "General" },
     { key: "talla", label: "Talla", width: 9, numero: true, formato: "General" },
@@ -92,7 +100,8 @@ export const GenerarExcelAtenciones = async ({ desde, hasta }, token) => {
             item: indice + 1,
             fecha: fechaLegible(atencion.fecha),
             hora: horaLegible(atencion.hora),
-            dni: atencion.dni,
+            tipoDocumento: String(atencion.tipoDocumento ?? "").replace(/_/g, " "),
+            numeroDocumento: atencion.numeroDocumento,
             apellidosNombres: atencion.apellidosNombres,
             peso: atencion.peso,
             talla: atencion.talla,
@@ -102,7 +111,7 @@ export const GenerarExcelAtenciones = async ({ desde, hasta }, token) => {
             edad: atencion.edad,
             sexo: atencion.sexo,
             diagnostico: atencion.diagnostico,
-            medicinas: atencion.medicinas,
+            medicinas: textoMedicinas(atencion.medicinas),
             atendidoPor: atencion.atendidoPor,
             firma: textoFirma,
         };
@@ -115,6 +124,12 @@ export const GenerarExcelAtenciones = async ({ desde, hasta }, token) => {
         columnas,
         filas,
         alturaFila: ALTURA_FILA,
+    });
+
+    // Con muchas medicinas (una por línea) la fila crece para que no se corte el texto.
+    filas.forEach((fila, indice) => {
+        const lineas = fila.medicinas ? fila.medicinas.split("\n").length : 0;
+        hoja.getRow(primeraFilaDatos + indice).height = Math.max(ALTURA_FILA, lineas * ALTO_LINEA);
     });
 
     atenciones.forEach((atencion, indice) => {

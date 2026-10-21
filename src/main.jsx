@@ -27,6 +27,7 @@ import {
 import DashboardAdmin from "./views/admin/panel-de-control/PanelDeControl.jsx";
 import Accesos from "./views/admin/panel-de-control/Accesos/accesos.jsx";
 import Roles from "./views/admin/panel-de-control/Roles/Roles.jsx";
+import GestionOpciones from "./views/admin/panel-de-control/OpcionesVentanas/GestionOpciones.jsx";
 import Reporte from "./views/admin/panel-de-control/Reportes/Reporte.jsx";
 import Matriz from "./views/admin/panel-de-control/Matriz/Matriz.jsx";
 import Configuracion from "./views/admin/panel-de-control/Configuracion/Configuracion.jsx";
@@ -140,6 +141,7 @@ const AppContent = () => {
         <Route element={<ProtectedRoute TotalView={TotalView} />}>
           <Route path="/accesos" element={<Accesos />} />
           <Route path="/roles" element={<Roles />} />
+          <Route path="/gestion-opciones" element={<GestionOpciones />} />
           <Route path="/reporte-pacientes" element={<Reporte />} />
           <Route path="/matriz-postulante" element={<Matriz />} />
           <Route path="/valorizacion" element={<Valorizacion />} />

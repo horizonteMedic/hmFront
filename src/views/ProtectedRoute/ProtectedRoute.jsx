@@ -37,6 +37,7 @@ import { useLocation, Outlet, Navigate } from "react-router-dom"
 const protectedRoutes = {
   '/roles': "Menú de Roles",
   '/accesos': "Menú de Accesos",
+  '/gestion-opciones': "Gestion de Opciones del Sistema",
   '/reporte-pacientes': "Reportes",
   '/matriz-postulante': "Matriz Postulante",
   '/configuracion': "Configuracion",

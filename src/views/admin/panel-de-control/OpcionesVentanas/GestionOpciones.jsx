@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faEdit, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useSessionData } from '../../../../../hooks/useSessionData';
+import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faEdit, faSave, faTimes, faTrash, faSliders } from '@fortawesome/free-solid-svg-icons';
+import { useSessionData } from '../../../hooks/useSessionData';
  
 import AddChildModal from './AddChildModal';
 import { 
@@ -700,32 +700,49 @@ export default function GestionOpciones() {
     };
 
     return (
-        <div className="flex justify-center w-full px-4">
-            <div className="flex w-full  bg-white rounded-lg shadow-lg overflow-hidden">
-                {/* Panel izquierdo - Árbol */}
-                <div className="w-[500px] flex-shrink-0 border-r border-gray-200">
-                    {/* Header */}
-                    <div className="border-b border-gray-200 p-4 bg-gradient-to-r from-slate-800 to-slate-700">
-                        <div className="flex items-center justify-between">
-                            <h1 className="text-xl font-bold text-white">
+        <div className="container mx-auto mt-12 mb-12 px-4">
+            <div className="mx-auto w-full max-w-[1400px] bg-white rounded-xl shadow-xl overflow-hidden">
+                {/* Encabezado de la página */}
+                <div className="azuloscurobackground px-6 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-[#fc6b03]">
+                            <FontAwesomeIcon icon={faSliders} className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-white leading-tight">
                                 Gestión de Opciones del Sistema
                             </h1>
-                            <button
-                                onClick={handleAddRoot}
-                                className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
-                            >
-                                <FontAwesomeIcon icon={faPlus} className="h-4 w-4 mr-2" />
-                                Agregar a raíz
-                            </button>
+                            <p className="mt-1 text-sm text-slate-300">
+                                Organiza las ventanas y opciones del sistema: selecciona un elemento para editarlo o arrástralo para cambiar su ubicación.
+                            </p>
                         </div>
+                    </div>
+                    <button
+                        onClick={handleAddRoot}
+                        className="flex flex-shrink-0 items-center justify-center rounded-lg bg-[#fc6b03] px-4 py-2.5 font-semibold text-white shadow transition-colors duration-200 hover:bg-[#e45f00]"
+                    >
+                        <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
+                        Agregar a raíz
+                    </button>
+                </div>
+
+                <div className="flex flex-col lg:flex-row">
+                {/* Panel izquierdo - Árbol */}
+                <div className="w-full lg:w-[460px] flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col">
+                    <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-5 py-3">
+                        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Estructura</h2>
+                        <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                            {data.length} elementos
+                        </span>
                     </div>
 
                     {/* Contenido del árbol con dimensiones fijas y scroll mejorado */}
                     <div
                         className="overflow-y-auto overflow-x-hidden"
                         style={{
-                            height: '500px',
-                            padding: '16px',
+                            height: 'min(62vh, 600px)',
+                            minHeight: '380px',
+                            padding: '16px 20px',
                             WebkitOverflowScrolling: 'touch',
                             scrollBehavior: 'smooth'
                         }}
@@ -783,11 +800,11 @@ export default function GestionOpciones() {
                     </div>
 
                     {/* Footer con estadísticas */}
-                    <div className="border-t border-gray-200 p-4 bg-gray-50">
-                        <div className="text-xs text-gray-600 flex justify-between items-center">
-                            <span className="font-medium">Total: {data.length} elementos</span>
-                            <span className="font-medium">
-                                {selectedItem ? `Seleccionado: ${selectedItem.nombre}` : 'Ninguno seleccionado'}
+                    <div className="border-t border-gray-200 px-5 py-3 bg-gray-50">
+                        <div className="text-xs text-gray-600 flex justify-between items-center gap-3">
+                            <span className="font-medium flex-shrink-0">Seleccionado</span>
+                            <span className="truncate font-semibold text-slate-800">
+                                {selectedItem ? selectedItem.nombre : 'Ninguno'}
                             </span>
                         </div>
                     </div>
@@ -802,6 +819,7 @@ export default function GestionOpciones() {
                         onDelete={handleDelete}
                         data={data}
                     />
+                </div>
                 </div>
             </div>
 

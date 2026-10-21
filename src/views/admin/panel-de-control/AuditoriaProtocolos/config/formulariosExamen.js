@@ -1,6 +1,6 @@
-import { getFetch } from "../getFetch/getFetch";
-import Triaje from "../SistemaOcupacional/Triaje/Triaje";
-import { GetListTriajeMult } from "../SistemaOcupacional/Triaje/Controller";
+import { getFetch } from "../../getFetch/getFetch";
+import Triaje from "../../SistemaOcupacional/Triaje/Triaje";
+import { GetListTriajeMult } from "../../SistemaOcupacional/Triaje/Controller";
 
 // Qué abre cada examen del protocolo según su `referenciaNp`; los que no estén aquí aún no son clicables.
 //  - Formulario: recibe `nOrdenInicial` (carga esa orden) y `onGuardado` (se llama al registrar el examen).
