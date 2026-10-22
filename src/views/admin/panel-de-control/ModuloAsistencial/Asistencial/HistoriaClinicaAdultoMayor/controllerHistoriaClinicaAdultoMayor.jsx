@@ -214,6 +214,7 @@ const formFromHistoriaPropia = (data, today) => ({
     observaciones: data.observaciones ?? "",
     // Examen / diagnóstico / tratamiento: editables y se envían al guardar, así que también se completan
     // desde un registro previo (ver OpenModalHistorialPrevio).
+    anamnesis: data.anamnesis ?? "",
     examenFisico: data.examenFisico ?? "",
     examenesAuxiliares: data.examenesAuxiliares ?? "",
     diagnostico: data.diagnostico ?? "",
@@ -434,6 +435,7 @@ const construirBody = (form) => {
         sitioAnatomico: form.spg_sitio_anatomico ?? "",
         observaciones: form.observaciones ?? "",
 
+        anamnesis: form.anamnesis ?? "",
         examenFisico: form.examenFisico ?? "",
         examenesAuxiliares: form.examenesAuxiliares ?? "",
         diagnostico: form.diagnostico ?? "",
@@ -702,6 +704,7 @@ const construirDatosResumen = (data, triaje, numeroTicket) => {
         // Signos vitales y anamnesis (Triaje)
         ...datosTriajeResumen(triaje),
         antecedentes: armarAntecedentesResumen({ triaje, patologicos: patologicosDe(historia), historia }),
+        anamnesis: historia.anamnesis ?? "",
         examenFisico: historia.examenFisico,
         examenesAuxiliares: historia.examenesAuxiliares,
         diagnostico: historia.diagnostico,

@@ -72,6 +72,7 @@ const CAMPOS_EDITABLES = [
   "spg_n_caidas",
   "spg_fracturas",
   "spg_sitio_anatomico",
+  "anamnesis",
   "examenFisico",
   "examenesAuxiliares",
   "diagnostico",
@@ -262,6 +263,7 @@ export default function HistoriaClinicaAdultoMayor() {
     observaciones: "",
 
     // Examen / Diagnóstico (el backend los entrega prellenados; se editan y se guardan con la Historia)
+    anamnesis: "",
     examenFisico: "",
     examenesAuxiliares: "",
     diagnostico: "",
@@ -733,6 +735,17 @@ export default function HistoriaClinicaAdultoMayor() {
       {/* El backend los arma desde la consulta del paciente, pero se editan aquí y se guardan con la Historia.
           Diagnóstico y Tratamiento son obligatorios. */}
       <SectionFieldset legend="Examen, Diagnóstico y Tratamiento" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <InputTextArea
+          label="Anamnesis"
+          name="anamnesis"
+          value={form.anamnesis}
+          onChange={handleChange}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("anamnesis")}
+          onRevert={() => revertField("anamnesis")}
+          labelWidth="180px"
+          rows={3}
+        />
         <InputTextArea label="Examen Físico" name="examenFisico" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("examenFisico")} onRevert={() => revertField("examenFisico")} value={form.examenFisico} rows={3} />
         <InputTextArea label="Examenes Auxiliares" name="examenesAuxiliares" onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("examenesAuxiliares")} onRevert={() => revertField("examenesAuxiliares")} value={form.examenesAuxiliares} rows={3} />
         <InputTextArea label="Diagnóstico" name="diagnostico" required error={errores.diagnostico} onChange={handleChange} disabled={camposDeshabilitados} edited={isFieldEdited("diagnostico")} onRevert={() => revertField("diagnostico")} value={form.diagnostico} rows={3} />

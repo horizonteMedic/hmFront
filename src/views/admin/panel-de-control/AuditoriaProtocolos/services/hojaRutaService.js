@@ -1,10 +1,10 @@
 import { getFetch } from "../../../../utils/apiHelpers";
 
-// TEMPORAL: endpoint de la hoja de ruta, usado como prueba hasta que exista el definitivo de auditoría.
-const URL_HOJA_RUTA = "/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo";
+// Estado de los exámenes del protocolo de una orden, junto con los datos del paciente.
+const URL_HOJA_RUTA = "/api/v01/ct/consentDigit/estadoExamenesProtocolo";
 
 // Error con un mensaje pensado para el usuario (el resto de fallos se reemplaza por un texto genérico).
-export class ErrorBusqueda extends Error {}
+export class ErrorBusqueda extends Error { }
 
 // `referenciaNp` indica qué formulario abre el examen (ver config/formulariosExamen.js); `pasoExamen`, si ya se realizó.
 // `clave` identifica al examen dentro de la orden (un mismo id puede repetirse como adicional o en otra área).
@@ -30,8 +30,11 @@ const normalizarArea = ({ id, nombre, examenes = [], examenesAdicionales = [] })
 export const getHojaRuta = async (orden, token) => {
     const res = await getFetch(`${URL_HOJA_RUTA}/${encodeURIComponent(orden)}`, token);
     if (res?.status === 404) throw new ErrorBusqueda(`No se encontró la orden ${orden}.`);
-    if (res?.error || res?.codigo !== 200 || !res.resultado) throw new Error("Respuesta inesperada de la hoja de ruta");
 
-    const { areas = [], ...datos } = res.resultado;
+    // El endpoint responde con los datos directamente; también se acepta el envoltorio { codigo, resultado } de otros endpoints.
+    const cuerpo = res?.resultado ?? res;
+    if (res?.error || !cuerpo || !Array.isArray(cuerpo.areas)) throw new Error("Respuesta inesperada del estado de la orden");
+
+    const { areas, ...datos } = cuerpo;
     return { ...datos, areas: areas.map(normalizarArea) };
 };

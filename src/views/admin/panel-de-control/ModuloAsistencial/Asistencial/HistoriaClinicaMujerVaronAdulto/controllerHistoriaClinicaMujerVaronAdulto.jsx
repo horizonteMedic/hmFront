@@ -179,6 +179,7 @@ const formFromHistoriaPropia = (data, today) => ({
     vacuna_hvb_3_fecha: data.vacunaHvbFecha3 ?? "",
     vacuna_antiamarilica_1_dosis: data.vacunaAntiamarilicaDosis ?? "",
     vacuna_antiamarilica_1_fecha: data.vacunaAntiamarilicaFecha ?? "",
+    anamnesis: data.anamnesis ?? "",
     examenFisico: data.examenFisico ?? "",
     examenesAuxiliares: data.examenesAuxiliares ?? "",
     diagnostico: data.diagnostico ?? "",
@@ -372,6 +373,7 @@ const construirBody = (form) => ({
     vacunaHvbFecha3: form.vacuna_hvb_3_fecha ?? "",
     vacunaAntiamarilicaDosis: form.vacuna_antiamarilica_1_dosis ?? "",
     vacunaAntiamarilicaFecha: form.vacuna_antiamarilica_1_fecha ?? "",
+    anamnesis: form.anamnesis ?? "",
     examenFisico: form.examenFisico ?? "",
     examenesAuxiliares: form.examenesAuxiliares ?? "",
     diagnostico: form.diagnostico ?? "",
@@ -628,10 +630,11 @@ const construirDatosResumen = (data, triaje, numeroTicket) => {
         // Signos vitales y anamnesis (Triaje)
         ...datosTriajeResumen(triaje),
         antecedentes: armarAntecedentesResumen({ triaje, patologicos: patologicosDe(historia), historia }),
-        examenFisico: historia.examenFisico,
-        examenesAuxiliares: historia.examenesAuxiliares,
-        diagnostico: historia.diagnostico,
-        tratamiento: historia.tratamiento,
+        anamnesis: historia.anamnesis ?? "",
+        examenFisico: historia.examenFisico ?? "",
+        examenesAuxiliares: historia.examenesAuxiliares ?? "",
+        diagnostico: historia.diagnostico ?? "",
+        tratamiento: historia.tratamiento ?? "",
         cita: historia.seguimientoYControl || formatearFechaCorta(triaje?.fechaCita ?? ""),
     };
 };
