@@ -9,7 +9,7 @@ const inventariosUrl = `${inventarioUrl}/inventarios`;
 const TIPO_INVENTARIO_SEDE = "SEDE";
 
 // El central (el que no tiene inventario padre) va primero; el resto, por nombre.
-const ordenarInventarios = (a, b) => {
+export const ordenarInventarios = (a, b) => {
     const aEsCentral = a.inventarioPadreId == null;
     const bEsCentral = b.inventarioPadreId == null;
     if (aEsCentral !== bEsCentral) return aEsCentral ? -1 : 1;

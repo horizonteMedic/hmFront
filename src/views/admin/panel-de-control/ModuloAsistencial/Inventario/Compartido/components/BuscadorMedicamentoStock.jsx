@@ -6,6 +6,7 @@ import { etiquetaMedicamento } from "../inventarioUtils";
 // cuánto hay (`rotulo` + `campoCantidad`) para que se vea el saldo antes de elegir. Escribir descarta la
 // selección anterior: quien lo usa recibe `onTextoChange` y debe dejar sin elegir el medicamento.
 // Con `labelWidth` la etiqueta y la caja quedan alineadas con las de InputTextOneLine del mismo formulario.
+// `detalleCantidad(fila)` (opcional) arma el texto de saldo de cada opción en lugar de `rotulo` + `campoCantidad`.
 export default function BuscadorMedicamentoStock({
     id,
     label = "Medicamento",
@@ -16,14 +17,20 @@ export default function BuscadorMedicamentoStock({
     error,
     campoCantidad = "cantidadDisponible",
     rotulo = "Disp.",
+    detalleCantidad,
     placeholder,
     nextFocusId,
     labelWidth,
     required = false,
 }) {
     const opciones = useMemo(
-        () => filas.map((fila) => ({ id: fila.medicamentoId, etiqueta: `${etiquetaMedicamento(fila)} · ${rotulo} ${fila[campoCantidad]}`, fila })),
-        [filas, campoCantidad, rotulo]
+        () =>
+            filas.map((fila) => ({
+                id: fila.medicamentoId,
+                etiqueta: `${etiquetaMedicamento(fila)} · ${detalleCantidad ? detalleCantidad(fila) : `${rotulo} ${fila[campoCantidad]}`}`,
+                fila,
+            })),
+        [filas, campoCantidad, rotulo, detalleCantidad]
     );
 
     return (
