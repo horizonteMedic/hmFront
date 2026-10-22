@@ -100,7 +100,7 @@ export default function Medicamentos() {
                     <TarjetaReporte
                         icono={faPrescriptionBottleMedical}
                         titulo="Entregas de medicamentos"
-                        descripcion="Detalle de lo entregado en el rango, con un resumen del total y de cuántas unidades se entregaron de cada medicamento. No incluye reservas."
+                        descripcion="Detalle de lo entregado en el rango, con un resumen del total y de cuántas unidades se entregaron de cada medicamento, y su valor referencial. No incluye reservas."
                         generando={generando === "entregas"}
                         deshabilitado={deshabilitar("entregas")}
                         onGenerar={() => generar("entregas", () => GenerarExcelEntregas({ ...filtros, incluirReceta, incluirArea }, token))}
@@ -116,7 +116,7 @@ export default function Medicamentos() {
                     <TarjetaReporte
                         icono={faDolly}
                         titulo="Ingresos de stock"
-                        descripcion="Ingresos de medicamentos al inventario en el rango, con su cantidad y lote."
+                        descripcion="Ingresos de medicamentos al inventario en el rango, con su cantidad, lote, precio referencial y valor."
                         generando={generando === "ingresos"}
                         deshabilitado={deshabilitar("ingresos")}
                         onGenerar={() => generar("ingresos", () => GenerarExcelIngresos(filtros, token))}
@@ -125,7 +125,7 @@ export default function Medicamentos() {
                     <TarjetaReporte
                         icono={faBoxOpen}
                         titulo="Retiros de medicamentos"
-                        descripcion="Detalle de los retiros por vencimiento, pérdida u otros motivos, con un resumen del total y de cuántas unidades se retiraron de cada medicamento."
+                        descripcion="Detalle de los retiros por vencimiento, pérdida u otros motivos, con un resumen del total y de cuántas unidades se retiraron de cada medicamento, y su valor referencial."
                         generando={generando === "retiros"}
                         deshabilitado={deshabilitar("retiros")}
                         onGenerar={() => generar("retiros", () => GenerarExcelRetiros(filtros, token))}

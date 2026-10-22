@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import AutocompleteInput from "../../../../../components/reusableComponents/AutocompletableInput";
@@ -16,24 +16,29 @@ import { etiquetaMedicamento, normalizarTexto } from "../Compartido/inventarioUt
 import { ObtenerListaMedicamentos } from "../Catalogo/Medicamentos/controllerMedicamentos";
 import PaginadorTabla from "../Compartido/components/PaginadorTabla";
 import SelectorInventario from "../Compartido/components/SelectorInventario";
+import { formatearMonto, precioDeLote, valorDeMovimiento } from "../Compartido/precioReferencial";
+import { AYUDA_PRECIO_REFERENCIAL } from "../Compartido/textosAyudaStock";
 import { useConsultaInventario } from "../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../Compartido/hooks/useInventarios";
+import { useLotesInventario } from "../Compartido/hooks/useLotesInventario";
 import { conOrden, ordenarPorColumna, useOrdenTabla } from "../Compartido/hooks/useOrdenTabla";
 import { ObtenerMovimientos, RangoInicialKardex, TipoMovimiento, ValidarFiltrosKardex } from "./controllerKardex";
 
 const AYUDA_CANTIDAD = "Unidades que se movieron en este movimiento. No es el stock que quedó en el inventario.";
 const AYUDA_STOCK_FISICO = "Stock físico que quedó en el inventario luego de este movimiento. No considera las reservas.";
 const AYUDA_STOCK_RESERVADO = "Stock reservado (aún no recogido en farmacia) que quedó luego de este movimiento.";
+const AYUDA_VALOR_MOVIMIENTO = "Cantidad del movimiento por el precio referencial de su lote. Sale \"—\" si el lote no tiene precio o ya no se encuentra.";
 
 // Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas. `label` es el texto simple
 // (selector de columnas) y `encabezado`, si existe, lo que se ve en la cabecera de la tabla (con su "i" de ayuda). Los
 // encabezados largos se parten en varias líneas. Al pulsar la cabecera se ordena por el `accessor` de la columna o, si se
 // dibuja con `render`, por lo que devuelva su `valorOrden`. El medicamento va primero y luego el tipo de movimiento.
-const columnas = [
+// `valorDe(movimiento)` da el valor referencial del movimiento y `precioDe(movimiento)`, el precio de su lote.
+const crearColumnas = (valorDe, precioDe) => [
     {
         id: "medicamento",
         label: "Medicamento / Lote",
-        width: "26%",
+        width: "24%",
         valorOrden: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
         render: (row) => (
             <div>
@@ -47,20 +52,36 @@ const columnas = [
     {
         id: "tipo",
         label: "Tipo",
-        width: "11%",
+        width: "10%",
         valorOrden: (row) => TipoMovimiento(row.tipo).texto,
         render: (row) => {
             const tipo = TipoMovimiento(row.tipo);
             return <span className={`px-2 py-0.5 rounded text-sm font-semibold ${tipo.clases}`}>{tipo.texto}</span>;
         },
     },
-    { id: "fecha", label: "Fecha", width: "12%", valorOrden: (row) => row.fecha, render: (row) => formatearFechaHora(row.fecha) },
+    { id: "fecha", label: "Fecha", width: "11%", valorOrden: (row) => row.fecha, render: (row) => formatearFechaHora(row.fecha) },
     {
         id: "cantidad",
         label: "Cantidad del movimiento",
         encabezado: <>Cantidad del movimiento<InfoTooltip texto={AYUDA_CANTIDAD} /></>,
         accessor: "cantidad",
-        width: "10%",
+        width: "9%",
+    },
+    {
+        id: "precio",
+        label: "Precio ref.",
+        encabezado: <>Precio ref.<InfoTooltip texto={AYUDA_PRECIO_REFERENCIAL} /></>,
+        width: "8%",
+        valorOrden: precioDe,
+        render: (row) => formatearMonto(precioDe(row)),
+    },
+    {
+        id: "valor",
+        label: "Valor del movimiento",
+        encabezado: <>Valor del movimiento<InfoTooltip texto={AYUDA_VALOR_MOVIMIENTO} /></>,
+        width: "9%",
+        valorOrden: valorDe,
+        render: (row) => formatearMonto(valorDe(row)),
     },
     {
         id: "stockFisico",
@@ -79,7 +100,7 @@ const columnas = [
     {
         id: "motivo",
         label: "Motivo / Referencia",
-        width: "14%",
+        width: "13%",
         valorOrden: (row) => [row.motivo, row.referencia].filter(Boolean).join(" · "),
         render: (row) => [row.motivo, row.referencia].filter(Boolean).join(" · ") || "—",
     },
@@ -88,7 +109,7 @@ const columnas = [
 ];
 
 // Columnas que la tabla trae ocultas; el usuario puede mostrarlas desde "Columnas".
-const COLUMNAS_OCULTAS_INICIALES = ["stockFisico", "stockReservado"];
+const COLUMNAS_OCULTAS_INICIALES = ["stockFisico", "stockReservado", "precio"];
 
 // Ancho común de las etiquetas de los filtros, para que todas las cajas empiecen en la misma columna.
 const ANCHO_ETIQUETA = "110px";
@@ -108,13 +129,19 @@ export default function Kardex() {
     const [columnasOcultas, setColumnasOcultas] = useState(COLUMNAS_OCULTAS_INICIALES);
     const { orden, alternarOrden, quitarOrden } = useOrdenTabla();
 
+    // El kardex no trae precios: se buscan en el lote de cada movimiento (`loteId`).
+    const precios = useLotesInventario(inventarioId, token);
+    const valorDe = useCallback((movimiento) => valorDeMovimiento(movimiento, precios.lotesPorId), [precios.lotesPorId]);
+    const precioDe = useCallback((movimiento) => precioDeLote(precios.lotesPorId.get(String(movimiento.loteId))), [precios.lotesPorId]);
+    const columnas = useMemo(() => crearColumnas(valorDe, precioDe), [valorDe, precioDe]);
+
     const columnasVisibles = useMemo(
         () =>
             conOrden(columnas.filter((columna) => !columnasOcultas.includes(columna.id))).map(({ encabezado, ...columna }) => ({
                 ...columna,
                 label: encabezado ?? columna.label,
             })),
-        [columnasOcultas]
+        [columnas, columnasOcultas]
     );
 
     // Una columna oculta no puede seguir ordenando la tabla: no se vería por qué las filas están así.
@@ -129,7 +156,7 @@ export default function Kardex() {
     );
 
     // Si se ordenó por una cabecera, ese orden manda sobre toda la lista (no solo la página).
-    const movimientosOrdenados = useMemo(() => ordenarPorColumna(movimientos, columnas, orden), [movimientos, orden]);
+    const movimientosOrdenados = useMemo(() => ordenarPorColumna(movimientos, columnas, orden), [movimientos, columnas, orden]);
 
     const paginacion = usePagination(movimientosOrdenados, 25);
     const { setCurrentPage, paginatedData } = paginacion;
@@ -285,6 +312,7 @@ export default function Kardex() {
 
             <SectionFieldset legend="Movimientos">
                 <AvisoError mensaje={error} onRetry={() => buscar()} />
+                <AvisoError mensaje={precios.error} onRetry={precios.recargar} />
 
                 <p className="text-sm text-gray-500 mb-2">Haga clic en un movimiento para ver la traza de ese medicamento.</p>
 

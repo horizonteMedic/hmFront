@@ -1,22 +1,28 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel, faNotesMedical, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel, faFilePdf, faNotesMedical, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { rangoMesActual } from "../../Inventario/Compartido/inventarioUtils";
-import { GenerarExcelAtenciones } from "./controllerAtenciones";
+import { GenerarExcelAtenciones, GenerarPdfAtenciones } from "./controllerAtenciones";
+
+const CLASES_BOTON = `
+    flex items-center justify-center gap-2 text-white font-semibold px-6 py-2.5 rounded-md
+    transition-all duration-150 ease-out active:scale-95
+    disabled:opacity-60 disabled:cursor-not-allowed`;
 
 export default function Atenciones() {
     const { token } = useSessionData();
     const [rango, setRango] = useState(rangoMesActual);
-    const [generando, setGenerando] = useState(false);
+    // Formato que se está generando ("excel" o "pdf"), o "" si no hay ninguno: mientras tanto los dos botones quedan bloqueados.
+    const [generando, setGenerando] = useState("");
 
-    const handleGenerar = async () => {
-        setGenerando(true);
+    const handleGenerar = async (formato, generar) => {
+        setGenerando(formato);
         try {
-            await GenerarExcelAtenciones(rango, token);
+            await generar(rango, token);
         } finally {
-            setGenerando(false);
+            setGenerando("");
         }
     };
 
@@ -30,7 +36,8 @@ export default function Atenciones() {
                     <div>
                         <h2 className="text-lg font-bold text-[#233245]">Registro de Atenciones</h2>
                         <p className="text-sm text-gray-500">
-                            Exporta las atenciones del rango con los datos del paciente, diagnóstico, medicinas, quién atendió y la firma del paciente.
+                            Exporta las atenciones del rango con los datos del paciente, diagnóstico, tratamiento de triaje, medicinas, quién atendió y la
+                            firma del paciente, en Excel o en PDF.
                         </p>
                     </div>
                 </div>
@@ -55,15 +62,26 @@ export default function Atenciones() {
                     />
                 </div>
 
-                <button
-                    type="button"
-                    onClick={handleGenerar}
-                    disabled={generando}
-                    className="w-full flex items-center justify-center gap-2 bg-[#257a4e] hover:bg-[#1e6440] text-white font-semibold px-6 py-2.5 rounded-md transition-all duration-150 ease-out active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    <FontAwesomeIcon icon={generando ? faSpinner : faFileExcel} spin={generando} />
-                    {generando ? "Generando..." : "Excel"}
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => handleGenerar("excel", GenerarExcelAtenciones)}
+                        disabled={generando !== ""}
+                        className={`bg-[#257a4e] hover:bg-[#1e6440] ${CLASES_BOTON}`}
+                    >
+                        <FontAwesomeIcon icon={generando === "excel" ? faSpinner : faFileExcel} spin={generando === "excel"} />
+                        {generando === "excel" ? "Generando..." : "Excel"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleGenerar("pdf", GenerarPdfAtenciones)}
+                        disabled={generando !== ""}
+                        className={`bg-[#b42318] hover:bg-[#912018] ${CLASES_BOTON}`}
+                    >
+                        <FontAwesomeIcon icon={generando === "pdf" ? faSpinner : faFilePdf} spin={generando === "pdf"} />
+                        {generando === "pdf" ? "Generando..." : "PDF"}
+                    </button>
+                </div>
             </div>
         </div>
     );

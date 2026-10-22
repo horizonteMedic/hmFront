@@ -19,7 +19,8 @@ const bordes = (estilo, argb) => ({
 export const nuevoLibro = () => new ExcelJS.Workbook();
 
 // Agrega una hoja con título, líneas informativas, tabla y (opcional) fila de totales.
-//   columnas:   [{ key, label, width, numero? }]  (`numero` = alineada a la derecha y con separador de miles)
+//   columnas:   [{ key, label, width, numero?, formato? }]  (`numero` = alineada a la derecha y con separador de miles;
+//               `formato` = otro formato numérico de Excel, p. ej. "#,##0.00" para montos)
 //   filas:      [{ [key]: valor }]
 //   subtitulos: líneas de texto bajo el título (inventario, rango, totales...)
 //   totales:    { etiqueta, valores: { [key]: número } }
@@ -80,7 +81,7 @@ export const agregarHojaTabla = (libro, { nombre, titulo, subtitulos = [], colum
             celda.font = { bold: true, size: 10, color: { argb: "FFFFFFFF" } };
             celda.alignment = { vertical: "middle", horizontal: columna.numero ? "right" : "left" };
             celda.fill = relleno(COLOR_TITULO);
-            if (columna.numero) celda.numFmt = FORMATO_ENTERO;
+            if (columna.numero) celda.numFmt = columna.formato ?? FORMATO_ENTERO;
         });
     }
 
@@ -94,24 +95,12 @@ export const agregarHojaTabla = (libro, { nombre, titulo, subtitulos = [], colum
     return { hoja, primeraFilaDatos: filaCabecera.number + 1 };
 };
 
-const EXTENSIONES_IMAGEN = { "image/png": "png", "image/jpeg": "jpeg", "image/jpg": "jpeg", "image/gif": "gif" };
+// Registra en el libro una imagen ya descargada (de `descargarImagen`, en imagenReporte.js). Devuelve el id para
+// `colocarImagen`.
+export const registrarImagen = (libro, imagen) => libro.addImage({ buffer: imagen.bytes.buffer, extension: imagen.extension });
 
-// Descarga una imagen (URL o data URL) y la registra en el libro. Devuelve el id para `colocarImagen`, o null si
-// no se pudo obtener (sin permiso CORS, enlace caído, formato no soportado...): el reporte sigue sin ella.
-export const registrarImagen = async (libro, url) => {
-    try {
-        const respuesta = await fetch(url);
-        if (!respuesta.ok) return null;
-        const blob = await respuesta.blob();
-        const extension = EXTENSIONES_IMAGEN[blob.type];
-        if (!extension) return null;
-        return libro.addImage({ buffer: await blob.arrayBuffer(), extension });
-    } catch {
-        return null;
-    }
-};
-
-// Coloca una imagen ya registrada dentro de una celda (`fila` y `columna` en base 1), con un pequeño margen.
+// Coloca una imagen ya registrada dentro de una celda (`fila` y `columna` en base 1), con un pequeño margen. `ancho` y
+// `alto` están en píxeles.
 export const colocarImagen = (hoja, idImagen, { fila, columna, ancho, alto }) => {
     hoja.addImage(idImagen, {
         tl: { col: columna - 1 + 0.05, row: fila - 1 + 0.05 },

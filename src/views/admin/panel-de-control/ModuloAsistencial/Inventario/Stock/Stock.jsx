@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faRotate } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
@@ -14,9 +14,17 @@ import InfoTooltip from "../Compartido/components/InfoTooltip";
 import { normalizarTexto } from "../Compartido/inventarioUtils";
 import PaginadorTabla from "../Compartido/components/PaginadorTabla";
 import SelectorInventario from "../Compartido/components/SelectorInventario";
-import { AYUDA_STOCK_DISPONIBLE, AYUDA_STOCK_FISICO, AYUDA_STOCK_MINIMO, AYUDA_STOCK_RESERVADO } from "../Compartido/textosAyudaStock";
+import { sumarValores, textoValorMedicamento, textoValorTotal, valorPorMedicamento } from "../Compartido/precioReferencial";
+import {
+    AYUDA_STOCK_DISPONIBLE,
+    AYUDA_STOCK_FISICO,
+    AYUDA_STOCK_MINIMO,
+    AYUDA_STOCK_RESERVADO,
+    AYUDA_VALOR_STOCK,
+} from "../Compartido/textosAyudaStock";
 import { useConsultaInventario } from "../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../Compartido/hooks/useInventarios";
+import { useLotesInventario } from "../Compartido/hooks/useLotesInventario";
 import { esOrdenable, ordenarPorColumna, useOrdenTabla } from "../Compartido/hooks/useOrdenTabla";
 import { DescargarStockExcel, Faltante, ObtenerStockResumen, OrdenarPorUrgencia } from "./controllerStock";
 import ModalLotes from "./ModalLotes/ModalLotes";
@@ -24,8 +32,8 @@ import ModalLotes from "./ModalLotes/ModalLotes";
 // Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas. `label` es el texto simple
 // (selector de columnas) y `encabezado`, si existe, lo que se ve en la cabecera de la tabla (con su "i" de ayuda). Los
 // encabezados largos se parten en dos líneas. Al pulsar la cabecera se ordena por el `accessor` de la columna o, si se
-// dibuja con `render`, por lo que devuelva su `valorOrden`.
-const columnas = [
+// dibuja con `render`, por lo que devuelva su `valorOrden`. `valorDe(fila)` da el valor en stock del medicamento de la fila.
+const crearColumnas = (valorDe) => [
     { id: "nombre", label: "Medicamento", accessor: "nombre", width: "19%" },
     { id: "presentacion", label: "Presentación", accessor: "presentacion", width: "10%" },
     { id: "tipo", label: "Tipo", accessor: "tipoMedicamentoDescripcion", width: "10%" },
@@ -66,6 +74,17 @@ const columnas = [
         render: (row) => (Faltante(row) > 0 ? <strong className="text-red-600">{Faltante(row)}</strong> : "—"),
     },
     {
+        id: "valorStock",
+        label: "Valor en stock",
+        encabezado: <>Valor en stock<InfoTooltip texto={AYUDA_VALOR_STOCK} /></>,
+        width: "10%",
+        valorOrden: (row) => {
+            const valor = valorDe(row);
+            return !valor || valor.sinPrecio >= valor.lotes ? null : valor.total;
+        },
+        render: (row) => textoValorMedicamento(valorDe(row)),
+    },
+    {
         id: "proximoVencimiento",
         label: "Próx. Vencimiento",
         width: "10%",
@@ -96,6 +115,9 @@ export default function Stock() {
     const { token } = useSessionData();
     const { inventarios, inventarioId, setInventarioId, inventarioActual, errorInventarios, cargarInventarios } = useInventarios(token);
     const { datos: stock, cargando, error, ejecutar } = useConsultaInventario();
+    // El stock resumido no trae precios: el valor sale de los lotes del inventario (stock físico × precio referencial).
+    const precios = useLotesInventario(inventarioId, token);
+    const { recargar: recargarPrecios } = precios;
 
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroTipo, setFiltroTipo] = useState("");
@@ -104,12 +126,22 @@ export default function Stock() {
     const [medicamentoLotes, setMedicamentoLotes] = useState(null);
     const { orden, alternarOrden, quitarOrden } = useOrdenTabla();
 
+    const valores = useMemo(() => valorPorMedicamento(precios.lotes), [precios.lotes]);
+    const valorDe = useCallback((fila) => valores.get(String(fila.medicamentoId)), [valores]);
+    const columnas = useMemo(() => crearColumnas(valorDe), [valorDe]);
+
+    // Valor de todo el inventario (no solo de lo que deja ver el filtro).
+    const valorInventario = useMemo(() => {
+        const todos = [...valores.values()];
+        return { total: sumarValores(todos.map((valor) => valor.total)).total, sinPrecio: todos.reduce((suma, valor) => suma + valor.sinPrecio, 0) };
+    }, [valores]);
+
     const columnasVisibles = useMemo(
         () =>
             columnas
                 .filter((columna) => !columnasOcultas.includes(columna.id))
                 .map(({ encabezado, ...columna }) => ({ ...columna, label: encabezado ?? columna.label, sortable: esOrdenable(columna) })),
-        [columnasOcultas]
+        [columnas, columnasOcultas]
     );
 
     // Una columna oculta no puede seguir ordenando la tabla: no se vería por qué las filas están así.
@@ -120,6 +152,13 @@ export default function Stock() {
 
     const cargar = () => {
         if (inventarioId) ejecutar(() => ObtenerStockResumen(inventarioId, token));
+    };
+
+    // Actualizar y Reintentar vuelven a pedir también los lotes. Al cambiar de inventario los lotes se piden solos (los pide
+    // `useLotesInventario`), por eso el efecto de abajo solo llama a `cargar`.
+    const actualizar = () => {
+        cargar();
+        recargarPrecios();
     };
 
     useEffect(() => {
@@ -142,7 +181,7 @@ export default function Stock() {
             return !texto || normalizarTexto(`${fila.nombre} ${fila.presentacion}`).includes(texto);
         });
         return ordenarPorColumna(soloReposicion ? OrdenarPorUrgencia(filas) : filas, columnas, orden);
-    }, [stock, filtroNombre, filtroTipo, soloReposicion, orden]);
+    }, [stock, filtroNombre, filtroTipo, soloReposicion, columnas, orden]);
 
     const paginacion = usePagination(stockFiltrado, 50);
     const { setCurrentPage, paginatedData } = paginacion;
@@ -172,7 +211,7 @@ export default function Stock() {
                     <div className="flex flex-wrap items-center gap-4">
                         <button
                             type="button"
-                            onClick={cargar}
+                            onClick={actualizar}
                             disabled={!inventarioId || cargando}
                             className="
                                 bg-blue-600 hover:bg-blue-700
@@ -189,6 +228,11 @@ export default function Stock() {
                             <span className="text-sm">
                                 {stock.length} medicamentos ·{" "}
                                 <strong className={porReponer > 0 ? "text-red-600" : "text-emerald-700"}>{porReponer} por reponer</strong>
+                                {!precios.cargando && !precios.error && precios.lotes.length > 0 && (
+                                    <>
+                                        {" "}· Valor referencial: <strong>{textoValorTotal(valorInventario)}</strong>
+                                    </>
+                                )}
                             </span>
                         )}
                     </div>
@@ -222,7 +266,7 @@ export default function Stock() {
                         <div className="flex flex-wrap items-center gap-3">
                             <button
                                 type="button"
-                                onClick={() => DescargarStockExcel(stockFiltrado, inventarioActual, soloReposicion)}
+                                onClick={() => DescargarStockExcel(stockFiltrado, inventarioActual, soloReposicion, valorDe, valorInventario)}
                                 disabled={!inventarioActual || cargando || stockFiltrado.length === 0}
                                 title="Exporta todo lo que muestra la búsqueda, no solo la página que se ve"
                                 className="
@@ -242,8 +286,11 @@ export default function Stock() {
                 </div>
 
                 <AvisoError mensaje={error} onRetry={cargar} />
+                <AvisoError mensaje={precios.error} onRetry={recargarPrecios} />
 
-                <p className="text-sm text-gray-500 mb-2">Haga clic en un medicamento para ver sus lotes.</p>
+                <p className="text-sm text-gray-500 mb-2">
+                    Haga clic en un medicamento para ver sus lotes. En &quot;Valor en stock&quot;, un * indica que algún lote no tiene precio referencial.
+                </p>
 
                 <TablaTemplate
                     columns={columnasVisibles}

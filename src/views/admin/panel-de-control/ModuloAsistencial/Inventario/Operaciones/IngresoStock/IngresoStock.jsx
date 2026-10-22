@@ -17,6 +17,7 @@ import { ObtenerStockResumen } from "../../Stock/controllerStock";
 import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../../Compartido/hooks/useInventarios";
 import { conOrden, useOrdenEstable, useOrdenTabla } from "../../Compartido/hooks/useOrdenTabla";
+import { formatearMonto, soloPrecio } from "../../Compartido/precioReferencial";
 import {
     CrearItemIngreso,
     DetalleIngresoValido,
@@ -24,6 +25,7 @@ import {
     RegistrarIngresoStock,
     ValidarItemIngreso,
     ValidarItemsIngreso,
+    ValorDelIngreso,
 } from "./controllerIngresoStock";
 import ModalIngresoStockMasivo from "./ModalIngresoStockMasivo/ModalIngresoStockMasivo";
 
@@ -34,6 +36,7 @@ const initialFormState = {
     numeroLote: "",
     fechaVencimiento: "",
     cantidad: "",
+    precioReferencial: "",
 };
 
 // Campos de la línea que se está armando (la referencia es del ingreso completo y se conserva).
@@ -43,6 +46,7 @@ const lineaVacia = {
     numeroLote: "",
     fechaVencimiento: "",
     cantidad: "",
+    precioReferencial: "",
 };
 
 // Ancho común de todas las etiquetas del formulario. "Medicamento :" es la más larga y con 110px quedaba justa.
@@ -81,6 +85,8 @@ export default function IngresoStock() {
 
     // La cantidad de una fila se edita como texto, así que puede estar vacía mientras se corrige.
     const totalUnidades = items.reduce((total, item) => total + (Number(item.cantidad) || 0), 0);
+    // Las filas con un precio o una cantidad aún inválidos no suman (se marcan en rojo y no dejan registrar).
+    const valorTotal = useMemo(() => ValorDelIngreso(items).total, [items]);
     // Sin ningún medicamento agregado no hay nada que revisar ni registrar: el detalle y los botones quedan bloqueados.
     const hayItems = items.length > 0;
 
@@ -128,6 +134,12 @@ export default function IngresoStock() {
 
     const onChangeCantidad = (e) => {
         handleChangeNumberDecimals(e, 0);
+        limpiarError(e.target.name);
+    };
+
+    // El precio lleva hasta 2 decimales.
+    const onChangePrecio = (e) => {
+        handleChangeNumberDecimals(e, 2);
         limpiarError(e.target.name);
     };
 
@@ -180,11 +192,11 @@ export default function IngresoStock() {
 
     // El lote, el vencimiento y la cantidad se editan en la misma tabla. Cada cabecera ordena por lo que tenga la fila.
     const columnas = conOrden([
-        { id: "medicamento", label: "Medicamento", accessor: "medicamento", width: "26%" },
+        { id: "medicamento", label: "Medicamento", accessor: "medicamento", width: "22%" },
         {
             id: "numeroLote",
             label: "N° Lote",
-            width: "19%",
+            width: "16%",
             valorOrden: (row) => row.numeroLote,
             render: (row) => (
                 <InputCelda
@@ -198,7 +210,7 @@ export default function IngresoStock() {
         {
             id: "fechaVencimiento",
             label: "Vencimiento",
-            width: "23%",
+            width: "19%",
             valorOrden: (row) => row.fechaVencimiento,
             render: (row) => (
                 <InputCelda
@@ -213,7 +225,7 @@ export default function IngresoStock() {
         {
             id: "cantidad",
             label: "Cantidad",
-            width: "14%",
+            width: "11%",
             valorOrden: (row) => (row.cantidad === "" ? null : Number(row.cantidad)),
             render: (row) => (
                 <InputCelda
@@ -222,6 +234,21 @@ export default function IngresoStock() {
                     onChange={(e) => editarItem(row.uid, { cantidad: e.target.value.replace(/\D/g, "") })}
                     error={erroresItems[row.uid]?.cantidad}
                     aria-label="Cantidad"
+                />
+            ),
+        },
+        {
+            id: "precioReferencial",
+            label: "Precio (S/)",
+            width: "14%",
+            valorOrden: (row) => (row.precioReferencial === "" ? null : Number(row.precioReferencial)),
+            render: (row) => (
+                <InputCelda
+                    inputMode="decimal"
+                    value={row.precioReferencial ?? ""}
+                    onChange={(e) => editarItem(row.uid, { precioReferencial: soloPrecio(e.target.value, row.precioReferencial) })}
+                    error={erroresItems[row.uid]?.precioReferencial}
+                    aria-label="Precio referencial"
                 />
             ),
         },
@@ -295,6 +322,15 @@ export default function IngresoStock() {
                         required
                         error={errores.cantidad}
                     />
+                    <InputTextOneLine
+                        label="Precio (S/)"
+                        name="precioReferencial"
+                        labelWidth={ANCHO_ETIQUETA}
+                        value={form.precioReferencial}
+                        onChange={onChangePrecio}
+                        required
+                        error={errores.precioReferencial}
+                    />
                     <div className="flex items-start">
                         <button
                             type="button"
@@ -366,7 +402,7 @@ export default function IngresoStock() {
                             </p>
                         )}
                         <p className="mt-2 text-right font-semibold">
-                            {items.length} lote(s) · {totalUnidades} unidades
+                            {items.length} lote(s) · {totalUnidades} unidades · Valor referencial: {formatearMonto(valorTotal)}
                         </p>
                     </div>
                 </SectionFieldset>

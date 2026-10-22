@@ -7,6 +7,7 @@ import TablaTemplate from "../../../../../../../components/templates/TablaTempla
 import { formatearFechaCorta } from "../../../../../../../utils/formatDateUtils";
 import AvisoError from "../../../Compartido/components/AvisoError";
 import { useConsultaInventario } from "../../../Compartido/hooks/useConsultaInventario";
+import { formatearMonto, precioDeLote, textoValorTotal, valorDeLote } from "../../../Compartido/precioReferencial";
 import { ObtenerLotesConStock } from "../controllerRetiros";
 import {
     ConfirmarRetiroVencidos,
@@ -18,6 +19,8 @@ import {
     MedicamentoDelLote,
     MotivoVencimiento,
     RetirarLotesVencidos,
+    ValorALoteRetirar,
+    ValorRetirado,
 } from "./controllerRetirarVencidos";
 
 Modal.setAppElement("#root");
@@ -69,6 +72,8 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
     const visibles = useMemo(() => LotesARetirar(lotes.datos, diasValidos ? Number(diasProximos) : 0), [lotes.datos, diasProximos, diasValidos]);
     const elegidos = useMemo(() => visibles.filter((lote) => !desmarcados.has(lote.id)), [visibles, desmarcados]);
     const unidades = elegidos.reduce((total, lote) => total + lote.cantidadActual, 0);
+    // Valor referencial de lo que se perdería: stock actual × precio de cada lote marcado (los que no tienen precio no suman).
+    const valorElegidos = useMemo(() => ValorALoteRetirar(elegidos), [elegidos]);
     const conReservas = elegidos.filter((lote) => lote.cantidadReservada > 0).length;
     const todosMarcados = visibles.length > 0 && elegidos.length === visibles.length;
 
@@ -143,7 +148,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                     className="w-4 h-4 cursor-pointer"
                 />
             ),
-            width: "5%",
+            width: "4%",
             render: (row) => (
                 <input
                     type="checkbox"
@@ -155,20 +160,23 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                 />
             ),
         },
-        { label: "Medicamento", width: "27%", render: (row) => MedicamentoDelLote(row) },
-        { label: "N° Lote", width: "14%", render: (row) => row.numeroLote || "Sin lote" },
-        { label: "Vencimiento", width: "13%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
-        { label: "Días para vencimiento", width: "14%", render: (row) => textoDiasParaVencimiento(row.fechaVencimiento) },
-        { label: "Actual", accessor: "cantidadActual", width: "9%" },
-        { label: "Reservado", accessor: "cantidadReservada", width: "9%" },
-        { label: "Disponible", accessor: "cantidadDisponible", width: "9%" },
+        { label: "Medicamento", width: "21%", render: (row) => MedicamentoDelLote(row) },
+        { label: "N° Lote", width: "11%", render: (row) => row.numeroLote || "Sin lote" },
+        { label: "Vencimiento", width: "10%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
+        { label: "Días para vencimiento", width: "13%", render: (row) => textoDiasParaVencimiento(row.fechaVencimiento) },
+        { label: "Actual", accessor: "cantidadActual", width: "7%" },
+        { label: "Reservado", accessor: "cantidadReservada", width: "8%" },
+        { label: "Disponible", accessor: "cantidadDisponible", width: "8%" },
+        { label: "Precio ref.", width: "9%", render: (row) => formatearMonto(precioDeLote(row)) },
+        { label: "Valor a retirar", width: "9%", render: (row) => formatearMonto(valorDeLote(row)) },
     ];
 
     const columnasRetirados = [
-        { label: "Medicamento", width: "38%", render: (row) => MedicamentoDelLote(row.lote) },
-        { label: "N° Lote", width: "20%", render: (row) => row.lote.numeroLote || "Sin lote" },
-        { label: "Vencimiento", width: "20%", render: (row) => formatearFechaCorta(row.lote.fechaVencimiento) },
-        { label: "Cantidad retirada", accessor: "cantidad", width: "22%" },
+        { label: "Medicamento", width: "30%", render: (row) => MedicamentoDelLote(row.lote) },
+        { label: "N° Lote", width: "16%", render: (row) => row.lote.numeroLote || "Sin lote" },
+        { label: "Vencimiento", width: "16%", render: (row) => formatearFechaCorta(row.lote.fechaVencimiento) },
+        { label: "Cantidad retirada", accessor: "cantidad", width: "18%" },
+        { label: "Valor retirado", width: "20%", render: (row) => formatearMonto(valorDeLote(row.lote, row.cantidad)) },
     ];
 
     const columnasFallidos = [
@@ -231,7 +239,8 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
 
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <p className="text-sm">
-                                    Marcados: <strong>{elegidos.length}</strong> de <strong>{visibles.length}</strong> lote(s) · <strong>{unidades}</strong> unidades
+                                    Marcados: <strong>{elegidos.length}</strong> de <strong>{visibles.length}</strong> lote(s) · <strong>{unidades}</strong> unidades ·
+                                    Valor referencial: <strong>{textoValorTotal(valorElegidos)}</strong>
                                 </p>
                                 <button
                                     type="button"
@@ -280,6 +289,7 @@ export default function ModalRetirarVencidos({ isOpen, onRequestClose, inventari
                             <p className="font-semibold">
                                 Se retiraron <span className="text-emerald-700">{resultado.retirados.length}</span> de {resultado.retirados.length + resultado.fallidos.length} lote(s)
                                 {resultado.fallidos.length > 0 && <>; <span className="text-red-600">{resultado.fallidos.length} no se pudieron retirar</span></>}.
+                                {resultado.retirados.length > 0 && <> Valor referencial retirado: {textoValorTotal(ValorRetirado(resultado.retirados))}.</>}
                             </p>
 
                             {resultado.retirados.length > 0 && (
