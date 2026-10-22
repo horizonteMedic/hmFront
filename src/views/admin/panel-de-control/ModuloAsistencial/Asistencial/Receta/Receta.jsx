@@ -13,12 +13,21 @@ import {
     cantidadStock,
     crearItemReceta,
     detalleStockReceta,
+    estadoItemReceta,
     recetaBloqueada,
     validarLineaReceta,
 } from "./controllerReceta";
 import { useMedicamentosReceta } from "./useMedicamentosReceta";
 
 const ANCHO_ETIQUETA = "150px";
+
+// Estado de cada línea de la tabla (ver estadoItemReceta): lo entregado por farmacia, lo registrado que falta entregar y
+// lo que aún no se guarda con la Historia Clínica.
+const ESTADOS_ITEM = {
+    entregado: { texto: "ENTREGADO", clases: "bg-emerald-100 text-emerald-700" },
+    pendiente: { texto: "FALTA ENTREGAR", clases: "bg-amber-100 text-amber-700" },
+    porGuardar: { texto: "POR GUARDAR", clases: "bg-gray-100 text-gray-600" },
+};
 
 /**
  * Receta (reserva de medicamentos) de las Historias Clínicas del módulo (solo en tickets de La Arena).
@@ -112,10 +121,10 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
     const quitarItem = (uid) => setForm((f) => ({ ...f, recetaItems: f.recetaItems.filter((item) => item.uid !== uid) }));
 
     const columnas = [
-        { label: "Medicamento", width: "38%", render: (row) => row.medicamento },
+        { label: "Medicamento", width: "32%", render: (row) => row.medicamento },
         {
             label: "Cantidad",
-            width: "14%",
+            width: "12%",
             render: (row) => (
                 <>
                     {row.cantidad}
@@ -123,7 +132,20 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
                 </>
             ),
         },
-        { label: "Indicación", width: "34%", render: (row) => row.indicacion || "—" },
+        { label: "Indicación", width: "26%", render: (row) => row.indicacion || "—" },
+        {
+            label: "Estado",
+            width: "16%",
+            render: (row) => {
+                const { texto, clases } = ESTADOS_ITEM[estadoItemReceta(row)];
+                return (
+                    <>
+                        <span className={`px-2 py-0.5 rounded text-sm font-semibold whitespace-nowrap ${clases}`}>{texto}</span>
+                        {row.entregado && row.fechaEntrega && <span className="block text-xs text-gray-500">{formatearFechaHora(row.fechaEntrega)}</span>}
+                    </>
+                );
+            },
+        },
         ...(soloLectura
             ? []
             : [
