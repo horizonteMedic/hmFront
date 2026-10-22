@@ -1,10 +1,10 @@
 import { getFetch } from "../../../../utils/apiHelpers";
 
 // TEMPORAL: endpoint de la hoja de ruta, usado como prueba hasta que exista el definitivo de auditoría.
-const URL_HOJA_RUTA = "/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo";
+const URL_HOJA_RUTA = "/api/v01/ct/consentDigit/estadoExamenesProtocolo";
 
 // Error con un mensaje pensado para el usuario (el resto de fallos se reemplaza por un texto genérico).
-export class ErrorBusqueda extends Error {}
+export class ErrorBusqueda extends Error { }
 
 // `referenciaNp` indica qué formulario abre el examen (ver config/formulariosExamen.js); `pasoExamen`, si ya se realizó.
 // `clave` identifica al examen dentro de la orden (un mismo id puede repetirse como adicional o en otra área).
