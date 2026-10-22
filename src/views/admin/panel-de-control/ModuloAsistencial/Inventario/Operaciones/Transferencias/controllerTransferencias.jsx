@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioUrl, limpiarTexto } from "../../Compartido/inventarioUtils";
+import { sumarValores, textoValorTotal, valorDeLote } from "../../Compartido/precioReferencial";
 
 const transferenciasUrl = `${inventarioUrl}/transferencias`;
 
@@ -49,7 +50,12 @@ export const CrearItemTransferencia = (form, lote) => ({
     numeroLote: lote.numeroLote,
     fechaVencimiento: lote.fechaVencimiento,
     cantidad: Number(form.cantidad),
+    // Precio del lote de origen, para mostrar el valor de lo que se transfiere (no se envía al backend).
+    precioReferencial: lote.precioReferencial ?? null,
 });
+
+// Valor referencial de lo que se transfiere: { total, sinPrecio }. Los lotes sin precio no suman.
+export const ValorDeTransferencia = (items) => sumarValores(items.map((item) => valorDeLote(item, item.cantidad)));
 
 // Cambiar el origen invalida los lotes ya agregados (son del inventario anterior): se pide confirmar.
 export const ConfirmarCambioOrigen = async (cantidadItems) => {
@@ -95,7 +101,7 @@ export const RegistrarTransferencia = async ({ origen, destino, observacion, ite
     const unidades = items.reduce((total, item) => total + item.cantidad, 0);
     const { isConfirmed } = await Swal.fire({
         title: "Registrar transferencia",
-        text: `Se transferirán ${items.length} lote(s), ${unidades} unidades en total, de "${origen.nombre}" a "${destino.nombre}". ¿Desea continuar?`,
+        text: `Se transferirán ${items.length} lote(s), ${unidades} unidades en total (valor referencial ${textoValorTotal(ValorDeTransferencia(items))}), de "${origen.nombre}" a "${destino.nombre}". ¿Desea continuar?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, transferir",

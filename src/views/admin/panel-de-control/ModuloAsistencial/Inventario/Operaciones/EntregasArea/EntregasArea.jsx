@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../../components/reusableComponents/InputTextOneLine";
@@ -13,21 +13,24 @@ import AvisoError from "../../Compartido/components/AvisoError";
 import { etiquetaMedicamento, rangoMesActual, resumenLotes } from "../../Compartido/inventarioUtils";
 import PaginadorTabla from "../../Compartido/components/PaginadorTabla";
 import SelectorInventario from "../../Compartido/components/SelectorInventario";
+import { formatearMonto, sumarValores, textoValorTotal, valorDeMovimientoPorLotes } from "../../Compartido/precioReferencial";
 import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../../Compartido/hooks/useInventarios";
+import { useLotesInventario } from "../../Compartido/hooks/useLotesInventario";
 import { conOrden, ordenarPorColumna, useOrdenTabla } from "../../Compartido/hooks/useOrdenTabla";
 import { ObtenerEntregasArea } from "./controllerEntregasArea";
 import ModalNuevaEntrega from "./ModalNuevaEntrega/ModalNuevaEntrega";
 
 // Cada columna lleva un `id` para poder mostrarla u ocultarla desde el selector de columnas, y se ordena al pulsar su
-// cabecera: por su `accessor` o, si se dibuja con `render`, por lo que devuelva su `valorOrden`.
-const columnasHistorial = conOrden([
+// cabecera: por su `accessor` o, si se dibuja con `render`, por lo que devuelva su `valorOrden`. `valorDe(entrega)` da el
+// valor referencial de lo entregado.
+const crearColumnasHistorial = (valorDe) => conOrden([
     { id: "numeroEntrega", label: "N° Entrega", accessor: "numeroEntrega", width: "8%" },
     { id: "fecha", label: "Fecha", width: "11%", valorOrden: (row) => row.fechaRegistro, render: (row) => formatearFechaHora(row.fechaRegistro) },
     {
         id: "medicamento",
         label: "Medicamento",
-        width: "19%",
+        width: "17%",
         valorOrden: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
         render: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
     },
@@ -35,13 +38,14 @@ const columnasHistorial = conOrden([
     {
         id: "lotes",
         label: "Lotes",
-        width: "19%",
+        width: "17%",
         valorOrden: (row) => resumenLotes(row.lotes),
         render: (row) => <span className="text-sm">{resumenLotes(row.lotes) || "—"}</span>,
     },
-    { id: "persona", label: "Persona", accessor: "personaEntrega", width: "12%" },
+    { id: "valor", label: "Valor entregado", width: "8%", valorOrden: valorDe, render: (row) => formatearMonto(valorDe(row)) },
+    { id: "persona", label: "Persona", accessor: "personaEntrega", width: "11%" },
     { id: "area", label: "Área", accessor: "area", width: "8%" },
-    { id: "motivo", label: "Motivo", accessor: "motivo", width: "9%" },
+    { id: "motivo", label: "Motivo", accessor: "motivo", width: "8%" },
     { id: "usuario", label: "Usuario", accessor: "usuarioRegistro", width: "7%" },
 ]);
 
@@ -60,7 +64,15 @@ export default function EntregasArea() {
     const [columnasOcultas, setColumnasOcultas] = useState([]);
     const { orden, alternarOrden, quitarOrden } = useOrdenTabla();
 
-    const columnasVisibles = useMemo(() => columnasHistorial.filter((columna) => !columnasOcultas.includes(columna.id)), [columnasOcultas]);
+    // El historial trae de qué lotes salió cada entrega (`lotes`), pero no sus precios: se buscan en los lotes del inventario.
+    const precios = useLotesInventario(inventarioId, token);
+    const valorDe = useCallback((entrega) => valorDeMovimientoPorLotes(entrega.lotes, precios.lotesPorId), [precios.lotesPorId]);
+    const columnasHistorial = useMemo(() => crearColumnasHistorial(valorDe), [valorDe]);
+
+    const columnasVisibles = useMemo(
+        () => columnasHistorial.filter((columna) => !columnasOcultas.includes(columna.id)),
+        [columnasHistorial, columnasOcultas]
+    );
 
     // Una columna oculta no puede seguir ordenando la tabla: no se vería por qué las filas están así.
     const alternarColumna = (id) => {
@@ -81,8 +93,11 @@ export default function EntregasArea() {
                 columnasHistorial,
                 orden
             ),
-        [historial.datos, filtroArea, orden]
+        [historial.datos, filtroArea, columnasHistorial, orden]
     );
+
+    // Valor de todo lo que muestra el filtro (no solo de la página). Las entregas con algún lote sin precio no suman.
+    const valorEntregado = useMemo(() => sumarValores(entregasFiltradas.map(valorDe)), [entregasFiltradas, valorDe]);
 
     const paginacion = usePagination(entregasFiltradas, 10);
     const { setCurrentPage, paginatedData } = paginacion;
@@ -188,6 +203,7 @@ export default function EntregasArea() {
                 </div>
 
                 <AvisoError mensaje={historial.error} onRetry={buscarHistorial} />
+                <AvisoError mensaje={precios.error} onRetry={precios.recargar} />
 
                 <TablaTemplate
                     columns={columnasVisibles}
@@ -199,6 +215,10 @@ export default function EntregasArea() {
                 />
 
                 <PaginadorTabla paginacion={paginacion} total={entregasFiltradas.length} etiqueta="entregas" />
+
+                {entregasFiltradas.length > 0 && !precios.cargando && (
+                    <p className="mt-2 text-right font-semibold">Valor referencial entregado: {textoValorTotal(valorEntregado)}</p>
+                )}
             </SectionFieldset>
 
             <ModalNuevaEntrega
