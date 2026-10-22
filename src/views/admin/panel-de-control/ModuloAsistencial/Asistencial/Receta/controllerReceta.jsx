@@ -28,7 +28,8 @@ const jasperModules = import.meta.glob("../../../../../jaspers/ModuloAsistencial
 const rutaJasper = "../../../../../jaspers/ModuloAsistencial/Receta/Receta.jsx";
 
 // Estado de la sección dentro del formulario de la Historia Clínica. recetaItems es la lista de la receta
-// ({ uid, medicamentoId, medicamento, cantidad, indicacion, cantidadFaltante }) y recetaMedicamento*/recetaCantidad/
+// ({ uid, medicamentoId, medicamento, cantidad, indicacion, cantidadFaltante, registrado, entregado, fechaEntrega }) y
+// recetaMedicamento*/recetaCantidad/
 // recetaIndicacion son la línea que se está armando antes de pulsar "Agregar".
 export const RECETA_LINEA_VACIA = {
     recetaMedicamentoTexto: "",
@@ -130,6 +131,10 @@ export const formFromReceta = (receta) => {
                     cantidad: detalle.cantidad,
                     indicacion: detalle.indicacion ?? "",
                     cantidadFaltante: detalle.cantidadFaltante ?? 0,
+                    registrado: true,
+                    // Con la receta entregada completa todo salió; si no, cada detalle dice si ya se entregó (entrega parcial).
+                    entregado: estado === "entregada" || Boolean(detalle.entregado),
+                    fechaEntrega: detalle.fechaEntrega ?? "",
                 })),
         recetaUsuario: receta.usuarioRegistro ?? "",
         recetaFechaRegistro: receta.fechaRegistro ?? "",
@@ -179,7 +184,14 @@ export const crearItemReceta = (form, medicamento) => ({
     cantidad: Number(form.recetaCantidad),
     indicacion: limpiarTexto(form.recetaIndicacion).toUpperCase(),
     cantidadFaltante: 0,
+    registrado: false,
+    entregado: false,
+    fechaEntrega: "",
 });
+
+// Estado de una línea de la receta para la tabla: "entregado", "pendiente" (ya registrada, falta que farmacia la
+// entregue) o "porGuardar" (todavía no se guardó con la Historia Clínica).
+export const estadoItemReceta = (item) => (item.entregado ? "entregado" : item.registrado ? "pendiente" : "porGuardar");
 
 // ===== Guardado (lo dispara el Guardar de la Historia Clínica, ver controllerComplementos) =====
 // ¿La receta trae medicamentos para guardar? Una ya registrada (pendiente o entregada) no se vuelve a enviar.
