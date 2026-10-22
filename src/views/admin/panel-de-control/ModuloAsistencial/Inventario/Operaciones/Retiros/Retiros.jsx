@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBoxOpen, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 import InputTextOneLine from "../../../../../../components/reusableComponents/InputTextOneLine";
@@ -10,38 +10,40 @@ import { formatearFechaCorta, formatearFechaHora } from "../../../../../../utils
 import { usePagination } from "../../../../../../utils/listUtils";
 import AvisoError from "../../Compartido/components/AvisoError";
 import { etiquetaMedicamento, rangoMesActual } from "../../Compartido/inventarioUtils";
+import { formatearMonto, sumarValores, textoValorTotal, valorDeMovimiento } from "../../Compartido/precioReferencial";
 import PaginadorTabla from "../../Compartido/components/PaginadorTabla";
 import SelectorInventario from "../../Compartido/components/SelectorInventario";
 import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../../Compartido/hooks/useInventarios";
+import { useLotesInventario } from "../../Compartido/hooks/useLotesInventario";
 import { conOrden, ordenarPorColumna, useOrdenTabla } from "../../Compartido/hooks/useOrdenTabla";
 import { ObtenerMotivosRetiro, ObtenerRetiros } from "./controllerRetiros";
 import ModalRegistrarRetiro from "./ModalRegistrarRetiro/ModalRegistrarRetiro";
 import ModalRetirarVencidos from "./ModalRetirarVencidos/ModalRetirarVencidos";
 
 // Cada columna lleva un `id` y se ordena al pulsar su cabecera: por su `accessor` o, si se dibuja con `render`,
-// por lo que devuelva su `valorOrden`.
-const columnas = conOrden([
-    { id: "fecha", label: "Fecha", width: "12%", valorOrden: (row) => row.fechaRegistro, render: (row) => formatearFechaHora(row.fechaRegistro) },
+// por lo que devuelva su `valorOrden`. `valorDe(retiro)` da el valor referencial de lo retirado.
+const crearColumnas = (valorDe) => conOrden([
+    { id: "fecha", label: "Fecha", width: "11%", valorOrden: (row) => row.fechaRegistro, render: (row) => formatearFechaHora(row.fechaRegistro) },
     {
         id: "medicamento",
         label: "Medicamento",
-        width: "24%",
+        width: "21%",
         valorOrden: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
         render: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
     },
     {
         id: "lote",
         label: "Lote",
-        width: "16%",
+        width: "15%",
         valorOrden: (row) => row.numeroLote,
         render: (row) => `${row.numeroLote || "Sin lote"} · ${formatearFechaCorta(row.fechaVencimiento) || "—"}`,
     },
-    { id: "cantidad", label: "Cantidad", accessor: "cantidad", width: "8%" },
+    { id: "cantidad", label: "Cantidad", accessor: "cantidad", width: "7%" },
     {
         id: "motivo",
         label: "Motivo",
-        width: "13%",
+        width: "12%",
         valorOrden: (row) => row.motivo,
         render: (row) => (
             <span>
@@ -50,8 +52,9 @@ const columnas = conOrden([
             </span>
         ),
     },
-    { id: "observacion", label: "Observación", width: "17%", valorOrden: (row) => row.observacion, render: (row) => row.observacion || "—" },
+    { id: "observacion", label: "Observación", width: "15%", valorOrden: (row) => row.observacion, render: (row) => row.observacion || "—" },
     { id: "usuario", label: "Usuario", accessor: "usuarioRegistro", width: "10%" },
+    { id: "valor", label: "Valor", width: "9%", valorOrden: valorDe, render: (row) => formatearMonto(valorDe(row)) },
 ]);
 
 // Ancho común de las etiquetas de la barra de filtros, para que las cajas empiecen en la misma columna.
@@ -81,6 +84,11 @@ export default function Retiros() {
     const [modalVencidos, setModalVencidos] = useState(false);
     const { orden, alternarOrden } = useOrdenTabla();
 
+    // El historial de retiros no trae precios: el valor sale del lote de cada retiro (`loteId`).
+    const precios = useLotesInventario(inventarioId, token);
+    const valorDe = useCallback((retiro) => valorDeMovimiento(retiro, precios.lotesPorId), [precios.lotesPorId]);
+    const columnas = useMemo(() => crearColumnas(valorDe), [valorDe]);
+
     const opcionesMotivo = useMemo(() => motivos.datos.map((motivo) => ({ value: motivo, label: motivo })), [motivos.datos]);
 
     // Si se ordenó por una cabecera, ese orden manda sobre toda la lista (no solo la página).
@@ -91,8 +99,11 @@ export default function Retiros() {
                 columnas,
                 orden
             ),
-        [historial.datos, filtroMotivo, orden]
+        [historial.datos, filtroMotivo, columnas, orden]
     );
+
+    // Valor de todo lo que muestra el filtro (no solo de la página). Los retiros cuyo lote no tiene precio no suman.
+    const valorRetirado = useMemo(() => sumarValores(retirosFiltrados.map(valorDe)), [retirosFiltrados, valorDe]);
 
     const paginacion = usePagination(retirosFiltrados, 10);
     const { setCurrentPage, paginatedData } = paginacion;
@@ -194,6 +205,7 @@ export default function Retiros() {
                 </div>
 
                 <AvisoError mensaje={historial.error} onRetry={buscarHistorial} />
+                <AvisoError mensaje={precios.error} onRetry={precios.recargar} />
 
                 <TablaTemplate
                     columns={columnas}
@@ -205,6 +217,10 @@ export default function Retiros() {
                 />
 
                 <PaginadorTabla paginacion={paginacion} total={retirosFiltrados.length} etiqueta="retiros" />
+
+                {retirosFiltrados.length > 0 && !precios.cargando && (
+                    <p className="mt-2 text-right font-semibold">Valor referencial retirado: {textoValorTotal(valorRetirado)}</p>
+                )}
             </SectionFieldset>
 
             <ModalRegistrarRetiro

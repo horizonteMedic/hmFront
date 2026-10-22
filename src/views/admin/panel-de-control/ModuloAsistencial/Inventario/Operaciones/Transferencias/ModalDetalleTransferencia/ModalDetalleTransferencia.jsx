@@ -6,19 +6,24 @@ import TablaTemplate from "../../../../../../../components/templates/TablaTempla
 import { formatearFechaCorta, formatearFechaHora } from "../../../../../../../utils/formatDateUtils";
 import AvisoError from "../../../Compartido/components/AvisoError";
 import { etiquetaMedicamento } from "../../../Compartido/inventarioUtils";
+import { formatearMonto, precioDeLote, sumarValores, textoValorTotal, valorDeMovimiento } from "../../../Compartido/precioReferencial";
+import { useLotesInventario } from "../../../Compartido/hooks/useLotesInventario";
 import { ObtenerTransferencia } from "../controllerTransferencias";
 
 Modal.setAppElement("#root");
 
-const columnas = [
+// `precioDe(item)` y `valorDe(item)`: precio y valor referencial del lote de origen de cada fila.
+const crearColumnas = (precioDe, valorDe) => [
     {
         label: "Medicamento",
-        width: "40%",
+        width: "32%",
         render: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
     },
-    { label: "N° Lote", width: "20%", render: (row) => row.numeroLote || "—" },
-    { label: "Vencimiento", width: "20%", render: (row) => formatearFechaCorta(row.fechaVencimiento) || "—" },
-    { label: "Cantidad", accessor: "cantidad", width: "20%" },
+    { label: "N° Lote", width: "15%", render: (row) => row.numeroLote || "—" },
+    { label: "Vencimiento", width: "15%", render: (row) => formatearFechaCorta(row.fechaVencimiento) || "—" },
+    { label: "Cantidad", accessor: "cantidad", width: "10%" },
+    { label: "Precio ref.", width: "13%", render: (row) => formatearMonto(precioDe(row)) },
+    { label: "Valor", width: "15%", render: (row) => formatearMonto(valorDe(row)) },
 ];
 
 // Detalle de una transferencia: los datos de la fila ya cargada y los lotes que trae el detalle del backend.
@@ -51,6 +56,13 @@ export default function ModalDetalleTransferencia({ isOpen, onRequestClose, tran
     const items = detalle?.items ?? [];
     const unidades = items.reduce((total, item) => total + (Number(item.cantidad) || 0), 0);
 
+    // El detalle trae el `loteId` del lote de origen, no su precio: se busca en los lotes del inventario de origen.
+    const precios = useLotesInventario(isOpen ? transferencia?.inventarioOrigenId : null, token);
+    const precioDe = (item) => precioDeLote(precios.lotesPorId.get(String(item.loteId)));
+    const valorDe = (item) => valorDeMovimiento(item, precios.lotesPorId);
+    const columnas = crearColumnas(precioDe, valorDe);
+    const valorTotal = sumarValores(items.map(valorDe));
+
     return (
         <Modal
             isOpen={isOpen}
@@ -79,6 +91,7 @@ export default function ModalDetalleTransferencia({ isOpen, onRequestClose, tran
                     )}
 
                     <AvisoError mensaje={error} onRetry={cargar} />
+                    <AvisoError mensaje={precios.error} onRetry={precios.recargar} />
 
                     <TablaTemplate
                         columns={columnas}
@@ -88,7 +101,9 @@ export default function ModalDetalleTransferencia({ isOpen, onRequestClose, tran
                     />
 
                     {items.length > 0 && (
-                        <p className="text-right font-semibold">{items.length} lote(s) · {unidades} unidades</p>
+                        <p className="text-right font-semibold">
+                            {items.length} lote(s) · {unidades} unidades{!precios.cargando && <> · Valor referencial: {textoValorTotal(valorTotal)}</>}
+                        </p>
                     )}
                 </div>
 

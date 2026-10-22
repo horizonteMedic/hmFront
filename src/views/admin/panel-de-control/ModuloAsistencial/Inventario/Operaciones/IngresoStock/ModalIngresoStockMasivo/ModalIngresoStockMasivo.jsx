@@ -4,12 +4,13 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faCheck, faDownload, faFileExcel, faSave, faSpinner, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaCorta } from "../../../../../../../utils/formatDateUtils";
-import { RegistrarIngresoStock } from "../controllerIngresoStock";
+import { formatearMonto } from "../../../Compartido/precioReferencial";
+import { RegistrarIngresoStock, ValorDelIngreso } from "../controllerIngresoStock";
 import { DescargarPlantillaIngresoStock, LeerExcelIngresoStock } from "./controllerIngresoStockMasivo";
 
 Modal.setAppElement("#root");
 
-const columnas = ["Fila", "Medicamento", "N° Lote", "Vencimiento", "Cantidad", "Estado"];
+const columnas = ["Fila", "Medicamento", "N° Lote", "Vencimiento", "Cantidad", "Precio (S/)", "Estado"];
 
 export default function ModalIngresoStockMasivo({ isOpen, onRequestClose, inventario, referencia, medicamentos, token, usuario, onSuccess }) {
     const [filas, setFilas] = useState([]);
@@ -21,6 +22,7 @@ export default function ModalIngresoStockMasivo({ isOpen, onRequestClose, invent
     const conErrores = filas.filter((fila) => fila.error).length;
     const validas = filas.length - conErrores;
     const totalUnidades = filas.reduce((total, fila) => total + (fila.error ? 0 : fila.cantidad), 0);
+    const valorTotal = ValorDelIngreso(filas.filter((fila) => !fila.error)).total;
     const puedeRegistrar = filas.length > 0 && conErrores === 0 && !registrando && !leyendo;
 
     const limpiar = () => {
@@ -90,7 +92,7 @@ export default function ModalIngresoStockMasivo({ isOpen, onRequestClose, invent
 
                     <ol className="list-decimal list-inside text-sm text-gray-600 space-y-0.5">
                         <li>Descargue la plantilla: trae todos los medicamentos activos con su ID y nombre (no se modifican).</li>
-                        <li>Complete NUMERO LOTE, VENCIMIENTO (dd/mm/aaaa o mm/aaaa) y CANTIDAD solo de los que ingresan. Para varios lotes, copie la fila completa y péguela debajo.</li>
+                        <li>Complete NUMERO LOTE, VENCIMIENTO (dd/mm/aaaa o mm/aaaa), CANTIDAD y PRECIO REFERENCIAL (en soles, por unidad) solo de los que ingresan. Para varios lotes, copie la fila completa y péguela debajo.</li>
                         <li>Suba el archivo, revise las filas y registre. El usuario, la fecha y la hora los asigna el sistema.</li>
                     </ol>
 
@@ -137,7 +139,7 @@ export default function ModalIngresoStockMasivo({ isOpen, onRequestClose, invent
                         <>
                             <p className="text-sm">
                                 Filas leídas: <strong>{filas.length}</strong> · Correctas: <strong className="text-emerald-700">{validas}</strong> · Con error:{" "}
-                                <strong className={conErrores > 0 ? "text-red-600" : ""}>{conErrores}</strong> · Unidades a ingresar: <strong>{totalUnidades}</strong>
+                                <strong className={conErrores > 0 ? "text-red-600" : ""}>{conErrores}</strong> · Unidades a ingresar: <strong>{totalUnidades}</strong> · Valor referencial: <strong>{formatearMonto(valorTotal)}</strong>
                             </p>
                             {conErrores > 0 && (
                                 <p className="text-sm text-red-600">Corrija las filas marcadas en el Excel y vuelva a subirlo para poder registrar.</p>
@@ -162,6 +164,9 @@ export default function ModalIngresoStockMasivo({ isOpen, onRequestClose, invent
                                                     {fila.fechaVencimiento ? formatearFechaCorta(fila.fechaVencimiento) : fila.vencimientoTexto}
                                                 </td>
                                                 <td className="border px-2 py-1">{fila.cantidad}</td>
+                                                <td className="border px-2 py-1">
+                                                    {typeof fila.precioReferencial === "number" ? formatearMonto(fila.precioReferencial) : fila.precioReferencial || "—"}
+                                                </td>
                                                 <td className="border px-2 py-1">
                                                     {fila.error ? (
                                                         <span className="text-red-600 font-semibold">{fila.error}</span>

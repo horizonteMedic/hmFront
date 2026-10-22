@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faArrowsRotate,
@@ -19,8 +19,10 @@ import AvisoError from "../../Compartido/components/AvisoError";
 import { etiquetaMedicamento } from "../../Compartido/inventarioUtils";
 import PaginadorTabla from "../../Compartido/components/PaginadorTabla";
 import SelectorInventario from "../../Compartido/components/SelectorInventario";
+import { formatearMonto, textoValorMedicamento, textoValorTotal } from "../../Compartido/precioReferencial";
 import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { useInventarios } from "../../Compartido/hooks/useInventarios";
+import { useLotesInventario } from "../../Compartido/hooks/useLotesInventario";
 import {
     AnularReceta,
     DetalleConLoteVencido,
@@ -38,6 +40,8 @@ import {
     TieneFaltante,
     TieneLoteVencido,
     ValidarNumeroTicket,
+    ValorDeDetalle,
+    ValorDeReceta,
 } from "./controllerEntregaReceta";
 
 // Fondo con el que se resaltan las filas que no se pueden entregar completas por tener un lote vencido.
@@ -75,22 +79,23 @@ const lotesDelDetalle = (lotes) =>
     );
 
 // `resaltar` es true mientras la receta sigue pendiente: en una entregada o anulada el lote vencido ya no importa.
-const crearColumnasDetalle = (resaltar) => [
+// `valorDe(detalle)` da el valor referencial de los lotes del medicamento.
+const crearColumnasDetalle = (resaltar, valorDe) => [
     {
         label: "Medicamento",
-        width: "24%",
+        width: "22%",
         render: (row) => etiquetaMedicamento({ nombre: row.medicamentoNombre, presentacion: row.presentacion }),
     },
-    { label: "Indicación", width: "20%", render: (row) => row.indicacion || "—" },
-    { label: "Cantidad", accessor: "cantidad", width: "8%" },
+    { label: "Indicación", width: "17%", render: (row) => row.indicacion || "—" },
+    { label: "Cantidad", accessor: "cantidad", width: "7%" },
     {
         label: "Faltante",
-        width: "8%",
+        width: "7%",
         render: (row) => (!row.entregado && row.cantidadFaltante > 0 ? <strong className="text-red-600">{row.cantidadFaltante}</strong> : "—"),
     },
     {
         label: "Estado",
-        width: "16%",
+        width: "15%",
         render: (row) => {
             if (row.entregado) {
                 return (
@@ -106,18 +111,20 @@ const crearColumnasDetalle = (resaltar) => [
             return etiqueta("bg-amber-100 text-amber-700", "Pendiente");
         },
     },
-    { label: "Lotes", width: "24%", render: (row) => lotesDelDetalle(row.lotes) },
+    { label: "Lotes", width: "22%", render: (row) => lotesDelDetalle(row.lotes) },
+    { label: "Valor", width: "10%", render: (row) => formatearMonto(valorDe(row)) },
 ];
 
-// `idsConFaltante`: ids de las recetas que el backend lista como "con faltante" (lote vencido).
-const crearColumnasPendientes = (idsConFaltante) => [
+// `idsConFaltante`: ids de las recetas que el backend lista como "con faltante" (lote vencido). `valorDe(receta)` da el
+// valor referencial de lo reservado o entregado de la receta (de `ValorDeReceta`).
+const crearColumnasPendientes = (idsConFaltante, valorDe) => [
     { label: "N° Ticket", accessor: "numeroTicket", width: "9%" },
-    { label: "Paciente", width: "25%", render: (row) => NombrePaciente(row) || "—" },
-    { label: "Documento", width: "12%", render: (row) => row.pacienteDocumento || "—" },
-    { label: "Medicamentos", width: "12%", render: (row) => row.detalles?.length ?? "—" },
+    { label: "Paciente", width: "21%", render: (row) => NombrePaciente(row) || "—" },
+    { label: "Documento", width: "11%", render: (row) => row.pacienteDocumento || "—" },
+    { label: "Medicamentos", width: "11%", render: (row) => row.detalles?.length ?? "—" },
     {
         label: "Stock",
-        width: "22%",
+        width: "19%",
         render: (row) => (
             <span className="inline-flex flex-wrap items-center gap-1">
                 {TieneLoteVencido(row, idsConFaltante)
@@ -129,6 +136,7 @@ const crearColumnasPendientes = (idsConFaltante) => [
             </span>
         ),
     },
+    { label: "Valor", width: "9%", render: (row) => textoValorMedicamento(valorDe(row)) },
     { label: "Registrada", width: "20%", render: (row) => formatearFechaHora(row.fechaRegistro) },
 ];
 
@@ -143,7 +151,12 @@ export default function EntregaReceta({ tieneVista }) {
     // Recetas con lote vencido ("con faltante" en el backend): se piden aparte para resaltarlas en la lista y bloquear su entrega completa.
     const conFaltante = useConsultaInventario();
     const idsConFaltante = useMemo(() => new Set(conFaltante.datos.map((receta) => receta.id)), [conFaltante.datos]);
-    const columnasPendientes = useMemo(() => crearColumnasPendientes(idsConFaltante), [idsConFaltante]);
+    // Las recetas traen de qué lotes se reservó o entregó cada medicamento, pero no sus precios: se buscan en los lotes del
+    // inventario elegido (una receta de otro inventario, abierta por su ticket, queda con el valor en "—").
+    const precios = useLotesInventario(inventarioId, token);
+    const valorDeReceta = useCallback((receta) => ValorDeReceta(receta, precios.lotesPorId), [precios.lotesPorId]);
+    const valorDeDetalle = useCallback((detalle) => ValorDeDetalle(detalle, precios.lotesPorId), [precios.lotesPorId]);
+    const columnasPendientes = useMemo(() => crearColumnasPendientes(idsConFaltante, valorDeReceta), [idsConFaltante, valorDeReceta]);
 
     const [numeroTicket, setNumeroTicket] = useState("");
     const [errorTicket, setErrorTicket] = useState("");
@@ -227,7 +240,11 @@ export default function EntregaReceta({ tieneVista }) {
     // Con un lote vencido la receta no se entrega completa: solo parcialmente (lo disponible) o re-reservando.
     const loteVencido = receta ? TieneLoteVencido(receta, idsConFaltante) : false;
     const conProblema = loteVencido || (receta ? TieneFaltante(receta) : false);
-    const columnasDetalle = useMemo(() => crearColumnasDetalle(Boolean(receta) && PuedeEntregarse(receta)), [receta]);
+    const columnasDetalle = useMemo(
+        () => crearColumnasDetalle(Boolean(receta) && PuedeEntregarse(receta), valorDeDetalle),
+        [receta, valorDeDetalle]
+    );
+    const valorReceta = receta ? valorDeReceta(receta) : null;
 
     return (
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-start gap-4 px-4 pb-4">
@@ -263,6 +280,7 @@ export default function EntregaReceta({ tieneVista }) {
 
                 <AvisoError mensaje={pendientes.error} onRetry={cargarPendientes} />
                 <AvisoError mensaje={conFaltante.error} onRetry={cargarPendientes} />
+                <AvisoError mensaje={precios.error} onRetry={precios.recargar} />
 
                 <p className="text-sm text-gray-500 mb-2">
                     Haga clic en una receta para abrirla.{" "}
@@ -372,6 +390,12 @@ export default function EntregaReceta({ tieneVista }) {
                                     }
                                     emptyText="La receta no tiene medicamentos"
                                 />
+
+                                {valorReceta.lotes > 0 && !precios.cargando && (
+                                    <p className="text-right font-semibold">
+                                        Valor referencial {receta.entregado ? "entregado" : "reservado"}: {textoValorTotal(valorReceta)}
+                                    </p>
+                                )}
 
                                 <div className="flex flex-wrap gap-4">
                                     <button

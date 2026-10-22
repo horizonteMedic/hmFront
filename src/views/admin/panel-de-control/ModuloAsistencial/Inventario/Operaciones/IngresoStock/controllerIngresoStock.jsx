@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { enviarInventario, etiquetaMedicamento, hoyISO, inventarioUrl, limpiarTexto, normalizarTexto, parsearFechaVencimiento } from "../../Compartido/inventarioUtils";
+import { errorPrecio, formatearMonto, parsearPrecio, sumarValores } from "../../Compartido/precioReferencial";
 
 const ingresoStockUrl = `${inventarioUrl}/stock/ingreso`;
 
@@ -40,6 +41,9 @@ export const ValidarItemIngreso = (form, items) => {
     const errorDeCantidad = errorCantidad(form.cantidad);
     if (errorDeCantidad) errores.cantidad = errorDeCantidad;
 
+    const errorDePrecio = errorPrecio(form.precioReferencial);
+    if (errorDePrecio) errores.precioReferencial = errorDePrecio;
+
     if (!errores.medicamento && !errores.fechaVencimiento) {
         const clave = claveLote(form.medicamentoId, form.numeroLote, vencimiento);
         if (items.some((item) => claveLote(item.medicamentoId, item.numeroLote, parsearFechaVencimiento(item.fechaVencimiento)) === clave)) {
@@ -67,6 +71,9 @@ export const ValidarItemsIngreso = (items) => {
         const errorDeCantidad = errorCantidad(item.cantidad);
         if (errorDeCantidad) marcar(item.uid, "cantidad", errorDeCantidad);
 
+        const errorDePrecio = errorPrecio(item.precioReferencial);
+        if (errorDePrecio) marcar(item.uid, "precioReferencial", errorDePrecio);
+
         const vencimiento = parsearFechaVencimiento(item.fechaVencimiento);
         if (!vencimiento) return;
 
@@ -84,14 +91,26 @@ export const ValidarItemsIngreso = (items) => {
 };
 
 // Deja las filas del detalle como las espera el backend: lote en mayúsculas y sin espacios sobrantes, vencimiento
-// "yyyy-MM-dd" y cantidad numérica (en la tabla se editan como texto).
+// "yyyy-MM-dd" y cantidad y precio numéricos (en la tabla se editan como texto).
 export const NormalizarItemsIngreso = (items) =>
     items.map((item) => ({
         ...item,
         numeroLote: limpiarTexto(item.numeroLote).toUpperCase(),
         fechaVencimiento: parsearFechaVencimiento(item.fechaVencimiento),
         cantidad: Number(item.cantidad),
+        precioReferencial: parsearPrecio(item.precioReferencial),
     }));
+
+// Valor referencial de lo que se va a ingresar: suma de cantidad × precio de cada fila. Las filas sin un precio o una
+// cantidad válidos no suman y se cuentan en `sinPrecio`.
+export const ValorDelIngreso = (items) =>
+    sumarValores(
+        items.map((item) => {
+            const precio = parsearPrecio(item.precioReferencial);
+            const cantidad = Number(item.cantidad);
+            return precio == null || !Number.isFinite(cantidad) ? null : precio * cantidad;
+        })
+    );
 
 // Avisa si alguna fila del detalle tiene datos inválidos (están marcados en rojo en la tabla). Devuelve true si todo está bien.
 export const DetalleIngresoValido = async (items) => {
@@ -109,17 +128,19 @@ export const CrearItemIngreso = (form, medicamento) => ({
     numeroLote: limpiarTexto(form.numeroLote).toUpperCase(),
     fechaVencimiento: parsearFechaVencimiento(form.fechaVencimiento),
     cantidad: Number(form.cantidad),
+    precioReferencial: limpiarTexto(form.precioReferencial),
 });
 
 const construirBody = (inventario, referencia, items) => ({
     inventarioId: Number(inventario.id),
     referencia: limpiarTexto(referencia),
-    items: items.map(({ medicamentoId, nombre, numeroLote, fechaVencimiento, cantidad }) => ({
+    items: items.map(({ medicamentoId, nombre, numeroLote, fechaVencimiento, cantidad, precioReferencial }) => ({
         medicamentoId,
         nombre,
         numeroLote: numeroLote || null,
         fechaVencimiento,
         cantidad,
+        precioReferencial,
     })),
 });
 
@@ -135,9 +156,10 @@ export const RegistrarIngresoStock = async ({ inventario, referencia, items }, t
     }
 
     const unidades = items.reduce((total, item) => total + item.cantidad, 0);
+    const valor = ValorDelIngreso(items).total;
     const { isConfirmed } = await Swal.fire({
         title: "Registrar ingreso de stock",
-        text: `Se ingresarán ${items.length} lote(s), ${unidades} unidades en total, en "${inventario.nombre}". ¿Desea continuar?`,
+        text: `Se ingresarán ${items.length} lote(s), ${unidades} unidades en total (valor referencial ${formatearMonto(valor)}), en "${inventario.nombre}". ¿Desea continuar?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, registrar",
