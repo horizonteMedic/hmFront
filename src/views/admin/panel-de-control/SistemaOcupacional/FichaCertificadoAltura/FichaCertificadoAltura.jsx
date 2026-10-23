@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faUser,
@@ -23,22 +23,25 @@ import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaCertificadoAltura";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_FICHA_CERTIFICADO_ALTURA, VerifyTR } from "./controllerFichaCertificadoAltura";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 
-const tabla = "b_certificado_altura"
+const tabla = TABLA_FICHA_CERTIFICADO_ALTURA
 const today = getToday();
 
-export default function FichaCertificadoAltura() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador, sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar el certificado.
+export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const [activeTab, setActiveTab] = useState(0);
 
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
     const [visualerOpen, setVisualerOpen] = useState(null)
     const initialFormState = {
         // Header
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         codigoCertificado: null,
         fechaExam: today,
         tipoExamen: "",
@@ -168,7 +171,7 @@ export default function FichaCertificadoAltura() {
         handleRadioButtonBoolean,
         handleCheckBoxChange,
         handleClear,
-    } = useForm(initialFormState, { storageKey: "fichaCertificadoAltura" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "fichaCertificadoAltura" });
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {
@@ -227,6 +230,9 @@ export default function FichaCertificadoAltura() {
         },
     ];
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
         if (form.conclusion == null) {
             Swal.fire({
@@ -236,8 +242,15 @@ export default function FichaCertificadoAltura() {
             })
             return
         }
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay certificado; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -253,9 +266,11 @@ export default function FichaCertificadoAltura() {
     };
     return (
         <div className="mx-auto bg-white overflow-hidden">
-            <div className="flex h-full">
+            {/* Incrustado el ancho útil es el del panel: bajo 1700 px el panel de Agudeza Visual (20%) queda con campos
+                de 12 px, así que va debajo del contenido principal. */}
+            <div className={embebido ? "flex flex-col min-[1700px]:flex-row h-full" : "flex h-full"}>
                 {/* Contenido principal - 80% */}
-                <div className="w-4/5">
+                <div className={embebido ? "w-full min-[1700px]:w-4/5" : "w-4/5"}>
                     <div className="w-full">
                         {/* Datos del trabajador */}
                         <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -265,6 +280,7 @@ export default function FichaCertificadoAltura() {
                                 value={form?.norden}
                                 onChange={handleChangeNumber}
                                 onKeyUp={handleSearch}
+                                disabled={embebido}
                             />
                             <InputTextOneLine
                                 label="Fecha Examen"
@@ -545,40 +561,44 @@ export default function FichaCertificadoAltura() {
                                     >
                                         <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleClear}
-                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                                    </button>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                    <span className="font-bold italic text-base mb-1">Imprimir</span>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            name="norden"
-                                            value={form.norden}
-                                            onChange={handleChange}
-                                            className="border rounded px-2 py-1 text-base w-24"
-                                        />
-
+                                    {!embebido && (
                                         <button
                                             type="button"
-                                            onClick={handlePrint}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                            onClick={handleClear}
+                                            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                         >
-                                            <FontAwesomeIcon icon={faPrint} />
+                                            <FontAwesomeIcon icon={faBroom} /> Limpiar
                                         </button>
-                                    </div>
+                                    )}
                                 </div>
+                                {!embebido && (
+                                    <div className="flex flex-col items-end">
+                                        <span className="font-bold italic text-base mb-1">Imprimir</span>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                name="norden"
+                                                value={form.norden}
+                                                onChange={handleChange}
+                                                className="border rounded px-2 py-1 text-base w-24"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={handlePrint}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                            >
+                                                <FontAwesomeIcon icon={faPrint} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </section>
                         </div>
                     </div>
                 </div>
 
                 {/* Panel lateral de Agudeza Visual - 20% */}
-                <div className="w-1/5">
+                <div className={embebido ? "w-full max-w-[480px] min-[1700px]:max-w-none min-[1700px]:w-1/5" : "w-1/5"}>
                     <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
                         {/* Sin Corregir */}

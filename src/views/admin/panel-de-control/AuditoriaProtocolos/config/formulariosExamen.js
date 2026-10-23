@@ -84,16 +84,36 @@ import {
     PrintHojaR as imprimirOdontologia,
     TABLA_ODONTOLOGIA,
 } from "../../SistemaOcupacional/Odontologia/controllerOdontologia";
+import FichaCertificadoAltura from "../../SistemaOcupacional/FichaCertificadoAltura/FichaCertificadoAltura";
+import {
+    PrintHojaR as imprimirFichaCertificadoAltura,
+    TABLA_FICHA_CERTIFICADO_ALTURA,
+} from "../../SistemaOcupacional/FichaCertificadoAltura/controllerFichaCertificadoAltura";
+import TrabajosEspecificos from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/TrabajosEspecificos/TrabajosEspecificos";
+import {
+    PrintHojaR as imprimirTrabajosEspecificos,
+    TABLA_TRABAJOS_ESPECIFICOS,
+} from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/TrabajosEspecificos/controllerTrabajosEspecificos";
+import TestFatiga from "../../SistemaOcupacional/TestFatiga/TestFatiga_Somn";
+import {
+    PrintHojaR as imprimirTestFatiga,
+    TABLA_TEST_FATIGA_SOMNOLENCIA,
+} from "../../SistemaOcupacional/TestFatiga/ControllerTestF";
+import FichaSas from "../../SistemaOcupacional/FichaSAS/FichaSas";
+import { PrintHojaR as imprimirFichaSas, TABLA_FICHA_SAS } from "../../SistemaOcupacional/FichaSAS/controllerFichaSas";
+import InformePsicologico from "../../SistemaOcupacional/ModuloPsicologia/AnexosPsicologia/InformePsicologico/InformePsicologico";
+import {
+    PrintHojaR as imprimirInformePsicologico,
+    TABLA_INFORME_PSICOLOGICO,
+} from "../../SistemaOcupacional/ModuloPsicologia/AnexosPsicologia/InformePsicologico/controllerInformePsicologico";
+import Brigadista from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/Brigadista/Brigadista";
+import {
+    PrintHojaR as imprimirBrigadista,
+    TABLA_BRIGADISTA,
+} from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/Brigadista/controllerBrigadista";
 
-// El `referenciaNp` solo identifica el examen de la hoja de ruta: el formulario que abre se elige aquí, y un mismo
-// formulario puede abrirse desde más de un `referenciaNp`.
-const ALTURA_PSICOLOGICA = {
-    Formulario: AlturaPsicologica,
-    verReporte: (orden, token, datosFooter) =>
-        imprimirAlturaPsicologica(orden, token, TABLA_ALTURA_PSICOLOGICA, datosFooter),
-};
-
-// Qué abre cada examen del protocolo según su `referenciaNp`; los que no estén aquí aún no son clicables.
+// Qué abre cada examen del protocolo según su `referenciaNp` (= nameService/tabla del formulario); los que no estén
+// aquí aún no son clicables.
 //  - Formulario: recibe `nOrdenInicial` (carga esa orden) y `onGuardado` (se llama al registrar el examen).
 //  - verReporte(orden, token, datosFooter): abre el reporte del examen ya realizado.
 const FORMULARIOS = {
@@ -133,9 +153,20 @@ const FORMULARIOS = {
         verReporte: (orden, token, datosFooter) =>
             imprimirFichaAptitudAnexo16(orden, token, TABLA_FICHA_APTITUD_ANEXO16, datosFooter),
     },
-    // En la hoja de ruta, "Certificado en trabajos en altura" llega como `b_certificado_altura` pero se llena con este formulario.
-    b_certificado_altura: { titulo: "Certificado en Trabajos en Altura", ...ALTURA_PSICOLOGICA },
-    psicologiafobias: { titulo: "Informe Psicológico - Trabajo en Altura", ...ALTURA_PSICOLOGICA },
+    // Ficha Certificado de Altura (SistemaOcupacional/FichaCertificadoAltura), tabla `b_certificado_altura`.
+    b_certificado_altura: {
+        titulo: "Ficha Certificado de Trabajos en Altura",
+        Formulario: FichaCertificadoAltura,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirFichaCertificadoAltura(orden, token, TABLA_FICHA_CERTIFICADO_ALTURA, datosFooter),
+    },
+    // Formato Altura Psicológica (ModuloPsicologia/ExamenesComplementarios/AlturaPsicologica), tabla `psicologiafobias`.
+    psicologiafobias: {
+        titulo: "Formato Altura Psicológica",
+        Formulario: AlturaPsicologica,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirAlturaPsicologica(orden, token, TABLA_ALTURA_PSICOLOGICA, datosFooter),
+    },
     audiometria_2023: {
         titulo: "Audiometría",
         Formulario: Audiometria,
@@ -202,6 +233,34 @@ const FORMULARIOS = {
         titulo: "Odontología",
         Formulario: Odontologia,
         verReporte: (orden, token, datosFooter) => imprimirOdontologia(orden, token, TABLA_ODONTOLOGIA, datosFooter),
+    },
+    especificos: {
+        titulo: "Trabajos Específicos",
+        Formulario: TrabajosEspecificos,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirTrabajosEspecificos(orden, token, TABLA_TRABAJOS_ESPECIFICOS, datosFooter),
+    },
+    test_fatiga_somnolencia: {
+        titulo: "Test de Fatiga y Somnolencia",
+        Formulario: TestFatiga,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirTestFatiga(orden, token, TABLA_TEST_FATIGA_SOMNOLENCIA, datosFooter),
+    },
+    ficha_sas: {
+        titulo: "Ficha S.A.S.",
+        Formulario: FichaSas,
+        verReporte: (orden, token, datosFooter) => imprimirFichaSas(orden, token, TABLA_FICHA_SAS, datosFooter),
+    },
+    informe_psicologico: {
+        titulo: "Informe Psicológico Completo",
+        Formulario: InformePsicologico,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirInformePsicologico(orden, token, TABLA_INFORME_PSICOLOGICO, datosFooter),
+    },
+    psi_brigadistas: {
+        titulo: "Brigadista",
+        Formulario: Brigadista,
+        verReporte: (orden, token, datosFooter) => imprimirBrigadista(orden, token, TABLA_BRIGADISTA, datosFooter),
     },
 };
 

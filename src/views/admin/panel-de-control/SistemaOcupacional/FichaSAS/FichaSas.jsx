@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
@@ -19,9 +19,9 @@ import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
 import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import Mallampati from "../../../../../../public/img/Mallampati.jpg";
-import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerFichaSas";
+import { PrintHojaR, SubmitDataService, TABLA_FICHA_SAS, UpdateDataService, VerifyTR } from "./controllerFichaSas";
 
-const tabla = "ficha_sas";
+const tabla = TABLA_FICHA_SAS;
 const today = getToday();
 
 // Campos Sí/No que dependen de un "padre" (se limpian y bloquean cuando el padre pasa a NO).
@@ -152,12 +152,15 @@ function FilaSiNo({
     );
 }
 
-const FichaSas = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la Ficha SAS.
+const FichaSas = ({ nOrdenInicial, onGuardado }) => {
+    const embebido = Boolean(nOrdenInicial);
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
 
     const initialFormState = {
         // Header
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         codigoSas: null,
         fechaExam: today,
         tipoExamen: "",
@@ -283,7 +286,7 @@ const FichaSas = () => {
         handleClearnotO,
         handlePrintDefault,
         handleChangeNumberDecimals,
-    } = useForm(initialFormState, { storageKey: "ficha_sas_form" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "ficha_sas_form" });
 
     const {
         edicionHabilitada,
@@ -325,15 +328,25 @@ const FichaSas = () => {
         return Object.keys(next).length === 0;
     };
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
         if (!validateForm()) return;
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     const handleEdit = () => {
         if (!validateForm()) return;
-        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay ficha; si ya existe, sus respuestas)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     const handleClearForm = () => {
         setErrors({});
@@ -437,7 +450,7 @@ const FichaSas = () => {
     };
 
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
-    const nordenDisabled = hayRegistroCargado;
+    const nordenDisabled = embebido || hayRegistroCargado;
 
     const auditoria = buildAuditoria(form, {
         usuarioActual: userlogued,
@@ -565,13 +578,16 @@ const FichaSas = () => {
     ];
 
     return (
-        <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
+        // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las secciones de dos columnas
+        // quedan muy angostas y desbordan, así que se apilan.
+        <div className={embebido ? "space-y-3 px-4 max-[1599px]:[&>.grid]:grid-cols-1" : "space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto"}>
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
                 edicionHabilitada={edicionHabilitada}
                 onHabilitarEdicion={habilitarEdicion}
                 onLimpiar={handleClearForm}
+                mostrarLimpiar={!embebido}
             />
 
             {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
@@ -587,7 +603,7 @@ const FichaSas = () => {
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                    {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                 </div>
                 <InputTextOneLine
                     label="Fecha Examen"
@@ -1099,6 +1115,8 @@ const FichaSas = () => {
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
         </div>
     );

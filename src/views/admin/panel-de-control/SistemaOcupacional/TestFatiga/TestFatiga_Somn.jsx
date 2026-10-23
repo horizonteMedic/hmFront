@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
@@ -14,7 +14,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
 import { buildAuditoria } from "../../../../utils/auditoriaUtils";
-import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./ControllerTestF";
+import { PrintHojaR, SubmitDataService, TABLA_TEST_FATIGA_SOMNOLENCIA, UpdateDataService, VerifyTR } from "./ControllerTestF";
 import {
     OPCIONES_PROBABILIDAD,
     PREGUNTAS_SITUACION,
@@ -22,7 +22,7 @@ import {
     calcularPuntaje,
 } from "./modelTest";
 
-const tabla = "test_fatiga_somnolencia";
+const tabla = TABLA_TEST_FATIGA_SOMNOLENCIA;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -33,13 +33,16 @@ const CAMPOS_EDITABLES = [
     "nombre_medico",
 ];
 
-const Test_fatiga = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el test.
+const Test_fatiga = ({ nOrdenInicial, onGuardado }) => {
+    const embebido = Boolean(nOrdenInicial);
     const { token, userlogued, selectedSede, datosFooter, userName, userCompleto } = useSessionData();
     const today = getToday();
 
     const initialFormState = {
         // Header
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         fexamen: today,
         // Datos personales
         dni: "",
@@ -94,7 +97,7 @@ const Test_fatiga = () => {
         handleClearnotO,
         handlePrintDefault,
         handleChangeNumberDecimals,
-    } = useForm(initialFormState, { storageKey: "TestFatigaSomnolencia" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "TestFatigaSomnolencia" });
 
     const {
         edicionHabilitada,
@@ -113,7 +116,7 @@ const Test_fatiga = () => {
     const [errors, setErrors] = useState({});
 
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
-    const nordenDisabled = hayRegistroCargado;
+    const nordenDisabled = embebido || hayRegistroCargado;
 
     // Los errores se muestran solo tras intentar guardar y mientras el campo siga sin
     // resolverse; se limpian solos cuando el usuario lo completa.
@@ -133,15 +136,25 @@ const Test_fatiga = () => {
         return Object.keys(next).length === 0;
     };
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
         if (!validateForm()) return;
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     const handleEdit = () => {
         if (!validateForm()) return;
-        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay test; si ya existe, sus respuestas)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     const handleClearForm = () => {
         setErrors({});
@@ -188,13 +201,14 @@ const Test_fatiga = () => {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
+        <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[95%] xl:max-w-[90%] mx-auto"}>
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
                 edicionHabilitada={edicionHabilitada}
                 onHabilitarEdicion={habilitarEdicion}
                 onLimpiar={handleClearForm}
+                mostrarLimpiar={!embebido}
             />
 
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
@@ -211,7 +225,7 @@ const Test_fatiga = () => {
                         className="w-full"
                         error={nordenError}
                     />
-                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                    {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                 </div>
                 <InputTextOneLine
                     label="Fecha de Examen"
@@ -319,6 +333,8 @@ const Test_fatiga = () => {
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
         </div>
     );
