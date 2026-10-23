@@ -14,6 +14,9 @@ import {
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_RAYOS_X_TORAX_PA = "radiografia_torax";
+
 const obtenerReporteUrl =
   "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl =
@@ -141,7 +144,9 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
   VerifyTRDefault(
     nro,
     tabla,
@@ -153,6 +158,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     },
     () => {
       GetInfoServicio(nro, tabla, set, token, () => {
+        if (silencioso) {
+          Swal.close();
+          return;
+        }
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Rayos X Tórax.",

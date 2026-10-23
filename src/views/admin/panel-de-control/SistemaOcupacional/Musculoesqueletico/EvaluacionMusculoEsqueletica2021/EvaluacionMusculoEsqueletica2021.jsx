@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -10,11 +11,12 @@ import { useForm } from "../../../../../hooks/useForm";
 import {
   PrintHojaR,
   SubmitDataService,
+  TABLA_EVALUACION_2021,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica2021";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "evaluacion_musculo_esqueletica2021";
+const tabla = TABLA_EVALUACION_2021;
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -26,11 +28,14 @@ function fixEncodingModern(str) {
   return new TextDecoder("utf-8").decode(bytes);
 }
 
-const EvaluacionMusculoEsqueletica2021 = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar la evaluación.
+const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codEvaluacion: null,
     nombres: "",
     dni: "",
@@ -175,17 +180,27 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     handleClearnotO,
   } = useForm(initialFormState);
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
     SubmitDataService(
       form,
       token,
       userlogued,
-      handleClear,
+      alRegistrar,
       tabla,
       datosFooter,
       userCompleto?.datos?.dni_user
     );
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
@@ -233,6 +248,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
                 value={form.norden || ""}
                 onChange={handleChangeNumber}
                 onKeyDown={handleSearch}
+                disabled={embebido}
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
@@ -445,33 +461,37 @@ const EvaluacionMusculoEsqueletica2021 = () => {
             >
               <FontAwesomeIcon icon={faSave} /> Agregar/Actualizar
             </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
+            {!embebido && (
               <button
                 type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                onClick={handleClear}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
-                <FontAwesomeIcon icon={faPrint} />
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
               </button>
-            </div>
+            )}
           </div>
+
+          {!embebido && (
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">Imprimir</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

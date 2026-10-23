@@ -19,6 +19,9 @@ import {
 
 const EMPRESA_OHLA = "OBRASCON HUARTE LAIN S.A";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_ESPIROMETRIA = "funcion_abs";
+
 // ===== Configuración =====
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
@@ -259,7 +262,9 @@ export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter
 // ===== Búsqueda / verificación por N° Orden =====
 // VerifyTRPerzonalizadoDefault (3 estados: nuevo / existente / necesita Triaje),
 // anteponiendo la validación de sede como el resto de formularios de la plantilla.
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     if (!nro) {
         await Swal.fire({
             icon: "error",
@@ -300,6 +305,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => GetInfoServicio(nro, set, token, sede),
         () =>
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire({
                     icon: "warning",
                     title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',

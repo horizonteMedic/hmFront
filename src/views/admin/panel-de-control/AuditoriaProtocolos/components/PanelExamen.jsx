@@ -11,6 +11,7 @@ const PANTALLA_ANGOSTA = "(max-width: 1023px)";
 // `onGuardado` avisa que se registró el examen, para que la barra lateral refleje el nuevo estado.
 export default function PanelExamen({ examen, orden, onGuardado }) {
     const token = useAuthStore((state) => state.token);
+    const datosFooter = useAuthStore((state) => state.datosFooter);
     const { titulo, Formulario, verReporte } = formularioDe(examen);
     const raiz = useRef(null);
     const [registrado, setRegistrado] = useState(false);
@@ -28,7 +29,7 @@ export default function PanelExamen({ examen, orden, onGuardado }) {
     };
 
     return (
-        <section ref={raiz} className="scroll-mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <section ref={raiz} className="scroll-mt-4 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
             <header className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="min-w-0">
                     <p className="text-xs font-semibold tracking-wide text-gray-500">ORDEN {orden}</p>
@@ -38,7 +39,7 @@ export default function PanelExamen({ examen, orden, onGuardado }) {
                     type="button"
                     disabled={!examen.completado}
                     title={examen.completado ? undefined : "El examen aún no se realizó"}
-                    onClick={() => verReporte(orden, token)}
+                    onClick={() => verReporte(orden, token, datosFooter)}
                     className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <FontAwesomeIcon icon={faFilePdf} /> Ver reporte

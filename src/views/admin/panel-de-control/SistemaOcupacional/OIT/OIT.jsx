@@ -13,7 +13,7 @@ import { getFetch } from "../../getFetch/getFetch";
 import Parenquimatosas from "./Parenquimatosas/Parenquimatosas";
 import Pleurales from "./Pleurales/Pleurales";
 import Engrosamiento from "./Engrosamiento/Engrosamiento";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   handleSubirArchivo,
   handleSubirArchivoMasivo,
@@ -21,6 +21,7 @@ import {
   PrintHojaSinDatos,
   ReadArchivosForm,
   SubmitOIT,
+  TABLA_OIT,
   VerifyTR,
 } from "./controller/OIT_controller";
 import Swal from "sweetalert2";
@@ -32,14 +33,17 @@ import { getOITInitialFormState } from "./oitFormDefaults";
 import CargaMasivaOIT from "./CargaMasivaOIT/CargaMasivaOIT";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import { useForm } from "../../../../hooks/useForm";
-const tabla = "oit";
+const tabla = TABLA_OIT;
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const OIT = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// sin carga masiva ni Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar el OIT.
+const OIT = ({ nOrdenInicial, onGuardado }) => {
+  const embebido = Boolean(nOrdenInicial);
 
   const { token, userlogued, selectedSede, userName, userDNI } = useSessionData();
 
@@ -54,7 +58,10 @@ const OIT = () => {
           setForm,
           handleChangeNumber,
           handleChangeSimple,
-      } = useForm(getOITInitialFormState({ today, userlogued, userName, userDNI }));
+      } = useForm({
+        ...getOITInitialFormState({ today, userlogued, userName, userDNI }),
+        norden: embebido ? String(nOrdenInicial) : "",
+      });
 
 
   const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
@@ -62,6 +69,16 @@ const OIT = () => {
   const handleClean = () => {
     setForm(getOITInitialFormState({ today, userlogued, userName, userDNI }));
   };
+
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClean;
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay OIT; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
   console.log(form);
   const tabs = [
     {
@@ -180,17 +197,19 @@ const OIT = () => {
 
   return (
     <div className="">
-      <div className="max-w-[95%] mx-auto">
+      <div className={embebido ? "" : "max-w-[95%] mx-auto"}>
         <h1 className="text-3xl font-bold mb-4 text-center">OIT</h1>
-        <div className="flex justify-end mb-2">
-          <button
-            type="button"
-            onClick={() => setModalCargaMasiva(true)}
-            className="verde-btn px-4 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faUpload} /> Carga Masiva
-          </button>
-        </div>
+        {!embebido && (
+          <div className="flex justify-end mb-2">
+            <button
+              type="button"
+              onClick={() => setModalCargaMasiva(true)}
+              className="verde-btn px-4 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+            </button>
+          </div>
+        )}
         <div className=" border rounded-md p-4 shadow-sm bg-white">
           <div className="flex flex-col space-y-3">
             {/*1ra fila*/}
@@ -202,6 +221,7 @@ const OIT = () => {
                 value={form.norden}
                 onChange={handleChangeNumber}
                 onKeyUp={handleSearch}
+                disabled={embebido}
                 labelWidth="65px"
                 className="flex items-center gap-4"
               />
@@ -379,20 +399,22 @@ const OIT = () => {
                 type="button"
                 onClick={() => {
 
-                  SubmitOIT(form, token, userlogued, handleClean, tabla);
+                  SubmitOIT(form, token, userlogued, alRegistrar, tabla);
                 }}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
               </button>
             )}
-            <button
-              type="button"
-              onClick={handleClean}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
+            {!embebido && (
+              <button
+                type="button"
+                onClick={handleClean}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
+              </button>
+            )}
           </div>
           {/* <div className="flex gap-1 items-center">
             <label htmlFor="">Imprimir: </label>
@@ -411,25 +433,27 @@ const OIT = () => {
             </button>
           </div> */}
 
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
+          {!embebido && (
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">Imprimir</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleInputChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
 
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

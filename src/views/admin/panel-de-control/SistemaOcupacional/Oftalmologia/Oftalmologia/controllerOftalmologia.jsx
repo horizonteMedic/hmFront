@@ -5,6 +5,9 @@ import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFor
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 //===============Zona Modificación===============
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_OFTALMOLOGIA = "oftalmologia2021";
+
 const obtenerReporteUrl =
   "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica";
 const registrarUrl =

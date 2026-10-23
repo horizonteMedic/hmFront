@@ -3,6 +3,9 @@ import { getFetch } from "../../getFetch/getFetch";
 import { SubmitData } from "./model";
 
 //===============Zona Modificación===============
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_ODONTOLOGIA = "odontograma";
+
 const obtenerReporteUrl = "/api/v01/ct/odontograma/obtenerReporteOdontograma";
 const obtenerReporteUrlLo =
   "/api/v01/ct/odontograma/obtenerReporteOdontogramaLo";
@@ -347,7 +350,10 @@ export const Loading = (text) => {
   });
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: no muestra los avisos informativos ("ya cuenta con registros" / "sin registros anteriores"),
+// porque en el formulario incrustado el estado del registro ya se ve en pantalla. La elección de un N° de
+// orden anterior para copiar el odontograma se conserva.
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
   if (!nro) {
     await Swal.fire(
       "Error",
@@ -364,9 +370,13 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     console.log(res);
     if (res.id === 0) {
       //No tiene registro previo: ofrece copiar un odontograma de un N° de orden anterior
-      OpenModalNorden(nro, tabla, set, token, sede);
+      OpenModalNorden(nro, tabla, set, token, sede, { silencioso });
     } else {
       GetInfoServicio(nro, tabla, set, token, () => {
+        if (silencioso) {
+          Swal.close();
+          return;
+        }
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Odontograma.",
@@ -500,9 +510,14 @@ export const GetInfoPac = (
 };
 
 // Muestra los N° de orden anteriores del paciente 
-export const OpenModalNorden = async (norden, tabla, set, token, sede) => {
+export const OpenModalNorden = async (norden, tabla, set, token, sede, { silencioso = false } = {}) => {
   const list = await getFetch(`${obtenerListaNordenUrl}?nOrden=${norden}`, token);
   if (!Array.isArray(list) || list.length === 0) {
+    if (silencioso) {
+      // Sin aviso: GetInfoPac cierra el "Validando datos" al terminar
+      GetInfoPac(norden, set, token, sede);
+      return;
+    }
     GetInfoPac(norden, set, token, sede, () => { });
     Swal.fire({
       title: "N° de Orden sin registros anteriores",

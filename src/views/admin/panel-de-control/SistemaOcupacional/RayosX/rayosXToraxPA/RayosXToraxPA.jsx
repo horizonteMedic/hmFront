@@ -11,6 +11,7 @@ import {
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
+  TABLA_RAYOS_X_TORAX_PA,
   VerifyTR,
 } from "./controllerRayoxXToraxPA";
 import Swal from "sweetalert2";
@@ -31,16 +32,19 @@ import { handleSubirArchivo2 } from "../rayosXColumna/controllerRayosXColumna";
 import CIE10 from "../../Anexo16/CIE10/CIE10";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
-const tabla = "radiografia_torax";
+const tabla = TABLA_RAYOS_X_TORAX_PA;
 
-export default function RayosXToraxPA() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador, no muestra la búsqueda/historial y avisa con `onGuardado` al registrar el examen.
+export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const [dataTabla, setDataTabla] = useState([]);
   const today = getToday();
 
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codRat: null,
     fechaExam: today,
     nombreExamen: "",
@@ -93,7 +97,7 @@ export default function RayosXToraxPA() {
     handleChangeSimple,
     handleClear,
     handleClearnotO,
-  } = useForm(initialFormState, { storageKey: "rayosX_torax_PA" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "rayosX_torax_PA" });
 
   const [visualerOpen, setVisualerOpen] = useState(null)
 
@@ -104,8 +108,11 @@ export default function RayosXToraxPA() {
     }
   };
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
 
   const handleEjecutarConsulta = () => {
@@ -137,11 +144,18 @@ export default function RayosXToraxPA() {
   };
 
   useEffect(() => {
-    obtenerInfoTabla();
-  }, []);
+    if (!embebido) obtenerInfoTabla();
+  }, [embebido]);
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay examen; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   return (
-    <div className="px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6">
+    <div className={embebido ? "px-4 space-y-3" : "px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6"}>
       {/* Columna izquierda: Formulario */}
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
@@ -151,6 +165,7 @@ export default function RayosXToraxPA() {
             value={form.norden}
             onChange={handleChangeNumberDecimals}
             onKeyUp={handleSearch}
+            disabled={embebido}
           />
           <InputTextOneLine
             label="Fecha"
@@ -348,9 +363,11 @@ export default function RayosXToraxPA() {
           handleClear={handleClear}
           handleChangeNumberDecimals={handleChangeNumberDecimals}
           hidePrint
+          hideClear={embebido}
         />
       </div>
-      {/* Columna derecha: Panel de historial/búsqueda */}
+      {/* Columna derecha: Panel de historial/búsqueda (incrustado se omite) */}
+      {!embebido && (
       <div className="space-y-3">
         <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
@@ -417,27 +434,29 @@ export default function RayosXToraxPA() {
               <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
             </button>
           </div>
-
-          {visualerOpen && (
-            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-              <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-                <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                  <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                  <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-                </div>
-                <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                  <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-                </div>
-                <div className="flex justify-center">
-                  <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
         </SectionFieldset>
       </div>
+      )}
+
+      {/* Visor del archivo subido (fuera de la columna derecha: también se usa incrustado) */}
+      {visualerOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+              <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+              <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+            </div>
+            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+              <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+            </div>
+            <div className="flex justify-center">
+              <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
