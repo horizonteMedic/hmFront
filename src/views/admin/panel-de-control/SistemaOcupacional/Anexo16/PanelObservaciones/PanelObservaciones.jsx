@@ -15,6 +15,7 @@ export default function PanelObservaciones({
   handleBlur,
   setmodalCIE10,
   abrirCargaMasiva,
+  embebido = false,
   setForm,
   token
 }) {
@@ -32,15 +33,18 @@ export default function PanelObservaciones({
             Ingresar CIE 10
           </button>
         </div> */}
-        <div className="w-full flex justify-center items-center">
-          <button
-            type="button"
-            onClick={abrirCargaMasiva}
-            className="verde-btn px-6 py-2 rounded flex items-center justify-center gap-2"
-          >
-            Carga Masiva <FontAwesomeIcon icon={faUpload} />
-          </button>
-        </div>
+        {/* Carga Masiva (no va incrustado) */}
+        {!embebido && (
+          <div className="w-full flex justify-center items-center">
+            <button
+              type="button"
+              onClick={abrirCargaMasiva}
+              className="verde-btn px-6 py-2 rounded flex items-center justify-center gap-2"
+            >
+              Carga Masiva <FontAwesomeIcon icon={faUpload} />
+            </button>
+          </div>
+        )}
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
           <InputTextAreaUpper
             label="Observaciones Generales"

@@ -19,7 +19,8 @@ export default function Resultados({
   handleSave,
   handleClear,
   handleSearchExamenesRealizados,
-  handleCheckBoxChange
+  handleCheckBoxChange,
+  embebido = false
 }) {
 
   return (
@@ -263,33 +264,38 @@ export default function Resultados({
               >
                 <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
               </button>
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-
+              {!embebido && (
                 <button
                   type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                  onClick={handleClear}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                 >
-                  <FontAwesomeIcon icon={faPrint} />
+                  <FontAwesomeIcon icon={faBroom} /> Limpiar
                 </button>
-              </div>
+              )}
             </div>
+            {/* No va incrustado: Auditoría ya tiene "Ver reporte" */}
+            {!embebido && (
+              <div className="flex flex-col items-end">
+                <span className="font-bold italic text-base mb-1">Imprimir</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    name="norden"
+                    value={form.norden}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 text-base w-24"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faPrint} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

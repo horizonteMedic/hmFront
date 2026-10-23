@@ -22,6 +22,7 @@ export default function AccionesRegistroHeader({
   edicionHabilitada = false,
   onHabilitarEdicion = () => {},
   onLimpiar = () => {},
+  mostrarLimpiar = true,
   newLabel,
   editLabel,
   children,
@@ -32,8 +33,7 @@ export default function AccionesRegistroHeader({
   const mostrarHabilitar =
     hayRegistroCargado && tieneRegistro && !edicionHabilitada;
 
-  const mostrarLimpiar =
-    hayRegistroCargado;
+  const verLimpiar = mostrarLimpiar && hayRegistroCargado;
 
   return (
     <div className="sticky top-2 z-20 my-4 flex justify-end items-center gap-3 pointer-events-none">
@@ -56,7 +56,7 @@ export default function AccionesRegistroHeader({
         </button>
       )}
 
-      {mostrarLimpiar && (
+      {verLimpiar && (
         <button
           type="button"
           onClick={onLimpiar}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -14,7 +14,7 @@ import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
-import { GetExamenesRealizados, handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAnexo16";
+import { GetExamenesRealizados, handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_ANEXO16, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
 import Laboratorio from "./Laboratorio/Laboratorio";
@@ -22,14 +22,20 @@ import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import CIE10 from "./CIE10/CIE10";
 import { getAnexo16InitialFormState } from "./anexo16FormDefaults";
 import CargaMasivaAnexo16 from "./CargaMasivaAnexo16/CargaMasivaAnexo16";
-const tabla = "anexo7c";
+const tabla = TABLA_ANEXO16;
 
-export default function Anexo16({ SinReestricciones = false }) {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el Anexo 16.
+export default function Anexo16({ SinReestricciones = false, nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
-  const initialFormState = getAnexo16InitialFormState({ today, userlogued, userName, SinReestricciones });
+  const initialFormState = {
+    ...getAnexo16InitialFormState({ today, userlogued, userName, SinReestricciones }),
+    norden: embebido ? String(nOrdenInicial) : "",
+  };
 
   const {
     form,
@@ -43,7 +49,7 @@ export default function Anexo16({ SinReestricciones = false }) {
     handleClear,
     handleClearnotO,
     handleBlur
-  } = useForm(initialFormState, { storageKey: "anexo_16" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "anexo_16" });
 
   const [visualerOpen, setVisualerOpen] = useState(null)
   const [activeTab, setActiveTab] = useState(0);
@@ -64,9 +70,19 @@ export default function Anexo16({ SinReestricciones = false }) {
 
   ];
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter, SinReestricciones);
+    SubmitDataService(form, setForm, token, userlogued, alRegistrar, tabla, datosFooter, SinReestricciones);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay Anexo 16; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, SinReestricciones);
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm, SinReestricciones]);
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {
       // handleClearnotO();
@@ -148,6 +164,7 @@ export default function Anexo16({ SinReestricciones = false }) {
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleChangeSimple={handleChangeSimple}
                       handleBlur={handleBlur}
+                      embebido={embebido}
 
                     />
                   )
@@ -172,6 +189,7 @@ export default function Anexo16({ SinReestricciones = false }) {
             handleChange={handleChange}
             setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
             abrirCargaMasiva={() => setModalCargaMasiva(true)}
+            embebido={embebido}
             setForm={setForm}
             token={token}
           />

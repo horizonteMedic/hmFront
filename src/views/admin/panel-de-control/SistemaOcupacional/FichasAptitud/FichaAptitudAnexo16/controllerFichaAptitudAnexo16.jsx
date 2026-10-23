@@ -10,6 +10,9 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_FICHA_APTITUD_ANEXO16 = "certificado_aptitud_medico_ocupacional";
+
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16";
 const obtenerReporteResumenMedicoUrl =
@@ -251,7 +254,9 @@ export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     VerifyTRPerzonalizado(
         nro,
         tabla,
@@ -265,6 +270,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Ficha Aptitud Anexo 16.",

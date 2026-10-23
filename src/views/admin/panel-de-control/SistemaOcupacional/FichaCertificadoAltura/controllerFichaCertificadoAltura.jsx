@@ -10,6 +10,7 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura";
@@ -360,7 +361,7 @@ export const GetInfoServicioEditar = async (
             user_doctorAsignado: res.doctorAsignado,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
-            aptoDesde: res.fechaDesde_f_desde ?? today,
+            aptoDesde: res.fechaDesde_f_desde ?? getToday(),
             aptoHasta: res.fechaHasta_f_hasta ?? getTodayPlusOneYear(),
 
             conclusion: oidoMayor40 || obesidadIMC30 ? "NO APTO" :

@@ -10,7 +10,8 @@ const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica2021";
 
 const TABLA_EVALUACION_NORMAL = "evaluacion_musculo_esqueletica";
-const TABLA_EVALUACION_2021 = "evaluacion_musculo_esqueletica2021";
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_EVALUACION_2021 = "evaluacion_musculo_esqueletica2021";
 const MENSAJE_BLOQUEO_EVALUACION_NORMAL =
   "No se puede registrar porque este paciente ya cuenta con registros de Evaluación Músculo Esquelética.";
 
@@ -480,7 +481,10 @@ export const Loading = (text) => {
   });
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente no muestra el aviso de "ya cuenta con registros"
+// (formulario incrustado, donde el estado del registro ya se ve en pantalla). El bloqueo por el registro
+// Normal se conserva: explica por qué el formulario queda vacío.
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
   if (!nro) {
     await Swal.fire(
       "Error",
@@ -512,11 +516,13 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
 
   if (existePropia) {
     GetInfoServicio(nro, tabla, set, token, () => {
-      Swal.fire(
-        "Alerta",
-        "Este paciente ya cuenta con registros de MusculoEsqueletica.",
-        "warning"
-      );
+      if (!silencioso) {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de MusculoEsqueletica.",
+          "warning"
+        );
+      }
       console.log(existeNormal ? "Caso legado: ambas existen" : "Solo 2021 existe");
     });
     return;

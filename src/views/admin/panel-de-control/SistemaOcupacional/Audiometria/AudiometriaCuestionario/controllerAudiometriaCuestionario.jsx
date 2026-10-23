@@ -3,6 +3,9 @@ import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 
 //===============Zona Modificación===============
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_CUESTIONARIO_AUDIOMETRIA = "cuestionario_audiometria";
+
 const obtenerReporteUrl =
   "/api/v01/ct/audiometria/obtenerReporteCuestionarioAudiometria";
 const registrarUrl =
