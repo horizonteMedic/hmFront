@@ -9,6 +9,7 @@ import AvisoError from "../../../Compartido/components/AvisoError";
 import BuscadorMedicamentoStock from "../../../Compartido/components/BuscadorMedicamentoStock";
 import { ObtenerLotesMedicamento, ObtenerStockResumen, OpcionesLote } from "../../../Stock/controllerStock";
 import { useConsultaInventario } from "../../../Compartido/hooks/useConsultaInventario";
+import { formatearMonto, precioDeLote, valorDeLote } from "../../../Compartido/precioReferencial";
 import { MOTIVO_OTRO, RegistrarRetiro, ValidarRetiro } from "../controllerRetiros";
 
 Modal.setAppElement("#root");
@@ -30,6 +31,8 @@ export default function ModalRegistrarRetiro({ isOpen, onRequestClose, inventari
     const medicamentosConStock = useMemo(() => stock.datos.filter((fila) => fila.cantidadActual > 0), [stock.datos]);
     const lotesConStock = useMemo(() => lotes.datos.filter((l) => l.cantidadActual > 0), [lotes.datos]);
     const lote = lotesConStock.find((l) => String(l.id) === form.loteId) ?? null;
+    // Valor de las unidades que se van a retirar; sale cuando la cantidad escrita ya es un número.
+    const valorRetiro = lote && /^\d+$/.test(form.cantidad) ? valorDeLote(lote, Number(form.cantidad)) : null;
 
     const cargarStock = () => {
         if (inventario) stock.ejecutar(() => ObtenerStockResumen(inventario.id, token));
@@ -177,6 +180,14 @@ export default function ModalRegistrarRetiro({ isOpen, onRequestClose, inventari
                                 Actual: <strong>{lote.cantidadActual}</strong> · Reservada: <strong>{lote.cantidadReservada}</strong> · Disponible:{" "}
                                 <strong>{lote.cantidadDisponible}</strong>
                                 {lote.vencido ? " · Lote vencido" : ""}
+                                {precioDeLote(lote) == null ? (
+                                    " · Sin precio referencial"
+                                ) : (
+                                    <>
+                                        {" "}· Precio ref.: <strong>{formatearMonto(precioDeLote(lote))}</strong>
+                                        {valorRetiro != null && <> · Valor a retirar: <strong>{formatearMonto(valorRetiro)}</strong></>}
+                                    </>
+                                )}
                             </p>
                         )}
                     </div>

@@ -12,9 +12,13 @@ const camposAPI = {
   COCA: { valor: 'antConsumeHojaCoca', fecha: 'fechaConsumoHojaCoca' },
 };
 
-const tabla = 'con_panel2D';
+// nameService del consentimiento (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_CONSENTIMIENTO_PANEL_2D = 'con_panel2D';
+const tabla = TABLA_CONSENTIMIENTO_PANEL_2D;
 
-export const VerifyTR = async (nro, token, setForm, selectedSede, form) => {
+// `silencioso`: al encontrar un registro existente no muestra el aviso de "ya cuenta con registros"
+// (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, token, setForm, selectedSede, { silencioso = false } = {}) => {
   await VerifyTRDefault(
     nro,
     tabla,
@@ -22,7 +26,7 @@ export const VerifyTR = async (nro, token, setForm, selectedSede, form) => {
     setForm,
     selectedSede,
     () => GetInfoServicio(nro, token, setForm, selectedSede),
-    () => GetInfoServicioEditar(nro, token, setForm, form)
+    () => GetInfoServicioEditar(nro, token, setForm, { silencioso })
   );
 };
 
@@ -40,7 +44,7 @@ export const GetInfoServicio = async (nro, token, setForm, sede) => {
 };
 
 // ===== Mapeo Edición (registro existente) =====
-export const GetInfoServicioEditar = async (nro, token, setForm, form) => {
+export const GetInfoServicioEditar = async (nro, token, setForm, { silencioso = false } = {}) => {
   LoadingDefault('Obteniendo datos');
   try {
     const res = await getFetch(
@@ -48,23 +52,24 @@ export const GetInfoServicioEditar = async (nro, token, setForm, form) => {
       token
     );
     if (res.norden) {
-      Swal.fire(
-        "Alerta",
-        "Este paciente ya cuenta con registros de Consentimientos",
-        "warning"
-      );
-      const antecedentesActualizados = form.antecedentes.map((item) => {
-        const campos = camposAPI[item.key] || {};
-        return {
-          ...item,
-          value: res[campos.valor] ?? false,
-          fecha: res[campos.fecha] ?? today
-        };
-      });
+      if (!silencioso) {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Consentimientos",
+          "warning"
+        );
+      }
       setForm(prev => ({
         ...prev,
         ...res,
-        antecedentes: antecedentesActualizados,
+        antecedentes: prev.antecedentes.map((item) => {
+          const campos = camposAPI[item.key] || {};
+          return {
+            ...item,
+            value: res[campos.valor] ?? false,
+            fecha: res[campos.fecha] ?? today
+          };
+        }),
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         user_doctorAsignado: res.doctorAsignado ?? "",
 

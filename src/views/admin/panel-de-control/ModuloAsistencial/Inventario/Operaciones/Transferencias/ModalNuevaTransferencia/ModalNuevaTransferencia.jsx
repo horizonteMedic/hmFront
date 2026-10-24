@@ -12,6 +12,7 @@ import AvisoError from "../../../Compartido/components/AvisoError";
 import BuscadorMedicamentoStock from "../../../Compartido/components/BuscadorMedicamentoStock";
 import SelectorInventario from "../../../Compartido/components/SelectorInventario";
 import { ObtenerLotesMedicamento, ObtenerStockResumen, OpcionesLote } from "../../../Stock/controllerStock";
+import { formatearMonto, precioDeLote, textoValorTotal, valorDeLote } from "../../../Compartido/precioReferencial";
 import { useConsultaInventario } from "../../../Compartido/hooks/useConsultaInventario";
 import { conOrden, ordenarPorColumna, useOrdenTabla } from "../../../Compartido/hooks/useOrdenTabla";
 import {
@@ -20,6 +21,7 @@ import {
     CrearItemTransferencia,
     RegistrarTransferencia,
     ValidarItemTransferencia,
+    ValorDeTransferencia,
 } from "../controllerTransferencias";
 
 Modal.setAppElement("#root");
@@ -185,20 +187,28 @@ export default function ModalNuevaTransferencia({
 
     // Cada cabecera ordena por lo que muestra la columna.
     const columnasDetalle = conOrden([
-        { id: "medicamento", label: "Medicamento", accessor: "medicamento", width: "38%" },
-        { id: "numeroLote", label: "N° Lote", width: "18%", valorOrden: (row) => row.numeroLote, render: (row) => row.numeroLote || "—" },
+        { id: "medicamento", label: "Medicamento", accessor: "medicamento", width: "30%" },
+        { id: "numeroLote", label: "N° Lote", width: "14%", valorOrden: (row) => row.numeroLote, render: (row) => row.numeroLote || "—" },
         {
             id: "fechaVencimiento",
             label: "Vencimiento",
-            width: "16%",
+            width: "13%",
             valorOrden: (row) => row.fechaVencimiento,
             render: (row) => formatearFechaCorta(row.fechaVencimiento) || "—",
         },
-        { id: "cantidad", label: "Cantidad", accessor: "cantidad", width: "14%" },
+        { id: "cantidad", label: "Cantidad", accessor: "cantidad", width: "10%" },
+        { id: "precio", label: "Precio ref.", width: "11%", valorOrden: precioDeLote, render: (row) => formatearMonto(precioDeLote(row)) },
+        {
+            id: "valor",
+            label: "Valor",
+            width: "12%",
+            valorOrden: (row) => valorDeLote(row, row.cantidad),
+            render: (row) => formatearMonto(valorDeLote(row, row.cantidad)),
+        },
         {
             id: "accion",
             label: "Acción",
-            width: "14%",
+            width: "10%",
             render: (row) => (
                 <button
                     type="button"
@@ -344,7 +354,7 @@ export default function ModalNuevaTransferencia({
                                     emptyText="Aún no se agregó ningún lote"
                                 />
                                 <p className="mt-2 text-right font-semibold">
-                                    {items.length} lote(s) · {totalUnidades} unidades
+                                    {items.length} lote(s) · {totalUnidades} unidades · Valor referencial: {textoValorTotal(ValorDeTransferencia(items))}
                                 </p>
                             </div>
                         </SectionFieldset>

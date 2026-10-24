@@ -5,21 +5,24 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import TablaTemplate from "../../../../../../components/templates/TablaTemplate";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 import { etiquetaMedicamento } from "../../Compartido/inventarioUtils";
+import { formatearMonto, precioDeLote, sumarValores, textoValorTotal, valorDeLote } from "../../Compartido/precioReferencial";
 import { useConsultaInventario } from "../../Compartido/hooks/useConsultaInventario";
 import { EstadoLote, ObtenerLotesMedicamento } from "../controllerStock";
 
 Modal.setAppElement("#root");
 
 const columnas = [
-    { label: "N° Lote", width: "18%", render: (row) => row.numeroLote || "—" },
-    { label: "Vencimiento", width: "16%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
-    { label: "Días p/ vencer", width: "14%", render: (row) => (row.vencido ? "—" : row.diasParaVencer ?? "—") },
-    { label: "Actual", accessor: "cantidadActual", width: "11%" },
-    { label: "Reservada", accessor: "cantidadReservada", width: "12%" },
-    { label: "Disponible", accessor: "cantidadDisponible", width: "12%" },
+    { label: "N° Lote", width: "13%", render: (row) => row.numeroLote || "—" },
+    { label: "Vencimiento", width: "12%", render: (row) => formatearFechaCorta(row.fechaVencimiento) },
+    { label: "Días p/ vencer", width: "11%", render: (row) => (row.vencido ? "—" : row.diasParaVencer ?? "—") },
+    { label: "Actual", accessor: "cantidadActual", width: "9%" },
+    { label: "Reservada", accessor: "cantidadReservada", width: "10%" },
+    { label: "Disponible", accessor: "cantidadDisponible", width: "10%" },
+    { label: "Precio ref.", width: "11%", render: (row) => formatearMonto(precioDeLote(row)) },
+    { label: "Valor", width: "12%", render: (row) => formatearMonto(valorDeLote(row)) },
     {
         label: "Estado",
-        width: "17%",
+        width: "12%",
         render: (row) => {
             const estado = EstadoLote(row);
             return <span className={`px-2 py-0.5 rounded text-sm font-semibold ${estado.clases}`}>{estado.texto}</span>;
@@ -46,6 +49,8 @@ export default function ModalLotes({ isOpen, onRequestClose, inventario, medicam
     };
 
     const total = (campo) => lotes.reduce((suma, lote) => suma + (Number(lote[campo]) || 0), 0);
+    // Valor de lo que hay (stock actual × precio) en los lotes que se ven; los lotes sin precio no suman.
+    const valorTotal = sumarValores(lotes.map((lote) => valorDeLote(lote)));
 
     return (
         <Modal
@@ -55,7 +60,7 @@ export default function ModalLotes({ isOpen, onRequestClose, inventario, medicam
             className="outline-none"
             overlayClassName="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
         >
-            <div className="bg-white rounded-lg shadow-xl w-[95vw] max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-lg shadow-xl w-[95vw] max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
                 <div className="flex items-center justify-between bg-[#233245] text-white px-4 py-3">
                     <h2 className="font-bold text-lg">Lotes · {medicamento ? etiquetaMedicamento({ nombre: medicamento.nombre, presentacion: medicamento.presentacion }) : ""}</h2>
                     <button type="button" onClick={cerrar} className="text-2xl leading-none" title="Cerrar">
@@ -95,7 +100,8 @@ export default function ModalLotes({ isOpen, onRequestClose, inventario, medicam
 
                     {lotes.length > 0 && (
                         <p className="text-right font-semibold">
-                            Actual: {total("cantidadActual")} · Reservada: {total("cantidadReservada")} · Disponible: {total("cantidadDisponible")}
+                            Actual: {total("cantidadActual")} · Reservada: {total("cantidadReservada")} · Disponible: {total("cantidadDisponible")} · Valor:{" "}
+                            {textoValorTotal(valorTotal)}
                         </p>
                     )}
                 </div>

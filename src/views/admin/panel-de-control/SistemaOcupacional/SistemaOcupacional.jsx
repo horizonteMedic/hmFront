@@ -46,7 +46,6 @@ import {
   faAnchor,
   faSkiingNordic,
   faSkull,
-  faGamepad,
   faBed,
   faMountain,
   fa2,
@@ -111,7 +110,6 @@ import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
 import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
-import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 import Folio from "./Folio/Folio.jsx";
@@ -343,7 +341,6 @@ const TabComponent = () => {
                   { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
                   { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
                   { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT" },
-                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                   { vista: "Poderosa", tab: 37, icons: [{ icon: faPersonRifle }], label: "Poderosa" },
                   { vista: "Psicologia", tab: 10, icons: [{ icon: faBrain }], label: "Psicología" },
                   { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
@@ -636,7 +633,6 @@ const TabComponent = () => {
               },
               22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
               23: { title: "Test de Fatiga y Somnolencia", child: <Test_fatiga /> },
-              24: { title: "Gestion Opciones", child: <GestionOpciones /> },
               25: { title: "Antecedentes de Enfermedades en Altura", child: <AntecedentesDeAltura /> },
               26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
               27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },

@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { consultarInventario, enviarInventario, inventarioUrl, limpiarTexto } from "../../Compartido/inventarioUtils";
+import { formatearMonto, valorDeLote } from "../../Compartido/precioReferencial";
 
 const retirosUrl = `${inventarioUrl}/retiros`;
 const lotesUrl = `${inventarioUrl}/stock/lotes`;
@@ -76,9 +77,11 @@ export const EnviarRetiroLote = ({ loteId, cantidad, motivo, observacion }, toke
 // Devuelve true si el retiro quedó registrado, para que la pantalla limpie el formulario y recargue.
 export const RegistrarRetiro = async (form, lote, token, usuario) => {
     // Un retiro descuenta stock y no se puede deshacer desde aquí: se confirma antes.
+    const valor = valorDeLote(lote, Number(form.cantidad));
+    const textoValor = valor == null ? "" : ` (valor referencial ${formatearMonto(valor)})`;
     const { isConfirmed } = await Swal.fire({
         title: "Registrar retiro",
-        text: `Se retirarán ${Number(form.cantidad)} unidades del lote ${lote.numeroLote || "sin número"} de "${form.medicamentoTexto}" por ${form.motivo}. ¿Desea continuar?`,
+        text: `Se retirarán ${Number(form.cantidad)} unidades${textoValor} del lote ${lote.numeroLote || "sin número"} de "${form.medicamentoTexto}" por ${form.motivo}. ¿Desea continuar?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, retirar",

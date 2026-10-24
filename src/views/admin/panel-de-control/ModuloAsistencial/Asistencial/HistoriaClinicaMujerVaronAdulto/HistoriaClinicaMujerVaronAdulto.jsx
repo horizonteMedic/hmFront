@@ -61,6 +61,7 @@ const CAMPOS_EDITABLES = [
   "vacuna_hvb_3_fecha",
   "vacuna_antiamarilica_1_dosis",
   "vacuna_antiamarilica_1_fecha",
+  "anamnesis",
   "examenFisico",
   "examenesAuxiliares",
   "diagnostico",
@@ -172,6 +173,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     vigilancia_violencia: false,
 
     // Examen / Diagnóstico (informativo del ticket, editable). Diagnóstico y Tratamiento son obligatorios.
+    anamnesis: "",
     examenFisico: "",
     examenesAuxiliares: "",
     diagnostico: "",
@@ -670,6 +672,17 @@ export default function HistoriaClinicaMujerVaronAdulto() {
       </div>
 
       <SectionFieldset collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <InputTextArea
+          label="Anamnesis"
+          name="anamnesis"
+          value={form.anamnesis}
+          onChange={handleChange}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("anamnesis")}
+          onRevert={() => revertField("anamnesis")}
+          labelWidth="180px"
+          rows={3}
+        />
         <InputTextArea
           label="Examen Físico"
           name="examenFisico"

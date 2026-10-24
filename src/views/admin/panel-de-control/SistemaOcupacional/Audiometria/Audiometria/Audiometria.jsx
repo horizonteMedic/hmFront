@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import {
   SubmitDataService,
+  TABLA_AUDIOMETRIA,
   VerifyTR,
   PrintHojaR,
 } from "./controllerAudiometria";
@@ -21,7 +23,7 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
-const tabla = "audiometria_2023";
+const tabla = TABLA_AUDIOMETRIA;
 
 const chemicals = [
   "plomo",
@@ -33,12 +35,15 @@ const chemicals = [
 ];
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
 
-export default function Audiometria() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la audiometría.
+export default function Audiometria({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const initialFormState = {
     codAu: "",
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     fecha: today,
     nomExam: "",
     conclusionesCie10: "",
@@ -177,11 +182,21 @@ export default function Audiometria() {
     handleCheckBoxChange,
     handlePrintDefault,
     handleFocusNext,
-  } = useForm(initialFormState, { storageKey: "audiometriaNormal" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "audiometriaNormal" });
+
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay audiometría; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -265,7 +280,7 @@ export default function Audiometria() {
   };
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-3">
           <InputTextOneLine
@@ -274,6 +289,7 @@ export default function Audiometria() {
             value={form.norden}
             onChange={handleChangeNumberDecimals}
             onKeyUp={handleSearch}
+            disabled={embebido}
             labelWidth="120px"
           />
           <InputTextOneLine
@@ -825,6 +841,8 @@ export default function Audiometria() {
           handleClear={handleClear}
           handlePrint={handlePrint}
           handleChangeNumberDecimals={handleChangeNumberDecimals}
+          hideClear={embebido}
+          hidePrint={embebido}
         />
       </div>
     </div>

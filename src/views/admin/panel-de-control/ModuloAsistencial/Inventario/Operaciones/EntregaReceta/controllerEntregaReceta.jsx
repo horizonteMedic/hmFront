@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { consultarInventario, enviarInventario, escaparHtml, etiquetaMedicamento, hoyISO, limpiarTexto } from "../../Compartido/inventarioUtils";
+import { sumarValores, valorDeMovimientoPorLotes } from "../../Compartido/precioReferencial";
 
 // Las recetas viven fuera de /inventario: las crea la historia clínica y farmacia las entrega o las anula.
 const recetasUrl = "/asistencial/recetas";
@@ -59,6 +60,17 @@ export const TieneFaltante = (receta) =>
     PuedeEntregarse(receta) && (Boolean(receta.conFaltante) || (receta.detalles ?? []).some((detalle) => !detalle.entregado && detalle.cantidadFaltante > 0));
 
 export const NombrePaciente = (receta) => [receta.pacienteApellidos, receta.pacienteNombres].filter(Boolean).join(" ");
+
+// Valor referencial de un medicamento de la receta: el de los lotes de los que se reservó (o se entregó). null si no tiene
+// lotes (todo es faltante) o a alguno le falta el precio.
+export const ValorDeDetalle = (detalle, lotesPorId) => valorDeMovimientoPorLotes(detalle.lotes, lotesPorId);
+
+// Valor referencial de la receta: { total, sinPrecio, lotes }, donde `lotes` es la cantidad de medicamentos con stock
+// reservado o entregado (los que son todo faltante no cuentan) y `sinPrecio` cuántos de ellos no se pudieron valorizar.
+export const ValorDeReceta = (receta, lotesPorId) => {
+    const conStock = (receta.detalles ?? []).filter((detalle) => detalle.lotes?.length > 0);
+    return { ...sumarValores(conStock.map((detalle) => ValorDeDetalle(detalle, lotesPorId))), lotes: conStock.length };
+};
 
 export const EstadoReceta = (receta) => {
     if (receta.anulada) return { texto: "Anulada", clases: "bg-red-100 text-red-700" };

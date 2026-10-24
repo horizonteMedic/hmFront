@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { formatearFechaCorta, formatearFechaHora } from "../../../../../../../utils/formatDateUtils";
 import { agregarHoja, descargarLibro, nombreSeguro } from "../../../Compartido/excelInventario";
 import { etiquetaMedicamento, hoyISO, normalizarTexto } from "../../../Compartido/inventarioUtils";
+import { FORMATO_MONTO_EXCEL, montoExcel, precioDeLote, sumarValores, textoValorTotal, valorDeLote } from "../../../Compartido/precioReferencial";
 import { EnviarRetiroLote } from "../controllerRetiros";
 
 const MS_POR_DIA = 86400000;
@@ -33,12 +34,19 @@ export const LotesARetirar = (lotes, dias) =>
         return lote.vencido || (faltan != null && faltan <= dias);
     });
 
+// Valor referencial de lo que queda en los lotes (todo se retira): { total, sinPrecio }. Los lotes sin precio no suman.
+export const ValorALoteRetirar = (lotes) => sumarValores(lotes.map((lote) => valorDeLote(lote)));
+
+// Valor retirado de una lista [{ lote, cantidad }] (la relación de lo ya retirado): { total, sinPrecio }.
+export const ValorRetirado = (retirados) => sumarValores(retirados.map((retiro) => valorDeLote(retiro.lote, retiro.cantidad)));
+
 // Pide confirmar antes de retirar: descuenta stock y no se puede deshacer desde aquí.
 export const ConfirmarRetiroVencidos = async (lotes, inventario) => {
     const unidades = lotes.reduce((total, lote) => total + lote.cantidadActual, 0);
+    const valor = ValorALoteRetirar(lotes);
     const { isConfirmed } = await Swal.fire({
         title: "Retirar lotes vencidos o por vencer",
-        text: `Se retirarán ${lotes.length} lote(s), ${unidades} unidades en total, del inventario "${inventario.nombre}". Esta acción descuenta el stock. ¿Desea continuar?`,
+        text: `Se retirarán ${lotes.length} lote(s), ${unidades} unidades en total (valor referencial ${textoValorTotal(valor)}), del inventario "${inventario.nombre}". Esta acción descuenta el stock. ¿Desea continuar?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, retirar",
@@ -90,6 +98,21 @@ const columnasLote = [
     { etiqueta: "Vencimiento", ancho: 14, valor: (lote) => formatearFechaCorta(lote.fechaVencimiento) },
 ];
 
+// Dos columnas de monto para los Excel: el precio referencial del lote y el valor de las unidades que se cuentan en la fila.
+// `loteYUnidades(fila)` devuelve { lote, unidades } de cada fila de la hoja.
+const columnasPrecio = (loteYUnidades, etiquetaValor) => [
+    { etiqueta: "Precio ref. (S/)", ancho: 15, formato: FORMATO_MONTO_EXCEL, valor: (fila) => montoExcel(precioDeLote(loteYUnidades(fila).lote)) },
+    {
+        etiqueta: etiquetaValor,
+        ancho: 17,
+        formato: FORMATO_MONTO_EXCEL,
+        valor: (fila) => {
+            const { lote, unidades } = loteYUnidades(fila);
+            return montoExcel(valorDeLote(lote, unidades));
+        },
+    },
+];
+
 // Lista de los lotes que se van a retirar (los que están marcados), para revisarla o archivarla antes de confirmar.
 export const DescargarListaVencidos = async (lotes, inventario) => {
     const libro = new ExcelJS.Workbook();
@@ -99,8 +122,15 @@ export const DescargarListaVencidos = async (lotes, inventario) => {
         { etiqueta: "Stock actual", ancho: 13, valor: (lote) => lote.cantidadActual },
         { etiqueta: "Reservado", ancho: 12, valor: (lote) => lote.cantidadReservada },
         { etiqueta: "Disponible", ancho: 12, valor: (lote) => lote.cantidadDisponible },
+        ...columnasPrecio((lote) => ({ lote, unidades: lote.cantidadActual }), "Valor a retirar (S/)"),
     ];
-    agregarHoja(libro, "POR RETIRAR", `LOTES VENCIDOS Y POR VENCER POR RETIRAR | ${inventario.nombre} | ${formatearFechaCorta(hoyISO())}`, columnas, lotes);
+    agregarHoja(
+        libro,
+        "POR RETIRAR",
+        `LOTES VENCIDOS Y POR VENCER POR RETIRAR | ${inventario.nombre} | ${formatearFechaCorta(hoyISO())} | VALOR REFERENCIAL: ${textoValorTotal(ValorALoteRetirar(lotes))}`,
+        columnas,
+        lotes
+    );
 
     await descargarLibro(libro, `Vencidos_por_retirar_${nombreSeguro(inventario.nombre)}_${hoyISO()}.xlsx`);
 };
@@ -114,10 +144,11 @@ export const DescargarRelacionRetirados = async ({ retirados, fallidos }, invent
     agregarHoja(
         libro,
         "RETIRADOS",
-        titulo("LOTES VENCIDOS Y POR VENCER RETIRADOS"),
+        `${titulo("LOTES VENCIDOS Y POR VENCER RETIRADOS")} | VALOR REFERENCIAL RETIRADO: ${textoValorTotal(ValorRetirado(retirados))}`,
         [
             ...columnasLote.map((columna) => ({ ...columna, valor: (retiro, i) => columna.valor(retiro.lote, i) })),
             { etiqueta: "Cantidad retirada", ancho: 16, valor: (retiro) => retiro.cantidad },
+            ...columnasPrecio((retiro) => ({ lote: retiro.lote, unidades: retiro.cantidad }), "Valor retirado (S/)"),
             { etiqueta: "Fecha y hora del retiro", ancho: 22, valor: (retiro) => formatearFechaHora(retiro.fecha) },
             { etiqueta: "Usuario", ancho: 16, valor: () => usuario },
         ],
@@ -132,6 +163,7 @@ export const DescargarRelacionRetirados = async ({ retirados, fallidos }, invent
             [
                 ...columnasLote.map((columna) => ({ ...columna, valor: (fallo, i) => columna.valor(fallo.lote, i) })),
                 { etiqueta: "Stock actual", ancho: 13, valor: (fallo) => fallo.lote.cantidadActual },
+                ...columnasPrecio((fallo) => ({ lote: fallo.lote, unidades: fallo.lote.cantidadActual }), "Valor sin retirar (S/)"),
                 { etiqueta: "Motivo", ancho: 50, valor: (fallo) => fallo.mensaje },
             ],
             fallidos

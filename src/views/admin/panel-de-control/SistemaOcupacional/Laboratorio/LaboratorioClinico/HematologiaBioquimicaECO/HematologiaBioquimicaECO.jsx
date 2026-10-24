@@ -17,14 +17,14 @@ import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_LAB_CLINICO, UpdateDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
-const tabla = "lab_clinico";
+const tabla = TABLA_LAB_CLINICO;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -80,7 +80,10 @@ const CAMPOS_EDITABLES = [
   "nombre_doctorAsignado",
 ];
 
-export default function HematologiaBioquimicaECO() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador ni muestra el checklist de exámenes, y avisa con `onGuardado` al registrar o actualizar.
+export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
 
   const [showOnlyPassed, setShowOnlyPassed] = useState(false);
@@ -175,7 +178,7 @@ export default function HematologiaBioquimicaECO() {
   ]
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codLabclinico: null,
     fechaExamen: today,
 
@@ -293,7 +296,7 @@ export default function HematologiaBioquimicaECO() {
     handleClear,
     handleFocusNext,
     handleRadioButton,
-  } = useForm(initialFormState, { storageKey: "laboratorioClinico" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "laboratorioClinico" });
 
   const {
     edicionHabilitada,
@@ -311,13 +314,23 @@ export default function HematologiaBioquimicaECO() {
   const isDoctorEdited = isFieldEdited("user_doctorAsignado");
   const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla);
   };
 
   const handleEdit = () => {
-    UpdateDataService(form, token, userlogued, handleClear, tabla);
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay registro; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, null, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const handleHemoglobinaBlur = (e) => {
     const { value } = e.target;
@@ -418,7 +431,7 @@ export default function HematologiaBioquimicaECO() {
 
 
   return (
-    <div className="max-w-[95%] xl:max-w-[90%] mx-auto space-y-3">
+    <div className={embebido ? "space-y-3" : "max-w-[95%] xl:max-w-[90%] mx-auto space-y-3"}>
       <div className="px-4">
         <AccionesRegistroHeader
           tieneRegistro={form.tieneRegistro}
@@ -426,10 +439,11 @@ export default function HematologiaBioquimicaECO() {
           edicionHabilitada={edicionHabilitada}
           onHabilitarEdicion={habilitarEdicion}
           onLimpiar={handleClear}
+          mostrarLimpiar={!embebido}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="space-y-3 px-4 lg:col-span-3">
+      <div className={`grid grid-cols-1 gap-4 ${embebido ? "" : "lg:grid-cols-4"}`}>
+        <div className={`space-y-3 px-4 ${embebido ? "" : "lg:col-span-3"}`}>
           <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
             <div className="flex gap-x-3 w-full">
               <InputTextOneLine
@@ -438,11 +452,11 @@ export default function HematologiaBioquimicaECO() {
                 value={form.norden}
                 onChange={handleChangeNumber}
                 onKeyUp={handleSearch}
-                disabled={hayRegistroCargado}
+                disabled={embebido || hayRegistroCargado}
                 labelWidth="120px"
                 className="w-full"
               />
-              <SearchButton onClick={executeSearch} className="xl:hidden" />
+              {!embebido && <SearchButton onClick={executeSearch} className="xl:hidden" />}
             </div>
             <InputTextOneLine
               label="Fecha"
@@ -1115,89 +1129,94 @@ export default function HematologiaBioquimicaECO() {
             handlePrint={handlePrint}
             hideSave={form.tieneRegistro && !edicionHabilitada}
             hideEdit={!form.tieneRegistro || edicionHabilitada}
+            hideClear={embebido}
+            hidePrint={embebido}
           />
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="flex-1 space-y-3">
-
-
-            <div className="w-full flex  justify-between items-center px-2">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="showPassed"
-                  checked={showOnlyPassed}
-                  onChange={(e) => setShowOnlyPassed(e.target.checked)}
-                  disabled={!form.nombres}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
-                  Exámenes Pasados
-                </label>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
-                  No pasados: <span className="text-red-600 ml-1">{notPassed}</span>
+        {/* Checklist de exámenes de la orden (no va incrustado: la barra lateral de Auditoría ya lo muestra) */}
+        {!embebido && (
+          <div className="lg:col-span-1">
+            <div className="flex-1 space-y-3">
+  
+  
+              <div className="w-full flex  justify-between items-center px-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="showPassed"
+                    checked={showOnlyPassed}
+                    onChange={(e) => setShowOnlyPassed(e.target.checked)}
+                    disabled={!form.nombres}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
+                    Exámenes Pasados
+                  </label>
                 </div>
-                <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
-                  Pasados: <span className="text-green-600 ml-1">{passed}</span>
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
+                    No pasados: <span className="text-red-600 ml-1">{notPassed}</span>
+                  </div>
+                  <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                    Pasados: <span className="text-green-600 ml-1">{passed}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-
-            {form.listExamLab?.map(
-              section => {
-                const visibleItems = (section.items || []).filter(item =>
-                  showOnlyPassed ? item.resultado : true
-                );
-
-                if (visibleItems.length === 0) return null;
-
-                return (
-                  <SectionFieldset key={section.title} legend={section.title} className={"!px-0"}>
-                    {(section.items || []).map((item, index) => {
-                      const estado = Array.isArray(item.resultado)
-                        ? item.resultado.length > 0
-                          ? "PASO"
-                          : "NO TIENE"
-                        : item.resultado === true
-                          ? "PASO"
-                          : "NO PASO";
-                      if (showOnlyPassed && !item.resultado) return null;
-
-                      let cardClass = "break-inside-avoid mb-2 flex justify-between items-center border-2 p-3 mx-3 rounded-md shadow-sm gap-2 h-20 transition-all duration-200";
-
-                      if (!item.resultado) {
-                        // NO PASO -> ROJO FUERTE
-                        cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
-                      } else {
-                        // SI PASO -> POINTER
-                        cardClass += " bg-green-200 border-green-500 ";
-                      }
-                      return (
-                        <div key={`${item.label}-${index}`} className="mb-3">
-                          {/* 🔸 Items */}
-                          <div className={`${cardClass} onClick ${cardClass}`} key={index}>
-                            <InputTextOneLine
-                              label={item.label}
-                              name={item.name}
-                              value={estado}
-                              inputClassName={`text-center font-bold bg-transparent border-0 ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
-                              disabled
-                              labelWidth="160px"
-                            />
-
+  
+  
+              {form.listExamLab?.map(
+                section => {
+                  const visibleItems = (section.items || []).filter(item =>
+                    showOnlyPassed ? item.resultado : true
+                  );
+  
+                  if (visibleItems.length === 0) return null;
+  
+                  return (
+                    <SectionFieldset key={section.title} legend={section.title} className={"!px-0"}>
+                      {(section.items || []).map((item, index) => {
+                        const estado = Array.isArray(item.resultado)
+                          ? item.resultado.length > 0
+                            ? "PASO"
+                            : "NO TIENE"
+                          : item.resultado === true
+                            ? "PASO"
+                            : "NO PASO";
+                        if (showOnlyPassed && !item.resultado) return null;
+  
+                        let cardClass = "break-inside-avoid mb-2 flex justify-between items-center border-2 p-3 mx-3 rounded-md shadow-sm gap-2 h-20 transition-all duration-200";
+  
+                        if (!item.resultado) {
+                          // NO PASO -> ROJO FUERTE
+                          cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
+                        } else {
+                          // SI PASO -> POINTER
+                          cardClass += " bg-green-200 border-green-500 ";
+                        }
+                        return (
+                          <div key={`${item.label}-${index}`} className="mb-3">
+                            {/* 🔸 Items */}
+                            <div className={`${cardClass} onClick ${cardClass}`} key={index}>
+                              <InputTextOneLine
+                                label={item.label}
+                                name={item.name}
+                                value={estado}
+                                inputClassName={`text-center font-bold bg-transparent border-0 ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
+                                disabled
+                                labelWidth="160px"
+                              />
+  
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </SectionFieldset>
-                );
-              })}
+                        );
+                      })}
+                    </SectionFieldset>
+                  );
+                })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

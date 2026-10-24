@@ -12,6 +12,9 @@ import {
     imprimirReporteJasper,
 } from "../../../../../../utils/registroOcupacionalUtils";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_BRIGADISTA = "psi_brigadistas";
+
 // ===== Configuración =====
 const obtenerReporteUrl =
     "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista";
@@ -189,7 +192,9 @@ export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter
 };
 
 // ===== Búsqueda / verificación por N° Orden =====
-export const VerifyTR = (nro, tabla, token, set, sede) =>
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = (nro, tabla, token, set, sede, { silencioso = false } = {}) =>
     verificarRegistro({
         nro,
         tabla,
@@ -198,6 +203,10 @@ export const VerifyTR = (nro, tabla, token, set, sede) =>
         onNuevo: () => GetInfoServicio(nro, set, token, sede),
         onExistente: () =>
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire({
                     icon: "warning",
                     title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',

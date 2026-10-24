@@ -14,6 +14,7 @@ import {
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
+  TABLA_EKG,
   UpdateDataService,
   VerifyTR,
 } from "./controllerEKG";
@@ -34,7 +35,7 @@ import BotonesForm from "../../../../components/templates/BotonesForm";
 import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 
-const tabla = "informe_electrocardiograma";
+const tabla = TABLA_EKG;
 
 const equivalencias = {
   "BRADICARDIA SINUSAL FISIOLOGICA": "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA",
@@ -67,12 +68,15 @@ const CAMPOS_EDITABLES = [
   "nombre_doctorAsignado",
 ];
 
-export default function EKG() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador ni muestra la búsqueda de registros, y avisa con `onGuardado` al registrar o actualizar el EKG.
+export default function EKG({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codigoElectroCardiograma: null,
     fechaExam: today,
 
@@ -150,7 +154,7 @@ export default function EKG() {
     handleClearnotO,
     handlePrintDefault,
     handleFocusNext,
-  } = useForm(initialFormState, { storageKey: "ekg" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "ekg" });
 
   const {
     edicionHabilitada,
@@ -173,12 +177,15 @@ export default function EKG() {
   const [dataTabla, setDataTabla] = useState([]);
   const [visualerOpen, setVisualerOpen] = useState(null);
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
 
   const handleEdit = () => {
-    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
 
   // ===== Búsqueda con botón =====
@@ -253,8 +260,15 @@ export default function EKG() {
   };
 
   useEffect(() => {
-    obtenerInfoTabla();
+    if (!embebido) obtenerInfoTabla();
   }, []);
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay EKG; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const auditoria = buildAuditoria(form, {
     usuarioActual: userlogued,
@@ -262,16 +276,17 @@ export default function EKG() {
   });
 
   return (
-    <div className="px-4 max-w-[90%] xl:max-w-[80%] mx-auto space-y-3">
+    <div className={embebido ? "px-4 space-y-3" : "px-4 max-w-[90%] xl:max-w-[80%] mx-auto space-y-3"}>
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-6">
+      <div className={`grid grid-cols-1 gap-x-6 gap-y-6 ${embebido ? "" : "lg:grid-cols-2"}`}>
         {/* PANEL IZQUIERDO - FORMULARIO */}
         <div className="space-y-3">
           <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-2 gap-3">
@@ -282,11 +297,11 @@ export default function EKG() {
                 value={form.norden}
                 onChange={handleChangeNumber}
                 onKeyUp={handleSearch}
-                disabled={hayRegistroCargado}
+                disabled={embebido || hayRegistroCargado}
                 labelWidth="120px"
                 className="w-full"
               />
-              <SearchButton onClick={executeSearch} className="lg:hidden"  />
+              {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
             </div>
             <InputTextOneLine
               label="Fecha"
@@ -702,54 +717,56 @@ export default function EKG() {
           </SectionFieldset>
         </div>
 
-        {/* PANEL DERECHO - BÚSQUEDA Y RESULTADOS */}
-        <div className="space-y-3">
-          <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
-              <InputTextOneLine
-                label="Nombre"
-                labelOnTop
-                name="nombres_search"
-                value={form.nombres_search}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
-                    obtenerInfoTabla();
-                  }
-                }}
-                onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
+        {/* PANEL DERECHO - BÚSQUEDA Y RESULTADOS (no va incrustado) */}
+        {!embebido && (
+          <div className="space-y-3">
+            <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                  label="Nombre"
+                  labelOnTop
+                  name="nombres_search"
+                  value={form.nombres_search}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      obtenerInfoTabla();
+                    }
+                  }}
+                  onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
+                />
+                <InputTextOneLine
+                  label="Código"
+                  labelOnTop
+                  name="codigo_search"
+                  value={form.codigo_search}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      obtenerInfoTabla();
+                    }
+                  }}
+                  onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
+                />
+              </div>
+              <div className="flex-1">
+                <Table
+                  data={dataTabla}
+                  tabla={tabla}
+                  set={setForm}
+                  token={token}
+                  clean={handleClear}
+                  datosFooter={datosFooter}
+                />
+              </div>
+            </SectionFieldset>
+            <SectionFieldset legend="Diagrama de Derivaciones del ECG">
+              <img
+                src="img/diagrama_derivaciones_ecg.svg"
+                alt="Diagrama de Derivaciones del ECG"
+                className="mx-auto max-w-[250px] py-4"
               />
-              <InputTextOneLine
-                label="Código"
-                labelOnTop
-                name="codigo_search"
-                value={form.codigo_search}
-                onKeyUp={(e) => {
-                  if (e.key === "Enter") {
-                    obtenerInfoTabla();
-                  }
-                }}
-                onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
-              />
-            </div>
-            <div className="flex-1">
-              <Table
-                data={dataTabla}
-                tabla={tabla}
-                set={setForm}
-                token={token}
-                clean={handleClear}
-                datosFooter={datosFooter}
-              />
-            </div>
-          </SectionFieldset>
-          <SectionFieldset legend="Diagrama de Derivaciones del ECG">
-            <img
-              src="img/diagrama_derivaciones_ecg.svg"
-              alt="Diagrama de Derivaciones del ECG"
-              className="mx-auto max-w-[250px] py-4"
-            />
-          </SectionFieldset>
-        </div>
+            </SectionFieldset>
+          </div>
+        )}
       </div>
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
@@ -775,6 +792,8 @@ export default function EKG() {
         handlePrint={handlePrint}
         hideSave={form.tieneRegistro && !edicionHabilitada}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
       />
 
       {visualerOpen && (

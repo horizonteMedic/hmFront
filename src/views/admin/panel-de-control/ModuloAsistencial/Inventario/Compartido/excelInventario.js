@@ -15,7 +15,8 @@ export const nombreSeguro = (texto) =>
         .replace(/^_+|_+$/g, "");
 
 // Agrega una hoja con una fila de título, los encabezados y una fila por elemento de `filas`.
-// `columnas`: [{ etiqueta, ancho, valor(fila, indice) }]. La hoja queda con el encabezado inmovilizado.
+// `columnas`: [{ etiqueta, ancho, valor(fila, indice), formato? }]. `formato` es el formato numérico de Excel de la columna
+// (p. ej. "#,##0.00" para montos). La hoja queda con el encabezado inmovilizado.
 export const agregarHoja = (libro, nombre, titulo, columnas, filas) => {
     const hoja = libro.addWorksheet(nombre);
 
@@ -40,6 +41,9 @@ export const agregarHoja = (libro, nombre, titulo, columnas, filas) => {
 
     filas.forEach((fila, indice) => {
         const nueva = hoja.addRow(columnas.map((columna) => columna.valor(fila, indice)));
+        columnas.forEach((columna, i) => {
+            if (columna.formato) nueva.getCell(i + 1).numFmt = columna.formato;
+        });
         nueva.eachCell((celda) => {
             celda.alignment = { vertical: "middle", wrapText: true };
             celda.border = {

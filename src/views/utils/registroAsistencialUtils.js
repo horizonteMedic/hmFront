@@ -199,12 +199,14 @@ const lectorPorDefecto = (url) => (numeroTicket, token) => obtenerRegistroPorTic
  * @param {string}   [p.ruta]          Ruta del reporte bajo `url` (default "obtenerReporte"; Hemoglobina
  *                                     usa "obtenerReporteHemoglobina").
  * @param {string}   p.nameService     nameService del examen (p. ej. "hemograma_asistencial").
+ * @param {string}   [p.nombreParametro]  Nombre del query param que lleva `nameService` (default "nameService";
+ *                                     los consentimientos de laboratorio usan "nameConset").
  * @param {Function} p.tieneRegistro   (resultado) => boolean; qué campo prueba que el registro existe.
  */
-export const crearLectorReporte = ({ url, ruta = "obtenerReporte", nameService, tieneRegistro }) => (esJasper) => async (numeroTicket, token) => {
+export const crearLectorReporte = ({ url, ruta = "obtenerReporte", nameService, nombreParametro = "nameService", tieneRegistro }) => (esJasper) => async (numeroTicket, token) => {
   try {
     const res = await getFetch(
-      `${url}/${ruta}?numeroTicket=${numeroTicket}&nameService=${nameService}&esJasper=${esJasper}`,
+      `${url}/${ruta}?numeroTicket=${numeroTicket}&${nombreParametro}=${nameService}&esJasper=${esJasper}`,
       token
     );
     if (!res || res.error) return null;

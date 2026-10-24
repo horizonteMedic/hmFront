@@ -17,6 +17,9 @@ import {
   verificarRegistro,
 } from "../../../../../../utils/registroOcupacionalUtils.js";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_LAB_CLINICO = "lab_clinico";
+
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta";
@@ -277,7 +280,9 @@ export const UpdateDataService = (form, token, user, limpiar, tabla) =>
 // ===== Búsqueda / verificación por N° Orden =====
 // Además de cargar los datos (nuevo o existente), refresca el checklist de exámenes
 // (GetExamenesLab) con el estado real de cada examen para ese N° Orden.
-export const VerifyTR = (nro, tabla, token, set, sede, ExamenesList) =>
+// `silencioso` (formulario incrustado, sin checklist): no refresca el checklist y, al encontrar un
+// registro existente, solo cierra el "Validando datos", sin el aviso de "ya cuenta con registros".
+export const VerifyTR = (nro, tabla, token, set, sede, ExamenesList, { silencioso = false } = {}) =>
   verificarRegistro({
     nro,
     tabla,
@@ -285,10 +290,15 @@ export const VerifyTR = (nro, tabla, token, set, sede, ExamenesList) =>
     sede,
     onNuevo: () =>
       GetInfoServicio(nro, set, token, sede, async () => {
+        if (silencioso) return;
         await GetExamenesLab(nro, set, token, ExamenesList);
       }),
     onExistente: () =>
       GetInfoServicioEditar(nro, tabla, set, token, async () => {
+        if (silencioso) {
+          Swal.close();
+          return;
+        }
         await GetExamenesLab(nro, set, token, ExamenesList);
         Swal.fire(
           "Alerta",

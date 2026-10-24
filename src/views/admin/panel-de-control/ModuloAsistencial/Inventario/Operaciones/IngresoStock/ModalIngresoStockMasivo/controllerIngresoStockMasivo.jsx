@@ -2,6 +2,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
 import { etiquetaMedicamento, hoyISO, limpiarTexto, normalizarTexto, parsearFechaVencimiento } from "../../../Compartido/inventarioUtils";
+import { errorPrecio, parsearPrecio, PRECIO_MAXIMO } from "../../../Compartido/precioReferencial";
 import { claveLote } from "../controllerIngresoStock";
 
 const HOJA_INGRESO = "INGRESO_STOCK";
@@ -19,10 +20,12 @@ const columnas = [
     { campo: "numeroLote", etiqueta: "NUMERO LOTE", alias: ["LOTE", "N LOTE", "NRO LOTE"], ancho: 18 },
     { campo: "vencimiento", etiqueta: "VENCIMIENTO", alias: ["FECHA VENCIMIENTO", "FECHA DE VENCIMIENTO"], ancho: 18 },
     { campo: "cantidad", etiqueta: "CANTIDAD", ancho: 12 },
+    { campo: "precio", etiqueta: "PRECIO REFERENCIAL", alias: ["PRECIO", "PRECIO REF", "PRECIO S/", "VALOR REFERENCIAL"], ancho: 20 },
 ];
 
 const COLUMNA_VENCIMIENTO = columnas.findIndex((columna) => columna.campo === "vencimiento") + 1;
 const COLUMNA_CANTIDAD = columnas.findIndex((columna) => columna.campo === "cantidad") + 1;
+const COLUMNA_PRECIO = columnas.findIndex((columna) => columna.campo === "precio") + 1;
 
 // Error con un mensaje pensado para el usuario (archivo mal armado); cualquier otro fallo de lectura se
 // reemplaza por un texto genérico.
@@ -49,14 +52,14 @@ const generarPlantilla = async (medicamentos) => {
     });
 
     medicamentos.forEach((medicamento) => {
-        const fila = hoja.addRow([medicamento.id, medicamento.nombre, medicamento.presentacion, null, null, null]);
+        const fila = hoja.addRow([medicamento.id, medicamento.nombre, medicamento.presentacion, null, null, null, null]);
         columnas.forEach((columna, i) => {
             if (columna.fijo) fila.getCell(i + 1).fill = rellenar("FFEDEDED");
         });
     });
 
     // VENCIMIENTO en formato texto: así "06/2027" queda tal cual y se interpreta como mes/año (con formato
-    // de fecha Excel lo convertiría al día 1 de junio). También se deja la validación de CANTIDAD.
+    // de fecha Excel lo convertiría al día 1 de junio). También se dejan las validaciones de CANTIDAD y PRECIO.
     const ultimaFila = medicamentos.length + 1 + FILAS_EXTRA;
     for (let fila = 2; fila <= ultimaFila; fila++) {
         hoja.getCell(fila, COLUMNA_VENCIMIENTO).numFmt = "@";
@@ -69,6 +72,16 @@ const generarPlantilla = async (medicamentos) => {
             errorTitle: "Cantidad no válida",
             error: "Ingrese un número entero (1 o más).",
         };
+        hoja.getCell(fila, COLUMNA_PRECIO).numFmt = "0.00";
+        hoja.getCell(fila, COLUMNA_PRECIO).dataValidation = {
+            type: "decimal",
+            operator: "between",
+            allowBlank: true,
+            formulae: [0, PRECIO_MAXIMO],
+            showErrorMessage: true,
+            errorTitle: "Precio no válido",
+            error: `Ingrese un monto en soles de 0 a ${PRECIO_MAXIMO.toLocaleString("en-US")}.`,
+        };
     }
     hoja.views = [{ state: "frozen", ySplit: 1 }];
     hoja.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: columnas.length } };
@@ -78,9 +91,10 @@ const generarPlantilla = async (medicamentos) => {
     const instrucciones = [
         "Cada fila es un lote. Si un medicamento llega en varios lotes o con distintos vencimientos, copie la fila completa (con ID y NOMBRE) y péguela debajo.",
         "No modifique ID, NOMBRE ni PRESENTACION (columnas grises): el sistema comprueba que correspondan al mismo medicamento.",
-        "Complete NUMERO LOTE (opcional), VENCIMIENTO y CANTIDAD solo en los medicamentos que va a ingresar. Las filas sin datos se ignoran.",
+        "Complete NUMERO LOTE (opcional), VENCIMIENTO, CANTIDAD y PRECIO REFERENCIAL solo en los medicamentos que va a ingresar. Las filas sin datos se ignoran.",
         "VENCIMIENTO: día/mes/año (15/03/2027) o solo mes y año (06/2027); con mes y año se toma el último día del mes.",
         "CANTIDAD: número entero de 1 o más.",
+        "PRECIO REFERENCIAL: precio en soles de una unidad de ese lote (12.50); puede ser 0. Es una referencia para valorizar el stock, no un costo contable.",
         "No se admiten medicamentos ya vencidos ni dos filas con el mismo medicamento, lote y vencimiento.",
         "El usuario y la fecha y hora del ingreso los asigna el sistema. El stock entra al inventario elegido en la pantalla.",
     ];
@@ -133,7 +147,7 @@ const ubicarColumnas = (hoja) => {
 };
 
 // Primer problema de la fila, o "" si está completa. El duplicado se revisa aparte.
-const errorDeFila = ({ idTexto, medicamento, nombreTexto, vencimiento, vencimientoVacio, cantidadTexto, cantidad }) => {
+const errorDeFila = ({ idTexto, medicamento, nombreTexto, vencimiento, vencimientoVacio, cantidadTexto, cantidad, precioTexto }) => {
     if (!idTexto) return "Falta el ID del medicamento";
     if (!medicamento) return `El ID ${idTexto} no corresponde a un medicamento activo`;
     if (nombreTexto && normalizarTexto(nombreTexto) !== normalizarTexto(medicamento.nombre)) {
@@ -144,8 +158,11 @@ const errorDeFila = ({ idTexto, medicamento, nombreTexto, vencimiento, vencimien
     if (vencimiento < hoyISO()) return "El medicamento ya está vencido";
     if (!cantidadTexto) return "Falta la cantidad";
     if (!(Number.isInteger(cantidad) && cantidad >= 1)) return "La cantidad debe ser un número entero (1 o más)";
-    return "";
+    return errorPrecio(precioTexto);
 };
+
+// Precio tal como se escribió en la celda: se admite el "S/" delante ("S/ 12.50").
+const limpiarPrecio = (texto) => texto.replace(/^S\/\.?\s*/i, "");
 
 // Lee la hoja INGRESO_STOCK (o la primera) y devuelve { ok, filas } o { ok: false, mensaje }. Las filas del
 // catálogo sin lote, vencimiento ni cantidad se ignoran (la plantilla trae todos los medicamentos y solo se
@@ -173,7 +190,8 @@ export const LeerExcelIngresoStock = async (archivo, medicamentos) => {
             const numeroLote = textoDeCelda(fila.getCell(indices.numeroLote)).toUpperCase();
             const vencimientoTexto = textoDeCelda(fila.getCell(indices.vencimiento));
             const cantidadTexto = textoDeCelda(fila.getCell(indices.cantidad));
-            if (!numeroLote && !vencimientoTexto && !cantidadTexto) return;
+            const precioTexto = limpiarPrecio(textoDeCelda(fila.getCell(indices.precio)));
+            if (!numeroLote && !vencimientoTexto && !cantidadTexto && !precioTexto) return;
 
             const idTexto = textoDeCelda(fila.getCell(indices.id));
             const nombreTexto = indices.nombre ? textoDeCelda(fila.getCell(indices.nombre)) : "";
@@ -190,6 +208,7 @@ export const LeerExcelIngresoStock = async (archivo, medicamentos) => {
                 vencimientoVacio: !vencimientoTexto,
                 cantidadTexto,
                 cantidad,
+                precioTexto,
             });
             if (!error) {
                 const clave = claveLote(medicamento.id, numeroLote, vencimiento);
@@ -211,12 +230,14 @@ export const LeerExcelIngresoStock = async (archivo, medicamentos) => {
                 vencimientoTexto,
                 // Una cantidad vacía o ilegible ("abc") se muestra tal cual en vez de 0 o "NaN".
                 cantidad: cantidadTexto && Number.isFinite(cantidad) ? cantidad : cantidadTexto,
+                // Igual con el precio: si no es válido se muestra tal como lo escribió el usuario.
+                precioReferencial: parsearPrecio(precioTexto) ?? precioTexto,
                 error,
             });
         });
 
         if (filas.length === 0) {
-            throw new ErrorArchivo("El archivo no tiene filas con datos. Complete NUMERO LOTE, VENCIMIENTO y CANTIDAD en los medicamentos a ingresar.");
+            throw new ErrorArchivo("El archivo no tiene filas con datos. Complete NUMERO LOTE, VENCIMIENTO, CANTIDAD y PRECIO REFERENCIAL en los medicamentos a ingresar.");
         }
         return { ok: true, filas };
     } catch (error) {

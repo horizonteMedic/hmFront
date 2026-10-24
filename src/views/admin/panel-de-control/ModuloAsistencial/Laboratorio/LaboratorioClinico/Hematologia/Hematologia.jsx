@@ -171,7 +171,7 @@ export default function Hematologia() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-4 max-w-[95%] lg:max-w-[90%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
