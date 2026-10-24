@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import RegistroClientes from "./Admision/RegistroClientes.jsx";
 import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx";
+import AperturaExamenesLaArena from "./Admision/AperturaExamenes/LaArena/AperturaExamenesLaArena.jsx";
 import ImportacionModal from "./Admision/ImportacionMasiva.jsx";
 import ImportacionModalBasica from "./Admision/ImportacionModalBasica.jsx";
 import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
@@ -436,6 +437,15 @@ const TabComponent = () => {
                       Apertura Exámenes PreOcup
                     </button>
                   )}
+                  {tienePermisoEnVista("Admision", "Acceso a Examenes Pre") && (
+                    <button
+                      className={`${styles.tabButton} ${subTab === 4 ? styles.active : ""
+                        }`}
+                      onClick={() => setSubTab(4)}
+                    >
+                      Apertura Exámenes La Arena
+                    </button>
+                  )}
                   {tienePermisoEnVista(
                     "Admision",
                     "Acceso Consentimiento de Digitalizacion"
@@ -496,6 +506,18 @@ const TabComponent = () => {
                         setDNIG(nuevoDNI);
                       }}
                       tienePermisoEnVista={tienePermisoEnVista}
+                    />
+                  )}
+                  {subTab === 4 && (
+                    <AperturaExamenesLaArena
+                      listas={listasCombos}
+                      DNIG={DNIG}
+                      selectedSede={selectSede}
+                      token={token}
+                      userlogued={userlogued.sub}
+                      ChangeDNI={(nuevoDNI) => {
+                        setDNIG(nuevoDNI);
+                      }}
                     />
                   )}
                   {subTab === 3 && (
