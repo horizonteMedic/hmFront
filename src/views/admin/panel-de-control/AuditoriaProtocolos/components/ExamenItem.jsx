@@ -17,7 +17,7 @@ export default function ExamenItem({ examen, seleccionado, onClick }) {
             disabled={!onClick}
             onClick={onClick}
             aria-current={seleccionado ? "true" : undefined}
-            title={onClick ? undefined : "Este examen aún no tiene formulario disponible"}
+            title={onClick ? undefined : `Este examen aún no tiene formulario disponible (referenciaNp: ${JSON.stringify(examen.referenciaNp ?? null)})`}
             className={`flex w-full items-center gap-3 rounded-lg border-l-4 px-3 py-2 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${borde} ${fondo} ${
                 seleccionado ? "ring-2 ring-blue-600 shadow-md" : "shadow-sm"
             } ${onClick ? "hover:shadow-md" : "cursor-default opacity-60"}`}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -10,7 +10,7 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerInformePsicologico";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_INFORME_PSICOLOGICO, UpdateDataService, VerifyTR } from "./controllerInformePsicologico";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import SearchButton from "../../../../../../components/reusableComponents/SearchButton";
 import AccionesRegistroHeader from "../../../../../../components/reusableComponents/AccionesRegistroHeader";
@@ -21,7 +21,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
-const tabla = "informe_psicologico";
+const tabla = TABLA_INFORME_PSICOLOGICO;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -34,13 +34,16 @@ const CAMPOS_EDITABLES = [
     "areaPsicomotricidad",
 ];
 
-export default function InformePsicologico() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el informe.
+export default function InformePsicologico({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const today = getToday();
 
     const initialFormState = {
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         codigoInforme: null,
         fechaEntrevista: today,
         nombreExamen: "",
@@ -141,7 +144,7 @@ export default function InformePsicologico() {
         handleRadioButtonBoolean,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "informePsicologicoPsicologia" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "informePsicologicoPsicologia" });
 
     const {
         edicionHabilitada,
@@ -332,13 +335,23 @@ export default function InformePsicologico() {
     const handlePsicomotricidadCheckboxChange = handleAreaCheckboxChange('psicomotricidad');
 
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     const handleEdit = () => {
-        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay informe; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     // ===== Búsqueda con botón =====
     const executeSearch = () => {
@@ -379,13 +392,16 @@ export default function InformePsicologico() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
+        // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las áreas de dos columnas
+        // quedan muy angostas, así que se apilan.
+        <div className={embebido ? "space-y-3 px-4 max-[1599px]:[&>.grid]:grid-cols-1" : "space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto"}>
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
                 edicionHabilitada={edicionHabilitada}
                 onHabilitarEdicion={habilitarEdicion}
                 onLimpiar={handleClear}
+                mostrarLimpiar={!embebido}
             />
 
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
@@ -397,11 +413,11 @@ export default function InformePsicologico() {
                         value={form.norden}
                         onKeyUp={handleSearch}
                         onChange={handleChangeNumber}
-                        disabled={hayRegistroCargado}
+                        disabled={embebido || hayRegistroCargado}
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                    {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                 </div>
                 <InputTextOneLine
                     label="Fecha Entrevista"
@@ -845,6 +861,8 @@ export default function InformePsicologico() {
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">

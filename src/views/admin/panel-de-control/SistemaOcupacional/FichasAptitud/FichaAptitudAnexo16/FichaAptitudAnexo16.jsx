@@ -10,24 +10,27 @@ import {
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
-import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
+import { PrintHojaR, PrintHojaR2, SubmitDataService, TABLA_FICHA_APTITUD_ANEXO16, VerifyTR } from "./controllerFichaAptitudAnexo16";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CargaMasivaFA16 from "./CargaMasivaFA16/CargaMasivaFA16";
 
-const tabla = "certificado_aptitud_medico_ocupacional"
+const tabla = TABLA_FICHA_APTITUD_ANEXO16
 const tabla2 = "resumen_medico_poderosa"
 
-export default function FichaAptitudAnexo16() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la ficha.
+export default function FichaAptitudAnexo16({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
 
   const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
   const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
   const initialFormState = {
     // Datos básicos
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     tipoExamen: "",
     dni: "",
     nombres: "",
@@ -102,11 +105,21 @@ export default function FichaAptitudAnexo16() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "fichaAptitudAnexo16" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "fichaAptitudAnexo16" });
+
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay ficha; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -191,7 +204,7 @@ export default function FichaAptitudAnexo16() {
   };
 
   return (
-    <div className=" mx-auto max-w-[80%] space-y-3 py-4">
+    <div className={embebido ? "space-y-3 px-4 py-4" : " mx-auto max-w-[80%] space-y-3 py-4"}>
       <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-y-3 gap-x-4">
         <InputTextOneLine
           label="N° Orden"
@@ -199,6 +212,7 @@ export default function FichaAptitudAnexo16() {
           value={form?.norden}
           onChange={handleChangeNumber}
           onKeyUp={handleSearch}
+          disabled={embebido}
         />
         <InputTextOneLine
           label="Tipo de Examen"
@@ -214,13 +228,16 @@ export default function FichaAptitudAnexo16() {
           disabled
         />
       </SectionFieldset>
-      <button
-        type="button"
-        onClick={() => setModalCargaMasiva(true)}
-        className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
-      >
-        <FontAwesomeIcon icon={faUpload} /> Carga Masiva
-      </button>
+      {/* Carga Masiva (no va incrustado) */}
+      {!embebido && (
+        <button
+          type="button"
+          onClick={() => setModalCargaMasiva(true)}
+          className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
+        >
+          <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+        </button>
+      )}
       <div className="space-y-3">
         {/* Información del paciente */}
         <DatosPersonalesLaborales form={form} />
@@ -459,6 +476,8 @@ export default function FichaAptitudAnexo16() {
               handleClear={handleClear}
               handlePrint={handlePrint}
               handleChangeNumberDecimals={handleChangeNumberDecimals}
+              hideClear={embebido}
+              hidePrint={embebido}
             />
           </div>
           <button

@@ -32,10 +32,11 @@ import {
   handleSubirArchivo,
   ReadArchivosForm,
   handleSubirArchivoMasivo,
+  TABLA_CUESTIONARIO_NORDICO,
 } from "./ControllerCN";
 
 const today = getToday();
-const tabla = "cuestionario_nordico";
+const tabla = TABLA_CUESTIONARIO_NORDICO;
 
 // Entradas del índice lateral (nuevo formato). Cada `id` debe existir como
 // atributo id en el wrapper de su sección para que el scroll y el resaltado
@@ -54,11 +55,14 @@ const SECCIONES_NORDICO = [
 // Las ~180 preguntas del cuestionario respetan solo el bloqueo general (fieldset disabled).
 const CAMPOS_EDITABLES = ["fechaCuestionario", "user_medicoFirma", "nombre_medico"];
 
-const Cuestionario_Nordico = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir y
+// avisa con `onGuardado` al registrar o actualizar el cuestionario.
+const Cuestionario_Nordico = ({ nOrdenInicial, onGuardado }) => {
+  const embebido = Boolean(nOrdenInicial);
   const { token, selectedSede, userlogued, userName } = useSessionData();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codigoCuestionario: null,
     fechaCuestionario: today,
 
@@ -372,9 +376,19 @@ const Cuestionario_Nordico = () => {
   };
 
   // ===== Guardar / Actualizar =====
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleGuardar = () => {
-    SubmitCuestionarioNordic(form, token, userlogued, handleClear, tabla);
+    SubmitCuestionarioNordic(form, token, userlogued, alRegistrar, tabla);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay cuestionario; si ya existe, sus respuestas)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede);
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   // ===== Impresión =====
   const handlePrint = () => {
@@ -404,13 +418,14 @@ const Cuestionario_Nordico = () => {
   });
 
   return (
-    <div className="px-4 max-w-[95%] xl:max-w-[85%] mx-auto space-y-3">
+    <div className={embebido ? "px-4 space-y-3" : "px-4 max-w-[95%] xl:max-w-[85%] mx-auto space-y-3"}>
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
       />
 
       {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
@@ -426,12 +441,12 @@ const Cuestionario_Nordico = () => {
             value={form.norden}
             onChange={handleChangeNumber}
             onKeyUp={handleSearch}
-            disabled={hayRegistroCargado}
+            disabled={embebido || hayRegistroCargado}
             labelWidth="120px"
             className="flex-1"
 
           />
-          <SearchButton onClick={executeSearch} className="lg:hidden" />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
         <InputTextOneLine
           label="Fecha"
@@ -571,6 +586,8 @@ const Cuestionario_Nordico = () => {
         handlePrint={handlePrint}
         hideSave={form.tieneRegistro && !edicionHabilitada}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
       />
 
       {visualerOpen && (

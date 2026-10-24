@@ -1,9 +1,10 @@
+import { useEffect } from 'react';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
 import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
 import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
-import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPanel2D';
+import { PrintHojaR, SubmitDataService, TABLA_PANEL_2D, UpdateDataService, VerifyTR } from './controllerPanel2D';
 import {
   InputTextOneLine,
   InputsRadioGroup,
@@ -16,7 +17,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
-const tabla = 'panel2d';
+const tabla = TABLA_PANEL_2D;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -30,12 +31,15 @@ const CAMPOS_EDITABLES = [
   "nombre_doctorAsignado",
 ];
 
-export default function Panel2D() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el Panel 2D.
+export default function Panel2D({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: '',
+    norden: embebido ? String(nOrdenInicial) : '',
     fecha: today,
 
     nombreExamen: "",
@@ -89,7 +93,7 @@ export default function Panel2D() {
     handleClearnotO,
     handleClear,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "panel2d" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "panel2d" });
 
   const {
     edicionHabilitada,
@@ -107,13 +111,23 @@ export default function Panel2D() {
   const isDoctorEdited = isFieldEdited("user_doctorAsignado");
   const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla);
   };
 
   const handleEdit = () => {
-    UpdateDataService(form, token, userlogued, handleClear, tabla);
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay Panel 2D; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   // ===== Búsqueda con botón =====
   const executeSearch = () => {
@@ -154,13 +168,14 @@ export default function Panel2D() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
       />
 
       {/* Información del Examen */}
@@ -172,11 +187,11 @@ export default function Panel2D() {
             value={form.norden}
             onChange={handleChangeNumber}
             onKeyUp={handleSearch}
-            disabled={hayRegistroCargado}
+            disabled={embebido || hayRegistroCargado}
             labelWidth="120px"
             className="w-full"
           />
-          <SearchButton onClick={executeSearch} className="lg:hidden" />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
         <InputTextOneLine
           label="Fecha"
@@ -310,6 +325,8 @@ export default function Panel2D() {
         handlePrint={handlePrint}
         hideSave={form.tieneRegistro && !edicionHabilitada}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
       />
     </div>
   );

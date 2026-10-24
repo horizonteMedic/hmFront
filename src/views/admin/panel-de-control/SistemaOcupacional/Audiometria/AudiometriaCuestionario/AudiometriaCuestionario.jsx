@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 
@@ -5,10 +6,14 @@ import Swal from "sweetalert2";
 import {
   PrintHojaR,
   SubmitDataService,
+  TABLA_CUESTIONARIO_AUDIOMETRIA,
   VerifyTR,
 } from "./controllerAudiometriaCuestionario";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
+// El estado del formulario lo pone quien lo usa (AudiometriaTabSelector o AudiometriaCuestionarioConEstado).
+// Con `nOrdenInicial` va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir, bloquea el
+// N° Orden y avisa con `onGuardado` al registrar o actualizar el cuestionario.
 export default function AudiometriaCuestionario({
   token,
   selectedSede,
@@ -16,8 +21,11 @@ export default function AudiometriaCuestionario({
   initialFormState,
   form,
   setForm,
+  nOrdenInicial,
+  onGuardado,
 }) {
-  const tabla = "cuestionario_audiometria";
+  const embebido = Boolean(nOrdenInicial);
+  const tabla = TABLA_CUESTIONARIO_AUDIOMETRIA;
 
   const handleClear = () => {
     setForm(initialFormState);
@@ -60,8 +68,18 @@ export default function AudiometriaCuestionario({
     });
   };
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay cuestionario; si ya existe, sus respuestas)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede);
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm, tabla]);
+
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className={embebido ? "w-full bg-white p-6" : "w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6"}>
       <h2 className="text-center mb-6 font-bold" style={{ fontSize: "13px" }}>
         CUESTIONARIO DE AUDIOMETRÍA
       </h2>
@@ -85,6 +103,7 @@ export default function AudiometriaCuestionario({
                     VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                   }
                 }}
+                disabled={embebido}
                 className="border rounded px-2 py-1 w-full"
                 style={{ fontSize: "11px" }}
               />
@@ -1086,7 +1105,7 @@ export default function AudiometriaCuestionario({
               className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition"
               style={{ minWidth: "160px", fontSize: "12px" }}
               onClick={() => {
-                SubmitDataService(form, token, userlogued, handleClear, tabla);
+                SubmitDataService(form, token, userlogued, alRegistrar, tabla);
               }}
             >
               <FontAwesomeIcon
@@ -1095,56 +1114,60 @@ export default function AudiometriaCuestionario({
               />{" "}
               Guardar/Actualizar
             </button>
-            <button
-              type="button"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
-              style={{ minWidth: "120px", fontSize: "12px" }}
-              onClick={handleClear}
-            >
-              <FontAwesomeIcon
-                icon={faBroom}
-                style={{ color: "white", fontSize: "13px" }}
-              />{" "}
-              Limpiar
-            </button>
+            {!embebido && (
+              <button
+                type="button"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
+                style={{ minWidth: "120px", fontSize: "12px" }}
+                onClick={handleClear}
+              >
+                <FontAwesomeIcon
+                  icon={faBroom}
+                  style={{ color: "white", fontSize: "13px" }}
+                />{" "}
+                Limpiar
+              </button>
+            )}
           </div>
         </fieldset>
-        {/* Imprimir Cuestionario */}
-        <fieldset className="border rounded p-3 min-w-[340px]">
-          <div className="flex items-center gap-2">
-            <label
-              className="font-bold min-w-[90px]"
-              style={{ fontSize: "12px" }}
-            >
-              Nro Orden :
-            </label>
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded-lg px-3 py-2"
-              style={{
-                fontSize: "12px",
-                width: "100px",
-                color: "#222",
-                fontWeight: "bold",
-                outline: "none",
-              }}
-            />
-            <button
-              type="button"
-              className="ml-2 px-4 py-2.5 rounded-lg border-none bg-[#2664eb]  transition text-white flex items-center justify-center"
-              title="Imprimir Cuestionario"
-              onClick={handlePrint}
-              style={{ fontSize: "13px" }}
-            >
-              <FontAwesomeIcon
-                icon={faPrint}
-                style={{ color: "#fff", fontSize: "13px" }}
+        {/* Imprimir Cuestionario (no va incrustado: Auditoría ya tiene "Ver reporte") */}
+        {!embebido && (
+          <fieldset className="border rounded p-3 min-w-[340px]">
+            <div className="flex items-center gap-2">
+              <label
+                className="font-bold min-w-[90px]"
+                style={{ fontSize: "12px" }}
+              >
+                Nro Orden :
+              </label>
+              <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                className="border rounded-lg px-3 py-2"
+                style={{
+                  fontSize: "12px",
+                  width: "100px",
+                  color: "#222",
+                  fontWeight: "bold",
+                  outline: "none",
+                }}
               />
-            </button>
-          </div>
-        </fieldset>
+              <button
+                type="button"
+                className="ml-2 px-4 py-2.5 rounded-lg border-none bg-[#2664eb]  transition text-white flex items-center justify-center"
+                title="Imprimir Cuestionario"
+                onClick={handlePrint}
+                style={{ fontSize: "13px" }}
+              >
+                <FontAwesomeIcon
+                  icon={faPrint}
+                  style={{ color: "#fff", fontSize: "13px" }}
+                />
+              </button>
+            </div>
+          </fieldset>
+        )}
       </div>
     </div>
   );

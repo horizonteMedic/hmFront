@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -7,6 +8,7 @@ import ExamenFisicoIII from "./ExamenFisicoIII";
 import {
   PrintHojaR,
   SubmitDataService,
+  TABLA_EVALUACION_NORMAL,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica";
 import { useForm } from "../../../../../hooks/useForm";
@@ -15,7 +17,7 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 import CIE10 from "../../Anexo16/CIE10/CIE10";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
-const tabla = "evaluacion_musculo_esqueletica";
+const tabla = TABLA_EVALUACION_NORMAL;
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -27,12 +29,15 @@ function fixEncodingModern(str) {
   return new TextDecoder("utf-8").decode(bytes);
 }
 
-export default function EvaluacionMusculoEsqueletica() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar la evaluación.
+export default function EvaluacionMusculoEsqueletica({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codEvaluacion: "",
     nombres: "",
     dni: "",
@@ -190,18 +195,28 @@ export default function EvaluacionMusculoEsqueletica() {
     handleClearnotO,
   } = useForm(initialFormState);
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
     SubmitDataService(
       form,
       token,
       userlogued,
-      handleClear,
+      alRegistrar,
       tabla,
       datosFooter,
       userCompleto?.datos?.dni_user
     );
     // Swal.fire("Éxito", "Datos guardados correctamente", "success");
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -232,8 +247,10 @@ export default function EvaluacionMusculoEsqueletica() {
     });
   };
 
+  // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las columnas Izquierdo/Derecho
+  // anidadas de los exámenes físicos quedan muy angostas y desbordan, así que se apilan.
   return (
-    <div className="w-full text-[11px]">
+    <div className={embebido ? "w-full text-[11px] max-[1599px]:[&_.grid_.grid]:grid-cols-1" : "w-full text-[11px]"}>
       {/* Header Form */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-blue-900 mb-4 border-b-2 pb-2">
@@ -250,6 +267,7 @@ export default function EvaluacionMusculoEsqueletica() {
                 value={form.norden || ""}
                 onChange={handleChangeNumber}
                 onKeyDown={handleSearch}
+                disabled={embebido}
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
@@ -605,33 +623,37 @@ export default function EvaluacionMusculoEsqueletica() {
             >
               <FontAwesomeIcon icon={faSave} /> Agregar/Actualizar
             </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
+            {!embebido && (
               <button
                 type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                onClick={handleClear}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
-                <FontAwesomeIcon icon={faPrint} />
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
               </button>
-            </div>
+            )}
           </div>
+
+          {!embebido && (
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">Imprimir</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

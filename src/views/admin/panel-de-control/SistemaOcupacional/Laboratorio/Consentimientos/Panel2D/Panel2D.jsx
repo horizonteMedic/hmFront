@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faPen } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
@@ -22,12 +23,15 @@ const CAMPOS_EDITABLES = [
   "nombre_doctorAsignado",
 ];
 
-const Panel2D = () => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el consentimiento.
+const Panel2D = ({ nOrdenInicial, onGuardado }) => {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: '',
+    norden: embebido ? String(nOrdenInicial) : '',
     fecha: today,
     nombres: '',
     edad: '',
@@ -55,7 +59,7 @@ const Panel2D = () => {
     fechaActualizacion: "",
   };
 
-  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState, { storageKey: "consPanel2D" });
+  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState, { storageKey: embebido ? undefined : "consPanel2D" });
 
   const {
     edicionHabilitada,
@@ -127,13 +131,23 @@ const Panel2D = () => {
     }, '¿Desea Imprimir Consentimiento Panel 2D?', form.norden);
   };
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear);
+    SubmitDataService(form, token, userlogued, alRegistrar);
   };
 
   const handleEdit = () => {
-    UpdateDataService(form, token, userlogued, handleClear);
+    UpdateDataService(form, token, userlogued, alRegistrar);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay consentimiento; si ya existe, sus respuestas)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const hayRegistroCargado = Boolean(form.nombres);
 
@@ -143,13 +157,14 @@ const Panel2D = () => {
   });
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className={embebido ? "w-full bg-white p-6" : "w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6"}>
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
       />
 
       <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA Y COCAINA</h2>
@@ -165,10 +180,10 @@ const Panel2D = () => {
               onKeyUp={(event) => {
                 if (event.key === 'Enter') {
                   handleset();
-                  VerifyTR(form.norden, token, setForm, selectedSede, form);
+                  VerifyTR(form.norden, token, setForm, selectedSede);
                 }
               }}
-              disabled={hayRegistroCargado}
+              disabled={embebido || hayRegistroCargado}
               labelWidth="120px"
               className="flex-1"
             />
@@ -243,7 +258,7 @@ const Panel2D = () => {
                     onChange={e => handleFechaChange(key, e.target.value)}
                     disabled={camposDeshabilitados}
                     labelWidth="80px"
-                    className="w-48"
+                    className={embebido ? "w-[190px]" : "w-48"}
                   />
                 )}
               </div>
@@ -303,33 +318,37 @@ const Panel2D = () => {
                 <FontAwesomeIcon icon={faPen} /> Editar
               </button>
             )}
-            <button
-              type="button"
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-              onClick={handleClear}
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
+            {!embebido && (
               <button
                 type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+                onClick={handleClear}
               >
-                <FontAwesomeIcon icon={faPrint} />
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
               </button>
-            </div>
+            )}
           </div>
+
+          {!embebido && (
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic mb-2">Imprimir</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </form>
     </div>

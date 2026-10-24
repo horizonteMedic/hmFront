@@ -9,9 +9,11 @@ import {
     faIdCard,
     faLocationDot,
     faMars,
+    faStethoscope,
     faVenus,
     faVenusMars,
 } from "@fortawesome/free-solid-svg-icons";
+import AvatarPaciente from "./AvatarPaciente";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const SEXOS = { M: "Masculino", F: "Femenino" };
@@ -69,18 +71,13 @@ const Seccion = ({ titulo, children, className }) => (
 
 // Ficha del paciente de la orden (va en la barra lateral): quién es, sus datos personales y los de su trabajo.
 export default function PacienteCard({ hoja }) {
-    const { orden, nombres, dni, edad, sexo, empresa, contrata, cargo, protocoloNombre, sede, fecha, hora, textoColor, codigoColor } = hoja;
+    const { orden, nombres, dni, edad, sexo, empresa, contrata, cargo, protocoloNombre, sede, fecha, hora, textoColor, codigoColor, urlFoto, examen } = hoja;
     const fechaHora = [formatearFechaCorta(fecha), hora].filter(Boolean).join(" · ");
 
     return (
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <header className="flex items-center gap-3 border-b border-gray-200 p-4">
-                <div
-                    aria-hidden="true"
-                    className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-800"
-                >
-                    {iniciales(nombres) || "?"}
-                </div>
+                <AvatarPaciente key={urlFoto} url={urlFoto} iniciales={iniciales(nombres)} />
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                         <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-sm font-semibold text-blue-800">Orden #{orden}</span>
@@ -105,13 +102,14 @@ export default function PacienteCard({ hoja }) {
 
             <div className="space-y-4 p-4">
                 <Seccion titulo="Datos personales" className="grid grid-cols-3 gap-2">
-                    <Dato compacto icono={faIdCard} etiqueta="DNI" valor={dni} />
+                    <Dato compacto icono={faIdCard} etiqueta="DNI" valor={dni && String(dni)} />
                     <Dato compacto icono={faCakeCandles} etiqueta="Edad" valor={edad && `${edad} años`} />
                     <Dato compacto icono={ICONOS_SEXO[sexo] ?? faVenusMars} etiqueta="Sexo" valor={SEXOS[sexo] ?? sexo} />
                 </Seccion>
 
                 <Seccion titulo="Datos laborales" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                     <Dato icono={faClipboardList} etiqueta="Protocolo" valor={protocoloNombre} />
+                    <Dato icono={faStethoscope} etiqueta="Examen médico" valor={examen} />
                     <Dato icono={faBriefcase} etiqueta="Cargo" valor={cargo} />
                     <Dato icono={faBuilding} etiqueta="Empresa" valor={empresa} className="sm:col-span-2 lg:col-span-1" />
                     <Dato icono={faHandshake} etiqueta="Contrata" valor={contrata} className="sm:col-span-2 lg:col-span-1" />

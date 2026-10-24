@@ -13,6 +13,7 @@ import {
   PrintHojaR,
   SubmitDataService,
   SubmitDataServiceLO,
+  TABLA_ODONTOLOGIA,
   VerifyTR,
 } from "./controllerOdontologia";
 import OdontogramaLevantarObservacion from "./OdontogramaLevantarObservacion";
@@ -23,16 +24,19 @@ import { getToday } from "../../../../utils/helpers";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 
-const tabla = "odontograma";
+const tabla = TABLA_ODONTOLOGIA;
 const tablaLO = "odontograma_lo";
 
 
-export default function Odontologia() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// sin pestaña de reportes ni Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar el odontograma.
+export default function Odontologia({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codOd: null,
     fechaExam: today,
     nombres: "",
@@ -204,8 +208,11 @@ export default function Odontologia() {
     });
   };
 
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
 
   const handleEjecutarConsulta = () => {
@@ -244,8 +251,15 @@ export default function Odontologia() {
     );
   };
   useEffect(() => {
-    obtenerInfoTabla();
-  }, []);
+    if (!embebido) obtenerInfoTabla();
+  }, [embebido]);
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay odontograma; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const obtenerInfoTabla = () => {
     getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
@@ -278,6 +292,7 @@ export default function Odontologia() {
                         );
                       }
                     }}
+                    disabled={embebido}
                     className="border rounded px-2 py-1 w-full"
                   />
                 </div>
@@ -371,7 +386,8 @@ export default function Odontologia() {
               </div>
             </div>
 
-            {/* Tabs */}
+            {/* Tabs (incrustado solo se muestra el odontograma) */}
+            {!embebido && (
             <div className="flex gap-1">
               <div
                 className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold  cursor-pointer   focus:outline-none flex items-center whitespace-nowrap ${activeTab === 1
@@ -394,9 +410,10 @@ export default function Odontologia() {
                 Reportes
               </div>
             </div>
+            )}
 
             {/* Contenido de los tabs */}
-            {activeTab === 1 && (
+            {(embebido || activeTab === 1) && (
               <OdontogramaAdultos
                 form={form}
                 setForm={setForm}
@@ -407,9 +424,10 @@ export default function Odontologia() {
                 handleClear={handleClear}
                 handleSave={handleSave}
                 handlePrint={handlePrint}
+                embebido={embebido}
               />
             )}
-            {activeTab === 2 && (
+            {!embebido && activeTab === 2 && (
               <OdontologiaReportes
                 form={form}
                 setForm={setForm}
