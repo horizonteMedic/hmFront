@@ -6,29 +6,41 @@ export const EMPRESA_LA_ARENA = 'LA ARENA S.A.';
 // "Autorizado por" que se aplica al cargar una pre-carga
 export const AUTORIZA_PRECARGA = 'DR. ARTEMIO';
 
+// Examen médico fijo de este formulario
+export const EXAMEN_ANUAL = 'ANUAL';
+
 export const esEmpresaLaArena = (nombre) => (nombre ?? '').toUpperCase().includes(EMPRESA_LA_ARENA);
 
-// name = campo del DTO · title = nombre completo que se muestra
-export const EXAMENES_ADICIONALES = [
-  { name: 'pruebaEsfuerzo', title: 'PRUEBA DE ESFUERZO' },
-  { name: 'examenVigia', title: 'EXAMEN VIGIA' },
-  { name: 'examenSanidad', title: 'EXAMEN SANIDAD' },
-  { name: 'n_testaltura', title: 'TEST DE ALTURA' },
-  { name: 'n_psicosen', title: 'PSICOSENSOMETRIA' },
-  { name: 'manipAlimentos', title: 'MANIPULADOR DE ALIMENTOS' },
-  { name: 'trabCalientes', title: 'TRABAJOS EN CALIENTE' },
-  { name: 'visualCompl', title: 'VISUAL COMPLEMENTARIO' },
-  { name: 'rxcKLumbar', title: 'RX COLUMNA LUMBAR FyL' },
-  { name: 'rxcLumbosacra', title: 'RX COLUMNA LUMBOSACRA FyL' },
-  { name: 'rxcDorsoLumbar', title: 'RX COLUMNA DORSOLUMBAR FyL' },
-  { name: 'espaciosConfinados', title: 'ESPACIOS CONFINADOS' },
-  { name: 'mercurioo', title: 'MERCURIO EN ORINA' },
-  { name: 'rxcPlomos', title: 'PLOMO EN SANGRE' },
-  { name: 'tmarihuana', title: 'MARIHUANA' },
-  { name: 'tcocaina', title: 'COCAINA' },
-  { name: 'herraManuales', title: 'HERRAMIENTAS MANUALES' },
-  { name: 'n_fisttest', title: 'FIST-TEST' },
+// Exámenes adicionales (campos del DTO): este formulario no los muestra, siempre van sin marcar
+const EXAMENES_ADICIONALES = [
+  'pruebaEsfuerzo',
+  'examenVigia',
+  'examenSanidad',
+  'n_testaltura',
+  'n_psicosen',
+  'manipAlimentos',
+  'trabCalientes',
+  'visualCompl',
+  'rxcKLumbar',
+  'rxcLumbosacra',
+  'rxcDorsoLumbar',
+  'espaciosConfinados',
+  'mercurioo',
+  'rxcPlomos',
+  'tmarihuana',
+  'tcocaina',
+  'herraManuales',
+  'n_fisttest',
 ];
+
+// Campos que este formulario no muestra. Al registrar una historia nueva se envían vacíos / sin marcar
+// (precioAdic vacío lo envía el modelo como "S/.0"); al actualizar se conservan los de la historia.
+export const VALORES_OCULTOS = {
+  precioPo: '',
+  tipoPago: '',
+  precioAdic: '',
+  ...Object.fromEntries(EXAMENES_ADICIONALES.map((name) => [name, false])),
+};
 
 // campo del formulario -> nombre que se muestra en el aviso de "Faltan completar"
 export const CAMPOS_REQUERIDOS = {
@@ -39,7 +51,6 @@ export const CAMPOS_REQUERIDOS = {
   razonContrata: 'Contrata',
   n_medico: 'Médico ocupacional',
   cargoDe: 'Cargo',
-  tipoPago: 'Forma de pago',
   fechaAperturaPo: 'Fecha de apertura',
 };
 
@@ -68,17 +79,14 @@ export const crearDatosIniciales = () => ({
   protocolo: '',
   cargoDe: '',
   areaO: '',
-  nomExamen: '',
+  nomExamen: EXAMEN_ANUAL,
   nomEx: '',
   mineralPo: '',
   alturaPo: '',
-  precioPo: '',
-  tipoPago: '',
-  precioAdic: '',
   autoriza: '',
   fechaAperturaPo: hoyDMA(),
   textObserv1: '',
   textObserv2: '',
   userRegistroDatos: '',
-  ...Object.fromEntries(EXAMENES_ADICIONALES.map(({ name }) => [name, false])),
+  ...VALORES_OCULTOS,
 });
