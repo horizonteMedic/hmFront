@@ -55,6 +55,7 @@ import Valorizacion from "./views/admin/panel-de-control/Valorizacion/Valorizaci
 import ModuloAsistencial from "./views/admin/panel-de-control/ModuloAsistencial/ModuloAsistencial.jsx";
 import ModuloSalud from "./views/admin/panel-de-control/ModuloSalud/ModuloSalud.jsx";
 import AuditoriaProtocolos from "./views/admin/panel-de-control/AuditoriaProtocolos/AuditoriaProtocolos.jsx";
+import PantallaPacientes from "./views/admin/Pantalla/PantallaPacientes.jsx";
 // import * as pdfjsLib from "pdfjs-dist";
 
 // pdfjsLib.disableWorker = true;
@@ -89,6 +90,7 @@ const AppContent = () => {
     "/actualizar-password",
     "/RegistroP",
     "/libro-de-reclamaciones",
+    "/pantalla-pacientes",
   ].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
@@ -183,6 +185,8 @@ const AppContent = () => {
           path="/libro-de-reclamaciones"
           element={<LibroDeReclamaciones />}
         />
+
+        <Route path="/pantalla-pacientes" element={<PantallaPacientes />} />
 
         <Route path="/permisos" element={<Permisos />} />
         <Route path="/anexo16a" element={<Anexo16A />} />
