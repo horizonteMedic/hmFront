@@ -111,11 +111,24 @@ import {
     PrintHojaR as imprimirBrigadista,
     TABLA_BRIGADISTA,
 } from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/Brigadista/controllerBrigadista";
+import Altura18 from "../../SistemaOcupacional/Altura18/Altura18";
+import { PrintHojaR as imprimirAltura18, TABLA_ALTURA_18 } from "../../SistemaOcupacional/Altura18/controllerAltura18";
+
+// Altura 1.8 (certificación médica de altura, tabla `certificacion_medica_altura`). Se abre por su propia clave y
+// también desde el examen de la hoja llamado "Ficha certificado de trabajos en altura" (ver `b_certificado_altura`).
+const ALTURA_18 = {
+    titulo: "Ficha Certificado de Trabajos en Altura (Altura 1.8)",
+    Formulario: Altura18,
+    verReporte: (orden, token, datosFooter) => imprimirAltura18(orden, token, TABLA_ALTURA_18, datosFooter),
+};
+const esFichaCertificadoTrabajosAltura = (examen) => /ficha.*certificado.*altura/i.test(examen.nombre ?? "");
 
 // Qué abre cada examen del protocolo según su `referenciaNp` (= nameService/tabla del formulario); los que no estén
 // aquí aún no son clicables.
 //  - Formulario: recibe `nOrdenInicial` (carga esa orden) y `onGuardado` (se llama al registrar el examen).
 //  - verReporte(orden, token, datosFooter): abre el reporte del examen ya realizado.
+//  - Si una misma clave debe abrir distinto según el nombre del examen, lleva una lista de candidatos y se elige el
+//    primero cuyo `coincide(examen)` sea verdadero (o que no lo tenga).
 const FORMULARIOS = {
     triaje: {
         titulo: "Triaje",
@@ -153,13 +166,20 @@ const FORMULARIOS = {
         verReporte: (orden, token, datosFooter) =>
             imprimirFichaAptitudAnexo16(orden, token, TABLA_FICHA_APTITUD_ANEXO16, datosFooter),
     },
-    // Ficha Certificado de Altura (SistemaOcupacional/FichaCertificadoAltura), tabla `b_certificado_altura`.
-    b_certificado_altura: {
-        titulo: "Ficha Certificado de Trabajos en Altura",
-        Formulario: FichaCertificadoAltura,
-        verReporte: (orden, token, datosFooter) =>
-            imprimirFichaCertificadoAltura(orden, token, TABLA_FICHA_CERTIFICADO_ALTURA, datosFooter),
-    },
+    // Ficha Certificado de Altura (SistemaOcupacional/FichaCertificadoAltura), tabla `b_certificado_altura`. El examen de
+    // la hoja llamado "Ficha certificado de trabajos en altura" abre Altura 1.8 (pedido del usuario), así que si llega
+    // con esta clave se elige por su nombre; los demás exámenes con esta clave abren la Ficha.
+    b_certificado_altura: [
+        { ...ALTURA_18, coincide: esFichaCertificadoTrabajosAltura },
+        {
+            titulo: "Ficha Certificado de Trabajos en Altura",
+            Formulario: FichaCertificadoAltura,
+            verReporte: (orden, token, datosFooter) =>
+                imprimirFichaCertificadoAltura(orden, token, TABLA_FICHA_CERTIFICADO_ALTURA, datosFooter),
+        },
+    ],
+    // Altura 1.8 por su propia tabla (si la hoja manda "Ficha certificado de trabajos en altura" con esta clave).
+    certificacion_medica_altura: ALTURA_18,
     // Formato Altura Psicológica (ModuloPsicologia/ExamenesComplementarios/AlturaPsicologica), tabla `psicologiafobias`.
     psicologiafobias: {
         titulo: "Formato Altura Psicológica",
@@ -267,7 +287,10 @@ const FORMULARIOS = {
 // El backend puede mandar el `referenciaNp` con otras mayúsculas o con espacios sobrantes: se compara normalizado.
 const claveDe = (examen) => String(examen.referenciaNp ?? "").trim().toLowerCase();
 
+const entradaDe = (entrada, examen) =>
+    Array.isArray(entrada) ? entrada.find((candidato) => !candidato.coincide || candidato.coincide(examen)) : entrada;
+
 export const formularioDe = (examen) => {
     const clave = claveDe(examen);
-    return Object.hasOwn(FORMULARIOS, clave) ? FORMULARIOS[clave] : undefined;
+    return Object.hasOwn(FORMULARIOS, clave) ? entradaDe(FORMULARIOS[clave], examen) : undefined;
 };
