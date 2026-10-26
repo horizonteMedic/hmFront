@@ -12,6 +12,9 @@ import {
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_ALTURA_18 = "certificacion_medica_altura";
+
 const obtenerReporteUrl =
     "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura";
 const registrarUrl =
@@ -431,7 +434,9 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
@@ -445,6 +450,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Altura 1.8",
