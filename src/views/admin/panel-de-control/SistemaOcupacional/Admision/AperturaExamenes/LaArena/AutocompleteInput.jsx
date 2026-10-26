@@ -7,6 +7,7 @@ const textoDe = (opcion) => opcion?.mensaje ?? '';
 // Input con sugerencias. El texto lo controla quien lo usa (`value` / `onChange`); aquí solo vive
 // si el desplegable está abierto. Enter elige la primera sugerencia; con `estricto` solo elige
 // una coincidencia exacta (o la única sugerencia) y, si no la hay, avisa con `onSinCoincidencia`.
+// Con `mostrarTodo` el desplegable también se abre sin texto, mostrando todas las opciones.
 // `children` se muestra a la derecha del input (p. ej. un botón "Agregar").
 const AutocompleteInput = ({
   id,
@@ -19,6 +20,7 @@ const AutocompleteInput = ({
   disabled,
   siguienteId,
   estricto = false,
+  mostrarTodo = false,
   onSinCoincidencia,
   children,
 }) => {
@@ -27,10 +29,10 @@ const AutocompleteInput = ({
   const lista = useMemo(() => (Array.isArray(opciones) ? opciones : []), [opciones]);
 
   const sugerencias = useMemo(() => {
-    if (!abierto || !texto) return [];
+    if (!abierto || (!texto && !mostrarTodo)) return [];
     const buscado = texto.toLowerCase();
     return lista.filter((o) => textoDe(o).toLowerCase().includes(buscado)).slice(0, MAX_SUGERENCIAS);
-  }, [abierto, texto, lista]);
+  }, [abierto, texto, lista, mostrarTodo]);
 
   const elegir = (opcion) => {
     onSelect(opcion);
@@ -71,6 +73,7 @@ const AutocompleteInput = ({
           }}
           onKeyDown={alPresionar}
           onFocus={() => setAbierto(true)}
+          onClick={() => setAbierto(true)}
           onBlur={() => setAbierto(false)}
           className={INPUT}
         />

@@ -8,14 +8,13 @@ import {
   faFileImport,
   faFileMedical,
   faFloppyDisk,
-  faListCheck,
   faLockOpen,
-  faMoneyBillWave,
   faNotesMedical,
   faPenToSquare,
   faPlus,
   faStethoscope,
   faUser,
+  faUserCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { SearchPacienteDNI } from '../../model/AdminPaciente';
 import { SubmitHistoriaC } from '../../model/AdminHistoriaC';
@@ -29,7 +28,6 @@ import ReportePacientes from '../modals/modalReportePacientes/ModalReportePacien
 import ReportePacientes2 from '../modals/modalReportePacientes2/ModalReportePacientes2.jsx';
 import ModalContabilidad from '../modals/modalContabilidad/ModalContabilidad.jsx';
 import AutocompleteInput from './AutocompleteInput.jsx';
-import ExamenesAdicionales from './ExamenesAdicionales.jsx';
 import TablaHistorias from './TablaHistorias.jsx';
 import { useListadoHistorias } from './useListadoHistorias.js';
 import { imprimirHojaDeRuta } from './hojaDeRuta.js';
@@ -42,37 +40,37 @@ import {
   aFechaDMA,
   EMPRESA_LA_ARENA,
   esEmpresaLaArena,
+  EXAMEN_ANUAL,
   FECHA_APERTURA_VALIDA,
   hoyDMA,
+  VALORES_OCULTOS,
 } from './constantes.js';
 
 const enfocar = (id) => document.getElementById(id)?.focus();
 
 // Apertura de exámenes ocupacionales exclusiva de LA ARENA S.A.
 const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued, ChangeDNI }) => {
-  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExamenMulti, ExplotacionMulti, MineralMulti, AlturaMulti, FormaPago, ListAuth } =
-    listas;
+  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExplotacionMulti, MineralMulti, AlturaMulti, ListAuth } = listas;
 
   // Solo se suscribe al nombre (useSessionData volvería a dibujar el formulario cada segundo por su reloj)
   const nombreSesion = useAuthStore((s) => s.userlogued?.datos?.nombres_user);
   const usuario = useMemo(() => fixEncodingModern(nombreSesion), [nombreSesion]);
 
-  // Nombre exacto de la empresa tal como viene en la lista del backend
-  const razonEmpresa = useMemo(() => {
+  // Empresa tal como viene en la lista del backend (nombre exacto y RUC)
+  const empresa = useMemo(() => {
     const lista = Array.isArray(EmpresasMulti) ? EmpresasMulti : [];
-    const empresa =
-      lista.find((e) => e.mensaje?.trim().toUpperCase() === EMPRESA_LA_ARENA) ?? lista.find((e) => esEmpresaLaArena(e.mensaje));
-    return empresa?.mensaje ?? EMPRESA_LA_ARENA;
+    return lista.find((e) => e.mensaje?.trim().toUpperCase() === EMPRESA_LA_ARENA) ?? lista.find((e) => esEmpresaLaArena(e.mensaje));
   }, [EmpresasMulti]);
+  const razonEmpresa = empresa?.mensaje ?? EMPRESA_LA_ARENA;
+  const rucEmpresa = empresa?.rucEmpresa;
 
   // — Estado del formulario —
   const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), codPa: DNIG ? String(DNIG) : '' }));
-  const [textoExamen, setTextoExamen] = useState(''); // el examen solo se fija al elegir una sugerencia
+  const [protocolos, setProtocolos] = useState([]); // protocolos de la empresa, para la lista
   const [modo, setModo] = useState('nuevo'); // 'nuevo' | 'edicion' (historia cargada desde la tabla)
   const [bloqueado, setBloqueado] = useState(false); // en edición, los campos están bloqueados hasta "Habilitar"
   const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el DNI se puede "Agregar" como nueva
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-  const [editarPrecio, setEditarPrecio] = useState(false);
   const [modal, setModal] = useState(null); // 'contrata' | 'preCarga' | 'reportePacientes' | 'reportePacientes2' | 'contabilidad'
   const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
 
@@ -81,11 +79,26 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   registrosRef.current = listado.registros;
 
   const dniRef = useRef(null);
-  const consultaPrecio = useRef(0);
 
   useEffect(() => {
     if (DNIG) dniRef.current?.focus();
   }, [DNIG]);
+
+  // Lista de protocolos de la empresa
+  useEffect(() => {
+    if (!rucEmpresa) return setProtocolos([]);
+    let vigente = true;
+    getFetch(`/api/v01/ct/protocolo/obtenerProtocoloRucEmpresa/empresa/${rucEmpresa}`, token)
+      .then((res) => {
+        if (!vigente) return;
+        const lista = res?.estatus === 'OK' && Array.isArray(res.resultado) ? res.resultado : [];
+        setProtocolos(lista.map(({ idProtocolo, nombre }) => ({ id: idProtocolo, mensaje: nombre })));
+      })
+      .catch(() => vigente && setProtocolos([]));
+    return () => {
+      vigente = false;
+    };
+  }, [rucEmpresa, token]);
 
   const setCampo = useCallback((name, value) => setDatos((d) => ({ ...d, [name]: value })), []);
   const alEscribir = (e) => setCampo(e.target.name, e.target.value.toUpperCase());
@@ -100,11 +113,9 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
 
   const limpiar = () => {
     setDatos(crearDatosIniciales());
-    setTextoExamen('');
     setModo('nuevo');
     setBloqueado(false);
     setDniEditado(false);
-    setEditarPrecio(false);
     ChangeDNI?.('');
   };
 
@@ -145,7 +156,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
       token,
       (importado) =>
         setDatos((d) => ({ ...d, ...importado, n_orden: d.n_orden, idPreNorden: d.idPreNorden, fechaAperturaPo: hoyDMA() })),
-      (res) => setTextoExamen(res.nomExamen || '')
+      () => {}
     );
   };
 
@@ -174,8 +185,6 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
         fechaAperturaPo: d.fechaAperturaPo,
         userRegistroDatos: item.usuarioRegistro ?? '',
         protocolo: item.protocolo ?? '',
-        precioPo: item.precio,
-        tipoPago: item.tipoPago,
         textObserv1: item.observacion1,
         idPreNorden: item.id,
         n_medico: item.medico,
@@ -185,32 +194,14 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
         mineralPo: item.mineral,
         alturaPo: item.altura,
         autoriza: AUTORIZA_PRECARGA,
-        nomExamen: item.nombreExamen,
+        nomExamen: EXAMEN_ANUAL,
       }));
-      setTextoExamen(item.nombreExamen || '');
       Swal.close();
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
     } finally {
       cerrarModal();
     }
-  };
-
-  // — Examen y precio —
-  const elegirExamen = (examen) => {
-    setTextoExamen(examen.mensaje);
-    setCampo('nomExamen', examen.mensaje);
-    const consulta = ++consultaPrecio.current; // si se elige otro examen enseguida, vale el último
-    getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${selectedSede}/${examen.mensaje}`, token)
-      .then((res) => {
-        if (consulta === consultaPrecio.current && res?.mensaje != null) setCampo('precioPo', res.mensaje);
-      })
-      .catch(() => {});
-  };
-
-  const alCambiarPrecio = (e) => {
-    const valor = e.target.value;
-    if (valor === '' || /^[\d.,\sS/]*$/.test(valor)) setCampo('precioPo', valor);
   };
 
   // Fecha DD/MM/AAAA mientras se escribe
@@ -235,11 +226,9 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
           userRegistroDatos: res.usuarioRegistro ?? '',
           protocolo: res.protocolo ?? '',
         });
-        setTextoExamen(res.nomExamen || '');
         setModo('edicion');
         setBloqueado(true);
         setDniEditado(false);
-        setEditarPrecio(false);
       } catch {
         Swal.fire('Error', 'No se pudo cargar la historia clínica', 'error');
       }
@@ -281,7 +270,8 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
 
   // — Guardar (1 = registrar, 2 = actualizar) —
   const guardar = async (tipoOperacion) => {
-    const envio = { ...datos, razonEmpresa };
+    // Al registrar, lo que el formulario no muestra va vacío / en 0; al actualizar se conserva lo de la historia
+    const envio = { ...datos, ...(tipoOperacion === 1 && VALORES_OCULTOS), nomExamen: EXAMEN_ANUAL, razonEmpresa };
     const faltantes = Object.entries(CAMPOS_REQUERIDOS)
       .filter(([campo]) => !envio[campo])
       .map(([, etiqueta]) => etiqueta);
@@ -427,11 +417,21 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
                   opciones={MedicosMulti}
                   placeholder="Escribe para buscar médico..."
                   disabled={bloqueado}
-                  siguienteId="cargoDe"
+                  siguienteId="protocolo"
                 />
               </Campo>
               <Campo label="Protocolo" htmlFor="protocolo">
-                <input id="protocolo" name="protocolo" type="text" autoComplete="off" value={datos.protocolo ?? ''} disabled={bloqueado} onChange={alEscribir} placeholder="Opcional" className={INPUT} />
+                <AutocompleteInput
+                  id="protocolo"
+                  value={datos.protocolo}
+                  onChange={(v) => setCampo('protocolo', v)}
+                  onSelect={(o) => setCampo('protocolo', o.mensaje)}
+                  opciones={protocolos}
+                  placeholder="Click para ver la lista o escribe para buscar..."
+                  mostrarTodo
+                  disabled={bloqueado}
+                  siguienteId="cargoDe"
+                />
               </Campo>
             </div>
           </Seccion>
@@ -460,22 +460,11 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
                     opciones={AreaMulti}
                     placeholder="Escribe para buscar área..."
                     disabled={bloqueado}
-                    siguienteId="nomExamen"
+                    siguienteId="nomEx"
                   />
                 </Campo>
                 <Campo label="Examen médico" htmlFor="nomExamen" className="col-span-2">
-                  <AutocompleteInput
-                    id="nomExamen"
-                    value={textoExamen}
-                    onChange={setTextoExamen}
-                    onSelect={elegirExamen}
-                    opciones={ExamenMulti}
-                    placeholder="Escribe para buscar examen..."
-                    disabled={bloqueado}
-                    siguienteId="nomEx"
-                    estricto
-                    onSinCoincidencia={() => setCampo('nomExamen', '')}
-                  />
+                  <input id="nomExamen" type="text" value={EXAMEN_ANUAL} disabled title="Examen fijo de este formulario" className={INPUT} />
                 </Campo>
               </div>
               <div className="grid grid-cols-3 gap-x-[12px]">
@@ -486,30 +475,14 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
                   <Selector id="mineralPo" value={datos.mineralPo} onChange={alElegirYEnfocar('alturaPo')} opciones={MineralMulti} disabled={bloqueado} />
                 </Campo>
                 <Campo label="Altura" htmlFor="alturaPo">
-                  <Selector id="alturaPo" value={datos.alturaPo} onChange={alElegirYEnfocar('tipoPago')} opciones={AlturaMulti} disabled={bloqueado} />
+                  <Selector id="alturaPo" value={datos.alturaPo} onChange={alElegirYEnfocar('autoriza')} opciones={AlturaMulti} disabled={bloqueado} />
                 </Campo>
               </div>
             </div>
           </Seccion>
 
-          <Seccion icono={faListCheck} titulo="Exámenes adicionales">
-            <ExamenesAdicionales datos={datos} disabled={bloqueado} onToggle={(e) => setCampo(e.target.name, e.target.checked)} />
-          </Seccion>
-
-          <Seccion icono={faMoneyBillWave} titulo="Pago y autorización">
+          <Seccion icono={faUserCheck} titulo="Autorización">
             <div className="grid grid-cols-2 gap-x-[12px] gap-y-[10px]">
-              <Campo label="Precio del examen" htmlFor="precioPo">
-                <div className="flex items-center gap-[8px]">
-                  <input id="precioPo" name="precioPo" type="text" autoComplete="off" value={datos.precioPo ?? ''} disabled={bloqueado || !editarPrecio} onChange={alCambiarPrecio} className={INPUT} />
-                  <label className="mb-0 flex cursor-pointer items-center gap-[4px] whitespace-nowrap text-lg font-semibold">
-                    <input type="checkbox" checked={editarPrecio} disabled={bloqueado} onChange={(e) => setEditarPrecio(e.target.checked)} />
-                    Editar
-                  </label>
-                </div>
-              </Campo>
-              <Campo label="Forma de pago" htmlFor="tipoPago">
-                <Selector id="tipoPago" value={datos.tipoPago} onChange={alElegir} opciones={FormaPago} disabled={bloqueado} vacio="Seleccionar" />
-              </Campo>
               <Campo label="Autorizado por" htmlFor="autoriza">
                 <Selector id="autoriza" value={datos.autoriza} onChange={alElegir} opciones={ListAuth} disabled={bloqueado} vacio="Seleccionar" />
               </Campo>
