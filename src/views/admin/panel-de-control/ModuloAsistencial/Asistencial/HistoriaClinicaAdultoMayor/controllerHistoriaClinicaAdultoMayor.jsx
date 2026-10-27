@@ -484,15 +484,19 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     // Se captura antes de limpiar: el formulario se vacía al terminar de guardar.
     const numeroTicket = form.n_hcl;
     const imprimirHistoria = () => PrintHojaR(numeroTicket, token, datosFooter);
-    // Con complementos guardados, el mensaje de éxito ofrece imprimir cada documento (si no, el "¿Desea imprimir?" de siempre).
+    const imprimirResumen = () => PrintResumenAsistencial(numeroTicket, token, datosFooter);
+    // En un ticket de La Arena (o con complementos guardados), el mensaje de éxito ofrece imprimir cada documento
+    // (Historia, Resumen Asistencial, Receta, Descanso, Informe); si no, el "¿Desea imprimir?" de siempre.
     const { mensaje, opciones } = armarResultadoGuardado({
         mensaje: "Historia Clínica del Adulto Mayor registrada correctamente.",
         guardados,
+        esArena: form.esArena,
         numeroTicket,
         token,
         datosFooter,
         obtenerDatosHC: ObtenerDatosComplementos,
         imprimirHistoria,
+        imprimirResumen,
     });
 
     await RegistrarServicioAsistencialDefault(
@@ -728,8 +732,10 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
         const data = unwrap(res);
 
+        // Los avisos se esperan (await): también se llama desde el mensaje de opciones de impresión, que se
+        // reabre al terminar esta función y taparía el aviso.
         if (res?.error || !data || !pacienteDe(data)) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
             return;
         }
 
@@ -739,7 +745,7 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         const modulo = await jasperModules[rutaJasperResumen]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasperResumen} no exporta una función por defecto`);
-            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            await Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
             return;
         }
 
@@ -747,7 +753,7 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);
-        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
     }
 };
 
@@ -772,6 +778,7 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
             datosFooter,
             obtenerDatosHC: ObtenerDatosComplementos,
             imprimirHistoria: () => PrintHojaR(numeroTicket, token, datosFooter),
+            imprimirResumen: () => PrintResumenAsistencial(numeroTicket, token, datosFooter),
         });
         return;
     }

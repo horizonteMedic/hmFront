@@ -480,7 +480,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
       </SectionFieldset>
 
       {/* ===== SECCIÓN: FIRMA, HUELLA Y FOTO ===== */}
-      <SectionFieldset legend="Firma, Huella y Fotografía" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SectionFieldset legend="Biométricos" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {documentos.map(({ tipo, estado, icono, texto, color, ayuda }) => (
           <div key={tipo} className="flex flex-col items-center gap-2">
             <FontAwesomeIcon

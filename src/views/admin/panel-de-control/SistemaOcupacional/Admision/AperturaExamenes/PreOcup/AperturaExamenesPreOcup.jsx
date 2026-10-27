@@ -17,6 +17,7 @@ import AuditoriaRegistro from '../../../../../../components/reusableComponents/A
 import InputAutocomplete from '../../../../../../components/reusableComponents/InputAutocomplete.jsx';
 import InputCheckbox from '../../../../../../components/reusableComponents/InputCheckbox.jsx';
 import InputTextOneLine from '../../../../../../components/reusableComponents/InputTextOneLine.jsx';
+import SearchButton from '../../../../../../components/reusableComponents/SearchButton.jsx';
 import { SelectField } from '../../../../../../components/reusableComponents/InputSelect.jsx';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset.jsx';
 import BotonesForm from '../../../../../../components/templates/BotonesForm.jsx';
@@ -49,6 +50,7 @@ const textoOpcion = (opcion) => opcion.mensaje || opcion.descripcion;
 const aOpciones = (lista) => (Array.isArray(lista) ? lista : []).map((o) => ({ value: textoOpcion(o), label: textoOpcion(o) }));
 const enfocar = (id) => document.getElementById(id)?.focus();
 const noHacerNada = () => {};
+const normalizar = (valor) => String(valor ?? '').trim().toUpperCase();
 
 // Apertura de exámenes ocupacionales (PreOcupacional)
 const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued, ChangeDNI, tienePermisoEnVista }) => {
@@ -58,6 +60,8 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), codPa: DNIG ? String(DNIG) : '' }));
   const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el DNI se puede "Agregar" como nueva
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
+  const [nordenBusqueda, setNordenBusqueda] = useState(''); // N° de orden que se está escribiendo (distinto de datos.n_orden, que viaja al guardar)
+  const [buscandoOrden, setBuscandoOrden] = useState(false);
   const [precioEditable, setPrecioEditable] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
   const [modal, setModal] = useState(null); // 'empresa' | 'contrata' | 'masiva' | 'preCarga' | 'reportePacientes' | 'reportePacientes2' | 'contabilidad'
@@ -119,6 +123,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
     setDniEditado(false);
     setPrecioEditable(false);
     setMostrarErrores(false);
+    setNordenBusqueda('');
     ChangeDNI?.('');
   };
 
@@ -204,23 +209,59 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
     setCampo('fechaAperturaPo', fecha);
   };
 
-  // — Tabla: cargar una historia / imprimir su hoja de ruta —
+  // — Cargar una historia (desde la tabla o buscándola por su N° de orden) / imprimir su hoja de ruta —
+  const mostrarHistoria = useCallback((res) => {
+    setDatos(historiaAFormulario(res));
+    setCargaId((id) => id + 1);
+    setDniEditado(false);
+    setPrecioEditable(false);
+    setMostrarErrores(false);
+    setNordenBusqueda('');
+  }, []);
+
   const cargarHistoria = useCallback(
     async ({ n_orden }) => {
       try {
         const res = await getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden}`, token);
         if (!res || res.error) throw new Error('sin datos');
-        setDatos(historiaAFormulario(res));
-        setCargaId((id) => id + 1);
-        setDniEditado(false);
-        setPrecioEditable(false);
-        setMostrarErrores(false);
+        mostrarHistoria(res);
       } catch {
         Swal.fire('Error', 'No se pudo cargar la historia clínica', 'error');
       }
     },
-    [token]
+    [token, mostrarHistoria]
   );
+
+  const alCambiarOrden = (e) => setNordenBusqueda(e.target.value.replace(/\D/g, '').slice(0, 7)); // solo números, como el filtro del listado
+
+  const buscarPorOrden = async () => {
+    if (!nordenBusqueda) return Swal.fire('Error', 'Debe colocar un N° de Orden', 'error');
+    mostrarCargando();
+    setBuscandoOrden(true);
+    try {
+      const res = await getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${nordenBusqueda}`, token);
+      if (res?.error && res.status >= 500) throw new Error('servidor');
+      if (!res || res.error || !res.n_orden) {
+        return Swal.fire('Sin Resultado', `No se encontró la historia clínica N° ${nordenBusqueda}`, 'warning');
+      }
+      // Guardar cambios reescribe la sede de la historia con la sede actual (SubmitHistoriaC): no se abre la de otra sede
+      if (normalizar(res.codSede) && normalizar(res.codSede) !== normalizar(selectedSede)) {
+        return Swal.fire(
+          'Otra sede',
+          `La historia N° ${res.n_orden} pertenece a la sede ${res.codSede}, distinta de la sede actual (${selectedSede}).`,
+          'warning'
+        );
+      }
+      mostrarHistoria(res);
+      Swal.close();
+    } catch {
+      Swal.fire('Error', 'No se pudo cargar la historia clínica', 'error');
+    } finally {
+      setBuscandoOrden(false);
+    }
+  };
+
+  const alTeclearOrden = (e) => e.key === 'Enter' && buscarPorOrden();
 
   const imprimirHistoria = useCallback(
     async (registro) => {
@@ -335,7 +376,6 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
           <SectionFieldset
             legend="Datos del Paciente"
             className="space-y-3"
-            actions={<span className="font-bold">Historia clínica N° {datos.n_orden || '—'}</span>}
           >
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
               <InputTextOneLine
@@ -398,6 +438,22 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
               {...requerido('apellidos')}
               {...revertible('apellidos')}
             />
+            <div className="flex w-full gap-x-3">
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={datos.tieneRegistro ? datos.n_orden : nordenBusqueda}
+                onChange={alCambiarOrden}
+                onKeyUp={alTeclearOrden}
+                disabled={datos.tieneRegistro || buscandoOrden}
+                labelWidth={LABEL}
+                className="w-full"
+                inputMode="numeric"
+                placeholder="N° orden y Enter para buscar"
+                autocomplete="off"
+              />
+              <SearchButton onClick={buscarPorOrden} disabled={datos.tieneRegistro || buscandoOrden} className="lg:hidden" />
+            </div>
           </SectionFieldset>
 
           <SectionFieldset legend="Empresa y Atención" className="space-y-3">
@@ -700,7 +756,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
               autocomplete="off"
             />
             <InputTextOneLine
-              label="Código"
+              label="N° Orden"
               name="busquedaCodigo"
               value={listado.busqueda.codigo}
               onChange={(e) => /^\d{0,7}$/.test(e.target.value) && listado.cambiarCodigo(e.target.value)}
