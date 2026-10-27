@@ -9,6 +9,9 @@ import {
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_ANEXO16A = "anexo16a";
+
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a";
 export const registrarUrl =
@@ -420,7 +423,9 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     VerifyTRPerzonalizado(
         nro,
         tabla,
@@ -434,6 +439,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Anexo 16 A.",

@@ -11,6 +11,9 @@ import {
 } from "../../../../utils/functionUtils";
 
 // ===== Configuración =====
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_CUESTIONARIO_NORDICO = "cuestionario_nordico";
+
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta";
 const obtenerReporteUrl =
   "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico";

@@ -14,6 +14,9 @@ import {
     imprimirReporteJasper,
 } from "../../../../utils/registroOcupacionalUtils";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_FICHA_SAS = "ficha_sas";
+
 // ===== Configuración =====
 const obtenerReporteUrl = "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas";
 const registrarUrl = "/api/v01/ct/fichaApneaSueno/registrarActualizarFichaSas";
@@ -422,7 +425,9 @@ export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter
 // Este examen exige que el paciente haya pasado Triaje antes de poder registrarse, por eso se
 // usa VerifyTRPerzonalizadoDefault (3 estados: nuevo / existente / necesita Triaje) en vez del
 // verificarRegistro binario, anteponiendo la validación de sede como el resto de formularios.
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     if (!nro) {
         await Swal.fire({
             icon: "error",
@@ -463,6 +468,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); }),
         () =>
             GetInfoServicioEditar(nro, tabla, set, token, sede, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire({
                     icon: "warning",
                     title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',

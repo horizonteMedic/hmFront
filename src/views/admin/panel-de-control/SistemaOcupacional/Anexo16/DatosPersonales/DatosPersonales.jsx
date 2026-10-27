@@ -15,6 +15,7 @@ export default function DatosPersonales({
   handleRadioButtonBoolean,
   handleRadioButton,
   handleSearch,
+  embebido = false,
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
@@ -27,6 +28,7 @@ export default function DatosPersonales({
             value={form.norden}
             onKeyUp={handleSearch}
             onChange={handleChangeNumber}
+            disabled={embebido}
             labelWidth="100px"
           />
           <InputTextOneLine

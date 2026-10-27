@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -12,12 +13,12 @@ import { getToday, getFechaHoraActual } from "../../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../../hooks/useRegistroEditable";
-import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerBrigadista";
+import { PrintHojaR, SubmitDataService, TABLA_BRIGADISTA, UpdateDataService, VerifyTR } from "./controllerBrigadista";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "psi_brigadistas";
+const tabla = TABLA_BRIGADISTA;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -35,13 +36,16 @@ const CAMPOS_EDITABLES = [
     "nombre_medico",
 ];
 
-export default function Brigadista() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el examen.
+export default function Brigadista({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         fecha: today,
         nombreExamen: "",
         esApto: undefined,
@@ -100,7 +104,7 @@ export default function Brigadista() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "psi_brigadistas" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "psi_brigadistas" });
 
     const {
         edicionHabilitada,
@@ -116,13 +120,23 @@ export default function Brigadista() {
     const isMedicoEdited = isFieldEdited("user_medicoFirma");
     const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     const handleEdit = () => {
-        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay examen; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     // ===== Búsqueda con botón =====
     const executeSearch = () => {
@@ -163,13 +177,14 @@ export default function Brigadista() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
                 edicionHabilitada={edicionHabilitada}
                 onHabilitarEdicion={habilitarEdicion}
                 onLimpiar={handleClear}
+                mostrarLimpiar={!embebido}
             />
 
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -180,11 +195,11 @@ export default function Brigadista() {
                         value={form.norden}
                         onChange={handleChangeNumber}
                         onKeyUp={handleSearch}
-                        disabled={hayRegistroCargado}
+                        disabled={embebido || hayRegistroCargado}
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                    {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                 </div>
                 <InputTextOneLine
                     label="Fecha"
@@ -348,6 +363,8 @@ export default function Brigadista() {
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
         </div>
     );

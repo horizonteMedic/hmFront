@@ -14,7 +14,8 @@ const normalizarExamen = (areaId, examen, adicional) => ({
     nombre: examen.nombre,
     referenciaNp: examen.referenciaNp,
     adicional,
-    completado: Boolean(examen.pasoExamen),
+    // TEMPORAL (pruebas): EKG siempre figura como realizado para poder abrir su reporte. Quitar el `||`.
+    completado: examen.referenciaNp === "electrocardiograma" || Boolean(examen.pasoExamen),
 });
 
 // Cada área junta sus exámenes del protocolo y los adicionales en una sola lista.

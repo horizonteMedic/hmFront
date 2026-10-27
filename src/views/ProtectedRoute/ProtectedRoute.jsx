@@ -68,7 +68,7 @@ export function ProtectedRoute() {
   }
 
   const isRouteAllowed = (route) => {
-    if (route === "/HistoriaOcupacional" || route === "/odontologia" || route === "/rayosx" || route === "/consentimiento-informado") return true;
+    if (route === "/HistoriaOcupacional" || route === "/odontologia" || route === "/rayosx" || route === "/pantalla-pacientes") return true;
     const routeName = protectedRoutes[route];
     return listView.includes(routeName);
   };

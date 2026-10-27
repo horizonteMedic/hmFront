@@ -1,4 +1,4 @@
-import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './controllerPerfilLipidico';
+import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, TABLA_PERFIL_LIPIDICO, UpdateDataService, VerifyTR } from './controllerPerfilLipidico';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { useRegistroEditable } from '../../../../../../hooks/useRegistroEditable';
@@ -17,7 +17,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesForm from '../../../../../../components/templates/BotonesForm';
 
-const tabla = 'analisis_bioquimicos';
+const tabla = TABLA_PERFIL_LIPIDICO;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -33,12 +33,15 @@ const CAMPOS_EDITABLES = [
   "nombre_doctorAsignado",
 ];
 
-export default function PerfilLipidico() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador ni muestra la búsqueda de exámenes, y avisa con `onGuardado` al registrar o actualizar.
+export default function PerfilLipidico({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: '',
+    norden: embebido ? String(nOrdenInicial) : '',
     fecha: today,
     nombreExamen: '',
 
@@ -97,7 +100,7 @@ export default function PerfilLipidico() {
     handleChangeSimple,
     handleClearnotO,
     handleClear,
-  } = useForm(initialFormState, { storageKey: "perfilLipidico" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "perfilLipidico" });
 
   const {
     edicionHabilitada,
@@ -115,13 +118,25 @@ export default function PerfilLipidico() {
   const isDoctorEdited = isFieldEdited("user_doctorAsignado");
   const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
+  // Incrustado no se limpia el formulario al registrar (se avisa para que el contenedor muestre el nuevo estado)
+  // ni hay tabla lateral que refrescar.
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+  const refrescarTabla = embebido ? undefined : () => obtenerInfoTabla();
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, refrescarTabla);
   };
 
   const handleEdit = () => {
-    UpdateDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, refrescarTabla);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay registro; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const executeSearch = () => {
     handleClearnotO();
@@ -173,8 +188,8 @@ export default function PerfilLipidico() {
   };
 
   useEffect(() => {
-    if (selectedSede) obtenerInfoTabla();
-  }, [selectedSede]);
+    if (selectedSede && !embebido) obtenerInfoTabla();
+  }, [selectedSede, embebido]);
 
   useEffect(() => {
     if (!form.Editando) {
@@ -224,8 +239,9 @@ export default function PerfilLipidico() {
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
       />
-      <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
+      <div className={`grid gap-x-4 gap-y-3 ${embebido ? "" : "xl:grid-cols-2"}`}>
         <div className="space-y-3">
           <SectionFieldset legend="Información del Examen" className="grid lg:grid-cols-2 gap-3 col-span-2">
             <div className="flex gap-x-3 w-full">
@@ -235,10 +251,10 @@ export default function PerfilLipidico() {
                 value={form.norden}
                 onChange={handleChangeNumber}
                 onKeyUp={handleSearch}
-                disabled={hayRegistroCargado}
+                disabled={embebido || hayRegistroCargado}
                 className="w-full"
               />
-              <SearchButton onClick={executeSearch} />
+              {!embebido && <SearchButton onClick={executeSearch} />}
             </div>
             <InputTextOneLine
               label="Fecha"
@@ -380,26 +396,30 @@ export default function PerfilLipidico() {
             handleChangeNumberDecimals={handleChangeNumberDecimals}
             hideSave={form.tieneRegistro && !edicionHabilitada}
             hideEdit={!form.tieneRegistro || edicionHabilitada}
+            hideClear={embebido}
             hidePrint
           />
         </div>
-        <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Nombres"
-            name="nombres_search"
-            value={form.nombres_search}
-            onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
-            onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
-          />
-          <InputTextOneLine
-            label="Código"
-            name="codigo_search"
-            value={form.codigo_search}
-            onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
-            onChange={(e) => { handleChangeNumberDecimals(e, 0); setForm(prev => ({ ...prev, nombres_search: "" })) }}
-          />
-          <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
-        </SectionFieldset>
+        {/* Búsqueda de exámenes (no va incrustado) */}
+        {!embebido && (
+          <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
+            <InputTextOneLine
+              label="Nombres"
+              name="nombres_search"
+              value={form.nombres_search}
+              onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+              onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
+            />
+            <InputTextOneLine
+              label="Código"
+              name="codigo_search"
+              value={form.codigo_search}
+              onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+              onChange={(e) => { handleChangeNumberDecimals(e, 0); setForm(prev => ({ ...prev, nombres_search: "" })) }}
+            />
+            <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
+          </SectionFieldset>
+        )}
 
       </div>
     </div>

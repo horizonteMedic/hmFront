@@ -13,6 +13,7 @@ import {
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
+  TABLA_OFTALMOLOGIA,
   VerifyTR,
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
@@ -24,14 +25,17 @@ import SectionFieldset from "../../../../../components/reusableComponents/Sectio
 import { useForm } from "../../../../../hooks/useForm";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
-const tabla = "oftalmologia2021";
+const tabla = TABLA_OFTALMOLOGIA;
 const today = getToday();
 
-export default function OftalmologiaOhla() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la evaluación oftalmológica.
+export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, userName } = useSessionData();
 
   const initialFormState = {
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codOf: null,
     fechaExam: today,
     nomExam: "",
@@ -183,7 +187,7 @@ export default function OftalmologiaOhla() {
     handleChangeSimple,
     handleClearnotO,
     handleFocusNext
-  } = useForm(initialFormState, { storageKey: "antecedentes_altura" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "antecedentes_altura" });
 
 
   // const [form, setForm] = useState(initialFormState);
@@ -252,9 +256,18 @@ export default function OftalmologiaOhla() {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede);
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
   const handlePrint = () => {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
@@ -355,6 +368,7 @@ export default function OftalmologiaOhla() {
               value={form?.norden}
               onChange={handleChangeNumberDecimals}
               onKeyUp={handleSearch}
+              disabled={embebido}
             />
           </div>
           <div className="flex items-center gap-4">
@@ -474,7 +488,7 @@ export default function OftalmologiaOhla() {
       {/* Contenido de los tabs */}
       <div className="bg-white border  rounded-b-lg p-6 ">
         {tab === 0 && (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className={`grid grid-cols-1 gap-8 ${embebido ? "min-[1700px]:grid-cols-2" : "xl:grid-cols-2"}`}>
             {/* Columna 1: Todo el bloque oftalmológico */}
             <div className="space-y-6 flex flex-col">
               {/* Evaluación Oftalmológica */}
@@ -1912,33 +1926,38 @@ export default function OftalmologiaOhla() {
             >
               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
             </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
-
+            {!embebido && (
               <button
                 type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                onClick={handleClear}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
-                <FontAwesomeIcon icon={faPrint} />
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
               </button>
-            </div>
+            )}
           </div>
+          {/* No va incrustado: Auditoría ya tiene "Ver reporte" */}
+          {!embebido && (
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">Imprimir</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
+            </div>
+          )}
           {visualerOpen && (
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
               <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
@@ -17,19 +17,25 @@ import {
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
+import { PrintHojaR, SubmitDataService, TABLA_ANEXO16A, VerifyTR } from "./Anexo16AController";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { getAnexo16AInitialFormState } from "./anexo16aFormDefaults";
 import CargaMasivaAnexo16A from "./CargaMasivaAnexo16A/CargaMasivaAnexo16A";
 
-const tabla = "anexo16a";
+const tabla = TABLA_ANEXO16A;
 
-export default function Anexo16A() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar el Anexo 16A.
+export default function Anexo16A({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName, userDireccion } = useSessionData();
 
-  const initialFormState = getAnexo16AInitialFormState({ today, userlogued, userName, userDireccion });
+  const initialFormState = {
+    ...getAnexo16AInitialFormState({ today, userlogued, userName, userDireccion }),
+    norden: embebido ? String(nOrdenInicial) : "",
+  };
 
   const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
@@ -43,15 +49,25 @@ export default function Anexo16A() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "anexo_16a" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "anexo_16a" });
+
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
   const handleSave = () => {
     if (form.apto === undefined) {
       Swal.fire("Alerta", "Por favor, marque si es apto.", "warning")
       return;
     }
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente si aún no hay Anexo 16A; si ya existe, sus resultados)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -121,6 +137,7 @@ export default function Anexo16A() {
                 value={form?.norden}
                 onKeyUp={handleSearch}
                 onChange={handleChangeNumber}
+                disabled={embebido}
                 labelWidth="80px"
               />
               <InputTextOneLine
@@ -457,14 +474,16 @@ export default function Anexo16A() {
 
         {/* Columna de Agudeza Visual (derecha) - 1/4 del ancho */}
         <div className="lg:col-span-1 flex flex-col">
-          {/* Fila 3: Carga Masiva */}
-          <button
-            type="button"
-            onClick={() => setModalCargaMasiva(true)}
-            className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
-          >
-            <FontAwesomeIcon icon={faUpload} /> Carga Masiva
-          </button>
+          {/* Fila 3: Carga Masiva (no va incrustado) */}
+          {!embebido && (
+            <button
+              type="button"
+              onClick={() => setModalCargaMasiva(true)}
+              className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
+            >
+              <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+            </button>
+          )}
           <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1 flex flex-col">
             <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
 
@@ -601,32 +620,36 @@ export default function Anexo16A() {
                 >
                   <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                 </button>
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white  px-3 py-2 rounded flex items-center justify-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faBroom} /> Limpiar
-                </button>
+                {!embebido && (
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white  px-3 py-2 rounded flex items-center justify-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faBroom} /> Limpiar
+                  </button>
+                )}
               </div>
 
-              {/* Fila 2: Input y Botón lado a lado */}
-              <div className="flex gap-2">
-                <input
-                  name="norden"
-                  value={form?.norden}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-2 py-1"
-                  placeholder="N° Orden"
-                />
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white  px-3 py-2 rounded flex items-center justify-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} /> Imprimir
-                </button>
-              </div>
+              {/* Fila 2: Input y Botón lado a lado (no va incrustado: Auditoría ya tiene "Ver reporte") */}
+              {!embebido && (
+                <div className="flex gap-2">
+                  <input
+                    name="norden"
+                    value={form?.norden}
+                    onChange={handleChange}
+                    className="flex-1 border rounded px-2 py-1"
+                    placeholder="N° Orden"
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="bg-blue-600 hover:bg-blue-700 text-white  px-3 py-2 rounded flex items-center justify-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faPrint} /> Imprimir
+                  </button>
+                </div>
+              )}
 
 
             </div>

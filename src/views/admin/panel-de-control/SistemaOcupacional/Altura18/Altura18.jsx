@@ -9,24 +9,27 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAltura18";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_ALTURA_18, VerifyTR } from "./controllerAltura18";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
-const tabla = "certificacion_medica_altura";
+const tabla = TABLA_ALTURA_18;
 
-export default function Altura18() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador, sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar la certificación.
+export default function Altura18({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
     const [visualerOpen, setVisualerOpen] = useState(null)
 
     const initialFormState = {
         // Header - Información del examen
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         fecha: today,
         codigoCertificadoAltura: null,
         nombreExamen: "",
@@ -163,11 +166,21 @@ export default function Altura18() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "altura1.8" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "altura1.8" });
+
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay certificación; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -195,8 +208,10 @@ export default function Altura18() {
         handleCheckBoxWriteOnText(e, "observacionesYRecomendaciones", recomendacionesTextMap);
     }
 
+    // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las dos columnas de la parte
+    // inferior quedan muy angostas, así que se apilan.
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className={embebido ? "space-y-3 px-4 max-[1599px]:[&>.grid]:grid-cols-1" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <InputTextOneLine
@@ -205,6 +220,7 @@ export default function Altura18() {
                         value={form.norden}
                         onChange={handleChangeNumberDecimals}
                         onKeyUp={handleSearch}
+                        disabled={embebido}
                         labelWidth="120px"
                     />
                     <InputTextOneLine
@@ -649,6 +665,8 @@ export default function Altura18() {
                 handleClear={handleClear}
                 handlePrint={handlePrint}
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">

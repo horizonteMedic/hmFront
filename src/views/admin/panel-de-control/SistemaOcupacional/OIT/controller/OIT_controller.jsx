@@ -7,6 +7,9 @@ import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFor
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_OIT = "oit";
+
 const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -56,7 +59,9 @@ const Loading = (text) => {
 //     })
 // }
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
   if (!nro) {
     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
     return
@@ -76,7 +81,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       }))
     },
     () => {
-      GetInfoPacLaboratorioFil(nro, tabla, set, token)
+      GetInfoPacLaboratorioFil(nro, tabla, set, token, { silencioso })
       set(prev => ({
         ...prev,
         aPruebaDeSoledad: true,
@@ -110,7 +115,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
+export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, { silencioso = false } = {}) => {
   getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       console.log(res)
@@ -123,6 +128,10 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
       }))
     })
     .finally(() => {
+      if (silencioso) {
+        Swal.close()
+        return
+      }
       Swal.fire(
         "Alerta",
         "Este paciente ya cuenta con registros de OIT",

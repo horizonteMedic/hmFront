@@ -10,6 +10,10 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
+
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_FICHA_CERTIFICADO_ALTURA = "b_certificado_altura";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura";
@@ -360,7 +364,7 @@ export const GetInfoServicioEditar = async (
             user_doctorAsignado: res.doctorAsignado,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
-            aptoDesde: res.fechaDesde_f_desde ?? today,
+            aptoDesde: res.fechaDesde_f_desde ?? getToday(),
             aptoHasta: res.fechaHasta_f_hasta ?? getTodayPlusOneYear(),
 
             conclusion: oidoMayor40 || obesidadIMC30 ? "NO APTO" :
@@ -513,7 +517,9 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+// `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
+// "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
     VerifyTRPerzonalizado(
         nro,
         tabla,
@@ -527,6 +533,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Ficha Certificado de Altura",

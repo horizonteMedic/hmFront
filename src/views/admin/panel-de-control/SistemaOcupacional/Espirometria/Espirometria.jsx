@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -27,12 +27,13 @@ import {
     PrintHojaR,
     ReadArchivosForm,
     SubmitDataService,
+    TABLA_ESPIROMETRIA,
     UpdateDataService,
     VerifyTR,
 } from "./controllerEspirometria";
 import { handleSubirArchivo } from "../Altura18/controllerAltura18";
 
-const tabla = "funcion_abs";
+const tabla = TABLA_ESPIROMETRIA;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -53,13 +54,16 @@ const CAMPOS_EDITABLES = [
     "nombre_doctorExtra",
 ];
 
-export default function Espirometria() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la espirometría.
+export default function Espirometria({ nOrdenInicial, onGuardado }) {
+    const embebido = Boolean(nOrdenInicial);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
-        norden: "",
+        norden: embebido ? String(nOrdenInicial) : "",
         fecha: today,
         nombreExamen: "",
         pasoExamen: false,
@@ -151,7 +155,7 @@ export default function Espirometria() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "espirometria" });
+    } = useForm(initialFormState, { storageKey: embebido ? undefined : "espirometria" });
 
     const {
         edicionHabilitada,
@@ -178,13 +182,23 @@ export default function Espirometria() {
 
     const [visualerOpen, setVisualerOpen] = useState(null);
 
+    // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+    const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     const handleEdit = () => {
-        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
+
+    // Incrustado: abre la orden recibida (datos del paciente si aún no hay espirometría; si ya existe, sus resultados)
+    useEffect(() => {
+        if (embebido) {
+            VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+        }
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
     // ===== Búsqueda con botón =====
     const executeSearch = () => {
@@ -225,13 +239,14 @@ export default function Espirometria() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
                 edicionHabilitada={edicionHabilitada}
                 onHabilitarEdicion={habilitarEdicion}
                 onLimpiar={handleClear}
+                mostrarLimpiar={!embebido}
             />
 
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -242,11 +257,11 @@ export default function Espirometria() {
                         value={form.norden}
                         onChange={handleChangeNumber}
                         onKeyUp={handleSearch}
-                        disabled={hayRegistroCargado}
+                        disabled={embebido || hayRegistroCargado}
                         labelWidth="120px"
                         className="w-full"
                     />
-                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                    {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                 </div>
                 <InputTextOneLine
                     label="Fecha"
@@ -610,6 +625,8 @@ export default function Espirometria() {
                 handlePrint={handlePrint}
                 hideSave={form.tieneRegistro && !edicionHabilitada}
                 hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
             />
 
             {visualerOpen && (
