@@ -1,14 +1,37 @@
-import React from "react";
 import { getToday } from "../../../../../utils/helpers";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import RadioTable from "../../../../../components/reusableComponents/RadioTable";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 
 const today = getToday();
 
-export default function AudiometriaOhlaNParte2({ form, setForm }) {
+const CAMPOS_AUDIOMETRO = ["noExamen", "bellPlus", "maico", "marca", "modelo", "calibracion"];
+const CAMPOS_DIAPASONES = ["od_250", "od_500", "od_1000", "oi_250", "oi_500", "oi_1000"];
+const CAMPOS_LOGOAUDIOMETRIA = [
+  "d_umbral_discriminacion",
+  "d_porcentaje",
+  "d_umbral_confort",
+  "d_umbral_disconfort",
+  "i_umbral_discriminacion",
+  "i_porcentaje",
+  "i_umbral_confort",
+  "i_umbral_disconfort",
+];
+
+export default function AudiometriaOhlaNParte2({
+  form,
+  setForm,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => { },
+  revertFields = () => { },
+}) {
+  // El registro puede traer estos campos en null: se normalizan para no romper las comparaciones de texto.
+  const tiempoExposicion = form.tiempoExposicion ?? "";
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -43,15 +66,49 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
 
   const handleCheckRadioExposicion = (e, objetivo) => {
     const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: f[name].toUpperCase().includes(objetivo)
-        ? ""
-        : /\d/.test(f[name])
-          ? f[name] + " " + objetivo
-          : " " + objetivo,
-    }));
+    setForm((f) => {
+      const actual = f[name] ?? "";
+      return {
+        ...f,
+        [name]: actual.toUpperCase().includes(objetivo)
+          ? ""
+          : /\d/.test(actual)
+            ? actual + " " + objetivo
+            : " " + objetivo,
+      };
+    });
   };
+
+  // Revierte un ítem de RadioTable; "Otra" arrastra su descripción (se limpia al pasar a NO).
+  const revertirItem = (name) =>
+    name === "otro" ? revertFields(["otro", "otroDescripcion"]) : revertField(name);
+
+  // Props comunes de un campo de texto: bloqueo, resaltado de cambios y botón de revertir.
+  const campo = (name, onChange = handleChange) => ({
+    name,
+    value: form[name],
+    onChange,
+    disabled,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
+
+  // Solo resalta (celdas angostas de tablas: el revert va en el título de la sección).
+  const celda = (name) => ({
+    name,
+    value: form[name],
+    onChange: handleChange,
+    disabled,
+    edited: isFieldEdited(name),
+    labelWidth: "0px",
+    inputClassName: "text-center",
+  });
+
+  // Botón de revertir en el título de una sección cuando alguno de sus campos cambió.
+  const revertirSeccion = (campos) =>
+    campos.some(isFieldEdited) ? (
+      <RevertButton onClick={() => revertFields(campos)} title="Revertir cambios de esta sección" />
+    ) : null;
 
   return (
     <div className="space-y-4">
@@ -62,29 +119,29 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <InputTextOneLine
                 label="Años Trab."
-                name="aniosTrabajo"
-                value={form.aniosTrabajo}
-                onChange={handleChangeNumber}
+                {...campo("aniosTrabajo", handleChangeNumber)}
                 labelWidth="90px"
+                inputMode="numeric"
               />
               <InputTextOneLine
                 label="Meses"
-                name="mesesTrabajo"
-                value={form.mesesTrabajo}
-                onChange={handleChangeNumber}
+                {...campo("mesesTrabajo", handleChangeNumber)}
                 labelWidth="90px"
+                inputMode="numeric"
               />
               <InputTextOneLine
                 label="Otoscopia"
-                name="otoscopia"
-                value={form.otoscopia}
-                onChange={handleChange}
+                {...campo("otoscopia")}
                 labelWidth="90px"
               />
             </div>
           </SectionFieldset>
 
-          <SectionFieldset legend="Audiómetro" className="space-y-3">
+          <SectionFieldset
+            legend="Audiómetro"
+            className="space-y-3"
+            actions={revertirSeccion(CAMPOS_AUDIOMETRO)}
+          >
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <InputTextOneLine
                 label="Marca"
@@ -99,6 +156,7 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   label="No Examen"
                   name="noExamen"
                   checked={form.noExamen}
+                  disabled={disabled}
                   onChange={() => {
                     const nuevoValor = !form.noExamen;
                     setForm((prev) => ({
@@ -116,6 +174,7 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   label="BELL PLUS"
                   name="bellPlus"
                   checked={form.bellPlus}
+                  disabled={disabled}
                   onChange={(e) => {
                     const checked = e.target.checked;
                     setForm((prev) => ({
@@ -132,6 +191,7 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   label="MAICO"
                   name="maico"
                   checked={form.maico}
+                  disabled={disabled}
                   onChange={(e) => {
                     const checked = e.target.checked;
                     setForm((prev) => ({
@@ -149,49 +209,50 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
             <InputTextOneLine label="Modelo" name="modelo" value={form.modelo} disabled labelWidth="100px" />
             <InputTextOneLine
               label="Calibración"
-              name="calibracion"
               type="date"
-              value={form.calibracion}
-              onChange={handleChange}
+              {...campo("calibracion")}
               labelWidth="100px"
             />
           </SectionFieldset>
 
           <SectionFieldset legend="Tiempo de Exposición Total Ponderado 8h/d" className="space-y-3">
-            <InputTextOneLine
-              name="tiempoExposicion"
-              value={form.tiempoExposicion}
-              onChange={handleChange}
-              labelWidth="0px"
-            />
+            <InputTextOneLine {...campo("tiempoExposicion")} labelWidth="0px" />
             <div className="flex gap-4">
               <InputCheckbox
                 label="H/D"
                 name="tiempoExposicion"
-                checked={form.tiempoExposicion.includes("H/D")}
+                checked={tiempoExposicion.includes("H/D")}
+                disabled={disabled}
                 onChange={(e) => handleCheckRadioExposicion(e, "H/D")}
               />
               <InputCheckbox
                 label="MIN/D"
                 name="tiempoExposicion"
-                checked={form.tiempoExposicion.includes("MIN/D")}
+                checked={tiempoExposicion.includes("MIN/D")}
+                disabled={disabled}
                 onChange={(e) => handleCheckRadioExposicion(e, "MIN/D")}
               />
             </div>
           </SectionFieldset>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <SectionFieldset legend="Uso de Protectores Auditivos" className="flex gap-4">
+            <SectionFieldset
+              legend="Uso de Protectores Auditivos"
+              className="flex gap-4"
+              actions={revertirSeccion(["tapones", "orejeras"])}
+            >
               <InputCheckbox
                 label="Tapones"
                 name="tapones"
                 checked={form.tapones}
+                disabled={disabled}
                 onChange={toggleCheckBox}
               />
               <InputCheckbox
                 label="Orejeras"
                 name="orejeras"
                 checked={form.orejeras}
+                disabled={disabled}
                 onChange={toggleCheckBox}
               />
             </SectionFieldset>
@@ -205,6 +266,9 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   { label: "No molesto", value: "RUIDO NO MOLESTO" },
                 ]}
                 onChange={(e, value) => setForm((f) => ({ ...f, apreciacion_ruido: value }))}
+                disabled={disabled}
+                edited={isFieldEdited("apreciacion_ruido")}
+                onRevert={() => revertField("apreciacion_ruido")}
                 vertical
               />
             </SectionFieldset>
@@ -227,6 +291,9 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
               ]}
               handleRadioButton={handleCheckRadio}
               labelColumns={2}
+              disabled={disabled}
+              isFieldEdited={isFieldEdited}
+              onRevert={revertField}
             />
           </SectionFieldset>
         </div>
@@ -247,10 +314,8 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   name: "otro",
                   extraContent: (
                     <InputTextOneLine
-                      name="otroDescripcion"
-                      value={form.otroDescripcion}
-                      onChange={handleChange}
-                      disabled={form.otro !== "SI"}
+                      {...campo("otroDescripcion")}
+                      disabled={disabled || form.otro !== "SI"}
                       labelWidth="0px"
                     />
                   ),
@@ -262,10 +327,21 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
               ]}
               handleRadioButton={handleCheckRadio}
               labelColumns={2}
+              disabled={disabled}
+              isFieldEdited={(name) =>
+                name === "otro"
+                  ? isFieldEdited("otro") || isFieldEdited("otroDescripcion")
+                  : isFieldEdited(name)
+              }
+              onRevert={revertirItem}
             />
           </SectionFieldset>
 
-          <SectionFieldset legend="Diapasones Rinne y Weber" className="px-2">
+          <SectionFieldset
+            legend="Diapasones Rinne y Weber"
+            className="px-2 overflow-x-auto"
+            actions={revertirSeccion(CAMPOS_DIAPASONES)}
+          >
             <table className="w-full">
               <thead>
                 <tr className="text-center">
@@ -282,23 +358,11 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                 ].map((hz) => (
                   <tr key={hz.key}>
                     <td className="px-1">
-                      <InputTextOneLine
-                        name={`od_${hz.key}`}
-                        value={form[`od_${hz.key}`]}
-                        onChange={handleChange}
-                        labelWidth="0px"
-                        inputClassName="text-center"
-                      />
+                      <InputTextOneLine {...celda(`od_${hz.key}`)} />
                     </td>
                     <td className="text-center py-1">{hz.label}</td>
                     <td className="px-1">
-                      <InputTextOneLine
-                        name={`oi_${hz.key}`}
-                        value={form[`oi_${hz.key}`]}
-                        onChange={handleChange}
-                        labelWidth="0px"
-                        inputClassName="text-center"
-                      />
+                      <InputTextOneLine {...celda(`oi_${hz.key}`)} />
                     </td>
                   </tr>
                 ))}
@@ -306,7 +370,11 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
             </table>
           </SectionFieldset>
 
-          <SectionFieldset legend="Logoaudiometría" className="px-2">
+          <SectionFieldset
+            legend="Logoaudiometría"
+            className="px-2 overflow-x-auto"
+            actions={revertirSeccion(CAMPOS_LOGOAUDIOMETRIA)}
+          >
             <table className="w-full">
               <thead>
                 <tr className="text-left">
@@ -325,22 +393,10 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
                   <tr key={item.key}>
                     <td className="py-1 pr-2">{item.label}</td>
                     <td className="px-1">
-                      <InputTextOneLine
-                        name={`d_${item.key}`}
-                        value={form[`d_${item.key}`]}
-                        onChange={handleChange}
-                        labelWidth="0px"
-                        inputClassName="text-center"
-                      />
+                      <InputTextOneLine {...celda(`d_${item.key}`)} />
                     </td>
                     <td className="px-1">
-                      <InputTextOneLine
-                        name={`i_${item.key}`}
-                        value={form[`i_${item.key}`]}
-                        onChange={handleChange}
-                        labelWidth="0px"
-                        inputClassName="text-center"
-                      />
+                      <InputTextOneLine {...celda(`i_${item.key}`)} />
                     </td>
                   </tr>
                 ))}
@@ -349,12 +405,7 @@ export default function AudiometriaOhlaNParte2({ form, setForm }) {
           </SectionFieldset>
 
           <SectionFieldset legend="Conclusiones">
-            <InputTextOneLine
-              name="conclusiones"
-              value={form.conclusiones}
-              onChange={handleChange}
-              labelWidth="0px"
-            />
+            <InputTextOneLine {...campo("conclusiones")} labelWidth="0px" />
           </SectionFieldset>
         </div>
       </div>

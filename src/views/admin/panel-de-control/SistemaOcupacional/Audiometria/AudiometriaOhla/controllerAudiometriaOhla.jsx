@@ -3,6 +3,8 @@ import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 import jsPDF from "jspdf";
 import { existeRegistro } from "../../../../../utils/functionUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import { validarSede } from "../../../../../utils/registroOcupacionalUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -87,6 +89,13 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           // user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           // user_doctorAsignado: res.doctorAsignado,
           // user_doctorExtra: res.doctorExtra,
+
+          // Auditoría. AudiometriaPoInformacionDTO no devuelve quién registró ni fechas de registro/edición.
+          userRegistro: "",
+          fechaRegistro: "",
+          usuarioActualizacion: "",
+          fechaActualizacion: "",
+          tieneRegistro: true,
         }));
       } else {
         return Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -218,6 +227,41 @@ export const Loading = (text) => {
   });
 };
 
+// Valida que el N° Orden pertenezca a la sede actual (como el resto de formularios de la plantilla).
+// Devuelve true si se puede continuar; si no, muestra el aviso correspondiente.
+export const validarSedeOrden = async (nro, sede, token) => {
+  if (!nro) {
+    await Swal.fire(
+      "Error",
+      "Debe Introducir un Nro de Historia Clinica válido",
+      "error"
+    );
+    return false;
+  }
+  if (!sede) return true;
+
+  Loading("Validando datos");
+  const { estado, descripcionSede } = await validarSede(nro, sede, token);
+  if (estado === "ok") {
+    Swal.close();
+    return true;
+  }
+  if (estado === "otraSede") {
+    Swal.fire({
+      icon: "warning",
+      title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+      html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+    });
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+      html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+    });
+  }
+  return false;
+};
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   if (!nro) {
     await Swal.fire(
@@ -292,8 +336,9 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
         genero: res.genero == "M" ? "Masculino" : "Femenino",
-        nombres: res.nombresApellidos,  
-        ocupacion: res.areaO
+        nombres: res.nombresApellidos,
+        ocupacion: res.areaO,
+        tieneRegistro: false,
       }));
     })
     .catch((error) => {
@@ -496,6 +541,14 @@ export const GetInfoServicioFicha = (
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           user_doctorAsignado: res.doctorAsignado,
           user_doctorExtra: res.doctorExtra,
+
+          // Auditoría REAL. FichaAudiologicaInformacionDTO solo devuelve el usuario que registró
+          // (`userRegistro`): no trae fechas de registro ni datos de edición.
+          userRegistro: res.userRegistro ?? "",
+          fechaRegistro: "",
+          usuarioActualizacion: "",
+          fechaActualizacion: "",
+          tieneRegistro: true,
         }));
         // setSearchNombreMedico(res.txtMedico);
       } else {
@@ -649,7 +702,7 @@ export const SubmitDataServiceAmbos = async (
 
   Loading("Registrando Audiometría Ohla...");
 
-  const bodyOhla = {
+  const baseOhla = {
     codAu: formOhla.codAu == "" ? null : formOhla.codAu,
     norden: formOhla.norden,
     numTicket: null,
@@ -664,8 +717,17 @@ export const SubmitDataServiceAmbos = async (
     oi1_3000: formOhla.oi_o_3000, oi1_4000: formOhla.oi_o_4000, oi1_6000: formOhla.oi_o_6000, oi1_8000: formOhla.oi_o_8000,
     diagnostico: formOhla.diagnostico,
     diagnosticoCie10: formOhla.diagnosticoCie10,
-    userRegistro: user,
   };
+
+  // El usuario que registra se llama `userRegistro` en los POST de OHLA y Ficha. AudiometriaPoInformacionDTO (GET)
+  // no lo devuelve, así que al editar, si no se conoce el creador, se manda el usuario en sesión (como siempre)
+  // en vez de null para no borrarlo; la Ficha sí lo devuelve y se reenvía el original.
+  const bodyOhla = sellarAuditoria(baseOhla, {
+    user,
+    esActualizacion: Boolean(formOhla.tieneRegistro),
+    userRegistro: formOhla.userRegistro || user,
+    fechaRegistro: formOhla.fechaRegistro,
+  });
 
   const resOhla = await SubmitData(bodyOhla, registrarUrl, token);
   if (resOhla.id !== 1 && resOhla.id !== 0) {
@@ -676,7 +738,7 @@ export const SubmitDataServiceAmbos = async (
 
   Loading("Registrando Ficha Audiológica...");
 
-  const bodyFicha = {
+  const baseFicha = {
     codFa: formFicha.codFa == "" ? null : formFicha.codFa,
     norden: formFicha.norden,
     fechaExamen: formFicha.fecha,
@@ -716,12 +778,18 @@ export const SubmitDataServiceAmbos = async (
     txtConclusiones: formFicha.conclusiones,
     txtOtoscopia: formFicha.otoscopia,
     txtMesesTrabajo: formFicha.mesesTrabajo,
-    userRegistro: user,
     userMedicoOcup: formFicha.nombre_profecional,
     usuarioFirma: formFicha.user_medicoFirma,
     doctorAsignado: formFicha.user_doctorAsignado,
     doctorExtra: formFicha.user_doctorExtra,
   };
+
+  const bodyFicha = sellarAuditoria(baseFicha, {
+    user,
+    esActualizacion: Boolean(formFicha.tieneRegistro),
+    userRegistro: formFicha.userRegistro || user,
+    fechaRegistro: formFicha.fechaRegistro,
+  });
 
   const resFicha = await SubmitData(bodyFicha, registrarUrlFicha, token);
   Swal.close();

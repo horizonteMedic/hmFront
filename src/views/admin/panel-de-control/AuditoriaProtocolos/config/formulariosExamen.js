@@ -33,7 +33,7 @@ import {
     PrintHojaR as imprimirAudiometria,
     TABLA_AUDIOMETRIA,
 } from "../../SistemaOcupacional/Audiometria/Audiometria/controllerAudiometria";
-import AudiometriaCuestionario from "../../SistemaOcupacional/Audiometria/AudiometriaCuestionario/AudiometriaCuestionarioConEstado";
+import AudiometriaCuestionario from "../../SistemaOcupacional/Audiometria/AudiometriaCuestionario/AudiometriaCuestionario";
 import {
     PrintHojaR as imprimirCuestionarioAudiometria,
     TABLA_CUESTIONARIO_AUDIOMETRIA,

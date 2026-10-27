@@ -22,6 +22,9 @@ export default function InputTextOneLine({
   required = false,
   error = "",
   autocomplete = "on",
+  placeholder,
+  maxLength,
+  inputMode,
 }) {
   const showRevert = edited && typeof onRevert === "function";
   const hasError = Boolean(error);
@@ -65,6 +68,9 @@ export default function InputTextOneLine({
             aria-invalid={hasError}
             aria-describedby={hasError ? `${name}-error` : undefined}
             autoComplete={autocomplete}
+            placeholder={placeholder}
+            maxLength={maxLength}
+            inputMode={inputMode}
           />
           {showRevert && <RevertButton onClick={onRevert} />}
         </div>

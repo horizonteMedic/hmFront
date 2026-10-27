@@ -1,10 +1,20 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint, faEdit, faEraser, faDownload, faLayerGroup, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { useForm } from '../../../../../hooks/useForm';
-import { useSessionData } from '../../../../../hooks/useSessionData';
-import { getToday } from '../../../../../utils/helpers';
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLayerGroup } from "@fortawesome/free-solid-svg-icons";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
-  GenerarConsentimientosMasivo,
   handleSubirArchivo,
   handleSubirArchivoMasivo,
   PrintHojaR,
@@ -12,269 +22,257 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerConsentimientoDigitalizacion";
-import { useState } from 'react';
-import ButtonsPDF from '../../../../../components/reusableComponents/ButtonsPDF';
+import ModalGenerarMasivo from "./ModalGenerarMasivo";
+import ModalVisorArchivo from "./ModalVisorArchivo";
 
-const tabla = 'consen_digit';
+const tabla = "consen_digit";
+const today = getToday();
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fecha", "authorized"];
 
 const ConsentimientoDigitalizacion = () => {
-  const today = getToday();
-  const { token, selectedSede, userlogued } = useSessionData();
+  const { token, selectedSede, userlogued, datosFooter } = useSessionData();
 
   const initialFormState = {
-    norden: '',
+    norden: "",
     fecha: today,
-    nombres: '',
-    dni: '',
+    nombres: "",
+    dni: "",
+    edad: "",
     authorized: true,
 
     SubirDoc: false,
-    nomenclatura: "DECLARACION USO FIRMA"
+    nomenclatura: "DECLARACION USO FIRMA",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
-  const [visualerOpen, setVisualerOpen] = useState(null)
+
+  const [visualerOpen, setVisualerOpen] = useState(null);
   const [masivoModalOpen, setMasivoModalOpen] = useState(false);
-  const [masivoNordenes, setMasivoNordenes] = useState('');
-  const [masivoFecha, setMasivoFecha] = useState(today);
-  const [masivoProcesando, setMasivoProcesando] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const {
     form,
     setForm,
     handleChangeSimple,
-    handleChange,
-    handleChangeNumberDecimals,
+    handleChangeNumber,
     handleClear,
     handleClearnotO,
-  } = useForm(initialFormState);
+    handlePrintDefault,
+    handleChangeNumberDecimals,
+  } = useForm(initialFormState, { storageKey: "ConsentimientoDigitalizacion" });
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const hayPacienteCargado = Boolean(form.nombres && form.dni);
+
+  // Los errores se muestran solo tras intentar guardar y se limpian solos cuando el campo se corrige.
+  const ordenError = errors.norden && !hayPacienteCargado ? errors.norden : "";
+  const fechaError = errors.fecha && !form.fecha ? errors.fecha : "";
+  const autorizacionError = errors.authorized && !form.authorized ? errors.authorized : "";
+
+  const validateForm = () => {
+    const next = {};
+    if (!String(form.norden).trim()) next.norden = "Ingrese el N° de orden.";
+    else if (!hayPacienteCargado) next.norden = "Busque el N° de orden para cargar los datos del paciente.";
+    if (!String(form.fecha).trim()) next.fecha = "Ingrese la fecha.";
+    if (!form.authorized) next.authorized = "Debe aceptar la autorización para registrar.";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const handleClearForm = () => {
+    setErrors({});
+    handleClear();
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    if (!validateForm()) return;
+    SubmitDataService(form, token, userlogued, handleClearForm, tabla, form.tieneRegistro);
   };
 
-  const canSave =
-    String(form.norden).trim() &&
-    String(form.fecha).trim() &&
-    String(form.nombres).trim() &&
-    String(form.dni).trim() &&
-    form.authorized;
-
-  const handlePrint = () => {
-    PrintHojaR(form.norden, token, tabla);
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    setErrors({});
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
   };
 
-  const handleGenerarMasivoSave = async () => {
-    setMasivoProcesando(true);
-    const resultado = await GenerarConsentimientosMasivo(masivoNordenes, masivoFecha, userlogued, token);
-    setMasivoProcesando(false);
-
-    if (resultado) {
-      if (resultado.fallidos.length > 0) {
-        setMasivoNordenes(resultado.fallidos.map((f) => f.norden).join(', '));
-      } else {
-        setMasivoModalOpen(false);
-        setMasivoNordenes('');
-      }
+  // ===== Búsqueda con enter =====
+  const handleSearch = (e) => {
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
 
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setErrors({});
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  // ===== Impresión =====
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
-    <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8">
-      <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
-        <label className="flex-1">
-          <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>Nro: Orden</span>
-          <input
-            type="text"
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumberDecimals}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                handleSearch(e);
-              }
-            }}
-            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-            placeholder="Ingrese número de orden"
-          />
-        </label>
-        <label className="flex-1">
-          <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>Fecha</span>
-          <input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={handleChangeSimple}
-            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </label>
-
-        <ButtonsPDF
-          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-        />
-
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClearForm}
+      >
         <button
           type="button"
-          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow transition-colors duration-200"
           onClick={() => setMasivoModalOpen(true)}
+          className="pointer-events-auto inline-flex items-center justify-center gap-2 text-white text-md font-semibold px-3 py-1.5 rounded bg-purple-600 hover:bg-purple-700 transition-all duration-150 ease-out hover:shadow-lg active:scale-95"
         >
-          <FontAwesomeIcon icon={faLayerGroup} />
-          Generar masivo
+          <FontAwesomeIcon icon={faLayerGroup} /> Generar masivo
         </button>
+      </AccionesRegistroHeader>
 
-      </div>
+      {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onKeyUp={handleSearch}
+            onChange={handleChangeNumber}
+            disabled={hayRegistroCargado}
+            labelWidth="120px"
+            className="w-full"
+            error={ordenError}
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          required
+          error={fechaError}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
+        />
+      </SectionFieldset>
 
-      <h2 className="text-center text-2xl mb-8 tracking-wide" style={{ color: '#000', fontWeight: 'bold' }}>
-        DECLARACIÓN JURADA PARA EL USO DE LA FIRMA ELECTRÓNICA
-      </h2>
-
-      <div className="flex flex-col md:flex-row items-center gap-3 mb-6">
-        <span className="font-medium" style={{ color: '#000', fontWeight: 'bold' }}>Yo,</span>
-        <input
-          type="text"
+      {/* ===== SECCIÓN: DATOS DEL PACIENTE ===== */}
+      <SectionFieldset legend="Datos del Paciente" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">
+        <InputTextOneLine
+          label="Nombres"
           name="nombres"
-          placeholder="Nombre completo"
           value={form.nombres}
-          onChange={handleChange}
-          className="flex-1 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+          disabled
+          labelWidth="120px"
+          className="lg:col-span-2"
         />
-        <span className="font-medium whitespace-nowrap" style={{ color: '#000', fontWeight: 'bold' }}>identificado(a) con DNI N.º</span>
-        <input
-          type="text"
-          name="dni"
-          placeholder="DNI"
-          value={form.dni}
-          onChange={handleChangeNumberDecimals}
-          className="w-40 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-        />
-      </div>
+        <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="60px" />
+        <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="60px" />
+      </SectionFieldset>
 
-      <div className="flex items-start gap-3 mb-8">
-        <input
-          type="checkbox"
-          name="authorized"
-          checked={form.authorized}
-          onChange={e => setForm(prev => ({ ...prev, authorized: e.target.checked }))}
-          className="mt-1 w-5 h-5 accent-blue-600 border-2 border-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-        />
-        <span className="text-base leading-relaxed">
-          Autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión de informes médicos. Esta firma tendrá validez para los documentos necesarios implicados en este proceso. Asimismo, doy fe de que la información proporcionada es verídica, al igual que la información que brindaré durante los exámenes realizados en el centro médico Horizonte Medic. También, autorizo el envío de información médica a los correos electrónicos y/o números de celular de la empresa contratista.
-        </span>
-      </div>
-
-      <div className="flex flex-col md:flex-row items-center gap-4 border-t pt-6 mt-6">
-        <button
-          className={`flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white shadow transition-colors duration-200 ${canSave ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
-          disabled={!canSave}
-          onClick={handleSave}
-        >
-          <FontAwesomeIcon icon={faEdit} />
-          Grabar/actualizar
-        </button>
-        <button
-          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-green-600 hover:bg-green-700 shadow transition-colors duration-200"
-          onClick={handlePrint}
-        >
-          <FontAwesomeIcon icon={faPrint} />
-          Imprimir
-        </button>
-        <button
-          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 shadow border border-gray-400 transition-colors duration-200"
-          onClick={handleClear}
-        >
-          <FontAwesomeIcon icon={faEraser} />
-          Limpiar
-        </button>
-      </div>
-      {visualerOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-            <div className="px-4 py-2 naranjabackgroud flex justify-between">
-              <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-              <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-            </div>
-            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-              <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-            </div>
-            <div className="flex justify-center">
-              <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-              </a>
-            </div>
-          </div>
+      {/* ===== SECCIÓN: DECLARACIÓN JURADA ===== */}
+      <SectionFieldset legend="Declaración Jurada para el Uso de la Firma Electrónica" className="space-y-4">
+        <p className="font-semibold">
+          Yo, <span className="font-bold underline underline-offset-2">{form.nombres || "…………………………"}</span>,
+          identificado(a) con DNI N.º <span className="font-bold underline underline-offset-2">{form.dni || "………………"}</span>:
+        </p>
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="authorized"
+            checked={form.authorized}
+            disabled={camposDeshabilitados}
+            onChange={(e) => setForm((prev) => ({ ...prev, authorized: e.target.checked }))}
+            className="mt-1 w-5 h-5 shrink-0 accent-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+          <span className="leading-relaxed">
+            Autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión de informes médicos. Esta firma tendrá validez para los documentos necesarios implicados en este proceso. Asimismo, doy fe de que la información proporcionada es verídica, al igual que la información que brindaré durante los exámenes realizados en el centro médico Horizonte Medic. También, autorizo el envío de información médica a los correos electrónicos y/o números de celular de la empresa contratista.
+          </span>
+          {isFieldEdited("authorized") && <RevertButton onClick={() => revertField("authorized")} />}
         </div>
+        {autorizacionError && <p className="text-sm text-red-600">{autorizacionError}</p>}
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: DOCUMENTO DIGITALIZADO ===== */}
+      <SectionFieldset legend="Documento Digitalizado" className="flex justify-center">
+        <ButtonsPDF
+          {...(form.SubirDoc ? { handleSave: () => handleSubirArchivo(form, selectedSede, userlogued, token) } : {})}
+          {...(form.SubirDoc ? { handleRead: () => ReadArchivosForm(form, setVisualerOpen, token) } : {})}
+          handleMasivo={() => handleSubirArchivoMasivo(form, selectedSede, userlogued, token)}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
       )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
+        handleClear={handleClearForm}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+      />
+
+      {visualerOpen && <ModalVisorArchivo archivo={visualerOpen} onClose={() => setVisualerOpen(null)} />}
       {masivoModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[500px] max-h-[90%]">
-            <div className="px-4 py-2 naranjabackgroud flex justify-between items-center">
-              <h2 className="text-lg font-bold color-blanco">Generar masivo</h2>
-              <button
-                onClick={() => !masivoProcesando && setMasivoModalOpen(false)}
-                className="text-xl text-white"
-                style={{ fontSize: '23px' }}
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </div>
-            <div className="px-6 py-5 flex flex-col gap-4">
-              <label className="block">
-                <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>
-                  Nro. Orden (separados por comas)
-                </span>
-                <textarea
-                  rows={4}
-                  value={masivoNordenes}
-                  onChange={(e) => setMasivoNordenes(e.target.value.replace(/[^0-9,\s]/g, ''))}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const texto = e.clipboardData.getData('text').replace(/[^0-9,\s]/g, '');
-                    setMasivoNordenes((prev) => prev + texto);
-                  }}
-                  className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-                  placeholder="Ej: 12345, 12346, 12347"
-                  disabled={masivoProcesando}
-                />
-              </label>
-              <label className="block">
-                <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>Fecha</span>
-                <input
-                  type="date"
-                  value={masivoFecha}
-                  onChange={(e) => setMasivoFecha(e.target.value)}
-                  className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={masivoProcesando}
-                />
-              </label>
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 shadow border border-gray-400 transition-colors duration-200"
-                  onClick={() => setMasivoModalOpen(false)}
-                  disabled={masivoProcesando}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className={`flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white shadow transition-colors duration-200 ${masivoProcesando || !masivoNordenes.trim() || !masivoFecha ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-                  onClick={handleGenerarMasivoSave}
-                  disabled={masivoProcesando || !masivoNordenes.trim() || !masivoFecha}
-                >
-                  <FontAwesomeIcon icon={faEdit} />
-                  {masivoProcesando ? 'Guardando...' : 'Guardar'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ModalGenerarMasivo
+          fechaInicial={today}
+          userlogued={userlogued}
+          token={token}
+          onClose={() => setMasivoModalOpen(false)}
+        />
       )}
     </div>
   );

@@ -24,6 +24,10 @@ import { useEffect, useState } from "react";
  * @param {object}   options
  * @param {boolean}  options.tieneRegistro    true si el form corresponde a un registro ya existente.
  * @param {string[]} options.camposEditables  Campos que el usuario puede editar (para snapshot/revert).
+ * @param {*}        [options.resetKey]       Identifica el registro cargado. Solo hace falta si el formulario
+ *                                            puede cambiar de un registro existente a otro SIN pasar por
+ *                                            "nuevo" (p. ej. al elegir filas de una tabla): al cambiar, la
+ *                                            edición se vuelve a bloquear y se toma otro snapshot.
  *
  * @returns {{
  *   edicionHabilitada: boolean,
@@ -36,7 +40,7 @@ import { useEffect, useState } from "react";
  * }}
  */
 export const useRegistroEditable = (form, setForm, options) => {
-  const { tieneRegistro, camposEditables } = options;
+  const { tieneRegistro, camposEditables, resetKey } = options;
 
   // Edición bloqueada hasta pulsar "Habilitar edición" (solo aplica a registros existentes).
   const [edicionHabilitada, setEdicionHabilitada] = useState(false);
@@ -58,9 +62,9 @@ export const useRegistroEditable = (form, setForm, options) => {
     } else {
       setValoresOriginales(null);
     }
-    // Solo queremos capturar el snapshot al pasar a (o salir de) modo edición.
+    // Solo queremos capturar el snapshot al pasar a (o salir de) modo edición, o al cambiar de registro.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tieneRegistro]);
+  }, [tieneRegistro, resetKey]);
 
   // ¿El campo difiere de su valor original? (solo aplica en modo edición).
   const isFieldEdited = (campo) =>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import RegistroClientes from "./Admision/RegistroClientes.jsx";
-import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx";
+import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/PreOcup/AperturaExamenesPreOcup.jsx";
 import AperturaExamenesLaArena from "./Admision/AperturaExamenes/LaArena/AperturaExamenesLaArena.jsx";
 import ImportacionModal from "./Admision/ImportacionMasiva.jsx";
 import ImportacionModalBasica from "./Admision/ImportacionModalBasica.jsx";
@@ -212,26 +212,6 @@ const TabComponent = () => {
   const AlturaMulti = ComboboxAlturaMulti("T-NP");
   const FormaPago = ComboboxFormaPago("T-NP");
   const ListAuth = ComboboxListAuth("T-NP");
-
-  const [datos, setDatos] = useState({
-    codPa: "",
-    nombresPa: "",
-    apellidosPa: "",
-    fechaNaciminetoPa: "",
-    sexoPa: "",
-    emailPa: "",
-    lugarNacPa: "",
-    nivelEstPa: "",
-    ocupacionPa: "",
-    estadoCivilPa: "",
-    direccionPa: "",
-    departamentoPa: "",
-    provinciaPa: "",
-    distritoPa: "",
-    caserioPA: "",
-    telCasaPa: "",
-    celPa: "",
-  });
 
   const listasCombos = {
     EmpresasMulti,
@@ -475,8 +455,6 @@ const TabComponent = () => {
                   {subTab === 0 && (
                     <RegistroClientes
                       listas={listasCombosR}
-                      datos={datos}
-                      setDatos={setDatos}
                       selectedSede={selectSede}
                       token={token}
                       tabHC={() => {

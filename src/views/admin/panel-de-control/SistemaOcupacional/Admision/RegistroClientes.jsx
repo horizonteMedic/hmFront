@@ -1,281 +1,216 @@
-import { useState, useRef, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import Swal from 'sweetalert2';
-import { Loading } from '../../../../components/Loading';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faSearch, faX, faSignature, faFingerprint, faBroom, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faX, faSignature, faFingerprint, faCamera, faUpload } from '@fortawesome/free-solid-svg-icons';
+
+import InputTextOneLine from '../../../../components/reusableComponents/InputTextOneLine';
+import InputAutocomplete from '../../../../components/reusableComponents/InputAutocomplete';
+import SectionFieldset from '../../../../components/reusableComponents/SectionFieldset';
+import SearchButton from '../../../../components/reusableComponents/SearchButton';
+import AccionesRegistroHeader from '../../../../components/reusableComponents/AccionesRegistroHeader';
+import AuditoriaRegistro from '../../../../components/reusableComponents/AuditoriaRegistro';
+import BotonesForm from '../../../../components/templates/BotonesForm';
+import { useForm } from '../../../../hooks/useForm';
+import { useSessionData } from '../../../../hooks/useSessionData';
+import { useRegistroEditable } from '../../../../hooks/useRegistroEditable';
+import { getFechaHoraActual } from '../../../../utils/helpers';
+import { buildAuditoria } from '../../../../utils/auditoriaUtils';
 
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
+import { VerifyHoF } from './model/Submit';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import FotoPaciente from './foto/FotoPaciente';
-import { VerifyHoF } from './model/Submit';
 import SubidaMasiva from './RegistroPacientes/MasivoRegistroPacientes';
+import {
+  CAMPOS_EDITABLES,
+  CAMPOS_REQUERIDOS,
+  crearDatosIniciales,
+  ESTADOS_CIVILES,
+  esFechaNacimientoValida,
+  mascaraFechaNacimiento,
+  NIVELES_ESTUDIO,
+  OPCIONES_SEXO,
+  pacienteAFormulario,
+  SEXO_ETIQUETA,
+} from './RegistroPacientes/controllerRegistroClientes';
 
-const RegistroClientes = (props) => {
-  // ref para mantener el cursor fijo en "Nombres"
-  const nombreRef = useRef(null);
-  const dniRef = useRef(null);   // ⬅️  nuevo
+const DATOS_INICIALES = crearDatosIniciales();
+const SIN_ARCHIVO = { id: 0, url: '' };
+const etiquetaTexto = (opcion) => opcion;
+const etiquetaNombre = (opcion) => opcion.nombre;
+const etiquetaDescripcion = (opcion) => opcion.descripcion;
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [modalSubidaMasiva, setModalSubidaMasiva] = useState(false)
+// Enter pasa al siguiente campo (flujo de teclado del puesto de admisión)
+const alPresionarEnter = (siguienteId) => (e) => {
+  if (e.key === 'Enter') document.getElementById(siguienteId)?.focus();
+};
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProfesiones, setFilteredProfesiones] = useState([]);
-  const [selectedProfesion, setSelectedProfesion] = useState('');
-  const [modalhuellaF, setModalhuellaF] = useState(false);
-  const [modalpad, setModalpad] = useState(false);
-  const [modalFoto, setModalFoto] = useState(false);
-  const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
-  const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
-  const [FotoP, setFotoP] = useState({ id: 0, url: '' });
-  const [notCharge, setNotcharge] = useState(false)
-  const { Profesiones, Departamentos, Provincias, Distritos } = props.listas
+const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => {
+  const { Profesiones = [], Departamentos = [], Provincias = [], Distritos = [] } = listas;
+  const { userlogued } = useSessionData();
 
-  useEffect(() => {
-    if (Profesiones && Profesiones.length > 0) {
-      setNotcharge(true); // habilita input
-    } else {
-      setNotcharge(false); // deshabilita input
-    }
-  }, [Profesiones]);
+  const { form, setForm, handleChange, handleClear } = useForm(DATOS_INICIALES, { storageKey: 'RegistroPacientes' });
 
-  const sexoOptions = ['MASCULINO', 'FEMENINO'];
-  const nivelOptions = [
-    'ANALFABETO',
-    'PRIMARIA COMPLETA',
-    'PRIMARIA INCOMPLETA',
-    'SECUNDARIA COMPLETA',
-    'SECUNDARIA INCOMPLETA',
-    'UNIVERSITARIO',
-    'TECNICO'
-  ];
-  const handleDateInput = e => {
-    // si quisieras validar o parsear, aquí lo haces
-    setDatos(d => ({ ...d, fechaNaciminetoPa: e.target.value }));
-  };
+  const { edicionHabilitada, habilitarEdicion, camposDeshabilitados, isFieldEdited, revertField } = useRegistroEditable(
+    form,
+    setForm,
+    { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES }
+  );
 
-  // --- Handlers genéricos ---
-  const handleChange = e => {
-    const { name, value } = e.target;
-    props.setDatos(d => ({ ...d, [name]: value.toUpperCase() }));
-  };
+  const [mostrarErrores, setMostrarErrores] = useState(false);
+  const [modal, setModal] = useState(null); // 'huella' | 'pad' | 'foto' | 'masivo'
+  const [FirmaP, setFirmaP] = useState(SIN_ARCHIVO);
+  const [HuellaP, setHuellaP] = useState(SIN_ARCHIVO);
+  const [FotoP, setFotoP] = useState(SIN_ARCHIVO);
 
-  const handleDNI = e => {
-    const { name, value } = e.target;
-    const onlyDigits = value.replace(/\D/g, '');      // quita todo lo que no sea dígito
-    props.setDatos(d => ({                                  // guarda como string
-      ...d,
-      [name]: onlyDigits              // '' si el input está vacío
-    }));
-  };
+  const cerrarModal = () => setModal(null);
+  const setCampo = (name, value) => setForm((f) => ({ ...f, [name]: value }));
+  const campoNumerico = (e) => setCampo(e.target.name, e.target.value.replace(/\D/g, ''));
 
-  const handleNumber = e => {
-    const { name, value } = e.target;
-    const onlyDigits = value.replace(/\D/g, '');
-    props.setDatos(d => ({ ...d, [name]: onlyDigits }));    // '' si está vacío
-  };
+  // Resaltado + botón de revertir de un campo editable
+  const revertible = (campo) => ({ edited: isFieldEdited(campo), onRevert: () => revertField(campo) });
 
-  const handleDPD = e => {
-    const { name, value } = e.target;
-    const sel = value ? JSON.parse(value) : '';
-    setDatos(d => {
-      let newD = { ...d, [name]: sel };
-      if (name === 'departamentoPa') {
-        newD.provinciaPa = '';
-        newD.distritoPa = '';
-      }
-      return newD;
+  // Campo obligatorio: se marca solo tras intentar guardar y se limpia cuando se completa
+  const requerido = (campo) => ({
+    required: true,
+    error: mostrarErrores && !String(form[campo] ?? '').trim() ? 'Campo obligatorio' : '',
+  });
+
+  // Departamento -> Provincia -> Distrito (cada lista depende de la elección anterior)
+  const departamento = useMemo(() => Departamentos.find((d) => d.nombre === form.departamentoPa), [Departamentos, form.departamentoPa]);
+  const provincia = useMemo(
+    () => Provincias.find((p) => p.idDepartamento === departamento?.id && p.nombre === form.provinciaPa),
+    [Provincias, departamento, form.provinciaPa]
+  );
+  const provinciasDelDepartamento = useMemo(
+    () => (departamento ? Provincias.filter((p) => p.idDepartamento === departamento.id) : []),
+    [Provincias, departamento]
+  );
+  const distritosDeLaProvincia = useMemo(
+    () => (provincia ? Distritos.filter((d) => d.idProvincia === provincia.id) : []),
+    [Distritos, provincia]
+  );
+
+  // Al cambiar el departamento (escribiendo o eligiendo) la provincia y el distrito se limpian si ya no le
+  // pertenecen; lo mismo con el distrito al cambiar la provincia
+  const cambiarDepartamento = (nombre) =>
+    setForm((f) => {
+      const dep = Departamentos.find((d) => d.nombre === nombre);
+      const provinciaVigente = dep && Provincias.some((p) => p.idDepartamento === dep.id && p.nombre === f.provinciaPa);
+      return provinciaVigente ? { ...f, departamentoPa: nombre } : { ...f, departamentoPa: nombre, provinciaPa: '', distritoPa: '' };
     });
+  const cambiarProvincia = (nombre) =>
+    setForm((f) => {
+      const prov = provinciasDelDepartamento.find((p) => p.nombre === nombre);
+      const distritoVigente = prov && Distritos.some((d) => d.idProvincia === prov.id && d.nombre === f.distritoPa);
+      return distritoVigente ? { ...f, provinciaPa: nombre } : { ...f, provinciaPa: nombre, distritoPa: '' };
+    });
+
+  const archivosVacios = () => {
+    setFirmaP(SIN_ARCHIVO);
+    setHuellaP(SIN_ARCHIVO);
+    setFotoP(SIN_ARCHIVO);
   };
 
-  const focusNext = (e, nextId) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      document.getElementById(nextId)?.focus();
-    }
+  // Limpia el formulario; `conservarDni` deja el DNI buscado para seguir llenando un paciente nuevo
+  const limpiar = ({ conservarDni = false } = {}) => {
+    const dni = form.codPa;
+    setMostrarErrores(false);
+    archivosVacios();
+    if (conservarDni) setForm({ ...DATOS_INICIALES, codPa: dni });
+    else handleClear();
+    document.getElementById('codPa')?.focus();
   };
 
-  // Autocomplete de profesión
-  const handleProfesionSearch = e => {
-    const v = e.target.value;
-    props.setDatos(d => ({ ...d, ocupacionPa: v.toUpperCase() }))
-    setSearchTerm(v);
-    setFilteredProfesiones(
-      v
-        ? Profesiones.filter(o =>
-          o.descripcion.toLowerCase().includes(v.toLowerCase())
-        )
-        : []
-    );
-  };
-
-  const handleSelectProfesion = prof => {
-    setSearchTerm(prof.descripcion)
-    setSelectedProfesion(prof.descripcion);
-    props.setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
-    setFilteredProfesiones([]);
-    document.getElementById('estadoCivilPa')?.focus();
-  };
-
-  // --- Búsqueda de paciente -------------------------
-  const handleSearch = e => {
-    e.preventDefault();
-    if (!props.datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
+  // ===== Búsqueda de paciente por DNI =====
+  const buscarPaciente = async () => {
+    if (!form.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
 
     Swal.fire({
-      title: 'Buscando datos', allowOutsideClick: false,
+      title: 'Buscando datos',
+      allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: false,
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!", didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
-    SearchPacienteDNI(props.selectedSede, props.datos.codPa, props.token)
-      .then(async res => {
-        Swal.close();
+    try {
+      const res = await SearchPacienteDNI(selectedSede, form.codPa, token);
+      Swal.close();
 
-        // Si no existe el paciente
-        if (!res.codPa) {
-          await Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'info',
-            title: '<span style="font-size:1rem">Paciente no encontrado</span>',
-            width: 360,
-            padding: '1.25rem',
-            showConfirmButton: false,
-            timer: 1200,
-            customClass: { icon: 'swal2-icon-scale' }
-          });
+      // Paciente nuevo: se conserva el DNI y se sigue con los demás datos
+      if (!res?.codPa) {
+        await Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'info',
+          title: '<span style="font-size:1rem">Paciente no encontrado</span>',
+          width: 360,
+          padding: '1.25rem',
+          showConfirmButton: false,
+          timer: 1200,
+          customClass: { icon: 'swal2-icon-scale' },
+        });
+        limpiar({ conservarDni: true });
+        setTimeout(() => document.getElementById('nombresPa')?.focus(), 0);
+        return;
+      }
 
-          handleLimpiar(true);
-          setTimeout(() => nombreRef.current?.focus(), 0);
-          return;
-        }
+      setMostrarErrores(false);
+      setForm(pacienteAFormulario(res));
 
-        if (res.fechaNaciminetoPa) {
-          const [yyyy, mm, dd] = res.fechaNaciminetoPa.split('-');
-          res.fechaNaciminetoPa = `${dd}-${mm}-${yyyy}`;
-        }
+      // Huella, firma y foto ya tomadas
+      const [H, F, FO] = await Promise.all(
+        ['HUELLA', 'FIRMAP', 'FOTO_PACIENTE'].map((tipo) =>
+          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/${tipo}`)
+        )
+      );
+      setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : SIN_ARCHIVO);
+      setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : SIN_ARCHIVO);
+      setFotoP(FO.id === 1 ? { id: 1, url: FO.mensaje } : SIN_ARCHIVO);
+    } catch {
+      Swal.close();
+      Swal.fire('Error', 'Ha ocurrido un error', 'error');
+    }
+  };
 
-        // 1️⃣ Sanear null/undefined → convertirlos en cadena vacía
-        const sanitized = Object.fromEntries(
-          Object.entries(res).map(([key, value]) => [key, value ?? ''])
-        );
-
-        // 2️⃣ Sobrescribir todo el objeto datos con valores saneados
-        props.setDatos(sanitized);
-
-        // 3️⃣ Mapear departamento/provincia/distrito SOLO si vienen valores válidos
-        let deptObj = sanitized.departamentoPa || '';
-        let provObj = sanitized.provinciaPa || '';
-        let distObj = sanitized.distritoPa || '';
-
-        if (sanitized.departamentoPa) {
-          const foundDept = Departamentos.find(d => d.nombre === sanitized.departamentoPa);
-          deptObj = foundDept || sanitized.departamentoPa;
-
-          const foundProv = foundDept
-            ? Provincias.find(p =>
-              p.idDepartamento === foundDept.id &&
-              p.nombre === sanitized.provinciaPa
-            )
-            : null;
-          provObj = foundProv || sanitized.provinciaPa;
-
-          const foundDist = foundProv
-            ? Distritos.find(d =>
-              d.idProvincia === foundProv.id &&
-              d.nombre === sanitized.distritoPa
-            )
-            : null;
-          distObj = foundDist || sanitized.distritoPa;
-        }
-        //Eliminar validacion
-        props.setDatos(d => ({
-          ...d,
-          departamentoPa: deptObj,
-          provinciaPa: provObj,
-          distritoPa: distObj
-        }));
-        console.log(sanitized)
-        // 4️⃣ Sincronizar los campos de búsqueda/autocomplete
-        if (sanitized.sexoPa === 'M' || sanitized.sexoPa === 'MASCULINO') setSearchSexo('MASCULINO');
-        else if (sanitized.sexoPa === 'F' || sanitized.sexoPa === 'FEMENINO') setSearchSexo('FEMENINO');
-        else setSearchSexo('');
-
-        setSearchNivel(sanitized.nivelEstPa);
-        setSearchCivil(sanitized.estadoCivilPa);
-
-        setSearchTerm(sanitized.ocupacionPa);
-        setSelectedProfesion(sanitized.ocupacionPa);
-
-        setSearchDept(sanitized.departamentoPa);
-        setSearchProv(sanitized.provinciaPa);
-        setSearchDist(sanitized.distritoPa);
-
-        // 5️⃣ Limpiar todas las listas de sugerencias
-        setFilteredSexo([]);
-        setFilteredNivel([]);
-        setFilteredProfesiones([]);
-        setFilteredCivil([]);
-        setFilteredDept([]);
-        setFilteredProv([]);
-        setFilteredDist([]);
-
-        // 6️⃣ Cargar huella y firma
-        const [H, F, FO] = await Promise.all([
-          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/HUELLA`),
-          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FIRMAP`),
-          VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FOTO_PACIENTE`)
-        ]);
-        setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
-        setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
-        setFotoP(FO.id === 1 ? { id: 1, url: FO.mensaje } : { id: 0, url: '' });
-      })
-      .catch(() => {
-        Swal.close();
-        Swal.fire('Error', 'Ha ocurrido un error', 'error');
-      });
-  }
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    const camposRequeridos = ['codPa', 'nombresPa', 'fechaNaciminetoPa', 'sexoPa', 'lugarNacPa', 'nivelEstPa', 'ocupacionPa',
-      'estadoCivilPa', 'direccionPa', 'departamentoPa', 'provinciaPa', 'distritoPa', 'celPa']; // agrega los campos que quieras
-    const camposVacios = camposRequeridos.filter(campo => !props.datos[campo]);
-    if (camposVacios.length > 0) {
-      const lista = camposVacios.join(', ');
-      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+  // ===== Guardar / Guardar cambios =====
+  const guardar = () => {
+    const faltantes = Object.entries(CAMPOS_REQUERIDOS)
+      .filter(([campo]) => !String(form[campo] ?? '').trim())
+      .map(([, etiqueta]) => etiqueta);
+    if (faltantes.length > 0) {
+      setMostrarErrores(true);
+      return Swal.fire('Error', `Faltan completar: ${faltantes.join(', ')}`, 'error');
+    }
+    if (!esFechaNacimientoValida(form.fechaNaciminetoPa)) {
+      setMostrarErrores(true);
+      return Swal.fire('Error', 'La fecha de nacimiento debe ser una fecha válida con el formato DD-MM-AAAA', 'error');
     }
 
+    const dni = form.codPa;
+    const esEdicion = form.tieneRegistro;
 
     Swal.fire({
       title: 'Validando Datos',
       allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: false,
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
-    SubmitRegistrarPaciente(props.datos, props.selectedSede, props.token)
-      .then(r => {
+    SubmitRegistrarPaciente(form, selectedSede, token)
+      .then((r) => {
         Swal.close();
-        console.log(r)
         if (!r.id) {
-          Swal.fire('Error', 'No se pudo registrar', 'error');
-        } else {
-          Swal.fire('Registrado', 'Paciente registrado', 'success');
-          handleLimpiar();
-          props.tabHC();
-          props.ChangeDNI(props.datos.codPa);
+          Swal.fire('Error', esEdicion ? 'No se pudo actualizar' : 'No se pudo registrar', 'error');
+          return;
         }
+        Swal.fire(esEdicion ? 'Actualizado' : 'Registrado', esEdicion ? 'Paciente actualizado' : 'Paciente registrado', 'success');
+        limpiar();
+        tabHC();
+        ChangeDNI(dni);
       })
       .catch(() => {
         Swal.close();
@@ -283,811 +218,322 @@ const RegistroClientes = (props) => {
       });
   };
 
-  // 1️⃣  Valor inicial de datos (puedes extraerlo a una constante para no repetir)
-  const initialDatos = {
-    codPa: '',
-    nombresPa: '',
-    apellidosPa: '',
-    fechaNaciminetoPa: '',
-    sexoPa: '',
-    emailPa: '',
-    lugarNacPa: '',
-    nivelEstPa: '',
-    ocupacionPa: '',
-    estadoCivilPa: '',
-    direccionPa: '',
-    departamentoPa: '',
-    provinciaPa: '',
-    distritoPa: '',
-    caserioPA: '',
-    telCasaPa: '',
-    celPa: ''
+  // Firma, huella y foto necesitan el DNI del paciente
+  const abrirCaptura = (tipo) => {
+    if (!form.codPa) return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+    setModal(tipo);
   };
 
-  const handleLimpiar = (keepDNI = false) => {
-    const dniActual = keepDNI ? props.datos.codPa : '';   // guarda o descarta el DNI
+  const hayRegistroCargado = Boolean(form.codPa || form.nombresPa);
+  const auditoria = buildAuditoria(form, { usuarioActual: userlogued, fechaHoraActual: getFechaHoraActual() });
 
-    // 🔄 reinicia el estado principal
-    props.setDatos({ ...initialDatos, codPa: dniActual });
-    setStartDate(new Date());          // (por si usas DatePicker)
-
-    // 🔄 limpia todos los autocompletados / filtros
-    setSearchTerm(''); setFilteredProfesiones([]); setSelectedProfesion('');
-    setSearchSexo(''); setFilteredSexo([]);
-    setSearchNivel(''); setFilteredNivel([]);
-    setSearchCivil(''); setFilteredCivil([]);
-    setSearchDept(''); setFilteredDept([]);
-    setSearchProv(''); setFilteredProv([]);
-    setSearchDist(''); setFilteredDist([]);
-
-    // 🔄 limpia huella, firma y foto previas
-    setHuellaP({ id: 0, url: '' });
-    setFirmaP({ id: 0, url: '' });
-    setFotoP({ id: 0, url: '' });
-
-    // ⌨️ devuelve el foco al DNI para seguir escribiendo
-    dniRef.current?.focus();
-  };
-
-  const openHuella = () => {
-    if (!props.datos.codPa)
-      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
-    setModalhuellaF(true);
-  };
-  const openPad = () => {
-    if (!props.datos.codPa)
-      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
-    setModalpad(true);
-  };
-  const openFoto = () => {
-    if (!props.datos.codPa)
-      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
-    setModalFoto(true);
-  };
-  // 1. Definir opciones (al principio del componente)
-  const civilOptions = [
-    'SOLTERO',
-    'CASADO',
-    'VIUDO',
-    'CONVIVIENTE',
-    'SEPARADO',
-    'DIVORCIADO'
+  const documentos = [
+    { tipo: 'pad', estado: FirmaP, icono: faSignature, texto: 'Tomar Firma', color: 'bg-purple-600 hover:bg-purple-700', ayuda: 'Captura la firma digital del paciente' },
+    { tipo: 'huella', estado: HuellaP, icono: faFingerprint, texto: 'Tomar Huella Futronic', color: 'bg-teal-600 hover:bg-teal-700', ayuda: 'Escanea la huella dactilar del paciente' },
+    { tipo: 'foto', estado: FotoP, icono: faCamera, texto: 'Tomar Fotografía', color: 'bg-orange-500 hover:bg-orange-600', ayuda: 'Captura la foto del paciente con la cámara' },
   ];
 
-
-  // 2. Estados para la búsqueda
-  const [searchSexo, setSearchSexo] = useState('');
-  const [filteredSexo, setFilteredSexo] = useState([]);
-  const [searchNivel, setSearchNivel] = useState('');
-  const [filteredNivel, setFilteredNivel] = useState([]);
-
-  // 3. Handlers de filtrado y selección
-  const handleSexoSearch = e => {
-    const v = e.target.value.toUpperCase();
-    setSearchSexo(v);
-    setFilteredSexo(
-      v ? sexoOptions.filter(s => s.includes(v)) : []
-    );
-  };
-  const handleSelectSexo = val => {
-    setSearchSexo(val);
-    props.setDatos(d => ({ ...d, sexoPa: val.charAt(0) }));
-    setFilteredSexo([]);
-    document.getElementById('emailPa')?.focus();
-  };
-
-  const handleNivelSearch = e => {
-    const v = e.target.value.toUpperCase();
-    props.setDatos(d => ({ ...d, nivelEstPa: v.toUpperCase() }))
-    setSearchNivel(v);
-    setFilteredNivel(
-      v ? nivelOptions.filter(n => n.includes(v)) : []
-    );
-  };
-  const handleSelectNivel = val => {
-    setSearchNivel(val);
-    props.setDatos(d => ({ ...d, nivelEstPa: val }));
-    setFilteredNivel([]);
-    document.getElementById('ocupacionPa')?.focus();
-  };
-
-  // 2. Añadir a tus useState:
-  const [searchCivil, setSearchCivil] = useState('');
-  const [filteredCivil, setFilteredCivil] = useState([]);
-
-  // 3. Manejadores:
-  const handleCivilSearch = e => {
-    const v = e.target.value.toUpperCase();
-    setSearchCivil(v);
-    setFilteredCivil(
-      v
-        ? civilOptions.filter(c => c.includes(v))
-        : []
-    );
-  };
-
-  const handleSelectCivil = val => {
-    setSearchCivil(val);
-    props.setDatos(d => ({ ...d, estadoCivilPa: val }));
-    setFilteredCivil([]);
-    document.getElementById('direccionPa')?.focus();
-  };
-
-  // Opciones base ya vienen de tu ComboboxDepartamentos(), ComboboxProvincias(), ComboboxDistritos()
-  // Estados para Departamento
-  const [searchDept, setSearchDept] = useState('');
-  const [filteredDept, setFilteredDept] = useState([]);
-
-  // Estados para Provincia
-  const [searchProv, setSearchProv] = useState('');
-  const [filteredProv, setFilteredProv] = useState([]);
-
-  // Estados para Distrito
-  const [searchDist, setSearchDist] = useState('');
-  const [filteredDist, setFilteredDist] = useState([]);
-
-  // Handler Departamento
-  const handleDeptSearch = e => {
-    const v = e.target.value;
-    props.setDatos(d => ({ ...d, departamentoPa: v.toUpperCase() }))
-    setSearchDept(v);
-    setFilteredDept(
-      v
-        ? Departamentos.filter(d =>
-          d.nombre.toLowerCase().includes(v.toLowerCase())
-        )
-        : []
-    );
-  };
-  const handleSelectDept = dept => {
-    setSearchDept(dept.nombre);
-    props.setDatos(d => ({ ...d, departamentoPa: dept }));
-    setFilteredDept([]);
-    // limpia provincias/distritos cuando cambias de depto
-    setSearchProv('');
-    setFilteredProv([]);
-    setSearchDist('');
-    setFilteredDist([]);
-  };
-
-  // Handler Provincia (usa Provincias filtradas por depto seleccionado)
-  const handleProvSearch = e => {
-    const v = e.target.value;
-    props.setDatos(d => ({ ...d, provinciaPa: v.toUpperCase() }))
-    setSearchProv(v);
-    const opciones = props.datos.departamentoPa
-      ? Provincias.filter(p =>
-        p.idDepartamento === props.datos.departamentoPa.id &&
-        p.nombre.toLowerCase().includes(v.toLowerCase())
-      )
-      : [];
-    setFilteredProv(v ? opciones : []);
-  };
-  const handleSelectProv = prov => {
-    setSearchProv(prov.nombre);
-    props.setDatos(d => ({ ...d, provinciaPa: prov }));
-    setFilteredProv([]);
-    // limpia distrito al cambiar provincia
-    setSearchDist('');
-    setFilteredDist([]);
-  };
-
-  // Handler Distrito (usa Distritos filtrados por provincia seleccionada)
-  const handleDistSearch = e => {
-    const v = e.target.value;
-    props.setDatos(d => ({ ...d, distritoPa: v.toUpperCase() }))
-    setSearchDist(v);
-    const opciones = props.datos.provinciaPa
-      ? Distritos.filter(d =>
-        d.idProvincia === props.datos.provinciaPa.id &&
-        d.nombre.toLowerCase().includes(v.toLowerCase())
-      )
-      : [];
-    setFilteredDist(v ? opciones : []);
-  };
-  const handleSelectDist = dist => {
-    setSearchDist(dist.nombre);
-    props.setDatos(d => ({ ...d, distritoPa: dist }));
-    setFilteredDist([]);
-  };
-  const handleFecha = e => {
-    const raw = e.target.value.replace(/\D/g, '').slice(0, 8);   // máx. 8 dígitos
-    let formatted = raw;
-
-    if (raw.length >= 5) {
-      formatted = raw.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1-$2-$3'); // ddMMaaaa → dd-MM-aaaa
-    } else if (raw.length >= 3) {
-      formatted = raw.replace(/(\d{2})(\d{0,2})/, '$1-$2'); // ddM → dd-M
-    }
-
-    props.setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
-  };
-
   return (
-    <div className="p-4">
-      <button onClick={() => { setModalSubidaMasiva(true) }} className="verde-btn px-4 py-1 rounded flex items-center mr-3">
-        Subida Masiva
-      </button>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
-        {/* Columna 1 */}
-        <div className="flex flex-col space-y-2">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={() => limpiar()}
+      >
+        <button type="button" onClick={() => setModal('masivo')} className="pointer-events-auto verde-btn px-4 py-2 rounded flex items-center gap-2">
+          <FontAwesomeIcon icon={faUpload} /> Subida Masiva
+        </button>
+      </AccionesRegistroHeader>
 
-          <div className="flex items-center space-x-2">
-            <label htmlFor="codPa" className="block w-[11.5em]">
-              DNI/LM:
-            </label>
-            <input autoComplete="off"
-              ref={dniRef}
-              type="text"
-              id="codPa"
-              name="codPa"
-              value={props.datos.codPa}
-              onChange={handleDNI}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  handleSearch(e);
-                }
-              }}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
+      {/* ===== SECCIÓN: DATOS PERSONALES ===== */}
+      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="flex gap-x-3 w-full lg:col-span-2">
+          <InputTextOneLine
+            label="DNI/LM"
+            name="codPa"
+            value={form.codPa}
+            onChange={campoNumerico}
+            onKeyUp={(e) => e.key === 'Enter' && buscarPaciente()}
+            disabled={form.tieneRegistro}
+            labelWidth="120px"
+            className="w-full lg:w-1/2 lg:pr-2"
+            inputMode="numeric"
+            {...requerido('codPa')}
+          />
+          <SearchButton onClick={buscarPaciente} disabled={form.tieneRegistro} />
+        </div>
+
+        <InputTextOneLine
+          label="Nombres"
+          name="nombresPa"
+          value={form.nombresPa}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('apellidosPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('nombresPa')}
+          {...revertible('nombresPa')}
+        />
+        <InputTextOneLine
+          label="Apellidos"
+          name="apellidosPa"
+          value={form.apellidosPa}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('fechaNaciminetoPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...revertible('apellidosPa')}
+        />
+
+        <InputTextOneLine
+          label="Fecha Nac."
+          name="fechaNaciminetoPa"
+          value={form.fechaNaciminetoPa}
+          onChange={(e) => setCampo('fechaNaciminetoPa', mascaraFechaNacimiento(e.target.value))}
+          onKeyUp={alPresionarEnter('sexoPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          placeholder="DD-MM-AAAA"
+          maxLength={10}
+          inputMode="numeric"
+          {...requerido('fechaNaciminetoPa')}
+          {...revertible('fechaNaciminetoPa')}
+        />
+        <InputAutocomplete
+          label="Sexo"
+          name="sexoPa"
+          value={SEXO_ETIQUETA[form.sexoPa] ?? ''}
+          onSelect={(sexo) => setCampo('sexoPa', sexo.charAt(0))}
+          options={OPCIONES_SEXO}
+          getLabel={etiquetaTexto}
+          soloSeleccion
+          nextFocusId="emailPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('sexoPa')}
+          {...revertible('sexoPa')}
+        />
+
+        <InputTextOneLine
+          label="Email"
+          name="emailPa"
+          value={form.emailPa}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('lugarNacPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...revertible('emailPa')}
+        />
+        <InputTextOneLine
+          label="Lugar Nac."
+          name="lugarNacPa"
+          value={form.lugarNacPa}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('nivelEstPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('lugarNacPa')}
+          {...revertible('lugarNacPa')}
+        />
+
+        <InputAutocomplete
+          label="Nivel Estudio"
+          name="nivelEstPa"
+          value={form.nivelEstPa}
+          onChange={(v) => setCampo('nivelEstPa', v)}
+          onSelect={(nivel) => setCampo('nivelEstPa', nivel)}
+          options={NIVELES_ESTUDIO}
+          getLabel={etiquetaTexto}
+          nextFocusId="ocupacionPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('nivelEstPa')}
+          {...revertible('nivelEstPa')}
+        />
+        <InputAutocomplete
+          label="Prof/Ocup"
+          name="ocupacionPa"
+          value={form.ocupacionPa}
+          onChange={(v) => setCampo('ocupacionPa', v)}
+          onSelect={(profesion) => setCampo('ocupacionPa', profesion.descripcion)}
+          options={Profesiones}
+          getLabel={etiquetaDescripcion}
+          nextFocusId="estadoCivilPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('ocupacionPa')}
+          {...revertible('ocupacionPa')}
+        />
+
+        <InputAutocomplete
+          label="Estado Civil"
+          name="estadoCivilPa"
+          value={form.estadoCivilPa}
+          onSelect={(estado) => setCampo('estadoCivilPa', estado)}
+          options={ESTADOS_CIVILES}
+          getLabel={etiquetaTexto}
+          soloSeleccion
+          nextFocusId="direccionPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('estadoCivilPa')}
+          {...revertible('estadoCivilPa')}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: DOMICILIO Y CONTACTO ===== */}
+      <SectionFieldset legend="Domicilio y Contacto" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+        <InputTextOneLine
+          label="Dirección"
+          name="direccionPa"
+          value={form.direccionPa}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('departamentoPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          className="lg:col-span-2"
+          {...requerido('direccionPa')}
+          {...revertible('direccionPa')}
+        />
+
+        <InputAutocomplete
+          label="Departamento"
+          name="departamentoPa"
+          value={form.departamentoPa}
+          onChange={cambiarDepartamento}
+          onSelect={(dep) => cambiarDepartamento(dep.nombre)}
+          options={Departamentos}
+          getLabel={etiquetaNombre}
+          mostrarTodo
+          nextFocusId="provinciaPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('departamentoPa')}
+          {...revertible('departamentoPa')}
+        />
+        <InputAutocomplete
+          label="Provincia"
+          name="provinciaPa"
+          value={form.provinciaPa}
+          onChange={cambiarProvincia}
+          onSelect={(prov) => cambiarProvincia(prov.nombre)}
+          options={provinciasDelDepartamento}
+          getLabel={etiquetaNombre}
+          mostrarTodo
+          nextFocusId="distritoPa"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('provinciaPa')}
+          {...revertible('provinciaPa')}
+        />
+
+        <InputAutocomplete
+          label="Distrito"
+          name="distritoPa"
+          value={form.distritoPa}
+          onChange={(v) => setCampo('distritoPa', v)}
+          onSelect={(dist) => setCampo('distritoPa', dist.nombre)}
+          options={distritosDeLaProvincia}
+          getLabel={etiquetaNombre}
+          mostrarTodo
+          nextFocusId="caserioPA"
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...requerido('distritoPa')}
+          {...revertible('distritoPa')}
+        />
+        <InputTextOneLine
+          label="Caserío"
+          name="caserioPA"
+          value={form.caserioPA}
+          onChange={handleChange}
+          onKeyUp={alPresionarEnter('telCasaPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          {...revertible('caserioPA')}
+        />
+
+        <InputTextOneLine
+          label="Teléfono"
+          name="telCasaPa"
+          value={form.telCasaPa}
+          onChange={campoNumerico}
+          onKeyUp={alPresionarEnter('celPa')}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          inputMode="numeric"
+          {...revertible('telCasaPa')}
+        />
+        <InputTextOneLine
+          label="Celular"
+          name="celPa"
+          value={form.celPa}
+          onChange={campoNumerico}
+          disabled={camposDeshabilitados}
+          labelWidth="120px"
+          inputMode="numeric"
+          {...requerido('celPa')}
+          {...revertible('celPa')}
+        />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: FIRMA, HUELLA Y FOTO ===== */}
+      <SectionFieldset legend="Firma, Huella y Fotografía" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {documentos.map(({ tipo, estado, icono, texto, color, ayuda }) => (
+          <div key={tipo} className="flex flex-col items-center gap-2">
+            <FontAwesomeIcon
+              icon={estado.id === 1 ? faCheck : faX}
+              size="xl"
+              color={estado.id === 1 ? 'green' : 'red'}
+              title={estado.id === 1 ? 'Ya registrada' : 'Pendiente'}
             />
             <button
-              onClick={handleSearch}
-              className="px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2"
+              type="button"
+              onClick={() => abrirCaptura(tipo)}
+              title={ayuda}
+              className={`w-full max-w-[16rem] px-4 py-2 text-base font-semibold rounded text-white flex items-center gap-2 justify-center transition-all duration-150 ease-out hover:shadow-lg active:scale-95 ${color}`}
             >
-              <span>Buscar</span>
-              <FontAwesomeIcon icon={faSearch} />
+              <FontAwesomeIcon icon={icono} /> {texto}
             </button>
           </div>
+        ))}
+      </SectionFieldset>
 
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Nombres:</label>
-            <input autoComplete="off"
-              ref={nombreRef}
-              type="text"
-              id="nombresPa"
-              name="nombresPa"
-              value={props.datos.nombresPa}
-              onChange={handleChange}
-              onKeyDown={(e) => focusNext(e, 'apellidosPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Apellidos:</label>
-            <input autoComplete="off"
-              type="text"
-              id="apellidosPa"
-              name="apellidosPa"
-              value={props.datos.apellidosPa}
-              onChange={handleChange}
-              onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          {/* Fecha de Nacimiento */}
-          <div className="flex items-start space-x-2">     {/* fila igual que los demás */}
-            {/* label – ancho fijo */}
-            <label className="block w-36 mt-2">Fecha Nac.:</label>
-
-            {/* zona del input + nota */}
-            <div className="flex flex-col w-full">
-              <input autoComplete="off"
-                type="text"
-                id="fechaNaciminetoPa"
-                name="fechaNaciminetoPa"
-                value={props.datos.fechaNaciminetoPa}
-                onChange={handleFecha}
-                placeholder="dd-MM-yyyy"
-                onKeyDown={e => focusNext(e, 'sexoPa')}
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-              />
-
-              <p className="text-xs text-gray-500 mt-1">
-                Formato: <strong>Día-Mes-Año</strong> (DD-MM-AAAA)
-              </p>
-            </div>
-          </div>
-
-          {/* Sexo */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Sexo:</label>
-              <input autoComplete="off"
-                id="sexoPa"
-                type="text"
-                value={searchSexo}
-                onChange={handleSexoSearch}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (filteredSexo.length > 0) {
-                      handleSelectSexo(filteredSexo[0]);
-                    } else if (searchSexo && (searchSexo === 'MASCULINO' || searchSexo === 'FEMENINO')) {
-                      handleSelectSexo(searchSexo);
-                    } else {
-                      document.getElementById('emailPa')?.focus();
-                    }
-                  }
-                }}
-              />
-            </div>
-            {searchSexo && filteredSexo.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
-                {filteredSexo.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => handleSelectSexo(opt)}
-                  >
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Email:</label>
-            <input autoComplete="off"
-              id="emailPa"
-              onKeyDown={(e) => focusNext(e, 'lugarNacPa')}
-              type="email"
-              name="emailPa"
-              value={props.datos.emailPa}
-              onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Lugar Nac.:</label>
-            <input autoComplete="off"
-              id="lugarNacPa"
-              type="text"
-              name="lugarNacPa"
-              value={props.datos.lugarNacPa}
-              onKeyDown={(e) => focusNext(e, 'nivelEstPa')}
-              onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-        </div>
-
-        {/* Columna 2 */}
-        <div className="flex flex-col space-y-2">
-
-          {/* Nivel Estudio */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Nivel Estudio:</label>
-              <input autoComplete="off"
-                id="nivelEstPa"
-                type="text"
-                value={searchNivel}
-                onChange={handleNivelSearch}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (filteredNivel.length > 0) {
-                      handleSelectNivel(filteredNivel[0]);
-                    } else {
-                      document.getElementById('ocupacionPa')?.focus();
-                    }
-                  }
-                }}
-              />
-            </div>
-            {searchNivel && filteredNivel.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
-                {filteredNivel.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => handleSelectNivel(opt)}
-                  >
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          {/* Prof/Ocup */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Prof/Ocup:</label>
-              <input autoComplete="off"
-                id="ocupacionPa"
-                name="ocupacionPa"
-                type="text"
-                value={searchTerm}
-                onChange={handleProfesionSearch}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (filteredProfesiones.length > 0) {
-                      handleSelectProfesion(filteredProfesiones[0]);
-                    } else {
-                      document.getElementById('estadoCivilPa')?.focus();
-                    }
-                  }
-                }}
-              />
-            </div>
-
-            {searchTerm && filteredProfesiones.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-                {filteredProfesiones.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => handleSelectProfesion(opt)}
-                  >
-                    {opt.descripcion}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Estado Civil:</label>
-              <input autoComplete="off"
-                id="estadoCivilPa"
-                name="estadoCivilPa"
-                type="text"
-                value={searchCivil}
-                onChange={handleCivilSearch}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (filteredCivil.length > 0) {
-                      handleSelectCivil(filteredCivil[0]);
-                    } else {
-                      document.getElementById('direccionPa')?.focus();
-                    }
-                  }
-                }}
-              />
-            </div>
-
-            {searchCivil && filteredCivil.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-                {filteredCivil.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => handleSelectCivil(opt)}
-                  >
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Dirección:</label>
-            <input autoComplete="off"
-              id='direccionPa'
-              type="text"
-              name="direccionPa"
-              value={props.datos.direccionPa}
-              onKeyDown={(e) => focusNext(e, 'departamentoPa')}
-              onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          {/* Departamento */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Departamento:</label>
-              <input autoComplete="off"
-                id="departamentoPa"
-                type="text"
-                value={searchDept}
-                onChange={handleDeptSearch}
-                onFocus={() => {
-                  // si no hay nada filtrado, muestra todo el catálogo
-                  if (filteredDept.length === 0) {
-                    setFilteredDept(
-                      Departamentos.filter(d =>
-                        d.nombre.toLowerCase().includes(searchDept.toLowerCase())
-                      )
-                    );
-                  }
-                }}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && filteredDept.length > 0) {
-                    e.preventDefault();
-                    handleSelectDept(filteredDept[0]);
-                    document.getElementById('provinciaPa')?.focus();
-                  }
-                }}
-              />
-            </div>
-            {searchDept && filteredDept.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-                {filteredDept.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => {
-                      handleSelectDept(opt);
-                      document.getElementById('provinciaPa')?.focus();
-                    }}
-                  >
-                    {opt.nombre}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Provincia */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Provincia:</label>
-              <input autoComplete="off"
-                id="provinciaPa"
-                type="text"
-                value={searchProv}
-                onChange={handleProvSearch}
-                placeholder="Escribe para buscar..."
-                onFocus={() => {
-                  if (filteredProv.length === 0) {
-                    const opciones = props.datos.departamentoPa
-                      ? Provincias.filter(p => p.idDepartamento === props.datos.departamentoPa.id)
-                      : [];
-                    setFilteredProv(opciones);
-                  }
-                }}
-
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && filteredProv.length > 0) {
-                    e.preventDefault();
-                    handleSelectProv(filteredProv[0]);
-                    document.getElementById('distritoPa')?.focus();
-                  }
-                }}
-              />
-            </div>
-            {searchProv && filteredProv.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-                {filteredProv.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => {
-                      handleSelectProv(opt);
-                      document.getElementById('distritoPa')?.focus();
-                    }}
-                  >
-                    {opt.nombre}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Distrito */}
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <label className="block w-36">Distrito:</label>
-              <input autoComplete="off"
-                id="distritoPa"
-                type="text"
-                value={searchDist}
-                onFocus={() => {
-                  if (filteredDist.length === 0) {
-                    const opciones = props.datos.provinciaPa
-                      ? Distritos.filter(d => d.idProvincia === props.datos.provinciaPa.id)
-                      : [];
-                    setFilteredDist(opciones);
-                  }
-                }}
-
-                onChange={handleDistSearch}
-                placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-                style={{ textTransform: 'uppercase' }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && filteredDist.length > 0) {
-                    e.preventDefault();
-                    handleSelectDist(filteredDist[0]);
-                    document.getElementById('caserioPA')?.focus();
-                  }
-                }}
-              />
-            </div>
-            {searchDist && filteredDist.length > 0 && (
-              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-                {filteredDist.map((opt, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => {
-                      handleSelectDist(opt);
-                      document.getElementById('caserioPA')?.focus();
-                    }}
-                  >
-                    {opt.nombre}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Caserío:</label>
-            <input autoComplete="off"
-              type="text"
-              id="caserioPA"
-              name="caserioPA"
-              value={props.datos.caserioPA}
-              onChange={handleChange}
-              onKeyDown={(e) => focusNext(e, 'telCasaPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-              style={{ textTransform: 'uppercase' }}
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Teléfono:</label>
-            <input autoComplete="off"
-              type="text"
-              id="telCasaPa"
-              name="telCasaPa"
-              value={props.datos.telCasaPa}
-              onKeyDown={(e) => focusNext(e, 'celPa')}
-              onChange={handleNumber}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Celular:</label>
-            <input autoComplete="off"
-              type="text"
-              id="celPa"
-              name="celPa"
-              value={props.datos.celPa}
-              onChange={handleNumber}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Botones finales */}
-      <div className="flex justify-end gap-4 mt-4">
-        <div className='flex flex-col flex-wrap justify-center items-center'>
-          <label htmlFor="">{FirmaP.id === 1 ? <FontAwesomeIcon color='green' icon={faCheck} size='xl' /> : <FontAwesomeIcon color='red' size='xl' icon={faX} />}</label>
-          <button
-            onClick={openPad}
-            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-purple-600 text-white flex items-center gap-2 justify-center hover:bg-purple-700"
-          >
-            <FontAwesomeIcon icon={faSignature} /> Tomar Firma
-          </button>
-        </div>
-        <div className='flex flex-col flex-wrap justify-center items-center'>
-          <label htmlFor="">{HuellaP.id === 1 ? <FontAwesomeIcon color='green' size='xl' icon={faCheck} /> : <FontAwesomeIcon color='red' size='xl' icon={faX} />}</label>
-          <button
-            onClick={openHuella}
-            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-teal-600 text-white flex items-center gap-2 justify-center hover:bg-teal-700"
-          >
-            <FontAwesomeIcon icon={faFingerprint} /> Tomar Huella Futronic
-          </button>
-        </div>
-        <div className='flex flex-col flex-wrap justify-center items-center'>
-          <label htmlFor="">{FotoP.id === 1 ? <FontAwesomeIcon color='green' size='xl' icon={faCheck} /> : <FontAwesomeIcon color='red' size='xl' icon={faX} />}</label>
-          <button
-            onClick={openFoto}
-            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-orange-500 text-white flex items-center gap-2 justify-center hover:bg-orange-600"
-          >
-            <FontAwesomeIcon icon={faCamera} /> Tomar Fotografía
-          </button>
-        </div>
-        <div className='flex flex-col flex-wrap justify-end items-center'>
-          <button
-            onClick={handleSubmit}
-            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-blue-600 text-white flex items-center gap-2 justify-center hover:bg-blue-700"
-          >
-            <FontAwesomeIcon icon={faCheck} /> Registrar
-          </button>
-        </div>
-        <div className='flex flex-col flex-wrap justify-end items-center'>
-          <button
-            onClick={handleLimpiar}
-            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-red-500 text-white flex items-center gap-2 justify-center hover:bg-red-600"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-      </div>
-
-      {/* Leyenda de botones horizontal */}
-      <div className="mt-6 p-3 rounded-lg bg-gray-50 border border-gray-200 w-full flex flex-row items-center justify-center gap-8">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-purple-600 text-white"><FontAwesomeIcon icon={faSignature} /></span>
-          <span className="text-gray-700 text-sm">Tomar Firma: Captura la firma digital del paciente</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-teal-600 text-white"><FontAwesomeIcon icon={faFingerprint} /></span>
-          <span className="text-gray-700 text-sm">Tomar Huella Futronic: Escanea la huella dactilar del paciente</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-orange-500 text-white"><FontAwesomeIcon icon={faCamera} /></span>
-          <span className="text-gray-700 text-sm">Tomar Fotografía: Captura la foto del paciente con la cámara</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-blue-600 text-white"><FontAwesomeIcon icon={faCheck} /></span>
-          <span className="text-gray-700 text-sm">Registrar: Guarda los datos del paciente</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-red-500 text-white"><FontAwesomeIcon icon={faBroom} /></span>
-          <span className="text-gray-700 text-sm">Limpiar: Limpia todos los campos del formulario</span>
-        </div>
-      </div>
-
-      {modalhuellaF && (
-        <NewHuellaFut
-          close={() => setModalhuellaF(false)}
-          DNI={props.datos.codPa}
-          Huella={HuellaP}
-          setHuella={() => { setHuellaP({ id: 1 }) }}
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
         />
       )}
-      {modalFoto && (
-        <FotoPaciente
-          close={() => setModalFoto(false)}
-          DNI={props.datos.codPa}
-          Foto={FotoP}
-          setFoto={(url) => { setFotoP({ id: 1, url }) }}
-        />
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        hidePrint
+        handleSave={guardar}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? 'Guardar Cambios' : 'Registrar'}
+        handleEdit={habilitarEdicion}
+        handleClear={() => limpiar()}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+      />
+
+      {modal === 'huella' && (
+        <NewHuellaFut close={cerrarModal} DNI={form.codPa} Huella={HuellaP} setHuella={() => setHuellaP({ id: 1 })} />
       )}
-      {modalpad && (
-        <NewPad
-          close={() => setModalpad(false)}
-          DNI={props.datos.codPa}
-          Firma={FirmaP}
-          setFirma={() => { setFirmaP({ id: 1 }) }}
-        />
+      {modal === 'foto' && (
+        <FotoPaciente close={cerrarModal} DNI={form.codPa} Foto={FotoP} setFoto={(url) => setFotoP({ id: 1, url })} />
       )}
-      {modalSubidaMasiva && <SubidaMasiva
-        onClose={() => setModalSubidaMasiva(false)}
-        sede={props.selectedSede}
-        token={props.token}
-      />}
+      {modal === 'pad' && (
+        <NewPad close={cerrarModal} DNI={form.codPa} Firma={FirmaP} setFirma={() => setFirmaP({ id: 1 })} />
+      )}
+      {modal === 'masivo' && <SubidaMasiva onClose={cerrarModal} sede={selectedSede} token={token} />}
     </div>
   );
 };

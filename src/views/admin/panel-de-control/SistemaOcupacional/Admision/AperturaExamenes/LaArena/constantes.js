@@ -56,6 +56,26 @@ export const CAMPOS_REQUERIDOS = {
 
 export const FECHA_APERTURA_VALIDA = /^\d{2}\/\d{2}\/\d{4}$/;
 
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+// `codPa` entra porque, con la edición habilitada, cambiar el DNI permite registrar una historia nueva.
+export const CAMPOS_EDITABLES = [
+  'codPa',
+  'nombres',
+  'apellidos',
+  'razonContrata',
+  'n_medico',
+  'protocolo',
+  'cargoDe',
+  'areaO',
+  'nomEx',
+  'mineralPo',
+  'alturaPo',
+  'autoriza',
+  'fechaAperturaPo',
+  'textObserv1',
+  'textObserv2',
+];
+
 export const hoyDMA = () => format(new Date(), 'dd/MM/yyyy');
 
 // "2026-10-24" / "2026/10/24" -> "24/10/2026" ('' si no es una fecha válida)
@@ -87,6 +107,19 @@ export const crearDatosIniciales = () => ({
   fechaAperturaPo: hoyDMA(),
   textObserv1: '',
   textObserv2: '',
-  userRegistroDatos: '',
   ...VALORES_OCULTOS,
+
+  // Pre-carga de la que viene la historia (solo informativo)
+  idPreNorden: null,
+  preCargaUsuario: '',
+
+  // Control de UI: false = historia nueva / true = historia ya registrada (cargada desde la tabla)
+  tieneRegistro: false,
+
+  // Auditoría. BackendHistoriaClinicaOcupacionalDTO solo trae el usuario que registró (`usuarioRegistro`):
+  // no tiene fecha-hora de registro ni datos de edición, así que esos campos quedan vacíos.
+  userRegistro: '',
+  fechaRegistro: '',
+  usuarioActualizacion: '',
+  fechaActualizacion: '',
 });
