@@ -148,7 +148,7 @@ export default function Colinesterasa() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -201,7 +201,7 @@ export default function Colinesterasa() {
                 />
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <InputTextOneLine
                         label="Colinesterasa"
                         name="resultado"
@@ -214,7 +214,7 @@ export default function Colinesterasa() {
                         edited={isFieldEdited("resultado")}
                         onRevert={() => revertField("resultado")}
                     />
-                    <span className="text-gray-500 text-[11px] font-medium whitespace-pre">
+                    <span className="block max-w-full overflow-x-auto text-gray-500 text-[11px] font-medium whitespace-pre">
                         {`Niños, Hombres          :  3500 - 13400 U/I
 Mujeres, de 40 años     :  3500 - 13400 U/I
 Mujeres de 16 a 39 años

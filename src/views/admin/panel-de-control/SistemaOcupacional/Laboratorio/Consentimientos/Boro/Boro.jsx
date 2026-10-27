@@ -143,7 +143,7 @@ const Boro = () => {
   });
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full lg:max-w-[85vw] xl:max-w-[70vw] mx-auto bg-white rounded shadow p-3 sm:p-6">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -152,7 +152,7 @@ const Boro = () => {
         onLimpiar={handleClear}
       />
 
-      <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA Y COCAÍNA</h2>
+      <h2 className="text-lg sm:text-2xl font-bold text-center mb-4 sm:mb-6">CONSENTIMIENTO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA Y COCAÍNA</h2>
 
       <form className="space-y-6">
         <SectionFieldset legend="Datos del Paciente" className="space-y-4">
@@ -194,7 +194,7 @@ const Boro = () => {
               name="nombres"
               value={form.nombres || ''}
               readOnly
-              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
+              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-full sm:max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
               style={{ width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
             />
             <span>de</span>
@@ -253,7 +253,7 @@ const Boro = () => {
 
         <SectionFieldset legend="Además, declaro que la información que brindaré a continuación es verdadera:" className="space-y-4">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <InputCheckbox
                 name="enfermedad"
                 checked={form.enfermedad.key}
@@ -268,13 +268,13 @@ const Boro = () => {
                   value={form.enfermedad.cual}
                   onChange={(e) => handlePreguntaChange('enfermedad', 'cual', e.target.value)}
                   labelWidth="80px"
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                   disabled={camposDeshabilitados || !form.enfermedad.key}
                 />
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <InputCheckbox
                 name="medicamento"
                 checked={form.medicamento.key}
@@ -289,13 +289,13 @@ const Boro = () => {
                   value={form.medicamento.cual}
                   onChange={(e) => handlePreguntaChange('medicamento', 'cual', e.target.value)}
                   labelWidth="80px"
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                   disabled={camposDeshabilitados || !form.medicamento.key}
                 />
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <InputCheckbox
                 name="matecoca"
                 checked={form.matecoca.key}
@@ -311,13 +311,13 @@ const Boro = () => {
                   value={form.matecoca.fecha}
                   onChange={(e) => handlePreguntaChange('matecoca', 'fecha', e.target.value)}
                   labelWidth="150px"
-                  className="w-48"
+                  className="w-full sm:w-96 max-w-full"
                   disabled={camposDeshabilitados}
                 />
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <InputCheckbox
                 name="chaccha"
                 checked={form.chaccha.key}
@@ -333,13 +333,13 @@ const Boro = () => {
                   value={form.chaccha.fecha}
                   onChange={(e) => handlePreguntaChange('chaccha', 'fecha', e.target.value)}
                   labelWidth="150px"
-                  className="w-48"
+                  className="w-full sm:w-96 max-w-full"
                   disabled={camposDeshabilitados}
                 />
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <InputCheckbox
                 name="tratamiento"
                 checked={form.tratamiento.key}
@@ -349,7 +349,7 @@ const Boro = () => {
               />
             </div>
             {form.tratamiento.key && (
-              <div className="ml-8 space-y-3">
+              <div className="sm:ml-8 space-y-3">
                 <InputTextOneLine
                   label="Especifique cuál:"
                   name="tratamiento_cual"
@@ -458,7 +458,7 @@ const Boro = () => {
             </button>
           </div>
 
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center md:items-end">
             <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <input

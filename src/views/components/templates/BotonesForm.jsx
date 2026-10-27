@@ -23,7 +23,7 @@ export default function BotonesForm({
 }) {
     return (
         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
                 {!hideSave && (
                     <button
                         type="button"

@@ -14,6 +14,8 @@ export default function InputTextOneLine({
   max,
   labelWidth = "80px",
   labelOnTop = false,
+  // En mobile apila la etiqueta sobre el input; desde sm: vuelve a fila con `labelWidth` (comportamiento normal).
+  stackOnMobile = false,
   className = "",
   labelClassName = "",
   inputClassName = "",
@@ -36,13 +38,26 @@ export default function InputTextOneLine({
       ? "border-orange-400 bg-orange-100"
       : "";
 
+  const wrapperClass = labelOnTop
+    ? "flex flex-col gap-2"
+    : stackOnMobile
+      ? "flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4"
+      : "flex items-center gap-4";
+
+  // El ancho de la etiqueta llega por variable CSS para poder aplicarlo solo desde sm: cuando se apila en mobile.
+  const labelStyle = labelOnTop
+    ? {}
+    : stackOnMobile
+      ? { "--label-w": labelWidth }
+      : { minWidth: labelWidth, maxWidth: labelWidth };
+
   return (
     <div className={className}>
-      <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"}`}>
+      <div className={wrapperClass}>
         {label && (
           <label
-            className={`font-semibold ${labelClassName}`}
-            style={labelOnTop ? {} : { minWidth: labelWidth, maxWidth: labelWidth }}
+            className={`font-semibold ${stackOnMobile && !labelOnTop ? "sm:min-w-[var(--label-w)] sm:max-w-[var(--label-w)]" : ""} ${labelClassName}`}
+            style={labelStyle}
             htmlFor={name}
           >
             {label}
