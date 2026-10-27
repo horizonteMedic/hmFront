@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { isTokenExpired } from "../../../../store/auth";
+import { INTERVALO_REFRESCO_MS } from "../config/usuarioPantalla";
 import { getPacientesPantalla } from "../services/pantallaPacientesService";
+import { loginPantalla } from "../services/sesionPantallaService";
 
 const ZONA_HORARIA = "America/Lima";
 const UN_DIA_MS = 24 * 60 * 60 * 1000;
@@ -24,29 +27,54 @@ const ordenar = (pacientes) =>
             `${b.fecha} ${b.hora}`.localeCompare(`${a.fecha} ${a.hora}`)
     );
 
+// Si el token no se puede decodificar se da por válido: el reintento ante un 401 lo cubre.
+const tokenVencido = (token) => {
+    try {
+        return isTokenExpired(token);
+    } catch {
+        return false;
+    }
+};
+
 /**
- * Carga los pacientes de la pantalla y los refresca cada `intervaloMs`.
- * Ante un fallo conserva la última lista y marca `error`, para que el TV no quede en blanco.
+ * Se autentica solo con el usuario de servicio y refresca los pacientes cada `intervaloMs`.
+ * Renueva el token cuando vence (o ante un 401/403, con un único reintento) para que la pantalla
+ * pueda quedar encendida todo el día. Ante un fallo conserva la última lista y marca `error`.
  */
-export function usePacientesPantalla({ token, intervaloMs = 30000, habilitado = true }) {
+export function usePacientesPantalla({ intervaloMs = INTERVALO_REFRESCO_MS, habilitado = true } = {}) {
     const [pacientes, setPacientes] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
+    const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
 
     useEffect(() => {
         if (!habilitado) return;
         const controlador = new AbortController();
+        const { signal } = controlador;
+        let token = null;
+
+        const consultar = async () => {
+            if (!token || tokenVencido(token)) token = await loginPantalla(signal);
+            try {
+                return await getPacientesPantalla(rangoFechas(), token, signal);
+            } catch (e) {
+                if (e.status !== 401 && e.status !== 403) throw e;
+                token = await loginPantalla(signal);
+                return getPacientesPantalla(rangoFechas(), token, signal);
+            }
+        };
 
         const cargar = async () => {
             try {
-                const lista = await getPacientesPantalla(rangoFechas(), token, controlador.signal);
-                setPacientes(ordenar(lista));
+                setPacientes(ordenar(await consultar()));
+                setUltimaActualizacion(new Date());
                 setError(null);
             } catch (e) {
                 if (e.name === "AbortError") return;
-                setError(e.status === 401 || e.status === 403 ? "sesion" : "conexion");
+                token = null;
+                setError(e.esLogin || e.status === 401 || e.status === 403 ? "sesion" : "conexion");
             } finally {
-                if (!controlador.signal.aborted) setCargando(false);
+                if (!signal.aborted) setCargando(false);
             }
         };
 
@@ -56,7 +84,7 @@ export function usePacientesPantalla({ token, intervaloMs = 30000, habilitado = 
             controlador.abort();
             clearInterval(id);
         };
-    }, [token, intervaloMs, habilitado]);
+    }, [intervaloMs, habilitado]);
 
-    return { pacientes, cargando, error };
+    return { pacientes, cargando, error, ultimaActualizacion };
 }

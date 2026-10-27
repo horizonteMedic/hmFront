@@ -4,16 +4,13 @@ import { getFetch } from "../../../utils/apiHelpers";
 const URL_ESTADO_FECHAS = "/api/v01/ct/consentDigit/estadoExamenesProtocolo/fechas";
 
 // Un área solo está completa al 100%: todos sus exámenes (del protocolo y adicionales) ya se realizaron.
-// Si no, `pendientes` lista los nombres de lo que falta.
 const normalizarArea = ({ id, nombre, examenes = [], examenesAdicionales = [] }) => {
     const todos = [...examenes, ...examenesAdicionales];
-    const pendientes = [...new Set(todos.filter((examen) => !examen.pasoExamen).map((examen) => examen.nombre))];
     return {
         id,
         nombre,
         total: todos.length,
-        pendientes,
-        completado: todos.length > 0 && pendientes.length === 0,
+        completado: todos.length > 0 && todos.every((examen) => examen.pasoExamen),
     };
 };
 

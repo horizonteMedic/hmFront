@@ -2,6 +2,8 @@
 import drawQr from "./drawQr";
 
 // opciones.qr = true → en lugar del cuadro de color se dibuja un QR con el N° de orden
+// opciones.fechaEnFilaSede = true → la fecha va en la fila de la sede y el N° de orden (no en la de TIPO EX)
+// opciones.tamanoTipoEx → tamaño de letra del valor de TIPO EX (por defecto 9)
 const headerHR = (doc, datos, opciones = {}) => {
   // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
   const formatearFecha = (fecha) => {
@@ -116,12 +118,17 @@ const headerHR = (doc, datos, opciones = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("TIPO EX:", margin, y1);
   doc.setFont("helvetica", "normal");
+  if (opciones.tamanoTipoEx) doc.setFontSize(opciones.tamanoTipoEx);
   doc.text(`${datos.protocoloNombre || datos.examen || ""}`, margin + 20, y1);
+  doc.setFontSize(9);
 
+  // La fecha va en la fila de la sede y el N° de orden, o (por defecto) en la de TIPO EX
+  const yFecha = opciones.fechaEnFilaSede ? 25 + yOffset : y1;
+  const xFecha = opciones.fechaEnFilaSede ? margin + 88 : margin + 100;
   doc.setFont("helvetica", "bold");
-  doc.text("FECHA:", margin + 100, y1);
+  doc.text("FECHA:", xFecha, yFecha);
   doc.setFont("helvetica", "normal");
-  doc.text(`${formatearFecha(datos.fecha) || ""}`, margin + 115, y1);
+  doc.text(`${formatearFecha(datos.fecha) || ""}`, xFecha + 15, yFecha);
 
   doc.setFont("helvetica", "bold");
   doc.text("HORA:", margin + 147, y1);
