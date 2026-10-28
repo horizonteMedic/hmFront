@@ -14,6 +14,11 @@ export function SubmitRegistrarPaciente(data,sede,token) {
 
   const [dd, mm, yyyy] = data.fechaNaciminetoPa.split('-');
   const fechaFormateada = `${yyyy}-${mm}-${dd}`;
+
+  // Paciente ya registrado (cargado con GET datosPaciente): se reenvía su fecha-hora de registro original y
+  // los campos del DTO que el formulario no muestra, para que al editar no se sobrescriban con la fecha de
+  // hoy ni se borren. Paciente nuevo: fecha-hora actual y esos campos en null, como siempre.
+  const existente = Boolean(data.tieneRegistro && data.fechaRegistroPa);
   const body = {
     codPa: data.codPa,
     nombresPa: data.nombresPa,
@@ -29,16 +34,19 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     provinciaPa: data.provinciaPa ? (data.provinciaPa.nombre ? data.provinciaPa.nombre : data.provinciaPa): null,
     distritoPa: data.distritoPa? (data.distritoPa.nombre ? data.distritoPa.nombre : data.distritoPa): null,
     caserioPA: data.caserioPA,
-    fotoPa: null,
-    codAleatorioPa: null,
+    fotoPa: data.fotoPa || null,
+    codAleatorioPa: data.codAleatorioPa || null,
     telCasaPa: data.telCasaPa,
-    telTrabajoPa: null,
+    telTrabajoPa: data.telTrabajoPa || null,
     celPa: data.celPa,
-    fechaRegistroPa: `${year}-${month}-${day}`,
+    fechaRegistroPa: existente ? data.fechaRegistroPa : `${year}-${month}-${day}`,
     apellidosPa: data.apellidosPa,
-    horaRegistroPa: `${hours}:${minutes}:${seconds}`,
-    tipoDoc: 1
-  };    
+    horaRegistroPa: existente && data.horaRegistroPa ? data.horaRegistroPa : `${hours}:${minutes}:${seconds}`,
+    tipoDoc: data.tipoDoc || 1,
+    ...(data.cargo ? { cargo: data.cargo } : {}),
+    ...(data.area ? { area: data.area } : {}),
+    ...(data.tipoExamen ? { tipoExamen: data.tipoExamen } : {}),
+  };
  
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`
     const options = {

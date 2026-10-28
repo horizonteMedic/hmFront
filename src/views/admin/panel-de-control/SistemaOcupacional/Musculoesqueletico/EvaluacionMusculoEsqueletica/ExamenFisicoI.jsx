@@ -1,4 +1,4 @@
-import React from "react";
+import { useCampoEdicion } from "../EdicionContext";
 
 const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
   return (
@@ -13,89 +13,27 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
           <div>
             <div className="flex items-center gap-4 mb-3">
               <label className="font-semibold w-[80px]">Extensión:</label>
-              <input
-                className="border rounded px-2 py-1 flex-1"
-                name="extensionCabeza"
-                value={form.extensionCabeza}
-                onChange={handleChange}
-              />
+              <CampoTexto name="extensionCabeza" value={form.extensionCabeza} onChange={handleChange} />
             </div>
-            <div className="flex items-center gap-4">
-              <span className="font-semibold w-[80px]">Grado:</span>
-              <div className="flex gap-4 pl-2">
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoExtension"
-                    checked={form.gradoExtension === "N"}
-                    onChange={(e) => handleRadioButton(e, "N")}
-                  />
-                  N
-                </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoExtension"
-                    checked={form.gradoExtension === "R"}
-                    onChange={(e) => handleRadioButton(e, "R")}
-                  />
-                  R
-                </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoExtension"
-                    checked={form.gradoExtension === "M"}
-                    onChange={(e) => handleRadioButton(e, "M")}
-                  />
-                  M
-                </label>
-              </div>
-            </div>
+            <RadioGroup
+              label="Grado"
+              name="gradoExtension"
+              value={form.gradoExtension}
+              onChange={handleRadioButton}
+            />
           </div>
           
           <div>
             <div className="flex items-center gap-4 mb-3">
               <label className="font-semibold min-w-[80px]">Flexión:</label>
-              <input
-                className="border rounded px-2 py-1 flex-1"
-                name="flexionCabeza"
-                value={form.flexionCabeza}
-                onChange={handleChange}
-              />
+              <CampoTexto name="flexionCabeza" value={form.flexionCabeza} onChange={handleChange} />
             </div>
-            <div className="flex items-center gap-4">
-              <span className="font-semibold min-w-[80px]">Grado:</span>
-              <div className="flex gap-4 pl-2">
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoFlexion"
-                    checked={form.gradoFlexion === "N"}
-                    onChange={(e) => handleRadioButton(e, "N")}
-                  />
-                  N
-                </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoFlexion"
-                    checked={form.gradoFlexion === "R"}
-                    onChange={(e) => handleRadioButton(e, "R")}
-                  />
-                  R
-                </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="gradoFlexion"
-                    checked={form.gradoFlexion === "M"}
-                    onChange={(e) => handleRadioButton(e, "M")}
-                  />
-                  M
-                </label>
-              </div>
-            </div>
+            <RadioGroup
+              label="Grado"
+              name="gradoFlexion"
+              value={form.gradoFlexion}
+              onChange={handleRadioButton}
+            />
           </div>
         </div>
       </div>
@@ -342,10 +280,27 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
   );
 };
 
+// Campo de texto con resaltado y botón de revertir
+const CampoTexto = ({ name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
+  return (
+    <div className="flex flex-1 items-center gap-2">
+      <input
+        className={`border rounded px-2 py-1 flex-1 ${claseEditado ? "border-orange-400 bg-orange-100" : ""}`}
+        name={name}
+        value={value}
+        onChange={onChange}
+      />
+      {botonRevertir}
+    </div>
+  );
+};
+
 // Componente auxiliar para grupos de radio buttons
 const RadioGroup = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[120px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -376,6 +331,7 @@ const RadioGroup = ({ label, name, value, onChange }) => {
           M
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };

@@ -152,7 +152,7 @@ export default function EtanolSaliva() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -209,7 +209,7 @@ export default function EtanolSaliva() {
 
             </SectionFieldset>
             <SectionFieldset legend="Resultado" className="w-full">
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full">
 
                     {/* 1. Label de la prueba y el input (Cajita) */}
                     <div className="flex-grow">
@@ -218,6 +218,7 @@ export default function EtanolSaliva() {
                             name="resultado"
                             value={form.resultado}
                             labelWidth="400px" // Espacio suficiente para el nombre largo de la prueba
+                            stackOnMobile
                             onChange={handleChange}
                             onKeyUp={handleFocusNext}
                             className="w-full"

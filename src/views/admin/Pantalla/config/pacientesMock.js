@@ -10,15 +10,19 @@ const COLORES = [
     { letra: "E", hex: "#FF6699" },
 ];
 
-// Exámenes por área, en el orden de las letras de `estados` (10 en total).
+// Áreas reales del backend (nombres e ids tomados de una respuesta de ejemplo), un examen por área,
+// en el orden de las letras de `estados` (10 en total).
 const AREAS_BASE = [
-    { id: 1, nombre: "Triaje", examenes: ["Triaje"] },
-    { id: 2, nombre: "Laboratorio", examenes: ["Hemograma", "Glucosa", "Orina"] },
-    { id: 3, nombre: "Rayos X", examenes: ["Rx Tórax"] },
-    { id: 4, nombre: "Audiometría", examenes: ["Audiometría"] },
-    { id: 5, nombre: "Oftalmología", examenes: ["Agudeza visual", "Ishihara"] },
-    { id: 6, nombre: "Psicología", examenes: ["Psicología"] },
-    { id: 7, nombre: "Cardiología", examenes: ["EKG"] },
+    { id: 7, nombre: "AUDIOMETRIA", examenes: ["AUDIOMETRIA"] },
+    { id: 8, nombre: "EKG", examenes: ["EKG"] },
+    { id: 9, nombre: "ESPIROMETRIA", examenes: ["ESPIROMETRIA"] },
+    { id: 10, nombre: "LABORATORIO", examenes: ["LABORATORIO CLINICO"] },
+    { id: 13, nombre: "PSICOLOGIA", examenes: ["TRABAJOS ESPECIFICOS"] },
+    { id: 16, nombre: "MEDICINA GENERAL OCUPACIONAL", examenes: ["ANEXO 16A"] },
+    { id: 17, nombre: "OFTALMOLOGIA", examenes: ["OFTALMOLOGIA"] },
+    { id: 20, nombre: "TRIAJE", examenes: ["TRIAJE"] },
+    { id: 22, nombre: "RADIOGRAFIA", examenes: ["RAYOS X TORAX"] },
+    { id: 24, nombre: "ODONTOLOGIA - USO LA ARENA", examenes: ["ODONTOLOGIA"] },
 ];
 
 // `estados`: una letra por examen: "T" = ya pasó, "F" = pendiente, "-" = no está en su protocolo.

@@ -4,84 +4,100 @@ import {
     handleSubidaMasiva,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
-    PrintHojaRJsReportDefault,
     ReadArchivosFormDefault,
-    VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
+import { verificarRegistro } from "../../../../../utils/registroOcupacionalUtils";
 import { getFetch } from "../../../getFetch/getFetch";
 import { generatePdf } from "./PdfGenerado";
 import { VerifyHoF } from "../model/Submit";
 import { SubmitConsentimiento } from "../model/Consentimiento";
 
 
+// ===== Configuración =====
 const obtenerInfoConsentimientoUrl = "/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado";
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
-const obtenerReporteJsReportUrl = "/api/v01/st/registros/descargarReporteConsentimientoDigitalizacion"
 
+// ===== Mapeo Registro nuevo =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    // Norden inexistente / paciente no encontrado / error del backend.
+    if (!res || res.error || !res.dni) {
+        Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+            html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+        });
+        return;
+    }
+    set((prev) => ({
+        ...prev,
+        norden: res.norden ?? nro,
+        nombres: res.nombresApellidos ?? "",
+        dni: res.dni ?? "",
+        edad: res.edad ?? "",
+        tieneRegistro: false,
+    }));
+};
 
-export const GetInfoServicio = async (nro, tabla, set, token, sede, onFinish = () => { }) => {
+// ===== Mapeo Edición =====
+// GET infoFormatoConsentDigitalizado (FormatoPDFConsetDigitalizadoDTO): el usuario que registró
+// viene como `user_registro` (snake_case), distinto de `userRegistro` que usa el POST registrar.
+// El DTO no trae fecha-hora de registro ni datos de edición, así que esos campos de auditoría
+// quedan vacíos.
+export const GetInfoServicioEditar = async (nro, set, token, onFinish = () => { }) => {
     try {
-        const res = await getFetch(
-            `${obtenerInfoConsentimientoUrl}/${nro}`,
-            token
-        );
+        const res = await getFetch(`${obtenerInfoConsentimientoUrl}/${nro}`, token);
 
         if (res && res.dni) {
             set((prev) => ({
                 ...prev,
-                norden: nro,
+                norden: res.norden ?? nro,
                 fecha: res.fecha_examen ?? "",
                 nombres: res.nombres ?? "",
                 dni: res.dni ?? "",
+                edad: res.edad ?? "",
+                authorized: res.autoriza ?? true,
 
                 SubirDoc: true,
-                digitalizacion: res.digitalizacion
+
+                // Auditoría REAL
+                userRegistro: res.user_registro ?? "",
+                fechaRegistro: "",
+                usuarioActualizacion: "",
+                fechaActualizacion: "",
+                tieneRegistro: true,
             }));
+            onFinish();
         } else {
             Swal.fire("Error", "Ha ocurrido un error", "error");
         }
     } catch (error) {
         Swal.fire("Error", "Ha ocurrido un error", "error");
-    } finally {
-        onFinish();
     }
 };
 
-const GetInfoPac = async (nro, set, token, sede) => {
-    const res = await GetInfoPacDefault(nro, token, sede);
-    if (res && res.dni) {
-        set((prev) => ({
-            ...prev,
-            norden: nro,
-            nombres: res.nombresApellidos ?? prev.nombres ?? "",
-            dni: res.dni ?? prev.dni ?? "",
-        }));
-    }
-};
-
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Búsqueda / verificación por N° Orden =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            GetInfoServicio(nro, tabla, set, token, sede, () => {
+        onNuevo: () => GetInfoServicio(nro, set, token, sede),
+        onExistente: () =>
+            GetInfoServicioEditar(nro, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con un consentimiento registrado.",
                     "warning"
                 );
-            });
-        }
-    );
-};
+            }),
+    });
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+// ===== Guardar / Editar =====
+// El POST registrar es un upsert por N° Orden (no devuelve `id`, devuelve el DTO con `norden`),
+// por eso no usa guardarRegistro/actualizarRegistro de registroOcupacionalUtils.
+export const SubmitDataService = async (form, token, user, limpiar, tabla, esActualizacion = false) => {
     if (!form.norden) {
         await Swal.fire("Error", "Ingrese Nro orden", "error");
         return;
@@ -102,7 +118,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
             limpiar();
             Swal.fire({
                 title: "Exito",
-                text: "Consentimiento guardado exitosamente,\n¿Desea Imprimir?",
+                text: `Consentimiento ${esActualizacion ? "actualizado" : "guardado"} exitosamente,\n¿Desea Imprimir?`,
                 icon: "success",
                 showCancelButton: true,
                 cancelButtonText: "No",

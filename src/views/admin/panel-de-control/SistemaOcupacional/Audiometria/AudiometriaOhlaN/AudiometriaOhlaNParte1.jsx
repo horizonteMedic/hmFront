@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -15,13 +15,14 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 
 const tabla = "audiometria_po";
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+const camposOido = (prefijo) => frecuencias.map((hz) => `${prefijo}_${hz}`);
 
 export default function AudiometriaOhlaNParte1({
   token,
-  selectedSede,
   form,
   setForm,
   setFormFicha,
@@ -29,10 +30,23 @@ export default function AudiometriaOhlaNParte1({
   handleClear,
   dataTabla,
   setDataTabla,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertFields = () => { },
+  onCargarRegistro = () => { },
 }) {
   useEffect(() => {
     obtenerInfoTabla();
   }, []);
+
+  // Solo resalta (celdas angostas de la grilla: el revert va en el título de la sección).
+  const resaltado = (campo) => ({ edited: isFieldEdited(campo) });
+
+  // Botón de revertir en el título de una sección cuando alguno de sus campos cambió.
+  const revertirSeccion = (campos) =>
+    campos.some(isFieldEdited) ? (
+      <RevertButton onClick={() => revertFields(campos)} title="Revertir cambios de esta sección" />
+    ) : null;
 
   const obtenerInfoTabla = () => {
     getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
@@ -733,6 +747,7 @@ export default function AudiometriaOhlaNParte1({
             label="No Paso Examen"
             name="no_paso_Examen"
             checked={form.no_paso_Examen}
+            disabled={disabled}
             onChange={() => {
               setForm((prevForm) => {
                 const newValue = !prevForm.no_paso_Examen;
@@ -769,7 +784,11 @@ export default function AudiometriaOhlaNParte1({
 
         {/* Audiometría Aérea */}
         <SectionFieldset legend="Audiometría Aérea" className="space-y-3">
-          <SectionFieldset legend="Oído Derecho" className="grid grid-cols-8 gap-1 text-center font-semibold">
+          <SectionFieldset
+            legend="Oído Derecho"
+            className="grid grid-cols-8 gap-1 text-center font-semibold"
+            actions={revertirSeccion(camposOido("od"))}
+          >
             <div className="flex flex-col items-start gap-2">
               <p>hz</p>
               <p>dB (A)</p>
@@ -781,6 +800,8 @@ export default function AudiometriaOhlaNParte1({
                   name={`od_${hz}`}
                   value={form[`od_${hz}`]}
                   onChange={handleChangeNumber}
+                  disabled={disabled}
+                  {...resaltado(`od_${hz}`)}
                   inputClassName="text-center"
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -797,7 +818,11 @@ export default function AudiometriaOhlaNParte1({
             ))}
           </SectionFieldset>
 
-          <SectionFieldset legend="Oído Izquierdo" className="grid grid-cols-8 gap-1 text-center font-semibold">
+          <SectionFieldset
+            legend="Oído Izquierdo"
+            className="grid grid-cols-8 gap-1 text-center font-semibold"
+            actions={revertirSeccion(camposOido("oi"))}
+          >
             <div className="flex flex-col items-start gap-2">
               <p>hz</p>
               <p>dB (A)</p>
@@ -809,6 +834,8 @@ export default function AudiometriaOhlaNParte1({
                   name={`oi_${hz}`}
                   value={form[`oi_${hz}`]}
                   onChange={handleChangeNumber}
+                  disabled={disabled}
+                  {...resaltado(`oi_${hz}`)}
                   inputClassName="text-center"
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -840,7 +867,8 @@ export default function AudiometriaOhlaNParte1({
               label="Llenar"
               name="llenar_osea"
               checked={form.llenar_osea}
-              onChange={(e) => {
+              disabled={disabled}
+              onChange={() => {
                 setForm((prevForm) => {
                   const newValue = !prevForm.llenar_osea;
                   return {
@@ -867,7 +895,11 @@ export default function AudiometriaOhlaNParte1({
               }}
             />
           </div>
-          <SectionFieldset legend="Oído Derecho" className="grid grid-cols-8 gap-1 text-center font-semibold">
+          <SectionFieldset
+            legend="Oído Derecho"
+            className="grid grid-cols-8 gap-1 text-center font-semibold"
+            actions={revertirSeccion(camposOido("od_o"))}
+          >
             <div className="flex flex-col items-start gap-2">
               <p>hz</p>
               <p>dB (A)</p>
@@ -879,6 +911,8 @@ export default function AudiometriaOhlaNParte1({
                   name={`od_o_${hz}`}
                   value={form[`od_o_${hz}`]}
                   onChange={handleChangeNumber}
+                  disabled={disabled}
+                  {...resaltado(`od_o_${hz}`)}
                   inputClassName="text-center"
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -894,7 +928,11 @@ export default function AudiometriaOhlaNParte1({
               </div>
             ))}
           </SectionFieldset>
-          <SectionFieldset legend="Oído Izquierdo" className="grid grid-cols-8 gap-1 text-center font-semibold">
+          <SectionFieldset
+            legend="Oído Izquierdo"
+            className="grid grid-cols-8 gap-1 text-center font-semibold"
+            actions={revertirSeccion(camposOido("oi_o"))}
+          >
             <div className="flex flex-col items-start gap-2">
               <p>hz</p>
               <p>dB (A)</p>
@@ -906,6 +944,8 @@ export default function AudiometriaOhlaNParte1({
                   name={`oi_o_${hz}`}
                   value={form[`oi_o_${hz}`]}
                   onChange={handleChangeNumber}
+                  disabled={disabled}
+                  {...resaltado(`oi_o_${hz}`)}
                   inputClassName="text-center"
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
@@ -932,7 +972,11 @@ export default function AudiometriaOhlaNParte1({
           />
         </div>
 
-        <SectionFieldset legend="Diagnóstico" className="space-y-3">
+        <SectionFieldset
+          legend="Diagnóstico"
+          className="space-y-3"
+          actions={revertirSeccion(["diagnostico", "diagnosticoCie10"])}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
             <InputTextOneLine
               label="% pérdida global"
@@ -945,7 +989,8 @@ export default function AudiometriaOhlaNParte1({
             <button
               type="button"
               onClick={() => calcularOidos()}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 shrink-0"
+              disabled={disabled}
+              className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
             >
               <FontAwesomeIcon icon={faStethoscope} /> Diagnosticar
             </button>
@@ -956,6 +1001,9 @@ export default function AudiometriaOhlaNParte1({
             name="diagnostico"
             value={form.diagnostico}
             onChange={handleChange}
+            disabled={disabled}
+            edited={isFieldEdited("diagnostico")}
+            onRevert={() => revertFields(["diagnostico"])}
             rows={3}
           />
 
@@ -966,6 +1014,7 @@ export default function AudiometriaOhlaNParte1({
               label="Diagnóstico CIE10"
               token={token}
               setForm={setForm}
+              disabled={disabled}
             />
           </div>
         </SectionFieldset>
@@ -1017,6 +1066,7 @@ export default function AudiometriaOhlaNParte1({
             cleanFicha={handleClearFicha}
             mostrarGrafico={form.activar_grafico}
             firmaExtra={form.asignar_especialista}
+            onCargarRegistro={onCargarRegistro}
           />
         </SectionFieldset>
       </div>
@@ -1034,6 +1084,7 @@ function Table({
   cleanFicha,
   mostrarGrafico,
   firmaExtra,
+  onCargarRegistro,
 }) {
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -1051,6 +1102,8 @@ function Table({
   };
 
   function clicktable(nro) {
+    // Cada carga vuelve a bloquear la edición, aunque se elija otra vez el mismo registro.
+    onCargarRegistro();
     clean();
     Loading("Importando Datos");
     GetInfoServicio(nro, tabla, set, token);

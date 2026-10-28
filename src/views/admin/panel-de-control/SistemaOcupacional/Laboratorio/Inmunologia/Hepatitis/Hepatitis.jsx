@@ -183,7 +183,7 @@ export default function Hepatitis() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -256,7 +256,7 @@ export default function Hepatitis() {
       </SectionFieldset>
 
       <SectionFieldset legend="Resultados Rapid Test" className="grid space-y-3">
-        <div className='flex gap-4'>
+        <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
           {/* HAV */}
           <InputTextOneLine
             label='Hepatitis A (HAV)'
@@ -265,7 +265,7 @@ export default function Hepatitis() {
             onChange={handleChange}
             disabled={form.tipoHepatitis != "A" || camposDeshabilitados}
             labelWidth='120px'
-            className='w-full max-w-[85%]'
+            className='w-full sm:max-w-[85%]'
             edited={isFieldEdited("resultadoHAV")}
             onRevert={() => revertField("resultadoHAV")}
           />
@@ -280,7 +280,7 @@ export default function Hepatitis() {
             disabled={form.tipoHepatitis != "A" || camposDeshabilitados}
           />
         </div>
-        <div className='flex gap-4'>
+        <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
           {/* HBsAg */}
           <InputTextOneLine
             label='Hepatitis B (HBsAg)'
@@ -289,7 +289,7 @@ export default function Hepatitis() {
             onChange={handleChange}
             disabled={form.tipoHepatitis != "B" || camposDeshabilitados}
             labelWidth='120px'
-            className='w-full max-w-[85%]'
+            className='w-full sm:max-w-[85%]'
             edited={isFieldEdited("resultadoHBsAg")}
             onRevert={() => revertField("resultadoHBsAg")}
           />
@@ -304,7 +304,7 @@ export default function Hepatitis() {
             disabled={form.tipoHepatitis != "B" || camposDeshabilitados}
           />
         </div>
-        <div className='flex gap-4'>
+        <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
           <InputTextOneLine
             label='Hepatitis C (VHC)'
             name="resultadoVHC"
@@ -312,7 +312,7 @@ export default function Hepatitis() {
             onChange={handleChange}
             disabled={form.tipoHepatitis != "C" || camposDeshabilitados}
             labelWidth='120px'
-            className='w-full max-w-[85%]'
+            className='w-full sm:max-w-[85%]'
             edited={isFieldEdited("resultadoVHC")}
             onRevert={() => revertField("resultadoVHC")}
           />

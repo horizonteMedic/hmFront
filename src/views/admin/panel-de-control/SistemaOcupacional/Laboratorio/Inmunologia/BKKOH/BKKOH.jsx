@@ -159,7 +159,7 @@ export default function BKKOH() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -219,13 +219,13 @@ export default function BKKOH() {
       </SectionFieldset>
 
       <div className="text-center font-semibold text-lg my-4">MUESTRA: ESPUTO</div>
-      <SectionFieldset legend="Pruebas" className="grid grid-cols-12 gap-2 items-center">
+      <SectionFieldset legend="Pruebas" className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-center">
         {examenDirecto ? (
           <>
             < InputTextOneLine
               label='KOH'
               labelWidth='180px'
-              className="col-span-6"
+              className="lg:col-span-6"
               name="koh"
               value={form.koh}
               onChange={handleChange}
@@ -243,7 +243,7 @@ export default function BKKOH() {
               ]}
               onChange={handleRadioButton}
               disabled={!examenDirecto || camposDeshabilitados}
-              className='col-span-6'
+              className='lg:col-span-6' groupClassName='flex-wrap'
             />
           </>)
           : (
@@ -254,7 +254,7 @@ export default function BKKOH() {
                 name="bk1"
                 value={form.bk1}
                 onChange={handleChange}
-                className="col-span-6"
+                className="lg:col-span-6"
                 disabled={examenDirecto || camposDeshabilitados}
                 edited={isFieldEdited("bk1")}
                 onRevert={() => revertField("bk1")}
@@ -269,7 +269,7 @@ export default function BKKOH() {
                 ]}
                 onChange={handleRadioButton}
                 disabled={examenDirecto || camposDeshabilitados}
-                className='col-span-6'
+                className='lg:col-span-6' groupClassName='flex-wrap'
               />
               {/* BK 2 */}
               <InputTextOneLine
@@ -277,7 +277,7 @@ export default function BKKOH() {
                 labelWidth='180px'
                 name="bk2"
                 value={form.bk2}
-                className="col-span-6"
+                className="lg:col-span-6"
                 onChange={handleChange}
                 disabled={examenDirecto || camposDeshabilitados}
                 edited={isFieldEdited("bk2")}
@@ -293,7 +293,7 @@ export default function BKKOH() {
                 ]}
                 onChange={handleRadioButton}
                 disabled={examenDirecto || camposDeshabilitados}
-                className='col-span-6'
+                className='lg:col-span-6' groupClassName='flex-wrap'
               />
             </>)}
       </SectionFieldset>

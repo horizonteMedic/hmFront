@@ -168,7 +168,7 @@ export default function Panel2D({ nOrdenInicial, onGuardado }) {
   });
 
   return (
-    <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
+    <div className={embebido ? "space-y-3 px-4" : "space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto"}>
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -228,14 +228,14 @@ export default function Panel2D({ nOrdenInicial, onGuardado }) {
           onRevert={() => revertField("metodo")}
         />
         <div className="grid  gap-x-4 gap-y-3">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Marihuana (THC)'
               name="valueM"
               value={form.valueM}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueM")}
               onRevert={() => revertField("valueM")}
@@ -252,14 +252,14 @@ export default function Panel2D({ nOrdenInicial, onGuardado }) {
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Cocaína (COC)'
               name="valueC"
               value={form.valueC}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueC")}
               onRevert={() => revertField("valueC")}

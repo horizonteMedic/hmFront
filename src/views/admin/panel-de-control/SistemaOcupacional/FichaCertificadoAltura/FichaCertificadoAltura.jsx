@@ -4,9 +4,6 @@ import {
     faUser,
     faStethoscope,
     faChartLine,
-    faBroom,
-    faPrint,
-    faSave,
     faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -15,21 +12,94 @@ import {
     InputsRadioGroup,
     InputCheckbox,
     CIE10List,
-    InputTextAreaUpper
+    InputTextAreaUpper,
+    SectionFieldset,
+    SearchButton,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getTodayPlusOneYear, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_FICHA_CERTIFICADO_ALTURA, VerifyTR } from "./controllerFichaCertificadoAltura";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, TABLA_FICHA_CERTIFICADO_ALTURA, VerifyTR } from "./controllerFichaCertificadoAltura";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
 
 const tabla = TABLA_FICHA_CERTIFICADO_ALTURA
 const today = getToday();
+
+// Recomendaciones que se agregan/quitan del texto de observaciones al marcar su casilla.
+const RECOMENDACIONES = [
+    "sobrepesoDietaHipocalorica",
+    "corregirAgudezaVisual",
+    "corregirAgudezaVisualTotal",
+    "obesidadDietaHipocalorica",
+    "usoLentesCorrectoresLectura",
+    "corregirAgudezaLectura",
+];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExam",
+    "razonVisita",
+    "experienciaAnios",
+    // Antecedentes
+    "alteracionConsciencia",
+    "alcoholismoCronico",
+    "movimientosInvoluntariosEnfermedades",
+    "perdidaRecurrenteConsciencia",
+    "diabetesHipoglicemiaNoControlada",
+    "insuficienciaRenalCronicaGradoIV",
+    "efectosEnfermedadTratamiento",
+    "sustanciasEstupefacientesSinTratamiento",
+    "sustanciasEstupefacientesConAlteracion",
+    "sindromeApneaObstructivaSueño",
+    "obesidadIMC30",
+    "anemiaCriteriosOMS2011",
+    "comentariosDetalleAntecedentes",
+    // Pruebas complementarias
+    "resfriadoCuadroRespiratorio",
+    "vertigoMareos",
+    "temorAlturas",
+    "hipoacusiaFrecuenciasConversacionales",
+    "alteracionAgudezaVisual",
+    "campimetriaAnormal",
+    "medicinasTomando",
+    "otrosDatosRelevancia",
+    // Examen físico
+    "limitacionFuerzaExtremidades",
+    "alteracionEquilibrio",
+    "anormalidadMarcha",
+    "alteracionCoordinacionDedoNariz",
+    "asimetriaFacial",
+    "sustentacionPie1",
+    "presenciaNistagmus",
+    "anormalidadMovimientosOculares",
+    "pupilasNoCirla",
+    "anormalidadLenguaje",
+    "movimientosInvoluntarios",
+    "detalleInformacionExamenFisico",
+    // Conclusión y comentarios
+    "aptoDesde",
+    "aptoHasta",
+    "conclusion",
+    "observacionesRecomendaciones",
+    "conclusionesCie10",
+    ...RECOMENDACIONES,
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 // Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
 // no guarda su borrador, sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar el certificado.
@@ -53,7 +123,12 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
         edad: "",
         sexo: "",
         experienciaAnios: "",
-        areaTrabajo: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+        ocupacion: "",
+        cargoDesempenar: "",
         empresa: "",
         contrata: "",
         //==========================TAB LATERAL===========================
@@ -156,7 +231,16 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
         user_doctorAsignado: userlogued,
 
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA"
+        nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -172,6 +256,22 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
         handleCheckBoxChange,
         handleClear,
     } = useForm(initialFormState, { storageKey: embebido ? undefined : "fichaCertificadoAltura" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // Cada médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorAsignadoEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctorAsignado = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {
@@ -209,6 +309,9 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
         });
     };
 
+    // Las casillas de recomendaciones y el texto de observaciones van acoplados: se revierten juntos.
+    const camposRecomendaciones = [...RECOMENDACIONES, "observacionesRecomendaciones", "conclusionesCie10"];
+
     const tabs = [
         {
             id: 0,
@@ -233,16 +336,27 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
     // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
     const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
-    const handleSave = () => {
+    // La aptitud es obligatoria tanto al guardar como al editar.
+    const aptitudSeleccionada = () => {
         if (form.conclusion == null) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
                 text: "Por favor, seleccione la aptitud.",
             })
-            return
+            return false;
         }
+        return true;
+    };
+
+    const handleSave = () => {
+        if (!aptitudSeleccionada()) return;
         SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        if (!aptitudSeleccionada()) return;
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     // Incrustado: abre la orden recibida (datos del paciente si aún no hay certificado; si ya existe, sus resultados)
@@ -252,449 +366,375 @@ export default function FichaCertificadoAltura({ nOrdenInicial, onGuardado }) {
         }
     }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
     const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = embebido || hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
+    // Props comunes de un campo de texto de una sola línea.
+    const campo = (name, onChange = handleChangeSimple) => ({
+        name,
+        value: form?.[name],
+        onChange,
+        disabled: camposDeshabilitados,
+        edited: isFieldEdited(name),
+        onRevert: () => revertField(name),
+    });
+
     return (
-        <div className="mx-auto bg-white overflow-hidden">
-            {/* Incrustado el ancho útil es el del panel: bajo 1700 px el panel de Agudeza Visual (20%) queda con campos
+        <div className="mx-auto bg-white space-y-3 px-4 pb-6">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+                mostrarLimpiar={!embebido}
+            />
+
+            {/* Incrustado el ancho útil es el del panel: bajo 1700 px el panel de Agudeza Visual queda con campos
                 de 12 px, así que va debajo del contenido principal. */}
-            <div className={embebido ? "flex flex-col min-[1700px]:flex-row h-full" : "flex h-full"}>
-                {/* Contenido principal - 80% */}
-                <div className={embebido ? "w-full min-[1700px]:w-4/5" : "w-4/5"}>
-                    <div className="w-full">
-                        {/* Datos del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className={embebido
+                ? "grid grid-cols-1 gap-3 items-start min-[1700px]:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]"
+                : "grid grid-cols-1 gap-3 items-start xl:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]"}>
+                {/* ===== CONTENIDO PRINCIPAL ===== */}
+                <div className="space-y-3 min-w-0">
+                    {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
+                    <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                        <div className="flex gap-x-3 w-full">
                             <InputTextOneLine
                                 label="N° Orden"
                                 name="norden"
                                 value={form?.norden}
                                 onChange={handleChangeNumber}
                                 onKeyUp={handleSearch}
-                                disabled={embebido}
+                                disabled={nordenDisabled}
+                                labelWidth="110px"
+                                className="w-full"
                             />
-                            <InputTextOneLine
-                                label="Fecha Examen"
-                                type="date"
-                                name="fechaExam"
-                                value={form?.fechaExam}
-                                onChange={handleChangeSimple}
-                            />
-                            <InputTextOneLine
-                                label="Tipo de Examen"
-                                name="tipoExamen"
-                                value={form?.tipoExamen}
-                                disabled
-                            />
-                            <InputsRadioGroup
-                                name="razonVisita"
-                                value={form?.razonVisita}
-                                onChange={handleRadioButton}
-                                options={[
-                                    { label: "1ra Actitud", value: "PRIMERA ACTITUD" },
-                                    { label: "Revalidación", value: "REVALIDACION" },
-                                ]}
-                            />
-                        </section>
-
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4">
-                            <h3 className="text-[11px] font-semibold mb-3">Datos del Paciente</h3>
-                            {/* Fila 1: Nombres, DNI, Edad, Género */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-1">
-                                <InputTextOneLine
-                                    label="Nombres y Apellidos"
-                                    name="nombres"
-                                    value={form?.nombres}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="T. Experiencia"
-                                    name="experienciaAnios"
-                                    value={form?.experienciaAnios}
-                                    onChange={handleChange}
-                                />
-                                <InputTextOneLine
-                                    label="Sexo"
-                                    name="sexo"
-                                    value={form?.sexo}
-                                    disabled
-                                />
-                                <div className="grid grid-cols-2 gap-2">
-                                    <InputTextOneLine
-                                        label="DNI"
-                                        name="dni"
-                                        value={form?.dni}
-                                        disabled
-                                    />
-                                    <InputTextOneLine
-                                        label="Edad"
-                                        name="edad"
-                                        value={form?.edad}
-                                        disabled
-                                    />
-                                </div>
-                                <InputTextOneLine
-                                    label="Empresa"
-                                    name="empresa"
-                                    value={form?.empresa}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="Contrata"
-                                    name="contrata"
-                                    value={form?.contrata}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="Area de Trabajo"
-                                    name="areaTrabajo"
-                                    value={form?.areaTrabajo}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="Puesto de Trabajo"
-                                    name="puestoTrabajo"
-                                    value={form?.puestoTrabajo}
-                                    disabled
-                                />
-                                <ButtonsPDF
-                                    {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-                                    {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-                                    handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-                                />
-                            </div>
-                        </section>
-
-                        {/* Tab Navigation */}
-                        <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-black hover:bg-gray-100 ${activeTab === tab.id
-                                        ? "border-[#233245] text-[#233245] font-semibold"
-                                        : "border-transparent"
-                                        }`}
-                                    onClick={() => setActiveTab(tab.id)}
-                                >
-                                    <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                                    {tab.name}
-                                </button>
-                            ))}
-                        </nav>
-
-                        {/* Tab Content */}
-                        <div className="max-w-full">
-                            {tabs.map((tab) => {
-                                const Component = tab.component;
-                                return (
-                                    activeTab === tab.id && (
-                                        <Component
-                                            key={tab.id}
-                                            form={form}
-                                            setForm={setForm}
-                                            handleChange={handleChange}
-                                            handleChangeNumber={handleChangeNumber}
-                                            handleRadioButton={handleRadioButton}
-                                            handleChangeSimple={handleChangeSimple}
-                                            handleRadioButtonBoolean={handleRadioButtonBoolean}
-                                            handleCheckBoxChange={handleCheckBoxChange}
-                                            handleClear={handleClear}
-                                        />
-                                    )
-                                );
-                            })}
+                            {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
                         </div>
+                        <InputTextOneLine
+                            label="Fecha Examen"
+                            type="date"
+                            labelWidth="110px"
+                            {...campo("fechaExam")}
+                        />
+                        <InputTextOneLine
+                            label="Tipo de Examen"
+                            name="tipoExamen"
+                            value={form?.tipoExamen}
+                            disabled
+                            labelWidth="110px"
+                        />
+                        <InputTextOneLine
+                            label="T. Experiencia"
+                            labelWidth="110px"
+                            required
+                            {...campo("experienciaAnios", handleChange)}
+                        />
+                        <InputsRadioGroup
+                            name="razonVisita"
+                            value={form?.razonVisita}
+                            onChange={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("razonVisita")}
+                            onRevert={() => revertField("razonVisita")}
+                            options={[
+                                { label: "1ra Actitud", value: "PRIMERA ACTITUD" },
+                                { label: "Revalidación", value: "REVALIDACION" },
+                            ]}
+                        />
+                    </SectionFieldset>
 
-                        {/* Sección Estática - Conclusión y Comentarios */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 mt-0">
-                            <h4 className="text-[11px] font-semibold text-black mb-4">Conclusión y Comentarios</h4>
+                    {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+                    <DatosPersonalesLaborales form={form} />
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                {/* Columna Izquierda - Conclusión */}
-                                <div className="space-y-4 text-[11px]">
-                                    <div>
-                                        <label className="font-semibold mb-2 text-[11px]">
-                                            Apto para trabajo en altura:
-                                        </label>
-                                        <div className="grid grid-cols-1 gap-2">
-                                            <InputTextOneLine
-                                                label="Desde"
-                                                name="aptoDesde"
-                                                type="date"
-                                                value={form?.aptoDesde}
-                                                onChange={handleChangeSimple}
-                                            />
-                                            <InputTextOneLine
-                                                label="Hasta"
-                                                name="aptoHasta"
-                                                type="date"
-                                                value={form?.aptoHasta}
-                                                onChange={handleChangeSimple}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="font-semibold mb-2 text-[11px]">
-                                            Conclusiones:
-                                        </label>
-                                        <InputsRadioGroup
-                                            label="Restricción"
-                                            name="conclusion"
-                                            value={form?.conclusion}
-                                            onChange={handleRadioButton}
-                                            vertical
-                                            options={[
-                                                { label: "Apto", value: "APTO" },
-                                                { label: "Observado", value: "OBSERVADO" },
-                                                { label: "No Apto", value: "NO APTO" },
-                                                { label: "Apto con Restricción", value: "APTO CON RESTRICCION" },
-                                            ]}
-                                        />
-                                    </div>
-                                </div>
-                                {/* Columna Central - Observaciones */}
-                                <div className="space-y-4 text-[11px]">
-                                    <InputTextAreaUpper
-                                        label="Observaciones y Recomendaciones"
-                                        name="observacionesRecomendaciones"
-                                        rows={5}
-                                        value={form?.observacionesRecomendaciones}
-                                        onChange={(upper) => {
-                                            const cie10Lines = upper
-                                                .split("\n")
-                                                .filter(l => /^CIE 10:/i.test(l.trim()));
-                                            const nuevoCie10 = cie10Lines.join("\n");
-                                            setForm((d) => ({
-                                                ...d,
-                                                observacionesRecomendaciones: upper,
-                                                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
-                                            }));
-                                        }} 
-                                    />
-                                    <div className="bg-green-200 p-3 rounded-xl col-span-3">
-                                        <CIE10List
-                                            value={form.conclusionesCie10}
-                                            fieldName="conclusionesCie10"
-                                            label="Conclusiones CIE10"
-                                            token={token}
-                                            setForm={setForm}
-                                            setAdditionalForm={setForm}
-                                            additionalFieldName="observacionesRecomendaciones"
-                                            additionalDelimiter={"\n"}
-                                        />
-                                    </div>
-                                    <EmpleadoComboBox
-                                        value={form.nombre_medico}
+                    {/* ===== SECCIÓN: DOCUMENTO PSICOSENSOMÉTRICO ===== */}
+                    <SectionFieldset legend="Documento Psicosensométrico">
+                        <ButtonsPDF
+                            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                        />
+                    </SectionFieldset>
+
+                    {/* Tab Navigation */}
+                    <nav className="flex overflow-x-auto bg-white border-b border-gray-200">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                className={`flex-1 shrink-0 whitespace-nowrap px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-black hover:bg-gray-100 ${activeTab === tab.id
+                                    ? "border-[#233245] text-[#233245] font-semibold"
+                                    : "border-transparent"
+                                    }`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                                {tab.name}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Tab Content */}
+                    <div className="max-w-full">
+                        {tabs.map((tab) => {
+                            const Component = tab.component;
+                            return (
+                                activeTab === tab.id && (
+                                    <Component
+                                        key={tab.id}
                                         form={form}
-                                        label="Especialista"
-                                        onChange={handleChangeSimple}
+                                        setForm={setForm}
+                                        handleChange={handleChange}
+                                        handleChangeNumber={handleChangeNumber}
+                                        handleRadioButton={handleRadioButton}
+                                        handleChangeSimple={handleChangeSimple}
+                                        handleRadioButtonBoolean={handleRadioButtonBoolean}
+                                        handleCheckBoxChange={handleCheckBoxChange}
+                                        handleClear={handleClear}
+                                        disabled={camposDeshabilitados}
+                                        isFieldEdited={isFieldEdited}
+                                        revertField={revertField}
                                     />
-                                    <EmpleadoComboBox
-                                        value={form.nombre_doctorAsignado}
-                                        label="Doctor Asignado"
-                                        form={form}
-                                        onChange={handleChangeSimple}
-                                        nameField="nombre_doctorAsignado"
-                                        idField="user_doctorAsignado"
-                                    />
-                                </div>
-                                {/* Columna Derecha - Recomendaciones */}
-                                <div className="space-y-2 text-[11px]">
-                                    <h5 className="font-semibold text-black mb-3 text-[11px]">Recomendaciones:</h5>
-                                    <div className="space-y-2">
-                                        <InputCheckbox
-                                            label="SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
-                                            name="sobrepesoDietaHipocalorica"
-                                            checked={form?.sobrepesoDietaHipocalorica}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                        <InputCheckbox
-                                            label="CORREGIR AGUDEZA VISUAL."
-                                            name="corregirAgudezaVisual"
-                                            checked={form?.corregirAgudezaVisual}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                        <InputCheckbox
-                                            label="CORREGIR AGUDEZA VISUAL TOTAL."
-                                            name="corregirAgudezaVisualTotal"
-                                            checked={form?.corregirAgudezaVisualTotal}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                        <InputCheckbox
-                                            label="OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
-                                            name="obesidadDietaHipocalorica"
-                                            checked={form?.obesidadDietaHipocalorica}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                        <InputCheckbox
-                                            label="USO DE LENTES CORRECTORES PARA LECTURA DE CERCA"
-                                            name="usoLentesCorrectoresLectura"
-                                            checked={form?.usoLentesCorrectoresLectura}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                        <InputCheckbox
-                                            label="CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."
-                                            name="corregirAgudezaLectura"
-                                            checked={form?.corregirAgudezaLectura}
-                                            onChange={handleRecomendacionCheckboxChange}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Botones de Acción */}
-                            <section className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
-                                <div className=" flex gap-4">
-                                    <button
-                                        type="button"
-                                        onClick={handleSave}
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                                    </button>
-                                    {!embebido && (
-                                        <button
-                                            type="button"
-                                            onClick={handleClear}
-                                            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                        >
-                                            <FontAwesomeIcon icon={faBroom} /> Limpiar
-                                        </button>
-                                    )}
-                                </div>
-                                {!embebido && (
-                                    <div className="flex flex-col items-end">
-                                        <span className="font-bold italic text-base mb-1">Imprimir</span>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                name="norden"
-                                                value={form.norden}
-                                                onChange={handleChange}
-                                                className="border rounded px-2 py-1 text-base w-24"
-                                            />
-
-                                            <button
-                                                type="button"
-                                                onClick={handlePrint}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                            >
-                                                <FontAwesomeIcon icon={faPrint} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </section>
-                        </div>
+                                )
+                            );
+                        })}
                     </div>
+
+                    {/* ===== SECCIÓN: CONCLUSIÓN Y COMENTARIOS ===== */}
+                    <SectionFieldset legend="Conclusión y Comentarios" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Columna Izquierda - Conclusión */}
+                        <div className="space-y-4 text-[11px]">
+                            <div>
+                                <span className="block font-semibold mb-2 text-[11px]">
+                                    Apto para trabajo en altura:
+                                </span>
+                                <div className="grid grid-cols-1 gap-2">
+                                    <InputTextOneLine
+                                        label="Desde"
+                                        type="date"
+                                        {...campo("aptoDesde")}
+                                    />
+                                    <InputTextOneLine
+                                        label="Hasta"
+                                        type="date"
+                                        {...campo("aptoHasta")}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <span className="block font-semibold mb-2 text-[11px]">
+                                    Conclusiones:
+                                </span>
+                                <InputsRadioGroup
+                                    name="conclusion"
+                                    value={form?.conclusion}
+                                    onChange={handleRadioButton}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited("conclusion")}
+                                    onRevert={() => revertField("conclusion")}
+                                    vertical
+                                    options={[
+                                        { label: "Apto", value: "APTO" },
+                                        { label: "Observado", value: "OBSERVADO" },
+                                        { label: "No Apto", value: "NO APTO" },
+                                        { label: "Apto con Restricción", value: "APTO CON RESTRICCION" },
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                        {/* Columna Central - Observaciones */}
+                        <div className="space-y-4 text-[11px]">
+                            <InputTextAreaUpper
+                                label="Observaciones y Recomendaciones"
+                                name="observacionesRecomendaciones"
+                                rows={5}
+                                value={form?.observacionesRecomendaciones}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("observacionesRecomendaciones")}
+                                onRevert={() => revertFields(camposRecomendaciones)}
+                                onChange={(upper) => {
+                                    const cie10Lines = upper
+                                        .split("\n")
+                                        .filter(l => /^CIE 10:/i.test(l.trim()));
+                                    const nuevoCie10 = cie10Lines.join("\n");
+                                    setForm((d) => ({
+                                        ...d,
+                                        observacionesRecomendaciones: upper,
+                                        ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                                    }));
+                                }}
+                            />
+                            <div className="bg-green-200 p-3 rounded-xl">
+                                <CIE10List
+                                    value={form.conclusionesCie10}
+                                    fieldName="conclusionesCie10"
+                                    label="Conclusiones CIE10"
+                                    token={token}
+                                    setForm={setForm}
+                                    setAdditionalForm={setForm}
+                                    additionalFieldName="observacionesRecomendaciones"
+                                    additionalDelimiter={"\n"}
+                                    disabled={camposDeshabilitados}
+                                />
+                            </div>
+                            <EmpleadoComboBox
+                                value={form.nombre_medico}
+                                form={form}
+                                label="Especialista"
+                                onChange={handleChangeSimple}
+                                disabled={camposDeshabilitados}
+                                edited={isMedicoEdited}
+                                onRevert={revertMedico}
+                            />
+                            <EmpleadoComboBox
+                                value={form.nombre_doctorAsignado}
+                                label="Doctor Asignado"
+                                form={form}
+                                onChange={handleChangeSimple}
+                                nameField="nombre_doctorAsignado"
+                                idField="user_doctorAsignado"
+                                disabled={camposDeshabilitados}
+                                edited={isDoctorAsignadoEdited}
+                                onRevert={revertDoctorAsignado}
+                            />
+                        </div>
+                        {/* Columna Derecha - Recomendaciones */}
+                        <div className="space-y-2 text-[11px]">
+                            <div className="flex items-center justify-between mb-3">
+                                <h5 className="font-semibold text-black text-[11px]">Recomendaciones:</h5>
+                                {RECOMENDACIONES.some(isFieldEdited) && (
+                                    <RevertButton
+                                        onClick={() => revertFields(camposRecomendaciones)}
+                                        title="Revertir recomendaciones y observaciones"
+                                    />
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                {[
+                                    ["sobrepesoDietaHipocalorica", "SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."],
+                                    ["corregirAgudezaVisual", "CORREGIR AGUDEZA VISUAL."],
+                                    ["corregirAgudezaVisualTotal", "CORREGIR AGUDEZA VISUAL TOTAL."],
+                                    ["obesidadDietaHipocalorica", "OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."],
+                                    ["usoLentesCorrectoresLectura", "USO DE LENTES CORRECTORES PARA LECTURA DE CERCA"],
+                                    ["corregirAgudezaLectura", "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."],
+                                ].map(([name, label]) => (
+                                    <InputCheckbox
+                                        key={name}
+                                        label={label}
+                                        name={name}
+                                        checked={form?.[name]}
+                                        disabled={camposDeshabilitados}
+                                        onChange={handleRecomendacionCheckboxChange}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </SectionFieldset>
                 </div>
 
-                {/* Panel lateral de Agudeza Visual - 20% */}
-                <div className={embebido ? "w-full max-w-[480px] min-[1700px]:max-w-none min-[1700px]:w-1/5" : "w-1/5"}>
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                        <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
-                        {/* Sin Corregir */}
-                        <div className="mb-4">
-                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="">
-                                    <div className="font-semibold mb-2 text-center">O.D</div>
-                                    <div className="space-y-3">
-                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
-                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
-                                    </div>
-                                </div>
-                                <div className="">
-                                    <div className="font-semibold mb-2 text-center">O.I</div>
-                                    <div className="space-y-3">
-                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
-                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
-                                    </div>
-                                </div>
-                            </div>
+                {/* ===== PANEL LATERAL: AGUDEZA VISUAL (solo lectura: datos de Oftalmología) ===== */}
+                <div className={embebido ? "w-full max-w-[480px] min-[1700px]:max-w-none space-y-3 min-w-0" : "space-y-3 min-w-0"}>
+                    <SectionFieldset legend="Agudeza Visual - Sin Corregir" className="grid grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <div className="font-semibold text-center">O.D</div>
+                            <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
+                            <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
                         </div>
+                        <div className="space-y-3">
+                            <div className="font-semibold text-center">O.I</div>
+                            <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
+                            <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
+                        </div>
+                    </SectionFieldset>
 
-                        {/* Corregida */}
-                        <div className="mb-4">
-                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
-                            {/* Fila OD y OI */}
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-3">
-                                    <div className="font-semibold mb-2 text-center">O.D</div>
-                                    <InputTextOneLine
-                                        label="V.C."
-                                        name="vcCorregidaOD"
-                                        value={form?.vcCorregidaOD}
-                                        disabled
-                                        labelWidth="35px"
-                                    />
-                                    <InputTextOneLine
-                                        label="V.L."
-                                        name="vlCorregidaOD"
-                                        value={form?.vlCorregidaOD}
-                                        disabled
-                                        labelWidth="35px"
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="font-semibold mb-2 text-center">O.I</div>
-                                    <InputTextOneLine
-                                        label="V.C."
-                                        name="vcCorregidaOI"
-                                        value={form?.vcCorregidaOI}
-                                        disabled
-                                        labelWidth="35px"
-                                    />
-                                    <InputTextOneLine
-                                        label="V.L."
-                                        name="vlCorregidaOI"
-                                        value={form?.vlCorregidaOI}
-                                        disabled
-                                        labelWidth="35px"
-                                    />
-                                </div>
+                    <SectionFieldset legend="Agudeza Visual - Corregida" className="space-y-3">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                                <div className="font-semibold text-center">O.D</div>
+                                <InputTextOneLine label="V.C." name="vcCorregidaOD" value={form?.vcCorregidaOD} disabled labelWidth="35px" />
+                                <InputTextOneLine label="V.L." name="vlCorregidaOD" value={form?.vlCorregidaOD} disabled labelWidth="35px" />
                             </div>
-                            {/* Fila extra (ancho completo) */}
-                            <div className="mt-4 space-y-3">
-                                <InputTextOneLine
-                                    label="V.Clrs"
-                                    name="vclrs"
-                                    value={form?.vclrs}
-                                    disabled
-                                    className="flex-1 w-full"
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    name="vb"
-                                    label="V.B."
-                                    value={form?.vb}
-                                    disabled
-                                    className="flex-1 w-full"
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    label="R.P."
-                                    name="rp"
-                                    value={form?.rp}
-                                    disabled
-                                    className="flex-1 w-full"
-                                    labelWidth="35px"
-                                />
+                            <div className="space-y-3">
+                                <div className="font-semibold text-center">O.I</div>
+                                <InputTextOneLine label="V.C." name="vcCorregidaOI" value={form?.vcCorregidaOI} disabled labelWidth="35px" />
+                                <InputTextOneLine label="V.L." name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled labelWidth="35px" />
                             </div>
                         </div>
-                        {/* Enfermedades Oculares */}
-                        <InputTextArea label="Enfermedades Oculares" rows={6} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
-                    </div>
+                        <InputTextOneLine label="V.Clrs" name="vclrs" value={form?.vclrs} disabled labelWidth="45px" />
+                        <InputTextOneLine label="V.B." name="vb" value={form?.vb} disabled labelWidth="45px" />
+                        <InputTextOneLine label="R.P." name="rp" value={form?.rp} disabled labelWidth="45px" />
+                    </SectionFieldset>
+
+                    <SectionFieldset legend="Enfermedades Oculares">
+                        <InputTextArea name="enfermedadesOculares" value={form?.enfermedadesOculares} rows={6} disabled />
+                    </SectionFieldset>
                 </div>
             </div>
+
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+                hideClear={embebido}
+                hidePrint={embebido}
+            />
+
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">

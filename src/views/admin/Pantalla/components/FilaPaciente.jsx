@@ -1,36 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
-// Máximo de exámenes pendientes que se nombran en la celda; el resto se resume como "+N".
-const MAX_NOMBRADOS = 2;
-
-const descripcionPendientes = (pendientes) => {
-    const nombrados = pendientes.slice(0, MAX_NOMBRADOS).join(", ");
-    const resto = pendientes.length - MAX_NOMBRADOS;
-    return resto > 0 ? `${nombrados} +${resto}` : nombrados;
-};
-
 // `area` undefined = el área no está en el protocolo de este paciente.
 const CeldaArea = ({ area }) => {
     if (!area) return <span className="text-[22px] font-bold text-gray-300">–</span>;
 
-    if (area.completado) {
-        return (
-            <span className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-green-600 text-[18px] text-white">
-                <FontAwesomeIcon icon={faCheck} />
-            </span>
-        );
-    }
-
     return (
-        <div className="flex min-w-0 items-center gap-2 px-1" title={`Falta: ${area.pendientes.join(", ")}`}>
-            <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-red-600 text-[18px] text-white">
-                <FontAwesomeIcon icon={faXmark} />
-            </span>
-            <span className="line-clamp-2 text-[15px] font-semibold leading-tight text-red-700">
-                {descripcionPendientes(area.pendientes)}
-            </span>
-        </div>
+        <span
+            className={`flex h-[32px] w-[32px] items-center justify-center rounded-full text-[18px] text-white ${
+                area.completado ? "bg-green-600" : "bg-red-600"
+            }`}
+        >
+            <FontAwesomeIcon icon={area.completado ? faCheck : faXmark} />
+        </span>
     );
 };
 
@@ -40,7 +22,7 @@ const FilaPaciente = ({ paciente, columnas, plantillaColumnas }) => {
     return (
         <article
             className={`grid h-full items-center overflow-hidden rounded-lg border-l-[10px] bg-white shadow-md ${
-                finalizado ? "border-green-600" : "border-red-600"
+                total === 0 ? "border-gray-300" : finalizado ? "border-green-600" : "border-red-600"
             }`}
             style={{ gridTemplateColumns: plantillaColumnas }}
         >
@@ -51,7 +33,7 @@ const FilaPaciente = ({ paciente, columnas, plantillaColumnas }) => {
                 {color.letra}
             </span>
 
-            <p className="line-clamp-2 pr-3 text-[20px] font-extrabold uppercase leading-tight text-[#0e4d8c]">
+            <p className="truncate pr-3 text-[20px] font-extrabold uppercase text-[#0e4d8c]">
                 {nombres}
             </p>
 

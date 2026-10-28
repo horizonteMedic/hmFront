@@ -153,7 +153,7 @@ export default function VDRL() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -225,13 +225,13 @@ export default function VDRL() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultado" className="flex gap-4">
+      <SectionFieldset legend="Resultado" className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <InputTextOneLine
           label='VDRL'
           name="resultado"
           value={form.resultado}
           onChange={handleChange}
-          className='w-full max-w-[80%]'
+          className='w-full sm:max-w-[80%]'
           labelWidth='120px'
           disabled={camposDeshabilitados}
           edited={isFieldEdited("resultado")}

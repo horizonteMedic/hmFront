@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import RegistroClientes from "./Admision/RegistroClientes.jsx";
-import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx";
-import AperturaExamenesLaArena from "./Admision/AperturaExamenes/LaArena/AperturaExamenesLaArena.jsx";
+import AdmisionTabSelector from "./Admision/AdmisionTabSelector.jsx";
 import ImportacionModal from "./Admision/ImportacionMasiva.jsx";
 import ImportacionModalBasica from "./Admision/ImportacionModalBasica.jsx";
-import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
-import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx";
 import Triaje from "./Triaje/Triaje";
 import ConsentimientosSubTabSelector from "./Laboratorio/Consentimientos/ConsentimientosSubTabSelector.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
@@ -21,7 +17,6 @@ import {
   ComboboxExplotacionMulti,
   ComboboxMineralMulti,
   ComboboxAlturaMulti,
-  ComboboxPrecioExamenMulti,
   ComboboxFormaPago,
   ComboboxListAuth,
   ComboboxProfesión,
@@ -82,7 +77,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
-import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Espirometria from "./Espirometria/Espirometria.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
@@ -145,7 +139,7 @@ const hiddenExamTabs = [
 
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(null); // null: dashboard, 0: Admisión, 1: Triaje, 2: Laboratorio
-  const [subTab, setSubTab] = useState(0); // Para tabs internos de Admisión
+  const [subTab, setSubTab] = useState(0); // Para tabs internos de Audiometría
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [DNIG, setDNIG] = useState("");
@@ -212,26 +206,6 @@ const TabComponent = () => {
   const AlturaMulti = ComboboxAlturaMulti("T-NP");
   const FormaPago = ComboboxFormaPago("T-NP");
   const ListAuth = ComboboxListAuth("T-NP");
-
-  const [datos, setDatos] = useState({
-    codPa: "",
-    nombresPa: "",
-    apellidosPa: "",
-    fechaNaciminetoPa: "",
-    sexoPa: "",
-    emailPa: "",
-    lugarNacPa: "",
-    nivelEstPa: "",
-    ocupacionPa: "",
-    estadoCivilPa: "",
-    direccionPa: "",
-    departamentoPa: "",
-    provinciaPa: "",
-    distritoPa: "",
-    caserioPA: "",
-    telCasaPa: "",
-    celPa: "",
-  });
 
   const listasCombos = {
     EmpresasMulti,
@@ -417,119 +391,16 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Admisión</h2>
               </div>
-              <div>
-                <div className={styles.tabHeader}>
-                  {/*Esto se va a mostrar por defecto */}
-                  <button
-                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(0)}
-                  >
-                    Registro de Pacientes
-                  </button>
-
-                  {tienePermisoEnVista("Admision", "Acceso a Examenes Pre") && (
-                    <button
-                      className={`${styles.tabButton} ${subTab === 2 ? styles.active : ""
-                        }`}
-                      onClick={() => setSubTab(2)}
-                    >
-                      Apertura Exámenes PreOcup
-                    </button>
-                  )}
-                  {tienePermisoEnVista("Admision", "Acceso a Examenes Pre") && (
-                    <button
-                      className={`${styles.tabButton} ${subTab === 4 ? styles.active : ""
-                        }`}
-                      onClick={() => setSubTab(4)}
-                    >
-                      Apertura Exámenes La Arena
-                    </button>
-                  )}
-                  {tienePermisoEnVista(
-                    "Admision",
-                    "Acceso Consentimiento de Digitalizacion"
-                  ) && (
-                      <button
-                        className={`${styles.tabButton} ${subTab === 1 ? styles.active : ""
-                          }`}
-                        onClick={() => setSubTab(1)}
-                      >
-                        Consentimiento Digitalización
-                      </button>
-                    )}
-                  {tienePermisoEnVista(
-                    "Admision",
-                    "Acceso Reserva de Pacientes"
-                  ) && (
-                      <button
-                        className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
-                          }`}
-                        onClick={() => setSubTab(3)}
-                      >
-                        Reserva de Pacientes
-                      </button>
-                    )}
-                </div>
-                <div>
-                  {subTab === 0 && (
-                    <RegistroClientes
-                      listas={listasCombosR}
-                      datos={datos}
-                      setDatos={setDatos}
-                      selectedSede={selectSede}
-                      token={token}
-                      tabHC={() => {
-                        setSubTab(2);
-                      }}
-                      ChangeDNI={(nuevoDNI) => {
-                        setDNIG(nuevoDNI);
-                      }}
-                    />
-                  )}
-                  {subTab === 1 && (
-                    <ConsentimientoDigitalizacion
-                      token={token}
-                      userlogued={userlogued.sub}
-                      selectedSede={selectSede}
-                    />
-                  )}
-                  {subTab === 2 && (
-                    <AperturaExamenesPreOcup
-                      listas={listasCombos}
-                      DNIG={DNIG}
-                      selectedSede={selectSede}
-                      token={token}
-                      userlogued={userlogued.sub}
-                      PrecioC={ComboboxPrecioExamenMulti}
-                      ChangeDNI={(nuevoDNI) => {
-                        setDNIG(nuevoDNI);
-                      }}
-                      tienePermisoEnVista={tienePermisoEnVista}
-                    />
-                  )}
-                  {subTab === 4 && (
-                    <AperturaExamenesLaArena
-                      listas={listasCombos}
-                      DNIG={DNIG}
-                      selectedSede={selectSede}
-                      token={token}
-                      userlogued={userlogued.sub}
-                      ChangeDNI={(nuevoDNI) => {
-                        setDNIG(nuevoDNI);
-                      }}
-                    />
-                  )}
-                  {subTab === 3 && (
-                    <ReservaPacientes
-                      selectedSede="T-NP"
-                      token={token}
-                      Loading={Loading}
-                      userlogued={userlogued.sub}
-                    />
-                  )}
-                </div>
-              </div>
+              <AdmisionTabSelector
+                tienePermisoEnVista={tienePermisoEnVista}
+                listasRegistro={listasCombosR}
+                listas={listasCombos}
+                selectedSede={selectSede}
+                token={token}
+                userlogued={userlogued.sub}
+                DNIG={DNIG}
+                ChangeDNI={setDNIG}
+              />
             </div>
           )}
           {activeTab === 15 && (

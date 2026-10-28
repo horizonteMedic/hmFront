@@ -30,7 +30,7 @@ export default function ConsentimientosSubTabSelector({ tieneVista }) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-end space-x-2 px-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 px-4">
         <span className="font-semibold text-lg">Impresión Masiva</span>
         <input
           className="border rounded px-2 py-1 w-32 text-base"

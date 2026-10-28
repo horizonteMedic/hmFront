@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useAuthStore } from "../../../store/auth";
 import EncabezadoPantalla from "./components/EncabezadoPantalla";
 import LeyendaPantalla from "./components/LeyendaPantalla";
 import TablaPacientes from "./components/TablaPacientes";
@@ -14,22 +13,20 @@ import { armarColumnas } from "./utils/columnasExamenes";
 // Escena de diseño fija (Full HD). Se escala para llenar cualquier TV/monitor.
 const ANCHO_ESCENA = 1920;
 const ALTO_ESCENA = 1080;
-// Filas altas para que quepa el detalle de lo pendiente de cada área.
-const PACIENTES_POR_PAGINA = 14;
+const PACIENTES_POR_PAGINA = 20;
 
 const MensajeCentral = ({ children }) => (
-    <div className="flex flex-1 items-center justify-center text-[40px] font-semibold text-white/90">
+    <div className="flex flex-1 items-center justify-center text-[40px] font-semibold text-[#0e4d8c]">
         {children}
     </div>
 );
 
 const PantallaPacientes = () => {
-    const token = useAuthStore((state) => state.token);
     // `?demo` muestra datos de prueba para revisar el diseño sin backend.
     const [params] = useSearchParams();
     const esDemo = params.has("demo");
 
-    const datos = usePacientesPantalla({ token, habilitado: !esDemo });
+    const datos = usePacientesPantalla({ habilitado: !esDemo });
     const pacientes = esDemo ? PACIENTES_MOCK : datos.pacientes;
     const cargando = !esDemo && datos.cargando;
     const error = esDemo ? null : datos.error;
@@ -40,9 +37,9 @@ const PantallaPacientes = () => {
     const { esPantallaCompleta, alternar } = usePantallaCompleta();
     console.log(datos)
     return (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-[#0a2f57]">
+        <div className="fixed inset-0 z-50 overflow-hidden bg-[#d6e6f6]">
             <div
-                className="absolute left-1/2 top-1/2 flex flex-col bg-gradient-to-b from-[#0e4d8c] to-[#0a2f57] font-sans"
+                className="absolute left-1/2 top-1/2 flex flex-col bg-gradient-to-b from-[#eef5fc] to-[#d6e6f6] font-sans"
                 style={{
                     width: ANCHO_ESCENA,
                     height: ALTO_ESCENA,
@@ -73,6 +70,7 @@ const PantallaPacientes = () => {
                     pagina={pagina}
                     totalPaginas={totalPaginas}
                     error={error}
+                    ultimaActualizacion={esDemo ? null : datos.ultimaActualizacion}
                 />
             </div>
         </div>

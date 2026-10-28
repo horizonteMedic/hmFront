@@ -1,7 +1,13 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
-import { SubmitData } from "../model";
 import { existeRegistro } from "../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  validarSede,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -63,11 +69,18 @@ export const GetInfoServicio = (
           codEvaluacion: res.codEvaluacion ?? "",
           nombres: res.nombres ?? "",
           dni: res.dni ?? "",
-          areaTrabajo: res.area ?? "",
           edad: res.edad + " años",
           sexo: res.sexo ?? "",
           fecha: res.fechaExamen,
+          fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+          lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+          estadoCivil: res.estadoCivilPaciente ?? "",
+          nivelEstudios: res.nivelEstudioPaciente ?? "",
           empresa: res.empresa ?? "",
+          contrata: res.contrata ?? "",
+          // "Área Trabajo" del legacy; el cargo sale de `cargo`.
+          ocupacion: res.area ?? "",
+          cargoDesempenar: res.cargo ?? "",
           tiempoServicio: res.tiempoServicio ?? "",
 
           // PARTE 1: APTITUD ESPALDA
@@ -206,6 +219,14 @@ export const GetInfoServicio = (
           recomendaciones: res.recomendaciones,
 
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+          // Auditoría. EvaluacionMusculoEsqueletica2021ReporteDTO solo devuelve quién registró (`userRegistro`):
+          // no trae fechas de registro ni datos de edición.
+          userRegistro: res.userRegistro ?? "",
+          fechaRegistro: "",
+          usuarioActualizacion: "",
+          fechaActualizacion: "",
+          tieneRegistro: true,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -219,25 +240,10 @@ const cortarHastaPrimerEspacio = (str) => {
   const index = str.indexOf(" ");
   return index === -1 ? str : str.substring(0, index);
 };
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter,
-  dniUser
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-  const { bloqueado } = await verificarBloqueoEvaluacionNormal(form.norden, token);
-  if (bloqueado) {
-    await Swal.fire("Error", MENSAJE_BLOQUEO_EVALUACION_NORMAL, "error");
-    return;
-  }
-  Loading("Registrando Datos");
+
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form, dniUser) => {
   const body = {
     codEvaluacion: form.codEvaluacion,
     norden: form.norden,
@@ -383,34 +389,55 @@ export const SubmitDataService = async (
 
     usuarioFirma: form.user_medicoFirma,
     dniUser: dniUser,
-    userRegistro: user,
   };
-  SubmitData(body, registrarUrl, token).then((res) => {
-    console.log(res);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla, datosFooter);
-        }
-      });
-    } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
-    }
+  return body;
+};
+
+// Body completo (creación / actualización). EvaluacionMusculoEsqueletica2021DTO usa `userRegistro` para el
+// usuario que registra; en la edición se reenvía el creador original (el reporte sí lo devuelve; si no viniera,
+// el usuario en sesión, como siempre, para no dejarlo en null).
+const construirBody = (form, user, esActualizacion, dniUser) =>
+  sellarAuditoria(construirBase(form, dniUser), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro || user,
+    fechaRegistro: form.fechaRegistro,
+  });
+
+// Este backend responde id 1 o 0 al registrar/actualizar (ambos son éxito).
+const IDS_EXITO = [0, 1];
+
+// Antes de guardar/editar se aplica el bloqueo por la evaluación Normal (ver verificarBloqueoEvaluacionNormal).
+const guardarConBloqueo = async (accion, form, token, user, limpiar, tabla, datosFooter, dniUser) => {
+  if (!form.norden) {
+    await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  const { bloqueado } = await verificarBloqueoEvaluacionNormal(form.norden, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_EVALUACION_NORMAL, "error");
+    return;
+  }
+  await accion({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: (f, u, esActualizacion) => construirBody(f, u, esActualizacion, dniUser),
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    idsExito: IDS_EXITO,
   });
 };
-function convertirFecha(fecha) {
-  if (fecha === "") return "";
-  const [dia, mes, anio] = fecha.split("-");
-  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-}
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter, dniUser) =>
+  guardarConBloqueo(guardarRegistro, form, token, user, limpiar, tabla, datosFooter, dniUser);
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter, dniUser) =>
+  guardarConBloqueo(actualizarRegistro, form, token, user, limpiar, tabla, datosFooter, dniUser);
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
@@ -495,6 +522,27 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
   }
   Loading("Validando datos");
 
+  // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+  if (sede) {
+    const { estado, descripcionSede } = await validarSede(nro, sede, token);
+    if (estado === "otraSede") {
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+        html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+      });
+      return;
+    }
+    if (estado !== "ok") {
+      Swal.fire({
+        icon: "error",
+        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+      });
+      return;
+    }
+  }
+
   let existePropia, existeNormal, bloqueado;
   try {
     ({ existePropia, existeNormal, bloqueado } = await verificarBloqueoEvaluacionNormal(
@@ -538,14 +586,29 @@ export const GetInfoPac = (nro, set, token, sede) => {
     token
   )
     .then((res) => {
-      console.log("pros", res);
+      // Norden inexistente / paciente no encontrado / error del backend.
+      if (!res || res.error || !res.nombresApellidos) {
+        Swal.fire({
+          icon: "warning",
+          title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+          html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+        });
+        return;
+      }
       set((prev) => ({
         ...prev,
         ...res,
         sexo: res.genero,
         edad: res.edad + " años",
         nombres: res.nombresApellidos,
-        areaTrabajo: res.areaO,
+        fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+        lugarNacimiento: res.lugarNacimiento ?? "",
+        estadoCivil: res.estadoCivil ?? "",
+        nivelEstudios: res.nivelEstudios ?? "",
+        contrata: res.contrata ?? "",
+        ocupacion: res.areaO ?? "",
+        cargoDesempenar: res.cargo ?? "",
+        tieneRegistro: false,
       }));
     })
     .finally(() => {

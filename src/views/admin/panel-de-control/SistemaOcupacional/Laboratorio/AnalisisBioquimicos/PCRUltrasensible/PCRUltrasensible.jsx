@@ -152,7 +152,7 @@ export default function PCRUltrasensible() {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}
@@ -205,12 +205,13 @@ export default function PCRUltrasensible() {
                 />
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                     <InputTextOneLine
                         label="PRC ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO)"
                         name="resultado"
                         value={form.resultado}
                         labelWidth="400px"
+                        stackOnMobile
                         onChange={(e) => handleChangeNumberDecimals(e, 2)}
                         onKeyUp={handleFocusNext}
                         className="flex-1"
