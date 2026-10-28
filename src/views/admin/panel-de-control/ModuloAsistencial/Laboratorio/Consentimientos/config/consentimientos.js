@@ -32,7 +32,7 @@ const COCA_14_DIAS = { key: "COCA", label: "CONSUMIÓ HOJA DE COCA EN LOS 14 DÍ
 /**
  * Consentimientos de Laboratorio asistencial. Todos usan el mismo endpoint y solo cambian el `nameConset`, el
  * texto y los antecedentes, así que una pantalla (ConsentimientoLaboratorio) y un reporte sirven a todos.
- *   permission  vista que habilita la pestaña (las mismas que en SistemaOcupacional/Laboratorio/Consentimientos)
+ *   permission  vista que habilita la pestaña (las de SistemaOcupacional/Laboratorio/Consentimientos más " Asistencial")
  *   titulo      líneas del título (se imprimen centradas y subrayadas)
  *   texto       cuerpo con marcadores (ver textoPrueba)
  *   nota        frase que antecede a los antecedentes (opcional)
@@ -41,7 +41,7 @@ const COCA_14_DIAS = { key: "COCA", label: "CONSUMIÓ HOJA DE COCA EN LOS 14 DÍ
 export const CONSENTIMIENTOS = [
   {
     id: "muestraSangre",
-    permission: "Consentimiento Muestra Sangre",
+    permission: "Consentimiento Muestra Sangre Asistencial",
     label: "Muestra Sangre",
     icon: faTint,
     nameConset: "consent_Muestra_Sangre",
@@ -52,7 +52,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "panel2D",
-    permission: "Consentimiento Panel 2D",
+    permission: "Consentimiento Panel 2D Asistencial",
     label: "Panel 2D",
     icon: faSquare,
     nameConset: "con_panel2D",
@@ -62,7 +62,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "panel3D",
-    permission: "Consentimiento Panel 3D",
+    permission: "Consentimiento Panel 3D Asistencial",
     label: "Panel 3D",
     icon: faCube,
     nameConset: "con_panel3D",
@@ -72,7 +72,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "panel4D",
-    permission: "Consentimiento Panel 4D",
+    permission: "Consentimiento Panel 4D Asistencial",
     label: "Panel 4D",
     icon: faThLarge,
     nameConset: "con_panel4D",
@@ -88,7 +88,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "panel5D",
-    permission: "Consentimiento Panel 5D",
+    permission: "Consentimiento Panel 5D Asistencial",
     label: "Panel 5D",
     icon: faLayerGroup,
     nameConset: "con_panel5D",
@@ -106,7 +106,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "panel10D",
-    permission: "Consentimiento Panel 10D",
+    permission: "Consentimiento Panel 10D Asistencial",
     label: "Panel 10D",
     icon: faLayerGroup,
     nameConset: "con_panel10D",
@@ -128,7 +128,7 @@ export const CONSENTIMIENTOS = [
   },
   {
     id: "marihuana",
-    permission: "Consentimiento Cons. Marihuana",
+    permission: "Consentimiento Cons. Marihuana Asistencial",
     label: "Cons. Marihuana",
     icon: faCannabis,
     nameConset: "consent_marihuana",
