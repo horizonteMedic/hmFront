@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faUser,
     faStethoscope,
     faChartLine,
-    faBroom,
-    faPrint,
-    faSave,
     faDownload,
     faCarSide,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,21 +13,103 @@ import {
     InputsRadioGroup,
     InputCheckbox,
     CIE10List,
-    InputTextAreaUpper
+    InputTextAreaUpper,
+    SectionFieldset,
+    SearchButton,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
-import { getToday, getTodayPlusOneYear, getDatePlusYears } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear, getDatePlusYears, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import Swal from "sweetalert2";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
 import Boroo from "./Boroo/Boroo";
 
 const tabla = "b_certificado_conduccion";
+
+// Recomendaciones que se agregan/quitan del texto de observaciones al marcar su casilla.
+const RECOMENDACIONES = [
+    "sobrepesoDietaHipocalorica",
+    "corregirAgudezaVisual",
+    "corregirAgudezaVisualTotal",
+    "obesidadDietaHipocalorica",
+    "usoLentesCorrectoresLectura",
+    "corregirAgudezaLectura",
+];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExam",
+    "razonVisita",
+    "experienciaAnios",
+    // Examen médico
+    "limitacionFuerzaExtremidades",
+    "alteracionEquilibrioRomberg",
+    "anormalidadMarchaOjosCerrados",
+    "alteracionCoordinacionDedoNariz",
+    "asimetriaFacial",
+    "sustentacionUnPie",
+    "presenciaNistagmus",
+    "anormalidadMovimientosOculares",
+    "pupilasNoCirla",
+    "anormalidadLenguaje",
+    "movimientosInvoluntarios",
+    "detalleInformacionExamenMedico",
+    // Antecedentes
+    "alteracionConsciencia",
+    "alcoholismoCronico",
+    "movimientosInvoluntariosEnfermedades",
+    "perdidaRecurrenteConsciencia",
+    "diabetesHipoglicemiaNoControlada",
+    "insuficienciaRenalCronicaGradoIV",
+    "efectosEnfermedadTratamiento",
+    "sustanciasEstupefacientesSinTratamiento",
+    "sustanciasEstupefacientesConAlteracion",
+    "sindromeApneaObstructivaSueño",
+    "obesidadIMC30",
+    "anemiaCriteriosOMS2011",
+    "comentariosDetalleAntecedentes",
+    // Pruebas complementarias
+    "hipoacusiaFrecuenciasConversacionales",
+    "alteracionAgudezaVisual",
+    "noReconocimientoColores",
+    "campimetriaAnormal",
+    "pruebaVisionProfundidadAlterada",
+    "testSASAnormal",
+    "evaluacionPsicosensometricaAlterada",
+    "medicinasTomando",
+    "otrosDatosRelevancia",
+    // Boroo
+    "numeroDeLicencia",
+    "claseLicencia",
+    "fechaRevalidacionLicencia",
+    "categoriaLicencia",
+    "procedenciaLicencia",
+    "maquina",
+    "usoEstrictoLentesCorrectores",
+    // Conclusión y comentarios
+    "aptoDesde",
+    "aptoHasta",
+    "conclusion",
+    "observacionesRecomendaciones",
+    "conclusionesCie10",
+    ...RECOMENDACIONES,
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 export default function FichaConduccionVehiculos() {
     const today = getToday();
@@ -38,7 +117,6 @@ export default function FichaConduccionVehiculos() {
 
     const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
         useSessionData();
-
     const initialFormState = {
         // Datos personales
         norden: "",
@@ -55,8 +133,12 @@ export default function FichaConduccionVehiculos() {
 
         empresa: "",
         contrata: "",
-        puestoPostula: "",
-        puestoActual: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+        ocupacion: "",
+        cargoDesempenar: "",
         //=====================TAB LATERAL=====================
         // Agudeza Visual
         vcOD: "",
@@ -167,7 +249,16 @@ export default function FichaConduccionVehiculos() {
         user_doctorAsignado: userlogued,
 
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO"
+        nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -183,6 +274,22 @@ export default function FichaConduccionVehiculos() {
         handleCheckBoxChange,
         handleClear,
     } = useForm(initialFormState, { storageKey: "fichaConduccionVehiculos" });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // Cada médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorAsignadoEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctorAsignado = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
     // Handler para cuando cambia aptoDesde: actualiza aptoHasta automáticamente
     const handleAptoDesdeChange = (e) => {
@@ -232,6 +339,10 @@ export default function FichaConduccionVehiculos() {
             return { ...next, observacionesRecomendaciones: nuevoObs };
         });
     };
+
+    // Las casillas de recomendaciones y el texto de observaciones van acoplados: se revierten juntos.
+    const camposRecomendaciones = [...RECOMENDACIONES, "observacionesRecomendaciones", "conclusionesCie10"];
+
     const [visualerOpen, setVisualerOpen] = useState(null)
 
     const tabs = [
@@ -261,144 +372,164 @@ export default function FichaConduccionVehiculos() {
         },
     ];
 
-    const handleSave = () => {
+    // Tras registrar o limpiar se vuelve a la primera pestaña.
+    const limpiarTodo = () => { handleClear(); setActiveTab(0) };
+
+    // La aptitud es obligatoria tanto al guardar como al editar.
+    const aptitudSeleccionada = () => {
         if (form.conclusion == null) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
                 text: "Por favor, seleccione la aptitud.",
             })
-            return
+            return false;
         }
-        SubmitDataService(form, token, userlogued, () => { handleClear(); setActiveTab(0) }, tabla, datosFooter);
+        return true;
     };
 
+    const handleSave = () => {
+        if (!aptitudSeleccionada()) return;
+        SubmitDataService(form, token, userlogued, limpiarTodo, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        if (!aptitudSeleccionada()) return;
+        UpdateDataService(form, token, userlogued, limpiarTodo, tabla, datosFooter);
+    };
+
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        setActiveTab(0);
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            setActiveTab(0);
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setActiveTab(0);
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
+    };
+
+    // ===== Impresión =====
     const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
+    // Props comunes de un campo de texto de una sola línea.
+    const campo = (name, onChange = handleChangeSimple) => ({
+        name,
+        value: form?.[name],
+        onChange,
+        disabled: camposDeshabilitados,
+        edited: isFieldEdited(name),
+        onRevert: () => revertField(name),
+    });
+
     return (
-        <div className="flex h-full">
-            {/* Contenido principal - 80% */}
-            <div className="w-4/5">
-                <div className="w-full">
-                    {/* Datos del trabajador */}
-                    <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <InputTextOneLine
-                            label="N° Orden"
-                            name="norden"
-                            value={form?.norden}
-                            onChange={handleChangeNumber}
-                            onKeyUp={handleSearch}
-                        />
+        <div className="mx-auto bg-white space-y-3 px-4 pb-6">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={limpiarTodo}
+            />
+
+            <div className="grid grid-cols-1 gap-3 items-start xl:grid-cols-[minmax(0,4fr)_minmax(0,1fr)]">
+                {/* ===== CONTENIDO PRINCIPAL ===== */}
+                <div className="space-y-3 min-w-0">
+                    {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
+                    <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                        <div className="flex gap-x-3 w-full">
+                            <InputTextOneLine
+                                label="N° Orden"
+                                name="norden"
+                                value={form?.norden}
+                                onChange={handleChangeNumber}
+                                onKeyUp={handleSearch}
+                                disabled={nordenDisabled}
+                                labelWidth="110px"
+                                className="w-full"
+                            />
+                            <SearchButton onClick={executeSearch} className="lg:hidden" />
+                        </div>
                         <InputTextOneLine
                             label="Fecha Examen"
                             type="date"
-                            name="fechaExam"
-                            value={form?.fechaExam}
-                            onChange={handleChangeSimple}
+                            labelWidth="110px"
+                            {...campo("fechaExam")}
                         />
                         <InputTextOneLine
                             label="Tipo de Examen"
                             name="tipoExamen"
                             value={form?.tipoExamen}
                             disabled
+                            labelWidth="110px"
+                        />
+                        <InputTextOneLine
+                            label="T. Experiencia"
+                            labelWidth="110px"
+                            {...campo("experienciaAnios", handleChange)}
                         />
                         <InputsRadioGroup
                             name="razonVisita"
                             value={form?.razonVisita}
                             onChange={handleRadioButton}
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("razonVisita")}
+                            onRevert={() => revertField("razonVisita")}
                             options={[
                                 { label: "1ra Actitud", value: "PRIMERA ACTITUD" },
                                 { label: "Revalidación", value: "REVALIDACION" },
                             ]}
                         />
+                    </SectionFieldset>
+
+                    {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+                    <DatosPersonalesLaborales form={form} />
+
+                    {/* ===== SECCIÓN: DOCUMENTO PSICOSENSOMÉTRICO ===== */}
+                    <SectionFieldset legend="Documento Psicosensométrico">
                         <ButtonsPDF
                             {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
                             {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
                             handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
                         />
-                    </section>
-                    <section className="bg-white border border-gray-200 rounded-lg p-4 m-4">
-                        <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
-                        {/* Fila 1: Nombres, DNI, Edad, Género */}
-                        <div className="grid grid-cols-1 md:grid-cols-2  gap-2 mb-1">
-                            <InputTextOneLine
-                                label="Nombres y Apellidos"
-                                name="nombres"
-                                value={form?.nombres}
-                                disabled
-                            />
-                            <InputTextOneLine
-                                label="T. Experiencia"
-                                name="experienciaAnios"
-                                value={form?.experienciaAnios}
-                                onChange={handleChange}
-                            />
-                            <InputTextOneLine
-                                label="Sexo"
-                                name="sexo"
-                                value={form?.sexo}
-                                disabled
-                            />
-                            <div className="grid grid-cols-2 gap-2">
-                                <InputTextOneLine
-                                    label="DNI"
-                                    name="dni"
-                                    value={form?.dni}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="Edad"
-                                    name="edad"
-                                    value={form?.edad}
-                                    disabled
-                                />
-                            </div>
-                            <InputTextOneLine
-                                label="Empresa"
-                                name="empresa"
-                                value={form?.empresa}
-                                disabled
-                            />
-                            <InputTextOneLine
-                                label="Contrata"
-                                name="contrata"
-                                value={form?.contrata}
-                                disabled
-                            />
-                            <InputTextOneLine
-                                label="Area de Trabajo"
-                                name="puestoPostula"
-                                value={form?.puestoPostula}
-                                disabled
-                            />
-                            <InputTextOneLine
-                                label="Puesto de Trabajo"
-                                name="puestoActual"
-                                value={form?.puestoActual}
-                                disabled
-                            />
-                        </div>
-                    </section>
+                    </SectionFieldset>
 
                     {/* Tab Navigation */}
-                    <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
+                    <nav className="flex overflow-x-auto bg-white border-b border-gray-200">
                         {tabs.map((tab) =>
                             tab.id != 3 || form.esBoroo || form.esNYV ? (
                                 <button
                                     key={tab.id}
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                                    type="button"
+                                    className={`flex-1 shrink-0 whitespace-nowrap px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
                                         ? "border-[#233245] text-[#233245] font-semibold"
                                         : "border-transparent"
                                         }`}
@@ -426,310 +557,238 @@ export default function FichaConduccionVehiculos() {
                                         handleChangeSimple={handleChangeSimple}
                                         handleRadioButtonBoolean={handleRadioButtonBoolean}
                                         handleCheckBoxChange={handleCheckBoxChange}
-                                        handleClear={() => { handleClear(); setActiveTab(0) }}
+                                        handleClear={limpiarTodo}
+                                        disabled={camposDeshabilitados}
+                                        isFieldEdited={isFieldEdited}
+                                        revertField={revertField}
                                     />
                                 )
                             );
                         })}
                     </div>
 
-                    {/* Sección Estática - Conclusión y Comentarios */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4">
-                        <h4 className="text-lg font-semibold text-gray-800 mb-4">Conclusión y Comentarios</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Columna Izquierda - Conclusión */}
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="font-semibold mb-2">
-                                        Apto para conducción de vehículos:
-                                    </label>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        <InputTextOneLine
-                                            label="Desde"
-                                            name="aptoDesde"
-                                            type="date"
-                                            value={form?.aptoDesde}
-                                            onChange={handleAptoDesdeChange}
-                                        />
-                                        <InputTextOneLine
-                                            label="Hasta"
-                                            name="aptoHasta"
-                                            type="date"
-                                            value={form?.aptoHasta}
-                                            disabled
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="font-semibold mb-2">
-                                        Conclusiones:
-                                    </label>
-                                    <InputsRadioGroup
-                                        label="Restricción"
-                                        name="conclusion"
-                                        value={form?.conclusion}
-                                        onChange={handleRadioButton}
-                                        vertical
-                                        options={form?.esBoroo || form?.esNYV ? [
-                                            { label: "Apto", value: "APTO" },
-                                            { label: "No Apto", value: "NO APTO" },
-                                        ] : [
-                                            { label: "Apto", value: "APTO" },
-                                            { label: "Observado", value: "OBSERVADO" },
-                                            { label: "No Apto", value: "NO APTO" },
-                                            { label: "Apto con Restricción", value: "APTO CON RESTRICCION" },
-                                        ]}
+                    {/* ===== SECCIÓN: CONCLUSIÓN Y COMENTARIOS ===== */}
+                    <SectionFieldset legend="Conclusión y Comentarios" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Columna Izquierda - Conclusión */}
+                        <div className="space-y-4">
+                            <div>
+                                <span className="block font-semibold mb-2">
+                                    Apto para conducción de vehículos:
+                                </span>
+                                <div className="grid grid-cols-1 gap-2">
+                                    <InputTextOneLine
+                                        label="Desde"
+                                        type="date"
+                                        {...campo("aptoDesde", handleAptoDesdeChange)}
+                                        onRevert={() => revertFields(["aptoDesde", "aptoHasta"])}
+                                    />
+                                    {/* La vigencia se calcula desde la fecha de inicio (1 año; 2 para Boroo y N&V) */}
+                                    <InputTextOneLine
+                                        label="Hasta"
+                                        name="aptoHasta"
+                                        type="date"
+                                        value={form?.aptoHasta}
+                                        disabled
                                     />
                                 </div>
                             </div>
-
-                            {/* Columna Central - Observaciones */}
-                            <div className="space-y-4">
-                                <InputTextAreaUpper
-                                    label="Observaciones y Recomendaciones"
-                                    rows={6}
-                                    name="observacionesRecomendaciones"
-                                    value={form?.observacionesRecomendaciones}
-                                    onChange={(upper) => {
-                                        const cie10Lines = upper
-                                            .split("\n")
-                                            .filter(l => /^CIE 10:/i.test(l.trim()));
-                                        const nuevoCie10 = cie10Lines.join("\n");
-                                        setForm((d) => ({
-                                            ...d,
-                                            observacionesRecomendaciones: upper,
-                                            ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
-                                        }));
-                                    }}
-                                />
-                                <div className="bg-green-200 p-3 rounded-xl col-span-3">
-                                    <CIE10List
-                                        value={form.conclusionesCie10}
-                                        fieldName="conclusionesCie10"
-                                        label="Conclusiones CIE10"
-                                        token={token}
-                                        setForm={setForm}
-                                        setAdditionalForm={setForm}
-                                        additionalFieldName="observacionesRecomendaciones"
-                                        additionalDelimiter={"\n"}
-                                    />
-                                </div>
-                                <EmpleadoComboBox
-                                    value={form.nombre_medico}
-                                    label="Especialista"
-                                    form={form}
-                                    onChange={handleChangeSimple}
-                                />
-                                <EmpleadoComboBox
-                                    value={form.nombre_doctorAsignado}
-                                    label="Doctor Asignado"
-                                    form={form}
-                                    onChange={handleChangeSimple}
-                                    nameField="nombre_doctorAsignado"
-                                    idField="user_doctorAsignado"
+                            <div>
+                                <span className="block font-semibold mb-2">
+                                    Conclusiones:
+                                </span>
+                                <InputsRadioGroup
+                                    name="conclusion"
+                                    value={form?.conclusion}
+                                    onChange={handleRadioButton}
+                                    disabled={camposDeshabilitados}
+                                    edited={isFieldEdited("conclusion")}
+                                    onRevert={() => revertField("conclusion")}
+                                    vertical
+                                    options={form?.esBoroo || form?.esNYV ? [
+                                        { label: "Apto", value: "APTO" },
+                                        { label: "No Apto", value: "NO APTO" },
+                                    ] : [
+                                        { label: "Apto", value: "APTO" },
+                                        { label: "Observado", value: "OBSERVADO" },
+                                        { label: "No Apto", value: "NO APTO" },
+                                        { label: "Apto con Restricción", value: "APTO CON RESTRICCION" },
+                                    ]}
                                 />
                             </div>
+                        </div>
 
-                            {/* Columna Derecha - Recomendaciones */}
+                        {/* Columna Central - Observaciones */}
+                        <div className="space-y-4">
+                            <InputTextAreaUpper
+                                label="Observaciones y Recomendaciones"
+                                rows={6}
+                                name="observacionesRecomendaciones"
+                                value={form?.observacionesRecomendaciones}
+                                disabled={camposDeshabilitados}
+                                edited={isFieldEdited("observacionesRecomendaciones")}
+                                onRevert={() => revertFields(camposRecomendaciones)}
+                                onChange={(upper) => {
+                                    const cie10Lines = upper
+                                        .split("\n")
+                                        .filter(l => /^CIE 10:/i.test(l.trim()));
+                                    const nuevoCie10 = cie10Lines.join("\n");
+                                    setForm((d) => ({
+                                        ...d,
+                                        observacionesRecomendaciones: upper,
+                                        ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                                    }));
+                                }}
+                            />
+                            <div className="bg-green-200 p-3 rounded-xl">
+                                <CIE10List
+                                    value={form.conclusionesCie10}
+                                    fieldName="conclusionesCie10"
+                                    label="Conclusiones CIE10"
+                                    token={token}
+                                    setForm={setForm}
+                                    setAdditionalForm={setForm}
+                                    additionalFieldName="observacionesRecomendaciones"
+                                    additionalDelimiter={"\n"}
+                                    disabled={camposDeshabilitados}
+                                />
+                            </div>
+                            <EmpleadoComboBox
+                                value={form.nombre_medico}
+                                label="Especialista"
+                                form={form}
+                                onChange={handleChangeSimple}
+                                disabled={camposDeshabilitados}
+                                edited={isMedicoEdited}
+                                onRevert={revertMedico}
+                            />
+                            <EmpleadoComboBox
+                                value={form.nombre_doctorAsignado}
+                                label="Doctor Asignado"
+                                form={form}
+                                onChange={handleChangeSimple}
+                                nameField="nombre_doctorAsignado"
+                                idField="user_doctorAsignado"
+                                disabled={camposDeshabilitados}
+                                edited={isDoctorAsignadoEdited}
+                                onRevert={revertDoctorAsignado}
+                            />
+                        </div>
+
+                        {/* Columna Derecha - Recomendaciones */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between mb-3">
+                                <h5 className="font-semibold text-gray-700">Recomendaciones:</h5>
+                                {RECOMENDACIONES.some(isFieldEdited) && (
+                                    <RevertButton
+                                        onClick={() => revertFields(camposRecomendaciones)}
+                                        title="Revertir recomendaciones y observaciones"
+                                    />
+                                )}
+                            </div>
                             <div className="space-y-2">
-                                <h5 className="font-semibold text-gray-700 mb-3">Recomendaciones:</h5>
-                                <div className="space-y-2">
+                                {[
+                                    ["sobrepesoDietaHipocalorica", "SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."],
+                                    ["corregirAgudezaVisual", "CORREGIR AGUDEZA VISUAL."],
+                                    ["corregirAgudezaVisualTotal", "CORREGIR AGUDEZA VISUAL TOTAL."],
+                                    ["obesidadDietaHipocalorica", "OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."],
+                                    ["usoLentesCorrectoresLectura", "USO DE LENTES CORRECTORES PARA LECTURA DE CERCA"],
+                                    ["corregirAgudezaLectura", "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."],
+                                ].map(([name, label]) => (
                                     <InputCheckbox
-                                        label="SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
-                                        name="sobrepesoDietaHipocalorica"
-                                        checked={form?.sobrepesoDietaHipocalorica}
+                                        key={name}
+                                        label={label}
+                                        name={name}
+                                        checked={form?.[name]}
+                                        disabled={camposDeshabilitados}
                                         onChange={handleRecomendacionCheckboxChange}
                                     />
-                                    <InputCheckbox
-                                        label="CORREGIR AGUDEZA VISUAL."
-                                        name="corregirAgudezaVisual"
-                                        checked={form?.corregirAgudezaVisual}
-                                        onChange={handleRecomendacionCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="CORREGIR AGUDEZA VISUAL TOTAL."
-                                        name="corregirAgudezaVisualTotal"
-                                        checked={form?.corregirAgudezaVisualTotal}
-                                        onChange={handleRecomendacionCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
-                                        name="obesidadDietaHipocalorica"
-                                        checked={form?.obesidadDietaHipocalorica}
-                                        onChange={handleRecomendacionCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="USO DE LENTES CORRECTORES PARA LECTURA DE CERCA"
-                                        name="usoLentesCorrectoresLectura"
-                                        checked={form?.usoLentesCorrectoresLectura}
-                                        onChange={handleRecomendacionCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."
-                                        name="corregirAgudezaLectura"
-                                        checked={form?.corregirAgudezaLectura}
-                                        onChange={handleRecomendacionCheckboxChange}
-                                    />
-                                </div>
+                                ))}
                             </div>
                         </div>
-                        {/* Botones de Acción */}
-                        <section className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
-                            <div className=" flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={handleSave}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => { handleClear(); setActiveTab(0) }}
-                                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faBroom} /> Limpiar
-                                </button>
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span className="font-bold italic text-base mb-1">Imprimir</span>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        name="norden"
-                                        value={form.norden}
-                                        onChange={handleChange}
-                                        className="border rounded px-2 py-1 text-base w-24"
-                                    />
+                    </SectionFieldset>
+                </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={handlePrint}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faPrint} />
-                                    </button>
-                                </div>
+                {/* ===== PANEL LATERAL: AGUDEZA VISUAL (solo lectura: datos de Oftalmología) ===== */}
+                <div className="space-y-3 min-w-0">
+                    <SectionFieldset legend="Agudeza Visual - Sin Corregir" className="grid grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <div className="font-semibold text-center">O.D</div>
+                            <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
+                            <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="font-semibold text-center">O.I</div>
+                            <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
+                            <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
+                        </div>
+                    </SectionFieldset>
+
+                    <SectionFieldset legend="Agudeza Visual - Corregida" className="space-y-3">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                                <div className="font-semibold text-center">O.D</div>
+                                <InputTextOneLine label="V.C." name="vcCorregidaOD" value={form?.vcCorregidaOD} disabled labelWidth="35px" />
+                                <InputTextOneLine label="V.L." name="vlCorregidaOD" value={form?.vlCorregidaOD} disabled labelWidth="35px" />
                             </div>
-                        </section>
-                    </div>
+                            <div className="space-y-3">
+                                <div className="font-semibold text-center">O.I</div>
+                                <InputTextOneLine label="V.C." name="vcCorregidaOI" value={form?.vcCorregidaOI} disabled labelWidth="35px" />
+                                <InputTextOneLine label="V.L." name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled labelWidth="35px" />
+                            </div>
+                        </div>
+                        <InputTextOneLine label="V.Clrs" name="vclrs" value={form?.vclrs} disabled labelWidth="45px" />
+                        <InputTextOneLine label="V.B." name="vb" value={form?.vb} disabled labelWidth="45px" />
+                        <InputTextOneLine label="R.P." name="rp" value={form?.rp} disabled labelWidth="45px" />
+                    </SectionFieldset>
+
+                    <SectionFieldset legend="Enfermedades Oculares">
+                        <InputTextArea name="enfermedadesOculares" value={form?.enfermedadesOculares} rows={6} disabled />
+                    </SectionFieldset>
                 </div>
             </div>
 
-            {/* Panel lateral de Agudeza Visual - 20% */}
-            <div className="w-1/5">
-                <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                    <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
-                    {/* Sin Corregir */}
-                    <div className="mb-4">
-                        <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="">
-                                <div className="font-semibold mb-2 text-center">O.D</div>
-                                <div className="space-y-3">
-                                    <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
-                                    <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
-                                </div>
-                            </div>
-                            <div className="">
-                                <div className="font-semibold mb-2 text-center">O.I</div>
-                                <div className="space-y-3">
-                                    <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
-                                    <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
 
-                    {/* Corregida */}
-                    <div className="mb-4">
-                        <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
-                        {/* Fila OD y OI */}
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                                <div className="font-semibold mb-2 text-center">O.D</div>
-                                <InputTextOneLine
-                                    label="V.C."
-                                    name="vcCorregidaOD"
-                                    value={form?.vcCorregidaOD}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    label="V.L."
-                                    name="vlCorregidaOD"
-                                    value={form?.vlCorregidaOD}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <div className="font-semibold mb-2 text-center">O.I</div>
-                                <InputTextOneLine
-                                    label="V.C."
-                                    name="vcCorregidaOI"
-                                    value={form?.vcCorregidaOI}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    label="V.L."
-                                    name="vlCorregidaOI"
-                                    value={form?.vlCorregidaOI}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                            </div>
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={limpiarTodo}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
+
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
                         </div>
-                        {/* Fila extra (ancho completo) */}
-                        <div className="mt-4 space-y-3">
-                            <InputTextOneLine
-                                label="V.Clrs"
-                                name="vclrs"
-                                value={form?.vclrs}
-                                disabled
-                                className="flex-1 w-full"
-                                labelWidth="35px"
-                            />
-                            <InputTextOneLine
-                                name="vb"
-                                label="V.B."
-                                value={form?.vb}
-                                disabled
-                                className="flex-1 w-full"
-                                labelWidth="35px"
-                            />
-                            <InputTextOneLine
-                                label="R.P."
-                                name="rp"
-                                value={form?.rp}
-                                disabled
-                                className="flex-1 w-full"
-                                labelWidth="35px"
-                            />
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
                         </div>
                     </div>
-                    {visualerOpen && (
-                        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-                            <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-                                <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                                    <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                                    <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-                                </div>
-                                <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                                    <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-                                </div>
-                                <div className="flex justify-center">
-                                    <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                                        <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {/* Enfermedades Oculares */}
-                    <InputTextArea label="Enfermedades Oculares" rows={6} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
                 </div>
-            </div>
+            )}
         </div>
     );
 }

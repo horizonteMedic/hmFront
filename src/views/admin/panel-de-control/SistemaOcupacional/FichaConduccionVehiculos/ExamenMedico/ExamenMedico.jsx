@@ -4,7 +4,7 @@ import {
     InputsBooleanRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function ExamenMedico({ form, handleChange, handleRadioButtonBoolean }) {
+export default function ExamenMedico({ form, handleChange, handleRadioButtonBoolean, disabled = false, isFieldEdited = () => false, revertField = () => { } }) {
     return (
         <div className="p-4 space-y-6">
             {/* Medidas Antropométricas y Signos Vitales */}
@@ -109,6 +109,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="limitacionFuerzaExtremidades"
                                 value={form?.limitacionFuerzaExtremidades}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("limitacionFuerzaExtremidades")}
+                                onRevert={() => revertField("limitacionFuerzaExtremidades")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -117,6 +120,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="alteracionEquilibrioRomberg"
                                 value={form?.alteracionEquilibrioRomberg}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alteracionEquilibrioRomberg")}
+                                onRevert={() => revertField("alteracionEquilibrioRomberg")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -125,6 +131,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadMarchaOjosCerrados"
                                 value={form?.anormalidadMarchaOjosCerrados}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadMarchaOjosCerrados")}
+                                onRevert={() => revertField("anormalidadMarchaOjosCerrados")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -133,6 +142,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="alteracionCoordinacionDedoNariz"
                                 value={form?.alteracionCoordinacionDedoNariz}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alteracionCoordinacionDedoNariz")}
+                                onRevert={() => revertField("alteracionCoordinacionDedoNariz")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -141,6 +153,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="asimetriaFacial"
                                 value={form?.asimetriaFacial}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("asimetriaFacial")}
+                                onRevert={() => revertField("asimetriaFacial")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -149,6 +164,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="sustentacionUnPie"
                                 value={form?.sustentacionUnPie}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("sustentacionUnPie")}
+                                onRevert={() => revertField("sustentacionUnPie")}
                             />
                         </div>
                     </div>
@@ -160,6 +178,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="presenciaNistagmus"
                                 value={form?.presenciaNistagmus}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("presenciaNistagmus")}
+                                onRevert={() => revertField("presenciaNistagmus")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -168,6 +189,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadMovimientosOculares"
                                 value={form?.anormalidadMovimientosOculares}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadMovimientosOculares")}
+                                onRevert={() => revertField("anormalidadMovimientosOculares")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -176,6 +200,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="pupilasNoCirla"
                                 value={form?.pupilasNoCirla}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("pupilasNoCirla")}
+                                onRevert={() => revertField("pupilasNoCirla")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -184,6 +211,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadLenguaje"
                                 value={form?.anormalidadLenguaje}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadLenguaje")}
+                                onRevert={() => revertField("anormalidadLenguaje")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -192,6 +222,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                                 name="movimientosInvoluntarios"
                                 value={form?.movimientosInvoluntarios}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("movimientosInvoluntarios")}
+                                onRevert={() => revertField("movimientosInvoluntarios")}
                             />
                         </div>
                     </div>
@@ -205,6 +238,9 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                     name="detalleInformacionExamenMedico"
                     value={form?.detalleInformacionExamenMedico}
                     onChange={handleChange}
+                    disabled={disabled}
+                    edited={isFieldEdited("detalleInformacionExamenMedico")}
+                    onRevert={() => revertField("detalleInformacionExamenMedico")}
                     rows={4}
                 />
             </div>
