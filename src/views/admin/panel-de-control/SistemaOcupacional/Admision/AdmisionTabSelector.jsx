@@ -46,7 +46,7 @@ export default function AdmisionTabSelector({
         },
         {
             id: 2,
-            permission: "Acceso a Examenes Pre",
+            permission: "Acceso a Examenes Pre La Arena",
             label: "Apertura Exámenes La Arena",
             component: AperturaExamenesLaArena,
             props: propsApertura,
