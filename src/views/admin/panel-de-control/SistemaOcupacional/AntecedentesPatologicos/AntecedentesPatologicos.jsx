@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faStethoscope, faFileMedical } from "@fortawesome/free-solid-svg-icons";
 import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/AntecedentesPatologicosTab"
@@ -17,9 +17,15 @@ import { useForm } from "../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
 import { buildAuditoria } from "../../../../utils/auditoriaUtils";
-import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  TABLA_ANTECEDENTES_PATOLOGICOS,
+  UpdateDataService,
+  VerifyTR,
+} from "./controllerAntecedentesPatologicos";
 
-const tabla = "antecedentes_patologicos"
+const tabla = TABLA_ANTECEDENTES_PATOLOGICOS;
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 // Las casillas (enfermedades, síntomas, vacunas, agentes) solo respetan el bloqueo general.
@@ -85,14 +91,17 @@ const CAMPOS_EDITABLES = [
 ];
 
 // Tab Normal de Antecedentes Patológicos
-export default function AntecedentesPatologicos() {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// no guarda su borrador, sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar los antecedentes.
+export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
+  const embebido = Boolean(nOrdenInicial);
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
     //PRIMERA TAB==========================================================================
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codigoAntecedentesPatologicos_cod_ap: null,
     fechaExam: today,
     nombres: "",
@@ -379,7 +388,7 @@ export default function AntecedentesPatologicos() {
     handleClearnotO,
     handlePrintDefault,
     handleChangeNumberDecimals,
-  } = useForm(initialFormState, { storageKey: "antecedentes_patologicos" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "antecedentes_patologicos" });
 
   const {
     edicionHabilitada,
@@ -427,7 +436,7 @@ export default function AntecedentesPatologicos() {
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
   const hayRegistroCargado = Boolean(form.nombres || form.dni);
-  const nordenDisabled = hayRegistroCargado;
+  const nordenDisabled = embebido || hayRegistroCargado;
 
   // El error del N° Orden se muestra solo tras intentar guardar y se limpia cuando ya hay un paciente cargado.
   const ordenError = errors.norden && !hayRegistroCargado ? errors.norden : "";
@@ -440,20 +449,30 @@ export default function AntecedentesPatologicos() {
     return Object.keys(next).length === 0;
   };
 
-  const handleSave = () => {
-    if (!validateForm()) return;
-    SubmitDataService(form, token, userlogued, handleClearForm, tabla, datosFooter);
-  };
-
-  const handleEdit = () => {
-    if (!validateForm()) return;
-    UpdateDataService(form, token, userlogued, handleClearForm, tabla, datosFooter);
-  };
-
   const handleClearForm = () => {
     setErrors({});
     handleClear();
   };
+
+  // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+  const alRegistrar = embebido ? () => onGuardado?.() : handleClearForm;
+
+  const handleSave = () => {
+    if (!validateForm()) return;
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+  };
+
+  const handleEdit = () => {
+    if (!validateForm()) return;
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+  };
+
+  // Incrustado: abre la orden recibida (si aún no hay registro ofrece copiar uno anterior; si ya existe, sus datos)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
+    }
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   // ===== Búsqueda con boton =====
   const executeSearch = () => {
@@ -495,13 +514,22 @@ export default function AntecedentesPatologicos() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[95%] mx-auto">
+    <div
+      className={
+        // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las secciones de dos columnas
+        // quedan muy angostas y desbordan, así que se apilan.
+        embebido
+          ? "space-y-3 px-4 max-[1599px]:[&>.grid]:grid-cols-1"
+          : "space-y-3 px-4 max-w-[95%] mx-auto"
+      }
+    >
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClearForm}
+        mostrarLimpiar={!embebido}
       />
 
       {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
@@ -518,7 +546,7 @@ export default function AntecedentesPatologicos() {
             className="w-full"
             error={ordenError}
           />
-          <SearchButton onClick={executeSearch} className="lg:hidden" />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
         <InputTextOneLine
           label="Fecha"
@@ -663,6 +691,8 @@ export default function AntecedentesPatologicos() {
         handlePrint={handlePrint}
         hideSave={form.tieneRegistro && !edicionHabilitada}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
       />
     </div>
   );
