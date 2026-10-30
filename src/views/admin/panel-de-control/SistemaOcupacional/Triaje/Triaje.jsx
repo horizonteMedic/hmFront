@@ -50,8 +50,6 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
     // Estado inicial del formulario
     const initialFormState = {
         // Tipo de paciente
-        ocupacional: true,
-        asistencial: false,
         recibo: false,
         nOrden: true,
         conclusionesCie10: "",
@@ -103,13 +101,14 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
     const [habilitarTR, setHabilitarTR] = useState(false);
     const [habilitarEdicion, setHabilitarEdicion] = useState(false);
     const [tablehc, setTablehc] = useState([]);
+    const [cargandoTabla, setCargandoTabla] = useState(true);
     const [hoveredRow, setHoveredRow] = useState(null);
     const [resumenFecha, setResumenFecha] = useState(today);
 
     // Cargar tabla inicial
     useEffect(() => {
         if (!embebido && form.codigo === '' && form.nombresBusqueda === '') {
-            GetTable(form.codigo, form.nombresBusqueda, selectedSede, token, setTablehc);
+            GetTable(form.codigo, form.nombresBusqueda, selectedSede, token, setTablehc, setCargandoTabla);
         }
     }, [embebido, form.codigo, form.nombresBusqueda, refresh, selectedSede, token]);
 
@@ -236,31 +235,9 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                 <form className="space-y-3 text-md" onSubmit={(e) => e.preventDefault()}>
                     {/* Sección: Tipo de paciente y búsqueda */}
                     <SectionFieldset legend="Información del Paciente" className="space-y-3">
+                        {/* Informativo: este Triaje es siempre ocupacional (el asistencial tiene su propio formulario) */}
                         <div className="flex gap-3 items-center">
-                            <InputCheckbox
-                                label="Ocupacional"
-                                name="ocupacional"
-                                checked={form.ocupacional}
-                                onChange={(e) => {
-                                    setForm((prev) => ({
-                                        ...prev,
-                                        ocupacional: e.target.checked,
-                                        asistencial: !e.target.checked,
-                                    }));
-                                }}
-                            />
-                            <InputCheckbox
-                                label="Asistencial"
-                                name="asistencial"
-                                checked={form.asistencial}
-                                onChange={(e) => {
-                                    setForm((prev) => ({
-                                        ...prev,
-                                        asistencial: e.target.checked,
-                                        ocupacional: !e.target.checked,
-                                    }));
-                                }}
-                            />
+                            <InputCheckbox label="Ocupacional" name="ocupacional" checked disabled />
                         </div>
                         <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
                             <InputTextOneLine
@@ -633,7 +610,7 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                 name="codigo"
                                 value={form.codigo}
                                 onKeyUp={(event) => {
-                                    SearchHC(event, form, setTablehc, selectedSede, token);
+                                    SearchHC(event, form, setTablehc, selectedSede, token, setCargandoTabla);
                                 }}
                                 onChange={handleCodigoChange}
                                 labelWidth="120px"
@@ -649,7 +626,8 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                         setTablehc,
                                         selectedSede,
                                         token,
-                                        debounceTimeout
+                                        debounceTimeout,
+                                        setCargandoTabla
                                     );
                                 }}
                                 labelWidth="120px"
@@ -727,7 +705,7 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                                 className="border border-gray-300 px-2 py-1 mb-1 text-center"
                                                 colSpan={7}
                                             >
-                                                Cargando...
+                                                {cargandoTabla ? 'Cargando...' : 'Sin resultados'}
                                             </td>
                                         </tr>
                                     )}
