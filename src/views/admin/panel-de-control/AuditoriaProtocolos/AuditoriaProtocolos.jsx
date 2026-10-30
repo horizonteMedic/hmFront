@@ -7,6 +7,8 @@ import ListaExamenes from "./components/ListaExamenes";
 import PacienteCard from "./components/PacienteCard";
 import PanelExamen from "./components/PanelExamen";
 import ResumenProgreso from "./components/ResumenProgreso";
+import { formularioDe } from "./config/formulariosExamen";
+import useAccesoFormularios from "./hooks/useAccesoFormularios";
 import useHojaRuta from "./hooks/useHojaRuta";
 import { resumirExamenes } from "./utils/progreso";
 
@@ -14,12 +16,23 @@ export default function AuditoriaProtocolos() {
     const navigate = useNavigate();
     const token = useAuthStore((state) => state.token);
     const { hoja, cargando, error, buscar, refrescar } = useHojaRuta(token);
+    const { puedeAbrir, avisarSinAcceso } = useAccesoFormularios();
     // Se guarda solo la clave del examen abierto: el examen se toma siempre de la hoja, así su estado está al día
     const [claveAbierta, setClaveAbierta] = useState(null);
 
     const examenes = useMemo(() => hoja?.areas.flatMap((area) => area.examenes) ?? [], [hoja]);
     const progreso = useMemo(() => resumirExamenes(examenes), [examenes]);
     const examenAbierto = examenes.find((examen) => examen.clave === claveAbierta);
+
+    // El pad del examen se ve igual tenga o no acceso; el permiso se pide al intentar abrir su formulario
+    const abrirExamen = (examen) => {
+        const formulario = formularioDe(examen);
+        if (!puedeAbrir(formulario)) {
+            avisarSinAcceso(formulario);
+            return;
+        }
+        setClaveAbierta(examen.clave);
+    };
 
     const buscarOrden = (orden) => {
         setClaveAbierta(null);
@@ -56,7 +69,7 @@ export default function AuditoriaProtocolos() {
                                 <ListaExamenes
                                     areas={hoja.areas}
                                     seleccionada={claveAbierta}
-                                    onSeleccionar={(examen) => setClaveAbierta(examen.clave)}
+                                    onSeleccionar={abrirExamen}
                                 />
                             </aside>
 
