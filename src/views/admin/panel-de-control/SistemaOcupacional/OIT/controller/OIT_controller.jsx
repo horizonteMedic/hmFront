@@ -1,11 +1,14 @@
 import { getFetch } from "../../../getFetch/getFetch";
 import Swal from "sweetalert2";
-import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
+import { construirBodyOIT, construirBodyOITSinDatos } from "./model";
 import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
 import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
 import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault, VerifyTRPerzonalizadoDefault } from "../../../../../utils/functionUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import { guardarRegistro, actualizarRegistro, validarSede } from "../../../../../utils/registroOcupacionalUtils";
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
+const registrarUrl = "/api/v01/ct/oit/registrarActualizarOit"
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_OIT = "oit";
@@ -66,6 +69,30 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
     return
   }
+
+  Loading('Validando datos')
+
+  // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+  if (sede) {
+    const { estado, descripcionSede } = await validarSede(nro, sede, token)
+    if (estado === "otraSede") {
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+        html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+      })
+      return
+    }
+    if (estado !== "ok") {
+      Swal.fire({
+        icon: "error",
+        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+      })
+      return
+    }
+  }
+
   VerifyTRPerzonalizadoDefault(
     nro,
     tabla,
@@ -125,6 +152,14 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, { silencioso = 
         SubirDoc: true,
         digitalizacion: res.digitalizacion,
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+        // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+        // OitReporteDTO aún no devuelve fecha de registro ni datos de edición: mientras tanto quedan vacíos.
+        fechaRegistro: res.fechaRegistro ?? "",
+        userRegistro: res.userRegistro ?? "",
+        fechaActualizacion: res.fechaActualizacion ?? "",
+        usuarioActualizacion: res.usuarioActualizacion ?? "",
+        tieneRegistro: true,
       }))
     })
     .finally(() => {
@@ -140,55 +175,50 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, { silencioso = 
     })
 }
 
-export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos', 'error')
-    return
-  }
-  Loading('Registrando Datos')
-  if (form.SinDatos) {
-    SubmitOITModelSinDatos(form, user, token)
-      .then((res) => {
-        console.log(res)
-        if (res.id === 1 || res.id === 0) {
-          Swal.fire({
-            title: 'Exito', text: `${res.mensaje}, \n¿Desea imprimir ? `, icon: 'success', showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-          }).then((result) => {
-            limpiar()
-            if (result.isConfirmed) {
-              PrintHojaSinDatos(form.norden, token, tabla)
-            }
-          })
-        } else {
-          Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
-        }
-      })
+// Body completo (creación / actualización). OitDTO usa `userRegistro` para el usuario que registra.
+// El reporte (GET) aún no devuelve la fecha de registro, así que al editar, si no se conoce el creador,
+// se manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(form.SinDatos ? construirBodyOITSinDatos(form) : construirBodyOIT(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro || user,
+    fechaRegistro: form.fechaRegistro,
+  })
 
-  } else {
-    console.log('formulario', form)
-    SubmitOITModel(form, user, token)
-      .then((res) => {
-        console.log(res)
-        if (res.id === 1 || res.id === 0) {
-          Swal.fire({
-            title: 'Exito', text: `${res.mensaje}, \n¿Desea imprimir ? `, icon: 'success', showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-          }).then((result) => {
-            limpiar()
-            if (result.isConfirmed) {
+// Este endpoint responde id 1 al registrar y 0 al actualizar.
+const idsExito = [0, 1]
 
-              PrintHojaR(form.norden, token, tabla)
-            }
-          })
-        } else {
-          Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
-        }
-      })
-  }
-}
+const imprimir = (form, token, tabla) => () =>
+  form.SinDatos ? PrintHojaSinDatos(form.norden, token, tabla) : PrintHojaR(form.norden, token, tabla)
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitOIT = (form, token, user, limpiar, tabla) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: imprimir(form, token, tabla),
+    idsExito,
+  })
+
+// ===== Editar (registro existente) =====
+export const UpdateOIT = (form, token, user, limpiar, tabla) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: imprimir(form, token, tabla),
+    idsExito,
+  })
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')

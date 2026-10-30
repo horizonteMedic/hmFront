@@ -3,13 +3,9 @@ import {
   faMicroscope,
   faTint,
   faHeartbeat,
-  faSave,
-  faBroom,
-  faPrint,
   faDownload,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
-import { getFetch } from "../../getFetch/getFetch";
 import Parenquimatosas from "./Parenquimatosas/Parenquimatosas";
 import Pleurales from "./Pleurales/Pleurales";
 import Engrosamiento from "./Engrosamiento/Engrosamiento";
@@ -21,6 +17,7 @@ import {
   PrintHojaSinDatos,
   ReadArchivosForm,
   SubmitOIT,
+  UpdateOIT,
   TABLA_OIT,
   VerifyTR,
 } from "./controller/OIT_controller";
@@ -29,16 +26,40 @@ import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import { getOITInitialFormState } from "./oitFormDefaults";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import {
+  getOITInitialFormState,
+  CAMPOS_OIT_PARENQUIMATOSAS,
+  CAMPOS_OIT_PLEURALES,
+  CAMPOS_OIT_ENGROSAMIENTO,
+} from "./oitFormDefaults";
 import CargaMasivaOIT from "./CargaMasivaOIT/CargaMasivaOIT";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import { useForm } from "../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+
 const tabla = TABLA_OIT;
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+// Las casillas de las pestañas se resaltan y revierten por pestaña (ver `tabs`).
+const CAMPOS_EDITABLES = [
+  "SinDatos",
+  "flectura",
+  "fradiografia",
+  "user_medicoFirma",
+  "nombre_medico",
+  ...CAMPOS_OIT_PARENQUIMATOSAS,
+  ...CAMPOS_OIT_PLEURALES,
+  ...CAMPOS_OIT_ENGROSAMIENTO,
+];
 
 // Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
 // sin carga masiva ni Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar el OIT.
@@ -48,26 +69,37 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
   const { token, userlogued, selectedSede, userName, userDNI } = useSessionData();
 
   const [activeTab, setActiveTab] = useState(0);
-  //const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
-  // const [form, setForm] = useState(
-  //   getOITInitialFormState({ today, userlogued, userName, userDNI })
-  // );
+
+  const estadoInicial = getOITInitialFormState({ today, userlogued, userName, userDNI });
 
   const {
-          form,
-          setForm,
-          handleChangeNumber,
-          handleChangeSimple,
-      } = useForm({
-        ...getOITInitialFormState({ today, userlogued, userName, userDNI }),
-        norden: embebido ? String(nOrdenInicial) : "",
-      });
+    form,
+    setForm,
+    handleChangeNumber,
+    handleChangeSimple,
+  } = useForm({
+    ...estadoInicial,
+    norden: embebido ? String(nOrdenInicial) : "",
+  });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se
+  // revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
   const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
   const handleClean = () => {
-    setForm(getOITInitialFormState({ today, userlogued, userName, userDNI }));
+    setForm(estadoInicial);
   };
 
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
@@ -79,11 +111,12 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
       VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
     }
   }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
-  console.log(form);
+
   const tabs = [
     {
       label: "Parenquimatosas",
       icon: faMicroscope,
+      campos: CAMPOS_OIT_PARENQUIMATOSAS,
       component: (
         <Parenquimatosas
           token={token}
@@ -97,6 +130,7 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
     {
       label: "Pleurales",
       icon: faTint,
+      campos: CAMPOS_OIT_PLEURALES,
       component: (
         <Pleurales
           token={token}
@@ -110,6 +144,7 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
     {
       label: "Engrosamiento",
       icon: faHeartbeat,
+      campos: CAMPOS_OIT_ENGROSAMIENTO,
       component: (
         <Engrosamiento
           token={token}
@@ -122,21 +157,13 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
     },
   ];
 
-  const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
-  };
-
-  // const handleChangeSimple = (e) => {
-  //   const { name, value } = e.target;
-  //   setForm((f) => ({ ...f, [name]: value }));
-  // };
-
+  const tabActiva = tabs[activeTab];
+  const tabEditada = (tab) => tab.campos.some(isFieldEdited);
 
   const handleset = () => {
-    const defaults = getOITInitialFormState({ today, userlogued, userName, userDNI });
     setForm((prev) => ({
       ...prev,
-      ...defaults,
+      ...estadoInicial,
       norden: prev.norden,
       aPruebaDeSoledad: prev.aPruebaDeSoledad,
       SinDatos: prev.SinDatos,
@@ -145,10 +172,40 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
     }));
   };
 
-  const handleSearch = (event) => {
-    if (event.key !== "Enter") return;
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
     handleset();
     VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
+  const handleSearch = (e) => {
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+  const hayRegistroExistente = form.tieneRegistro;
+
+  const handleSave = () => {
+    SubmitOIT(form, token, userlogued, alRegistrar, tabla);
+  };
+
+  const handleUpdate = () => {
+    UpdateOIT(form, token, userlogued, alRegistrar, tabla);
+  };
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...estadoInicial, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
   };
 
   const handlePrint = () => {
@@ -193,159 +250,133 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
     }
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   const [visualerOpen, setVisualerOpen] = useState(null)
+
+  // Propiedades comunes de un campo editable: bloqueo, resaltado al modificarlo y botón de revertir.
+  const editable = (name) => ({
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
 
   return (
     <div className="">
       <div className={embebido ? "" : "max-w-[95%] mx-auto"}>
         <h1 className="text-3xl font-bold mb-4 text-center">OIT</h1>
-        {!embebido && (
-          <div className="flex justify-end mb-2">
+
+        <AccionesRegistroHeader
+          tieneRegistro={form.tieneRegistro}
+          hayRegistroCargado={hayRegistroCargado}
+          edicionHabilitada={edicionHabilitada}
+          onHabilitarEdicion={habilitarEdicion}
+          onLimpiar={handleClean}
+          mostrarLimpiar={!embebido}
+        >
+          {!embebido && (
             <button
               type="button"
               onClick={() => setModalCargaMasiva(true)}
-              className="verde-btn px-4 py-2 rounded flex items-center gap-2"
+              className="pointer-events-auto verde-btn px-3 py-1.5 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faUpload} /> Carga Masiva
             </button>
+          )}
+        </AccionesRegistroHeader>
+
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-3">
+          <div className="flex gap-x-3 w-full">
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
+              onChange={handleChangeNumber}
+              onKeyUp={handleSearch}
+              disabled={embebido || hayRegistroCargado}
+              labelWidth="100px"
+              className="w-full"
+            />
+            {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
           </div>
-        )}
-        <div className=" border rounded-md p-4 shadow-sm bg-white">
-          <div className="flex flex-col space-y-3">
-            {/*1ra fila*/}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-              {/*Norden*/}
-              <InputTextOneLine
-                label="N° Orden"
-                name="norden"
-                value={form.norden}
-                onChange={handleChangeNumber}
-                onKeyUp={handleSearch}
-                disabled={embebido}
-                labelWidth="65px"
-                className="flex items-center gap-4"
-              />
-              {/*Lector*/}
-              <div className="flex items-center gap-4 lg:col-span-2">
-                <label className="font-semibold max-w-[65px] min-w-[65px]">
-                  Lector:
-                </label>
-                <input
-                  type="text"
-                  name="lector"
-                  value={form.doctor}
-                  id="lector"
-                  disabled
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              {/*Nro Placa*/}
-              <div className="flex items-center gap-4">
-                <label className="font-semibold max-w-[65px] min-w-[65px]">
-                  Nro Placa:
-                </label>
-                <input
-                  type="text"
-                  name="placa"
-                  id="placa"
-                  value={form.nplaca}
-                  disabled
-                  onChange={handleInputChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-            </div>
-            {/*2da fila */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-              <div className="flex items-center gap-4 md:col-span-2">
-                <label className="font-semibold max-w-[65px] min-w-[65px]">
-                  Nombre:
-                </label>
-                <input
-                  type="text"
-                  name="nombres"
-                  value={form.nombres}
-                  onChange={handleInputChange}
-                  disabled
-                  id="nombres"
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold max-w-[65px] min-w-[65px]">
-                  Edad:
-                </label>
-                <input
-                  type="text"
-                  name="edad"
-                  id="edad"
-                  value={form.edad}
-                  onChange={handleInputChange}
-                  disabled
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              <label className="flex gap-2 font-semibold ">
-                Sin Datos:
-                <input
-                  checked={form.SinDatos}
-                  onChange={() => {
-                    setForm((prev) => ({ ...prev, SinDatos: !form.SinDatos }));
-                  }}
-                  type="checkbox"
-                  name="SinDatos"
-                  id="SinDatos"
-                  className="ml-[28px]"
-                />
-              </label>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold max-w-[65px] min-w-[65px] ">
-                  Fecha de Lectura:
-                </label>
-                <input
-                  type="date"
-                  name="flectura"
-                  value={form.flectura}
-                  onChange={handleInputChange}
-                  id="flectura"
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              {/* <span className="text-sm text-gray-500 mt-1 mr-4">
-                Día - Mes - Año
-              </span> */}
-              <div className="flex items-center gap-4">
-                <label className="font-semibold max-w-[65px] min-w-[65px] ">
-                  Fecha de Radiografia:
-                </label>
-                <input
-                  type="date"
-                  name="fradiografia"
-                  value={form.fradiografia}
-                  onChange={handleInputChange}
-                  id="fradiografia"
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              {/* <span className="text-sm text-gray-500 mt-1 mr-4">
-                Día - Mes - Año
-              </span> */}
-              <ButtonsPDF
-                {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
-                {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-                handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
-              />
-            </div>
+          <InputTextOneLine
+            label="Lector"
+            name="lector"
+            value={form.doctor}
+            disabled
+            labelWidth="100px"
+            className="xl:col-span-2"
+          />
+          <InputTextOneLine
+            label="Nro Placa"
+            name="placa"
+            value={form.nplaca}
+            disabled
+            labelWidth="100px"
+          />
+          <InputTextOneLine
+            label="Nombre"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            labelWidth="100px"
+            className="xl:col-span-2"
+          />
+          <InputTextOneLine
+            label="Edad"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="100px"
+          />
+          <div className="flex items-center gap-2">
+            <InputCheckbox
+              label="Sin Datos"
+              labelRight={false}
+              name="SinDatos"
+              checked={form.SinDatos}
+              disabled={camposDeshabilitados}
+              onChange={() => setForm((prev) => ({ ...prev, SinDatos: !prev.SinDatos }))}
+              className="font-semibold"
+            />
+            {isFieldEdited("SinDatos") && (
+              <RevertButton onClick={() => revertField("SinDatos")} title="Revertir cambio" />
+            )}
           </div>
-        </div>
+          <InputTextOneLine
+            label="Fecha de Lectura"
+            name="flectura"
+            type="date"
+            value={form.flectura}
+            onChange={handleChangeSimple}
+            labelWidth="100px"
+            {...editable("flectura")}
+          />
+          <InputTextOneLine
+            label="Fecha de Radiografía"
+            name="fradiografia"
+            type="date"
+            value={form.fradiografia}
+            onChange={handleChangeSimple}
+            labelWidth="100px"
+            {...editable("fradiografia")}
+          />
+          <ButtonsPDF
+            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
+            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
+          />
+        </SectionFieldset>
 
         {/* Tabs */}
         <div className="flex space-x-1 overflow-x-auto mt-4">
           {tabs.map((tab, idx) => (
             <button
               key={idx}
+              type="button"
               onClick={() => setActiveTab(idx)}
               className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${activeTab === idx
                 ? "bg-[#233245] text-white font-bold"
@@ -354,6 +385,12 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
             >
               <FontAwesomeIcon icon={tab.icon} className="mr-2" />
               {tab.label}
+              {tabEditada(tab) && (
+                <span
+                  className="ml-2 w-2.5 h-2.5 rounded-full bg-orange-500"
+                  title="Pestaña con cambios"
+                />
+              )}
             </button>
           ))}
         </div>
@@ -376,84 +413,62 @@ const OIT = ({ nOrdenInicial, onGuardado }) => {
           </div>
         )}
 
-
-
-        {/* Active Content */}
+        {/* Active Content: el fieldset bloquea las casillas de la pestaña mientras el registro no esté habilitado */}
         <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
-          {tabs[activeTab].component}
+          {tabEditada(tabActiva) && (
+            <div className="flex items-center justify-end gap-2 mb-3 text-sm text-orange-700">
+              <span>Esta pestaña tiene cambios sin guardar</span>
+              <RevertButton
+                onClick={() => revertFields(tabActiva.campos)}
+                title="Revertir los cambios de esta pestaña"
+              />
+            </div>
+          )}
+          <fieldset disabled={camposDeshabilitados} className="min-w-0">
+            {tabActiva.component}
+          </fieldset>
         </div>
 
-        <SectionFieldset legend="Asignación de Médico">
+        <SectionFieldset legend="Asignación de Médico" className="mt-3">
           <EmpleadoComboBox
             value={form.nombre_medico}
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
           />
         </SectionFieldset>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 px-4">
-          <div className="flex gap-4">
-            {form.aPruebaDeSoledad && (
-              <button
-                type="button"
-                onClick={() => {
+        {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+        {hayRegistroCargado && (
+          <AuditoriaRegistro
+            className="mt-3"
+            mostrarEdicion={form.tieneRegistro}
+            fechaCreacion={auditoria.fechaCreacion}
+            fechaEdicion={auditoria.fechaActualizacion}
+            usuarioRegistro={auditoria.usuarioRegistro}
+            usuarioEdicion={auditoria.usuarioActualizacion}
+          />
+        )}
 
-                  SubmitOIT(form, token, userlogued, alRegistrar, tabla);
-                }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-              </button>
-            )}
-            {!embebido && (
-              <button
-                type="button"
-                onClick={handleClean}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            )}
-          </div>
-          {/* <div className="flex gap-1 items-center">
-            <label htmlFor="">Imprimir: </label>
-            <input
-              className="border rounded px-2 py-1 w-24"
-              name="norden"
-              value={form.norden}
-              onChange={handleInputChange}
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div> */}
-
-          {!embebido && (
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleInputChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
-          )}
+        {/* ===== BOTONES DE ACCIÓN ===== */}
+        <div className="pt-4">
+          <BotonesForm
+            form={form}
+            onNordenChange={handlePrintNordenChange}
+            handleSave={hayRegistroExistente && edicionHabilitada ? handleUpdate : handleSave}
+            saveLabel={hayRegistroExistente && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+            handleEdit={habilitarEdicion}
+            handleClear={handleClean}
+            handlePrint={handlePrint}
+            hideSave={!form.aPruebaDeSoledad || (hayRegistroExistente && !edicionHabilitada)}
+            hideEdit={!hayRegistroExistente || edicionHabilitada}
+            hideClear={embebido}
+            hidePrint={embebido}
+            printLabel="Imprimir"
+          />
         </div>
       </div>
 

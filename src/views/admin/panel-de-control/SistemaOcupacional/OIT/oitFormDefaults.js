@@ -186,7 +186,26 @@ export const getOITInitialFormState = ({ today, userlogued, userName, userDNI })
   // Médico que Certifica //BUSCADOR
   nombre_medico: userName,
   user_medicoFirma: userlogued,
+
+  // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+  tieneRegistro: false,
+
+  // Auditoría
+  userRegistro: "",
+  fechaRegistro: "",
+  usuarioActualizacion: "",
+  fechaActualizacion: "",
 });
+
+// Campos de cada pestaña (para resaltar/revertir los cambios por pestaña al editar un registro).
+const clavesOIT = Object.keys(getOITInitialFormState({}));
+const camposOIT = (patron) => clavesOIT.filter((clave) => patron.test(clave));
+
+export const CAMPOS_OIT_PARENQUIMATOSAS = camposOIT(
+  /^(rb|anormalidades_parenquimatosas_|txtDefectosTecnicos$|chk\d{1,2}[DI]?$|chk[PS]\d$|chk[oabc]$)/
+);
+export const CAMPOS_OIT_PLEURALES = camposOIT(/^(chk2Si|chk2No|chkE\d|chk2_\d+)$/);
+export const CAMPOS_OIT_ENGROSAMIENTO = camposOIT(/^(chk3Si|chk3No|chk_\d+|txtSComentarios|opcionSComentario)$/);
 
 // Para registros de carga masiva cuyo COMENTARIO (conclusionesRadiograficas)
 // es distinto de "TÓRAX SIN ALTERACIONES": se conservan los valores por defecto
