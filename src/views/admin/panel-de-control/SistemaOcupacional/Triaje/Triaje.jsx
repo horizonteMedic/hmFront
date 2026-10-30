@@ -1,6 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBroom, faPencil, faSave } from '@fortawesome/free-solid-svg-icons';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
     InputTextArea,
     InputTextAreaUpper,
@@ -9,6 +7,7 @@ import {
     CIE10List,
 } from '../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../components/reusableComponents/SectionFieldset';
+import BotonesForm from '../../../../components/templates/BotonesForm';
 import { useForm } from '../../../../hooks/useForm';
 import { useSessionData } from '../../../../hooks/useSessionData';
 import { getToday } from '../../../../utils/helpers';
@@ -100,10 +99,19 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
     const [, setHabilitar] = useState(true);
     const [habilitarTR, setHabilitarTR] = useState(false);
     const [habilitarEdicion, setHabilitarEdicion] = useState(false);
+    const [tieneRegistro, setTieneRegistro] = useState(false);
     const [tablehc, setTablehc] = useState([]);
     const [cargandoTabla, setCargandoTabla] = useState(true);
     const [hoveredRow, setHoveredRow] = useState(null);
     const [resumenFecha, setResumenFecha] = useState(today);
+
+    // Los controllers avisan con `true` al cargar un triaje existente: hay registro y sus campos quedan bloqueados
+    // hasta "Habilitar edición". Con `false` (limpiar / orden nueva / tras guardar) vuelve al estado de registro nuevo.
+    const setRegistroCargado = useCallback((cargado) => {
+        setTieneRegistro(cargado);
+        setHabilitarTR(cargado);
+        setHabilitarEdicion(false);
+    }, []);
 
     // Cargar tabla inicial
     useEffect(() => {
@@ -115,9 +123,9 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
     // Incrustado: busca la orden recibida (datos del paciente si aún no hay triaje; si ya existe, sus resultados)
     useEffect(() => {
         if (embebido) {
-            VerifyTR({ nro: String(nOrdenInicial) }, getFetch, token, setForm, selectedSede, setHabilitarTR, setHabilitar);
+            VerifyTR({ nro: String(nOrdenInicial) }, getFetch, token, setForm, selectedSede, setRegistroCargado, setHabilitar);
         }
-    }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
+    }, [embebido, nOrdenInicial, selectedSede, token, setForm, setRegistroCargado]);
 
     // Handlers específicos
     const handleTriajeChange = (e) => {
@@ -156,6 +164,7 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
     };
 
     const refreshtable = () => {
+        setRegistroCargado(false);
         setRefresh((prev) => prev + 1);
         onGuardado?.();
     };
@@ -179,7 +188,7 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
             setForm,
             getFetch,
             token,
-            setHabilitarTR,
+            setRegistroCargado,
             setHabilitar
         );
     };
@@ -249,13 +258,14 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                 onKeyUp={(event) => {
                                     if (event.key === 'Enter') {
                                         handleTR();
+                                        setRegistroCargado(false);
                                         VerifyTR(
                                             form,
                                             getFetch,
                                             token,
                                             setForm,
                                             selectedSede,
-                                            setHabilitarTR,
+                                            setRegistroCargado,
                                             setHabilitar
                                         );
                                     }
@@ -367,7 +377,7 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                 name="fechaExamen"
                                 value={form.fechaExamen}
                                 onChange={handleChange}
-                                disabled={!habilitarEdicion}
+                                disabled={habilitarTR}
                                 labelWidth="120px"
                             />
                         </div>
@@ -549,52 +559,38 @@ export default function Triaje({ nOrdenInicial, onGuardado }) {
                                 additionalDelimiter={"\n"}
                             />
                         </div>
-                        <section className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
-                            <div className="flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setHabilitarEdicion(true);
-                                        setHabilitarTR(false);
-                                    }}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPencil} /> Editar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        handleSubmit(
-                                            form,
-                                            form.edad,
-                                            form.nro,
-                                            form.fechaExamen,
-                                            Swal,
-                                            token,
-                                            setForm,
-                                            refreshtable,
-                                            getFetch,
-                                            setHabilitar
-                                        );
-                                    }}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                                </button>
-                                {!embebido && (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            Clean(setForm);
-                                            setHabilitarEdicion(false);
-                                        }}
-                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
-                                    </button>
-                                )}
-                            </div>
-                        </section>
+                        <div className="pt-4">
+                            <BotonesForm
+                                form={form}
+                                handleSave={() => {
+                                    handleSubmit(
+                                        form,
+                                        form.edad,
+                                        form.nro,
+                                        form.fechaExamen,
+                                        Swal,
+                                        token,
+                                        setForm,
+                                        refreshtable,
+                                        getFetch,
+                                        setHabilitar
+                                    );
+                                }}
+                                saveLabel={tieneRegistro && habilitarEdicion ? 'Guardar Cambios' : 'Guardar'}
+                                handleEdit={() => {
+                                    setHabilitarEdicion(true);
+                                    setHabilitarTR(false);
+                                }}
+                                handleClear={() => {
+                                    Clean(setForm);
+                                    setRegistroCargado(false);
+                                }}
+                                hideSave={tieneRegistro && !habilitarEdicion}
+                                hideEdit={!tieneRegistro || habilitarEdicion}
+                                hideClear={embebido}
+                                hidePrint
+                            />
+                        </div>
                     </SectionFieldset>
                 </form>
             </div>
