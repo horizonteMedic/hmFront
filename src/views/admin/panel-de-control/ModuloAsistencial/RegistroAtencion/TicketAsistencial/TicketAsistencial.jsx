@@ -10,6 +10,7 @@ import SectionFieldset from "../../../../../components/reusableComponents/Sectio
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useEsSedeLaArena } from "../../../../../hooks/useLaArena";
 import { getToday, getEdadDesdeFecha } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
@@ -385,6 +386,12 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
     const { token, userlogued, userCompleto, selectedSede, userName } = useSessionData();
 
+    // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
+    // Lo define la sede con la que se registra el ticket (LARE; no es un dato del formulario, así que
+    // no se persiste ni se limpia ni hay un check manual). Se guarda en el ticket (esArena) y de ahí lo
+    // toman Triaje y las Historias Clínicas.
+    const esArena = useEsSedeLaArena();
+
     const initialFormState = {
         // Datos básicos
         tipoDocumento: "DNI",
@@ -395,10 +402,6 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         NHCL: "",
         nroTicket: "",
         codVendedor: "",
-
-        // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
-        // Se guarda en el ticket (esArena) y de ahí lo toman Triaje y las Historias Clínicas.
-        esArena: false,
 
         cargo: "",
         area: "",
@@ -433,7 +436,6 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         handleChange,
         handleChangeNumberDecimals,
         handleChangeSimple,
-        handleCheckBoxChange,
         handleClear,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "ticketAsistencial" });
@@ -450,13 +452,12 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
     // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado, así que el
-    // formulario se limpia por completo y solo conserva el nuevo tipo elegido (y el modo La Arena,
-    // que no es un dato del paciente).
+    // formulario se limpia por completo y solo conserva el nuevo tipo elegido.
     const handleTipoDocumentoChange = (e, value) => {
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
-        setForm({ ...initialFormState, tipoDocumento: value, esArena: form.esArena });
+        setForm({ ...initialFormState, tipoDocumento: value });
     };
 
     // Precarga del paciente recién guardado en la pestaña Registro: DNI/Pasaporte quedan escritos
@@ -474,12 +475,11 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
-        setForm((f) => ({
+        setForm({
             ...initialFormState,
-            esArena: f.esArena,
             tipoDocumento: sinDocumento ? "SIN DNI" : tipoDocumento,
             documentoIdentidad: sinDocumento ? "" : numeroDocumento,
-        }));
+        });
         setPrecarga((p) => ({
             key: p.key + 1,
             textoSinDni: sinDocumento ? `${apellidos} ${nombres}`.trim() : "",
@@ -686,11 +686,11 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
     // Todos los campos son obligatorios, excepto los de la sección "Agregar Servicios Ticket"
     // (esos solo alimentan la tabla; lo obligatorio ahí es tener al menos un ítem). Con
-    // "La Arena" marcado no se piden código de vendedor, método de pago, autorizado por ni servicios.
+    // la sede La Arena no se piden código de vendedor, método de pago, autorizado por ni servicios.
     const validateForm = () => {
         const next = {};
         if (!form.empresa?.trim()) next.empresa = "La empresa es obligatoria.";
-        if (!form.esArena) {
+        if (!esArena) {
             if (!form.metodoPago) next.metodoPago = "El método de pago es obligatorio.";
             if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
             if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
@@ -713,8 +713,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             return;
         }
         if (!validateForm()) return;
-        // Con La Arena marcado esos campos están ocultos: aunque tengan datos de antes, no se envían.
-        const esArena = !!form.esArena;
+        // Con la sede La Arena esos campos están ocultos: aunque tengan datos de antes, no se envían.
         if (!esArena && !form.ticketItems?.length) {
             Swal.fire("Error", "Agregue al menos un servicio al ticket.", "error");
             return;
@@ -782,28 +781,13 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             cancelButtonText: "No imprimir",
         }).then((result) => {
             if (!result.isConfirmed) return;
-            if (esArena) imprimirTicketA4(numeroTicketCreado);
-            else imprimirTicketVenta(numeroTicketCreado);
+            imprimirTicket(numeroTicketCreado);
         });
     };
 
-    // Arma e imprime el ticket de venta de 80mm (Horizonte Medic). Todos los datos -incluidos
-    // los del paciente (nombre/documento/edad)- se traen de GET /api/tickets/numero/{n}, el
-    // registro ya persistido; nunca del formulario en pantalla, porque al reimprimir un ticket
-    // anterior desde el input de "Imprimir" el formulario puede estar vacío o tener cargado
-    // otro paciente distinto. Se usa tanto al confirmar impresión justo después de registrar,
-    // como desde el botón "Imprimir" para reimprimir un ticket ya registrado.
-    const imprimirTicketVenta = async (numeroTicket) => {
-        const numero = numeroTicket ?? form.nroTicket;
-        if (!numero) return false;
-
-        const ticket = await ObtenerTicketPorNumero(numero, token);
-
-        if (!ticket) {
-            Swal.fire("Error", `No existe un ticket registrado con el N° ${numero}.`, "error");
-            return false;
-        }
-
+    // Arma e imprime el ticket de venta de 80mm (Horizonte Medic) a partir del ticket ya
+    // persistido (ver imprimirTicket).
+    const imprimirTicketVenta = (ticket) => {
         TicketVenta({
             tipoDocumento: "DNI",
             documentoIdentidad: ticket.pacienteDni,
@@ -823,24 +807,12 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                 descuento: c.descuentoLinea,
             })),
         });
-        return true;
     };
 
-    // Imprime el ticket en hoja A4 con solo los datos del formulario (sin servicios). Igual que
-    // el de 80mm, parte del ticket ya persistido (GET /api/tickets/numero/{n}); la historia
+    // Imprime el ticket en hoja A4 con solo los datos del ticket (sin servicios). La historia
     // clínica y el tipo de documento no vienen en el ticket, así que se completan con la ficha
     // del paciente (si esa consulta falla, el reporte sale igual sin esos dos datos).
-    const imprimirTicketA4 = async (numeroTicket) => {
-        const numero = numeroTicket ?? form.nroTicket;
-        if (!numero) return false;
-
-        const ticket = await ObtenerTicketPorNumero(numero, token);
-
-        if (!ticket) {
-            Swal.fire("Error", `No existe un ticket registrado con el N° ${numero}.`, "error");
-            return false;
-        }
-
+    const imprimirTicketA4 = async (ticket) => {
         const paciente = await ObtenerPacientePorId(ticket.pacienteId, token);
 
         TicketAsistencialA4({
@@ -859,17 +831,39 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             autorizadoPor: AUTORIZADO_POR.find((a) => a.value === ticket.autoriza)?.label ?? ticket.autoriza,
             medico: ticket.medico,
         });
+    };
+
+    // Todos los datos -incluidos los del paciente (nombre/documento/edad)- se traen de
+    // GET /api/tickets/numero/{n}, el registro ya persistido; nunca del formulario en pantalla,
+    // porque al reimprimir un ticket anterior desde el input de "Imprimir" el formulario puede
+    // estar vacío o tener cargado otro paciente distinto. El formato lo define el esArena del
+    // propio ticket (La Arena sale solo en A4; el resto, solo el ticket de 80mm), no la sede con
+    // la que se está trabajando ahora. Se usa tanto al confirmar impresión justo después de
+    // registrar, como desde el botón "Imprimir" para reimprimir un ticket ya registrado.
+    const imprimirTicket = async (numeroTicket) => {
+        const numero = numeroTicket ?? form.nroTicket;
+        if (!numero) return false;
+
+        const ticket = await ObtenerTicketPorNumero(numero, token);
+
+        if (!ticket) {
+            Swal.fire("Error", `No existe un ticket registrado con el N° ${numero}.`, "error");
+            return false;
+        }
+
+        if (ticket.esArena) await imprimirTicketA4(ticket);
+        else imprimirTicketVenta(ticket);
         return true;
     };
 
-    const handleImprimirTicket = async (formato = "80mm") => {
+    const handleImprimirTicket = async () => {
         const numero = String(form.nroTicket ?? "").trim();
         if (!numero) {
             setErrorImprimirTicket("Debe ingresar un N° de Ticket.");
             return;
         }
         setErrorImprimirTicket("");
-        const ok = formato === "a4" ? await imprimirTicketA4(numero) : await imprimirTicketVenta(numero);
+        const ok = await imprimirTicket(numero);
         if (!ok) {
             setErrorImprimirTicket(`El N° de Ticket "${numero}" no existe.`);
         }
@@ -885,9 +879,6 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     // el documento que el usuario está tipeando.
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
 
-    // La Arena imprime solo en hoja A4; los demás clientes, solo el ticket de 80mm.
-    const formatoImpresion = form.esArena ? "a4" : "80mm";
-
     // Casillas de edad según el paciente cargado (fechaNacimiento viene de su registro en
     // RegistroAsistencial). Sin paciente no se marca ninguna; los menores de 18 tampoco marcan
     // ADULTO (< 5 AÑOS / ADOLESCENTE siguen sin autocompletarse).
@@ -899,7 +890,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
             <SectionFieldset
                 legend="Información del Examen"
-                className={`grid ${form.esArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
+                className={`grid ${esArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
             >
                 <InputsRadioGroup
                     name="tipoDocumento"
@@ -951,7 +942,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     disabled
                     onKeyUp={handleSearch}
                 />
-                {!form.esArena && (
+                {!esArena && (
                     <InputTextOneLine
                         label="Código Vendedor"
                         name="codVendedor"
@@ -962,13 +953,6 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                         error={errors.codVendedor}
                     />
                 )}
-                <InputCheckbox
-                    label="La Arena"
-                    name="esArena"
-                    checked={form.esArena}
-                    onChange={handleCheckBoxChange}
-                    className="font-semibold w-fit"
-                />
             </SectionFieldset>
 
             <SectionFieldset legend="Datos" className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-3">
@@ -1002,7 +986,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     labelWidth="120px"
                     onChange={handleChange}
                 />
-                {!form.esArena && (
+                {!esArena && (
                     <>
                         <SelectField
                             label="Método de pago"
@@ -1069,7 +1053,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                 />
             </SectionFieldset>
 
-            {!form.esArena && (<>
+            {!esArena && (<>
             <SectionFieldset legend="Agregar Servicios Ticket" className="grid grid-cols-1 xl:grid-cols-[1fr_150px] gap-x-6 gap-y-3">
                 <div className="grid grid-cols-1 gap-y-3">
                     <div className="flex items-center gap-2">
@@ -1233,13 +1217,13 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                                     setErrorImprimirTicket("");
                                     handleChangeNumberDecimals(e);
                                 }}
-                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket(formatoImpresion)}
+                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket()}
                                 className={`border rounded px-2 py-1 text-base w-24 ${errorImprimirTicket ? "border-red-500 bg-red-50" : ""}`}
                             />
-                            {/* Excluyentes: La Arena imprime solo en A4; el resto, solo el ticket de 80mm. */}
+                            {/* El formato lo define el esArena del ticket: La Arena, A4; el resto, 80mm. */}
                             <button
                                 type="button"
-                                onClick={() => handleImprimirTicket(formatoImpresion)}
+                                onClick={() => handleImprimirTicket()}
                                 title="Imprimir ticket"
                                 className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2 transition-all duration-150 ease-out hover:shadow-lg active:scale-95 active:shadow-inner"
                             >

@@ -1,22 +1,27 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
-import { getFetch, getFetchPdf } from "../../../../utils/apiHelpers";
-import { getHoraActual, getToday } from "../../../../utils/helpers";
+import { getFetch } from "../../../../utils/apiHelpers";
+import { getHoraActual } from "../../../../utils/helpers";
+import { validarSede } from "../../../../utils/registroOcupacionalUtils";
 
 const obtenerEspecialidad =
     "/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesFichaInterconsulta";
-const obtenerJServerReporte =
-    "/api/v01/ct/fichaInterconsulta/descargarReporteFichaInterconsulta"
 const obtenerReporteUrl =
     "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte";
 const registrarUrl =
     "/api/v01/ct/fichaInterconsulta/registrarActualizarFichaInterconsulta";
-const today = getToday();
+
+// Auditoría vacía (registro que aún no existe en BD). FichaInterconsultaReporteDTO solo devuelve quién registró
+// (`userRegistro`) y la fecha de registro (`fechaRegistro`, sin hora): no trae datos de edición.
+const AUDITORIA_NUEVA = {
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
+};
 
 //Para ver uno registrado y ver sus especialidades
 export const GetInfoServicio = async (
@@ -168,7 +173,9 @@ export const GetInfoEspecialidad = async (
                 edadPaciente: `${res.edadPaciente}`,
                 dniUser: prev.dniUser,
                 fechaExamen: prev.fechaExamen,
-                motivo: `PACIENTE ${sexoVM} DE ${res.edadPaciente} AÑOS DE EDAD: \n${prev.motivo}`
+                motivo: `PACIENTE ${sexoVM} DE ${res.edadPaciente} AÑOS DE EDAD: \n${prev.motivo}`,
+                ...AUDITORIA_NUEVA,
+                tieneRegistro: false,
             };
         });
     }
@@ -202,9 +209,17 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente}`,
             dniUser: prev.dniUser,
             SubirDoc: true,
+            // En este formulario `userRegistro` guarda al doctor asignado (así se envía y así lo lee el reporte).
             user_medicoFirma: res.userRegistro ? res.userRegistro : prev.user_medicoFirma,
             fechaReevaluacion: res.fechaReevaluacion ?? "",
-            conclusionesCie10: res.conclusionesCie10
+            conclusionesCie10: res.conclusionesCie10,
+
+            // Auditoría REAL: solo `userRegistro` y `fechaRegistro` (fecha sin hora).
+            userRegistro: res.userRegistro ?? "",
+            fechaRegistro: res.fechaRegistro ?? "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: true,
         }));
     }
 };
@@ -246,6 +261,9 @@ export const GetInfoServicioNewEditar = async (
             tratamiento: "",
             apto: false,
             fechaReevaluacion: "",
+            // Es un registro NUEVO (otra especialidad de la misma orden): sin auditoría todavía.
+            ...AUDITORIA_NUEVA,
+            tieneRegistro: false,
             // NewNomenclatura: NewNomenclatura
         }));
     }
@@ -302,6 +320,38 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 };
 
 export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    Loading("Validando datos");
+
+    // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
     VerifyTRPerzonalizado(
         nro,
         tabla,

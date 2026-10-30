@@ -3,7 +3,7 @@ import {
     InputsBooleanRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function Antecedentes({ form, handleChange, handleRadioButtonBoolean }) {
+export default function Antecedentes({ form, handleChange, handleRadioButtonBoolean, disabled = false, isFieldEdited = () => false, revertField = () => { } }) {
     return (
         <div className="p-4 space-y-6">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -19,6 +19,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="alteracionConsciencia"
                                 value={form?.alteracionConsciencia}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alteracionConsciencia")}
+                                onRevert={() => revertField("alteracionConsciencia")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -29,6 +32,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="alcoholismoCronico"
                                 value={form?.alcoholismoCronico}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alcoholismoCronico")}
+                                onRevert={() => revertField("alcoholismoCronico")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -39,6 +45,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="movimientosInvoluntariosEnfermedades"
                                 value={form?.movimientosInvoluntariosEnfermedades}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("movimientosInvoluntariosEnfermedades")}
+                                onRevert={() => revertField("movimientosInvoluntariosEnfermedades")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -49,6 +58,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="perdidaRecurrenteConsciencia"
                                 value={form?.perdidaRecurrenteConsciencia}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("perdidaRecurrenteConsciencia")}
+                                onRevert={() => revertField("perdidaRecurrenteConsciencia")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -59,6 +71,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="diabetesHipoglicemiaNoControlada"
                                 value={form?.diabetesHipoglicemiaNoControlada}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("diabetesHipoglicemiaNoControlada")}
+                                onRevert={() => revertField("diabetesHipoglicemiaNoControlada")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -69,6 +84,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="insuficienciaRenalCronicaGradoIV"
                                 value={form?.insuficienciaRenalCronicaGradoIV}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("insuficienciaRenalCronicaGradoIV")}
+                                onRevert={() => revertField("insuficienciaRenalCronicaGradoIV")}
                             />
                         </div>
                     </div>
@@ -83,6 +101,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="efectosEnfermedadTratamiento"
                                 value={form?.efectosEnfermedadTratamiento}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("efectosEnfermedadTratamiento")}
+                                onRevert={() => revertField("efectosEnfermedadTratamiento")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -93,6 +114,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="sustanciasEstupefacientesSinTratamiento"
                                 value={form?.sustanciasEstupefacientesSinTratamiento}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("sustanciasEstupefacientesSinTratamiento")}
+                                onRevert={() => revertField("sustanciasEstupefacientesSinTratamiento")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -103,6 +127,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="sustanciasEstupefacientesConAlteracion"
                                 value={form?.sustanciasEstupefacientesConAlteracion}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("sustanciasEstupefacientesConAlteracion")}
+                                onRevert={() => revertField("sustanciasEstupefacientesConAlteracion")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -113,6 +140,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="sindromeApneaObstructivaSueño"
                                 value={form?.sindromeApneaObstructivaSueño}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("sindromeApneaObstructivaSueño")}
+                                onRevert={() => revertField("sindromeApneaObstructivaSueño")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -123,6 +153,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="obesidadIMC30"
                                 value={form?.obesidadIMC30}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("obesidadIMC30")}
+                                onRevert={() => revertField("obesidadIMC30")}
                             />
                         </div>
                         <div className="flex items-start justify-between">
@@ -133,6 +166,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="anemiaCriteriosOMS2011"
                                 value={form?.anemiaCriteriosOMS2011}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anemiaCriteriosOMS2011")}
+                                onRevert={() => revertField("anemiaCriteriosOMS2011")}
                             />
                         </div>
                         <div className="mt-6">
@@ -141,6 +177,9 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 name="comentariosDetalleAntecedentes"
                                 value={form?.comentariosDetalleAntecedentes}
                                 onChange={handleChange}
+                                disabled={disabled}
+                                edited={isFieldEdited("comentariosDetalleAntecedentes")}
+                                onRevert={() => revertField("comentariosDetalleAntecedentes")}
                                 rows={4}
                             />
                         </div>
