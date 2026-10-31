@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 import { format } from 'date-fns';
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import HojadeRutaDinamico from '../../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
+import HojadeRutaDinamicaLaArena from '../../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamicaLaArena.jsx';
 
 // Cada hoja de ruta es un jasper de src/views/jaspers cuyo nombre lo indica el backend.
 // El glob se evalúa una sola vez (a nivel de módulo) y carga cada jasper bajo demanda.
@@ -49,7 +49,7 @@ const imprimirPorProtocolo = async (nOrden, token) => {
   const res = await getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${nOrden}`, token);
   if (res?.codigo !== 200) return Swal.close();
   const { isConfirmed } = await confirmarImpresion(nOrden);
-  if (isConfirmed) HojadeRutaDinamico(res.resultado);
+  if (isConfirmed) HojadeRutaDinamicaLaArena(res.resultado);
 };
 
 /**
