@@ -3,35 +3,63 @@ import InputsRadioGroup from "../../../../components/reusableComponents/InputsRa
 import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../components/templates/BotonesForm";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../hooks/useForm";
-import useRealTime from "../../../../hooks/useRealTime";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import {
   PrintHojaR,
   SubmitDataService,
+  UpdateDataService,
   VerifyTR,
 } from "./ControllerCertificadoExposicionAlCalor";
 
-export default function CertificadoExposicionAlCalor() {
-  const tabla = "certificado_exposicion_al_calor";
+const tabla = "certificado_exposicion_al_calor";
 
+// Evaluación clínica: cada sección tiene su campo de resultado (`<name>Resultados`) y de observación
+// (`<name>Observaciones`).
+const SECCIONES_EVALUACION = [
+  { name: "signosVitales", label: "Signos vitales" },
+  { name: "sistemaCardiovascular", label: "Sistema Cardiovascular" },
+  { name: "sistemaRespiratorio", label: "Sistema Respiratorio" },
+  { name: "estadoNeurologico", label: "Estado Neurológico" },
+  { name: "estadoHidratacion", label: "Estado de Hidratación" },
+  { name: "toleranciaCalor", label: "Tolerancia al Calor" },
+  { name: "sudoracion", label: "Sudoración / Termorregulación" },
+];
+
+const CAMPOS_EVALUACION = SECCIONES_EVALUACION.flatMap(({ name }) => [
+  `${name}Resultados`,
+  `${name}Observaciones`,
+]);
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fecha",
+  ...CAMPOS_EVALUACION,
+  "aptitud",
+  "observaciones",
+  "restricciones",
+  "user_medicoFirma",
+  "nombre_medico",
+];
+
+export default function CertificadoExposicionAlCalor() {
   const today = getToday();
-  const {
-    token,
-    userlogued,
-    selectedSede,
-    datosFooter,
-    userName,
-    userCMP,
-  } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } =
+    useSessionData();
 
   const initialFormState = {
     norden: "",
     id: null,
     fecha: today,
+    hora: "",
     nombreExamen: "",
 
     nombres: "",
@@ -75,6 +103,15 @@ export default function CertificadoExposicionAlCalor() {
 
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -90,14 +127,52 @@ export default function CertificadoExposicionAlCalor() {
     storageKey: "certificado_exposicion_al_calor",
   });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, {
+    tieneRegistro: form.tieneRegistro,
+    camposEditables: CAMPOS_EDITABLES,
+  });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se revierten ambos.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -107,26 +182,50 @@ export default function CertificadoExposicionAlCalor() {
     });
   };
 
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const nordenDisabled = hayRegistroCargado;
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <SectionFieldset
         legend="Información del Examen"
         className="grid grid-cols-1 lg:grid-cols-4 gap-3"
       >
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onChange={handleChangeNumberDecimals}
-          onKeyUp={handleSearch}
-          labelWidth="120px"
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+            disabled={nordenDisabled}
+            labelWidth="120px"
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           name="fecha"
           type="date"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -148,168 +247,41 @@ export default function CertificadoExposicionAlCalor() {
 
       <DatosPersonalesLaborales form={form} />
 
-      {/* <SectionFieldset
-        legend="Datos del especialista"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-3"
-      >
-        <InputTextOneLine
-          label="Médico evaluador"
-          name="nombre_medico"
-          value={form.nombre_medico}
-          onChange={handleChangeSimple}
-          disabled
-          labelWidth="120px"
-        />
-
-        <InputTextOneLine
-          label="CMP"
-          name="userCMP"
-          onChange={handleChangeSimple}
-          value={userCMP}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset> */}
-
       <SectionFieldset
         legend="Evaluación Clínica y Ocupacional"
-        className="grid md:grid-cols-2 gap-x-4 gap-y-3"
+        className="grid grid-cols-1 gap-y-3"
       >
-        <div>
-          <div className="font-semibold mb-2 text-center ml-[80px]">
-            Resultado
-          </div>
-          <div className="space-y-3">
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Signos vitales</label>
+        {SECCIONES_EVALUACION.map(({ name, label }) => {
+          const campoResultado = `${name}Resultados`;
+          const campoObservacion = `${name}Observaciones`;
+          return (
+            <div
+              key={name}
+              className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3"
+            >
               <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="signosVitalesResultados"
-                value={form?.signosVitalesResultados}
+                label={label}
+                name={campoResultado}
+                value={form[campoResultado]}
                 onChange={handleChangeSimple}
+                rows={6}
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited(campoResultado)}
+                onRevert={() => revertField(campoResultado)}
+              />
+              <InputTextArea
+                label="Observaciones"
+                name={campoObservacion}
+                value={form[campoObservacion]}
+                onChange={handleChangeSimple}
+                rows={6}
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited(campoObservacion)}
+                onRevert={() => revertField(campoObservacion)}
               />
             </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Sistema Cardiovascular</label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="sistemaCardiovascularResultados"
-                value={form?.sistemaCardiovascularResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Sistema Respiratorio</label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="sistemaRespiratorioResultados"
-                value={form?.sistemaRespiratorioResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Estado Neurológico</label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="estadoNeurologicoResultados"
-                value={form?.estadoNeurologicoResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Estado de Hidratación</label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="estadoHidratacionResultados"
-                value={form?.estadoHidratacionResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">Tolerancia al Calor</label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="toleranciaCalorResultados"
-                value={form?.toleranciaCalorResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-            <div className="grid grid-cols-5 gap-2">
-              <label className="col-span-1">
-                Sudoración / Termorregulación
-              </label>
-              <InputTextArea
-                className="col-span-4"
-                rows={6}
-                name="sudoracionResultados"
-                value={form?.sudoracionResultados}
-                onChange={handleChangeSimple}
-              />
-            </div>
-          </div>
-        </div>
-        <div>
-          <div className="font-semibold mb-2 text-center ml-[80px]">
-            Observaciones
-          </div>
-          <div className="space-y-3">
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="signosVitalesObservaciones"
-              value={form?.signosVitalesObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="sistemaCardiovascularObservaciones"
-              value={form?.sistemaCardiovascularObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="sistemaRespiratorioObservaciones"
-              value={form?.sistemaRespiratorioObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="estadoNeurologicoObservaciones"
-              value={form?.estadoNeurologicoObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="estadoHidratacionObservaciones"
-              value={form?.estadoHidratacionObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="toleranciaCalorObservaciones"
-              value={form?.toleranciaCalorObservaciones}
-              onChange={handleChangeSimple}
-            />
-            <InputTextArea
-              className="col-span-4"
-              rows={6}
-              name="sudoracionObservaciones"
-              value={form?.sudoracionObservaciones}
-              onChange={handleChangeSimple}
-            />
-          </div>
-        </div>
+          );
+        })}
       </SectionFieldset>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -319,8 +291,11 @@ export default function CertificadoExposicionAlCalor() {
         >
           <InputsRadioGroup
             name="aptitud"
-            value={form?.aptitud}
+            value={form.aptitud}
             onChange={handleRadioButton}
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("aptitud")}
+            onRevert={() => revertField("aptitud")}
             vertical
             options={[
               {
@@ -343,19 +318,25 @@ export default function CertificadoExposicionAlCalor() {
           <InputTextArea
             label="Observaciones"
             name="observaciones"
-            value={form?.observaciones}
+            value={form.observaciones}
             onChange={handleChangeSimple}
             rows={5}
-          ></InputTextArea>
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("observaciones")}
+            onRevert={() => revertField("observaciones")}
+          />
         </SectionFieldset>
 
         <SectionFieldset legend="Restricciones">
           <InputTextArea
             name="restricciones"
-            value={form?.restricciones}
+            value={form.restricciones}
             onChange={handleChangeSimple}
             rows={10}
-          ></InputTextArea>
+            disabled={camposDeshabilitados}
+            edited={isFieldEdited("restricciones")}
+            onRevert={() => revertField("restricciones")}
+          />
         </SectionFieldset>
       </div>
 
@@ -365,15 +346,35 @@ export default function CertificadoExposicionAlCalor() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isMedicoEdited}
+          onRevert={revertMedico}
         />
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );
