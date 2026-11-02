@@ -113,11 +113,22 @@ import {
 } from "../../SistemaOcupacional/ModuloPsicologia/ExamenesComplementarios2/Brigadista/controllerBrigadista";
 import Altura18 from "../../SistemaOcupacional/Altura18/Altura18";
 import { PrintHojaR as imprimirAltura18, TABLA_ALTURA_18 } from "../../SistemaOcupacional/Altura18/controllerAltura18";
+import HistoriaOcupacional from "../components/HistoriaOcupacionalConListas";
+import {
+    PrintHojaR as imprimirHistoriaOcupacional,
+    TABLA_HISTORIA_OCUPACIONAL,
+} from "../../SistemaOcupacional/HistoriaOcupacional/controller/controllerHO";
+import AntecedentesPatologicos from "../../SistemaOcupacional/AntecedentesPatologicos/AntecedentesPatologicos";
+import {
+    PrintHojaR as imprimirAntecedentesPatologicos,
+    TABLA_ANTECEDENTES_PATOLOGICOS,
+} from "../../SistemaOcupacional/AntecedentesPatologicos/controllerAntecedentesPatologicos";
 
 // Altura 1.8 (certificación médica de altura, tabla `certificacion_medica_altura`). Se abre por su propia clave y
 // también desde el examen de la hoja llamado "Ficha certificado de trabajos en altura" (ver `b_certificado_altura`).
 const ALTURA_18 = {
     titulo: "Ficha Certificado de Trabajos en Altura (Altura 1.8)",
+    vistas: ["Altura 1.8"],
     Formulario: Altura18,
     verReporte: (orden, token, datosFooter) => imprimirAltura18(orden, token, TABLA_ALTURA_18, datosFooter),
 };
@@ -127,41 +138,51 @@ const esFichaCertificadoTrabajosAltura = (examen) => /ficha.*certificado.*altura
 // aquí aún no son clicables.
 //  - Formulario: recibe `nOrdenInicial` (carga esa orden) y `onGuardado` (se llama al registrar el examen).
 //  - verReporte(orden, token, datosFooter): abre el reporte del examen ya realizado.
+//  - vistas: permisos (los mismos nombres de `listView` que usa SistemaOcupacional) que hacen falta para abrir el
+//    formulario: la tarjeta, la pestaña y la sub-pestaña por las que se llega allí. Se exigen todos; sin `vistas` no
+//    se puede abrir. El pad del examen se ve igual, el aviso de "sin acceso" sale al intentar abrirlo.
 //  - Si una misma clave debe abrir distinto según el nombre del examen, lleva una lista de candidatos y se elige el
 //    primero cuyo `coincide(examen)` sea verdadero (o que no lo tenga).
 const FORMULARIOS = {
     triaje: {
         titulo: "Triaje",
+        vistas: ["Triaje"],
         Formulario: Triaje,
         verReporte: (orden, token) => GetListTriajeMult(orden, null, getFetch, token, true),
     },
     informe_electrocardiograma: {
         titulo: "Electrocardiograma",
+        vistas: ["EKG"],
         Formulario: EKG,
         verReporte: (orden, token, datosFooter) => imprimirEKG(orden, token, TABLA_EKG, datosFooter),
     }, 
     lab_clinico: {
         titulo: "Laboratorio Clínico",
+        vistas: ["Laboratorio Clinico", "Laboratorio Clinico Formulario", "Hematología - Bioquímica - ECO"],
         Formulario: LaboratorioClinico,
         verReporte: (orden, token) => imprimirLaboratorioClinico(orden, token, TABLA_LAB_CLINICO),
     },
     anexo16a: {
         titulo: "Anexo 16A",
+        vistas: ["Anexo 16 A"],
         Formulario: Anexo16A,
         verReporte: (orden, token, datosFooter) => imprimirAnexo16A(orden, token, TABLA_ANEXO16A, datosFooter),
     },
     oftalmologia2021: {
         titulo: "Oftalmología",
+        vistas: ["Oftalmologia"],
         Formulario: Oftalmologia,
         verReporte: (orden, token) => imprimirOftalmologia(orden, token, TABLA_OFTALMOLOGIA),
     },
     anexo7c: {
         titulo: "Ficha Anexo 16",
+        vistas: ["Anexo 16"],
         Formulario: Anexo16,
         verReporte: (orden, token, datosFooter) => imprimirAnexo16(orden, token, TABLA_ANEXO16, datosFooter),
     },
     certificado_aptitud_medico_ocupacional: {
         titulo: "Ficha de Aptitud 16",
+        vistas: ["Fichas Aptitud", "Ficha Aptitud Anexo 16"],
         Formulario: FichaAptitudAnexo16,
         verReporte: (orden, token, datosFooter) =>
             imprimirFichaAptitudAnexo16(orden, token, TABLA_FICHA_APTITUD_ANEXO16, datosFooter),
@@ -173,6 +194,7 @@ const FORMULARIOS = {
         { ...ALTURA_18, coincide: esFichaCertificadoTrabajosAltura },
         {
             titulo: "Ficha Certificado de Trabajos en Altura",
+            vistas: ["Ficha Certificado de Altura"],
             Formulario: FichaCertificadoAltura,
             verReporte: (orden, token, datosFooter) =>
                 imprimirFichaCertificadoAltura(orden, token, TABLA_FICHA_CERTIFICADO_ALTURA, datosFooter),
@@ -183,49 +205,58 @@ const FORMULARIOS = {
     // Formato Altura Psicológica (ModuloPsicologia/ExamenesComplementarios/AlturaPsicologica), tabla `psicologiafobias`.
     psicologiafobias: {
         titulo: "Formato Altura Psicológica",
+        vistas: ["Psicologia", "Examenes Complementarios Psicologia", "Altura Psicologica"],
         Formulario: AlturaPsicologica,
         verReporte: (orden, token, datosFooter) =>
             imprimirAlturaPsicologica(orden, token, TABLA_ALTURA_PSICOLOGICA, datosFooter),
     },
     audiometria_2023: {
         titulo: "Audiometría",
+        vistas: ["Audiometria"],
         Formulario: Audiometria,
         verReporte: (orden, token, datosFooter) => imprimirAudiometria(orden, token, TABLA_AUDIOMETRIA, datosFooter),
     },
     cuestionario_audiometria: {
         titulo: "Cuestionario de Audiometría",
+        vistas: ["Audiometria"],
         Formulario: AudiometriaCuestionario,
         verReporte: (orden, token) => imprimirCuestionarioAudiometria(orden, token, TABLA_CUESTIONARIO_AUDIOMETRIA),
     },
     funcion_abs: {
         titulo: "Espirometría",
+        vistas: ["Espirometria"],
         Formulario: Espirometria,
         verReporte: (orden, token) => imprimirEspirometria(orden, token, TABLA_ESPIROMETRIA),
     },
     analisis_bioquimicos: {
         titulo: "Perfil Lipídico",
+        vistas: ["Laboratorio Clinico", "Laboratorio Clinico Formulario", "Perfil Lipídico"],
         Formulario: PerfilLipidico,
         verReporte: (orden, token) => imprimirPerfilLipidico(orden, token, TABLA_PERFIL_LIPIDICO),
     },
     panel2d: {
         titulo: "Panel 2D",
+        vistas: ["Laboratorio Clinico", "Toxicologia", "Panel 2D"],
         Formulario: Panel2D,
         verReporte: (orden, token, datosFooter) => imprimirPanel2D(orden, token, TABLA_PANEL_2D, datosFooter),
     },
     cuestionario_nordico: {
         titulo: "Cuestionario Nórdico",
+        vistas: ["Cuestionario Nordico"],
         Formulario: CuestionarioNordico,
         verReporte: (orden, token) => imprimirCuestionarioNordico(orden, token, TABLA_CUESTIONARIO_NORDICO),
     },
     // El nameService del consentimiento es "con_panel2D": la clave va en minúsculas porque `formularioDe` normaliza.
     con_panel2d: {
         titulo: "Consentimiento Panel 2D",
+        vistas: ["Laboratorio Clinico", "Consentimientos", "Consentimiento Panel 2D"],
         Formulario: ConsentimientoPanel2D,
         // Este PrintHojaR recibe el formulario (solo lee su `norden`), no la orden suelta.
         verReporte: (orden, token) => imprimirConsentimientoPanel2D({ norden: orden }, token),
     },
     radiografia_torax: {
         titulo: "Rayos X Tórax PA",
+        vistas: ["Rayos X", "Radiografía de Torax"],
         Formulario: RayosXToraxPA,
         verReporte: (orden, token, datosFooter) =>
             imprimirRayosXToraxPA(orden, token, TABLA_RAYOS_X_TORAX_PA, datosFooter),
@@ -234,53 +265,76 @@ const FORMULARIOS = {
     // si la hoja usa otra clave para alguna de las dos, solo hay que cambiarla aquí.
     evaluacion_musculo_esqueletica: {
         titulo: "Evaluación Músculo Esquelética",
+        vistas: ["Evaluación Musculoesquelética", "E. Musculoesqueletica"],
         Formulario: EvaluacionMusculoEsqueletica,
         verReporte: (orden, token, datosFooter) =>
             imprimirEvaluacionMusculoEsqueletica(orden, token, TABLA_EVALUACION_NORMAL, datosFooter),
     },
     evaluacion_musculo_esqueletica2021: {
         titulo: "Evaluación Músculo Esquelética BOORO",
+        vistas: ["Evaluación Musculoesquelética", "E. Musculoesqueletica Booro"],
         Formulario: EvaluacionMusculoEsqueletica2021,
         verReporte: (orden, token, datosFooter) =>
             imprimirEvaluacionMusculoEsqueletica2021(orden, token, TABLA_EVALUACION_2021, datosFooter),
     },
     oit: {
         titulo: "OIT",
+        vistas: ["OIT"],
         Formulario: OIT,
         verReporte: (orden, token) => imprimirOIT(orden, token, TABLA_OIT),
     },
     odontograma: {
         titulo: "Odontología",
+        vistas: ["Odontologia"],
         Formulario: Odontologia,
         verReporte: (orden, token, datosFooter) => imprimirOdontologia(orden, token, TABLA_ODONTOLOGIA, datosFooter),
     },
     especificos: {
         titulo: "Trabajos Específicos",
+        vistas: ["Psicologia", "Examenes Complementarios 2 Psicologia", "Trabajos Especificos"],
         Formulario: TrabajosEspecificos,
         verReporte: (orden, token, datosFooter) =>
             imprimirTrabajosEspecificos(orden, token, TABLA_TRABAJOS_ESPECIFICOS, datosFooter),
     },
     test_fatiga_somnolencia: {
         titulo: "Test de Fatiga y Somnolencia",
+        vistas: ["Test Fatiga"],
         Formulario: TestFatiga,
         verReporte: (orden, token, datosFooter) =>
             imprimirTestFatiga(orden, token, TABLA_TEST_FATIGA_SOMNOLENCIA, datosFooter),
     },
     ficha_sas: {
         titulo: "Ficha S.A.S.",
+        vistas: ["Ficha SAS"],
         Formulario: FichaSas,
         verReporte: (orden, token, datosFooter) => imprimirFichaSas(orden, token, TABLA_FICHA_SAS, datosFooter),
     },
     informe_psicologico: {
         titulo: "Informe Psicológico Completo",
+        vistas: ["Psicologia", "Anexos Psicologia", "Informe Psicologico"],
         Formulario: InformePsicologico,
         verReporte: (orden, token, datosFooter) =>
             imprimirInformePsicologico(orden, token, TABLA_INFORME_PSICOLOGICO, datosFooter),
     },
     psi_brigadistas: {
         titulo: "Brigadista",
+        vistas: ["Psicologia", "Examenes Complementarios 2 Psicologia", "Brigadista"],
         Formulario: Brigadista,
         verReporte: (orden, token, datosFooter) => imprimirBrigadista(orden, token, TABLA_BRIGADISTA, datosFooter),
+    },
+    historia_oc_info: {
+        titulo: "Historia Ocupacional",
+        vistas: ["Historia Ocupacional"],
+        Formulario: HistoriaOcupacional,
+        // Este PrintHojaR recibe la sede solo para validarla al imprimir a mano; aquí la orden ya se abrió en la sede.
+        verReporte: (orden, token) => imprimirHistoriaOcupacional(orden, token, TABLA_HISTORIA_OCUPACIONAL),
+    },
+    antecedentes_patologicos: {
+        titulo: "Antecedentes Patológicos",
+        vistas: ["Antecedentes Patologicos"],
+        Formulario: AntecedentesPatologicos,
+        verReporte: (orden, token, datosFooter) =>
+            imprimirAntecedentesPatologicos(orden, token, TABLA_ANTECEDENTES_PATOLOGICOS, datosFooter),
     },
 };
 
@@ -289,6 +343,9 @@ const claveDe = (examen) => String(examen.referenciaNp ?? "").trim().toLowerCase
 
 const entradaDe = (entrada, examen) =>
     Array.isArray(entrada) ? entrada.find((candidato) => !candidato.coincide || candidato.coincide(examen)) : entrada;
+
+// ¿El usuario tiene todas las vistas que exige el formulario? `tieneVista(nombre)` viene de useAccesoFormularios.
+export const tieneAccesoA = (entrada, tieneVista) => Boolean(entrada?.vistas?.length) && entrada.vistas.every((vista) => tieneVista(vista));
 
 export const formularioDe = (examen) => {
     const clave = claveDe(examen);

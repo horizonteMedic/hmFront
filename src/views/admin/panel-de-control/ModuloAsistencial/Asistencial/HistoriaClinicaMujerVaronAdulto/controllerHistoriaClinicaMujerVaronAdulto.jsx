@@ -531,8 +531,9 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
 // Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Si el ticket es
 // de La Arena el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
 // El N° escrito en el bloque IMPRIMIR puede ser de otro ticket que el cargado en pantalla, así que "La Arena" se
-// consulta (esArena) en el ticket que se va a imprimir y no en el formulario.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+// consulta (esArena) en el ticket que se va a imprimir y no en el formulario. Con la sede La Arena seleccionada
+// (`esArenaSede`) también se ofrecen los complementos, sea cual sea el ticket.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, esArenaSede = false) => {
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;
@@ -542,7 +543,7 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     const historia = await ObtenerDatosComplementos(numeroTicket, token);
     Swal.close();
 
-    if (historia?.esArena) {
+    if (historia && (historia.esArena || esArenaSede)) {
         await ConfirmarImpresionConComplementos({
             numeroTicket,
             token,

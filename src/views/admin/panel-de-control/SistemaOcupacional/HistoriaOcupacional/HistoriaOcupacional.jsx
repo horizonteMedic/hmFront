@@ -6,6 +6,7 @@ import {
   handleSelect,
   PrintHojaR,
   SubmiteHistoriaOcupacionalController,
+  TABLA_HISTORIA_OCUPACIONAL,
   VerifyTR,
 } from "./controller/controllerHO";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -24,7 +25,7 @@ import DatosPersonalesLaborales from "../../../../components/templates/DatosPers
 import BotonesForm from "../../../../components/templates/BotonesForm";
 
 const today = getToday();
-const tabla = "historia_oc_info";
+const tabla = TABLA_HISTORIA_OCUPACIONAL;
 
 // Estilos de la tabla de experiencia ocupacional (antes en HistoriaOcupacional.module.css).
 // Se aplican a <th>/<td> con variantes arbitrarias para no depender de una hoja CSS.
@@ -181,12 +182,15 @@ const proteccionOptions = [
   },
 ];
 
-const HistoriaOcupacional = ({ listas }) => {
+// Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
+// sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar la historia ocupacional.
+const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
+  const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, userName, userDNI } = useSessionData();
 
   const initialFormState = {
     // Header
-    norden: "",
+    norden: embebido ? String(nOrdenInicial) : "",
     codHo: null,
     fecha: today,
     eliminados: [],
@@ -269,6 +273,15 @@ const HistoriaOcupacional = ({ listas }) => {
       }))
     );
   };
+
+  // Incrustado: abre la orden recibida (datos del paciente y su historia previa si aún no hay registro; si ya existe, sus filas)
+  useEffect(() => {
+    if (embebido) {
+      VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, setRegistrosFromServer, { silencioso: true });
+    }
+    // setRegistrosFromServer se recrea en cada render y solo usa setters estables
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
   // AUTOCOMPLETABLES
   const [searchEmpresa, setSearchEmpresa] = useState("");
@@ -582,7 +595,8 @@ const HistoriaOcupacional = ({ listas }) => {
         form,
         token,
         userlogued,
-        handleClearForm,
+        // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
+        embebido ? () => onGuardado?.() : handleClearForm,
         tabla,
         listaFinal
       );
@@ -618,13 +632,22 @@ const HistoriaOcupacional = ({ listas }) => {
   });
 
   return (
-    <div className="px-4 max-w-[95%] xl:max-w-[90%] mx-auto space-y-3 text-black">
+    <div
+      className={
+        // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las secciones de dos columnas
+        // quedan muy angostas y desbordan, así que se apilan.
+        embebido
+          ? "px-4 space-y-3 text-black max-[1599px]:[&>.grid]:grid-cols-1"
+          : "px-4 max-w-[95%] xl:max-w-[90%] mx-auto space-y-3 text-black"
+      }
+    >
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
         edicionHabilitada={edicionHabilitada}
         onHabilitarEdicion={habilitarEdicion}
         onLimpiar={handleClearForm}
+        mostrarLimpiar={!embebido}
       />
 
       {/* ===== SECCIÓN: DATOS HISTORIA OCUPACIONAL ===== */}
@@ -639,11 +662,11 @@ const HistoriaOcupacional = ({ listas }) => {
             value={form.norden}
             onChange={handleChangeNumber}
             onKeyUp={handleSearchNorden}
-            disabled={hayRegistroCargado}
+            disabled={embebido || hayRegistroCargado}
             labelWidth="120px"
             className="w-full"
           />
-          <SearchButton onClick={executeSearch} className="lg:hidden" />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
         <InputTextOneLine
           label="Fecha"
@@ -1580,6 +1603,8 @@ const HistoriaOcupacional = ({ listas }) => {
         handlePrint={handlePrint}
         hideSave={form.tieneRegistro && !edicionHabilitada}
         hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
       />
     </div>
   );

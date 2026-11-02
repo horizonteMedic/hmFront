@@ -63,8 +63,6 @@ export const GetInfoPac = (form, set, get, token, sede) => {
 export const Clean = (set) => {
     set((prev) => ({
         ...prev,
-        ocupacional: true,
-        asistencial: false,
         nro: '',
         nomExam: '',
         empresa: '',
@@ -94,31 +92,37 @@ export const Clean = (set) => {
     }));
 };
 
-export const GetTable = (nro, nombre, sede, token, set) => {
+// `setCargando` distingue "buscando" de "sin resultados" en la tabla: se apaga siempre al terminar,
+// aunque el backend responda con error o sin cuerpo (código inexistente).
+export const GetTable = (nro, nombre, sede, token, set, setCargando) => {
     const data = {
         opcion_id_p: 1,
         norden: nro,
         nombres_apellidos_p: nombre,
     };
-    GetHistoriaCTriaje(data, sede, token).then((res) => {
-        set(res);
-    });
+    setCargando(true);
+    GetHistoriaCTriaje(data, sede, token)
+        .then((res) => set(Array.isArray(res) ? res : []))
+        .catch(() => set([]))
+        .finally(() => setCargando(false));
 };
 
-export const SearchHC = (event, form, set, sede, token) => {
+export const SearchHC = (event, form, set, sede, token, setCargando) => {
     if (event.key === 'Enter') {
         const data = {
             opcion_id_p: 2,
             norden: Number(form.codigo),
             nombres_apellidos_p: '',
         };
-        GetHistoriaCTriaje(data, sede, token).then((res) => {
-            set(res);
-        });
+        setCargando(true);
+        GetHistoriaCTriaje(data, sede, token)
+            .then((res) => set(Array.isArray(res) ? res : []))
+            .catch(() => set([]))
+            .finally(() => setCargando(false));
     }
 };
 
-export const handleNombreChange = (e, set, setTable, sede, token, debounceTimeout) => {
+export const handleNombreChange = (e, set, setTable, sede, token, debounceTimeout, setCargando) => {
     const value = e.target.value.toUpperCase();
     set((prev) => ({ ...prev, nombresBusqueda: value, codigo: '' }));
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -129,6 +133,7 @@ export const handleNombreChange = (e, set, setTable, sede, token, debounceTimeou
                 norden: '',
                 nombres_apellidos_p: value,
             };
+            setCargando(true);
             GetHistoriaCTriaje(data, sede, token)
                 .then((res) => {
                     if (res && res.length) {
@@ -137,8 +142,10 @@ export const handleNombreChange = (e, set, setTable, sede, token, debounceTimeou
                         setTable([]);
                     }
                 })
-                .catch(() => setTable([]));
-        } else {
+                .catch(() => setTable([]))
+                .finally(() => setCargando(false));
+        } else if (value !== '') {
+            // Solo espacios: sin resultados. Si el campo quedó vacío, el efecto de Triaje recarga la tabla completa.
             setTable([]);
         }
     }, 400);

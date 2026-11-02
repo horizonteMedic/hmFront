@@ -12,42 +12,42 @@ export default function ToxicologiaSubTabSelector({ tieneVista }) {
     {
       id: 0,
       label: 'Panel 2D',
-      permission: 'Panel 2D',
+      permission: 'Panel 2D Asistencial',
       icon: faSquare,
       component: Panel2D
     },
     {
       id: 1,
       label: 'Panel 3D',
-      permission: 'Panel 3D',
+      permission: 'Panel 3D Asistencial',
       icon: faCube,
       component: Panel3D
     },
     {
       id: 2,
       label: 'Panel 4D',
-      permission: 'Panel 4D',
+      permission: 'Panel 4D Asistencial',
       icon: faThLarge,
       component: Panel4D
     },
     {
       id: 3,
       label: 'Panel 5D',
-      permission: 'Panel 5D',
+      permission: 'Panel 5D Asistencial',
       icon: faLayerGroup,
       component: Panel5D
     },
     {
       id: 4,
       label: 'Panel 10D',
-      permission: 'Panel 10D',
+      permission: 'Panel 10D Asistencial',
       icon: faLayerGroup,
       component: Panel10D
     },
     {
       id: 5,
       label: 'Etanol en Saliva',
-      permission: 'Etanol en Saliva',
+      permission: 'Etanol en Saliva Asistencial',
       icon: faLayerGroup,
       component: EtanolSaliva
     }

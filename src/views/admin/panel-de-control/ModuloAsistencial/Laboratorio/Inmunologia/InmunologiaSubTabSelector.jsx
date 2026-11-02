@@ -12,49 +12,49 @@ export default function InmunologiaSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
       id: 0,
-      permission: "Gonadotropina",
+      permission: "Gonadotropina Asistencial",
       label: "Gonadotropina",
       icon: faVenus,
       component: Gonadotropina
     },
     {
       id: 1,
-      permission: "BK - KOH",
+      permission: "BK - KOH Asistencial",
       label: "BK - KOH",
       icon: faMicroscope,
       component: BKKOH
     },
     {
       id: 2,
-      permission: "Aglutinaciones",
+      permission: "Aglutinaciones Asistencial",
       label: "Aglutinaciones",
       icon: faVirus,
       component: Aglutinaciones
     },
     {
       id: 3,
-      permission: "Hepatitis",
+      permission: "Hepatitis Asistencial",
       label: "Hepatitis",
       icon: faDisease,
       component: Hepatitis
     },
     {
       id: 4,
-      permission: "VDRL",
+      permission: "VDRL Asistencial",
       label: "VDRL",
       icon: faViruses,
       component: VDRL
     },
     {
       id: 5,
-      permission: "VIH",
+      permission: "VIH Asistencial",
       label: "VIH",
       icon: faMarsAndVenusBurst,
       component: VIH
     },
     {
       id: 6,
-      permission: "Thevenon",
+      permission: "Thevenon Asistencial",
       label: "Thevenon",
       icon: faSpider,
       component: Thevenon

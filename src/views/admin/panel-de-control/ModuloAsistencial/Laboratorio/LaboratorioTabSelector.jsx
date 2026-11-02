@@ -12,49 +12,49 @@ export default function LaboratorioTabSelector({ tieneVista }) {
     const tabsConfig = [
         {
             id: 0,
-            permission: "Laboratorio Clinico",
+            permission: "Laboratorio Clinico Asistencial",
             label: "Laboratorio Clínico",
             icon: faFlask,
             component: LaboratorioClinicoSubTabSelector
         },
         {
             id: 1,
-            permission: "Analisis Bioquimicos",
+            permission: "Analisis Bioquimicos Asistencial",
             label: "Análisis Bioquímicos",
             icon: faFilter,
             component: AnalisisBioquimicosSubTabSelector
         },
         {
             id: 2,
-            permission: "Inmunologia",
+            permission: "Inmunologia Asistencial",
             label: "Inmunología",
             icon: faShieldVirus,
             component: InmunologiaSubTabSelector
         },
         {
             id: 3,
-            permission: "Toxicologia",
+            permission: "Toxicologia Asistencial",
             label: "Toxicología",
             icon: faCannabis,
             component: ToxicologiaSubTabSelector
         },
         {
             id: 4,
-            permission: "Consentimientos",
+            permission: "Consentimientos Asistencial",
             label: "Consentimientos",
             icon: faFileAlt,
             component: ConsentimientosSubTabSelector
         },
         {
             id: 5,
-            permission: "Manipuladores",
+            permission: "Manipuladores Asistencial",
             label: "Manipuladores",
             icon: faMicroscope,
             component: ManipuladoresSubTabSelector
         },
         // {
         //     id: 6,
-        //     permission: "Pruebas Covid",
+        //     permission: "Pruebas Covid Asistencial",
         //     label: "Pruebas Covid",
         //     icon: faVirusCovid,
         //     component: TabEnConstruccion

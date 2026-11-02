@@ -9,21 +9,21 @@ export default function ManipuladoresSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
       id: 0,
-      permission: "Coprocultivo",
+      permission: "Coprocultivo Asistencial",
       label: "Coprocultivo",
       icon: faPrescriptionBottle,
       component: Coprocultivo
     },
     {
       id: 1,
-      permission: "Parasitología",
+      permission: "Parasitología Asistencial",
       label: "Parasitología",
       icon: faSpider,
       component: Coproparasitologia
     },
     {
       id: 2,
-      permission: "Examen Orina",
+      permission: "Examen Orina Asistencial",
       label: "Examen de Orina",
       icon: faDroplet,
       component: ExamenOrina
