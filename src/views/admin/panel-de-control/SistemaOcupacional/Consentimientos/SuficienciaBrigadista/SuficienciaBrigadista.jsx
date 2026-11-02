@@ -1,17 +1,26 @@
 import { InputsBooleanRadioGroup, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useForm } from "../../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
     PrintHojaR,
     SubmitDataService,
+    UpdateDataService,
     VerifyTR,
 } from "./controllerSuficienciaBrigadista";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "consta_brigadista";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fecha", "aptitud", "user_medicoFirma", "nombre_medico"];
 
 const textoFinalConsentimiento = `Ha sido evaluado de la normativa vigente, estando (APTO / NO APTO) para efectuar trabajos o actividades como brigadistas.`;
 const textoFinalConsentimiento2 = `A su vez se hace constar que se le ha informado al colaborador sobre los resultados Médicos Ocupacionales que se le practicaron en la fecha.`;
@@ -33,6 +42,15 @@ export default function SuficienciaBrigadista() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -40,21 +58,59 @@ export default function SuficienciaBrigadista() {
         setForm,
         handleChangeSimple,
         handleRadioButtonBoolean,
-        handleChangeNumberDecimals,
+        handleChangeNumber,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "suficienciaBrigadista" });
 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se
+    // revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
+    const hayRegistroCargado = Boolean(form.nombres);
+
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleUpdate = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
     };
 
     const handlePrint = () => {
@@ -63,22 +119,43 @@ export default function SuficienciaBrigadista() {
         });
     };
 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumberDecimals}
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     type="date"
                     name="fecha"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                 />
                 <InputTextOneLine
                     label="Hora"
@@ -151,6 +228,9 @@ export default function SuficienciaBrigadista() {
                             onChange={handleRadioButtonBoolean}
                             trueLabel="APTO"
                             falseLabel="NO APTO"
+                            disabled={camposDeshabilitados}
+                            edited={isFieldEdited("aptitud")}
+                            onRevert={() => revertField("aptitud")}
                         />
                     </div>
                 </div>
@@ -162,15 +242,34 @@ export default function SuficienciaBrigadista() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
                 />
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleUpdate : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

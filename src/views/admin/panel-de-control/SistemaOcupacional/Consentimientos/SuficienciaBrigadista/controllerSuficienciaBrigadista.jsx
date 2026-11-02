@@ -4,10 +4,14 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/constaBrigadista/reporteConstaBrigadista";
 const registrarUrl = "/api/v01/ct/constaBrigadista/registrarActualizarConstaBrigadista";
@@ -28,30 +32,79 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             aptitud: res.esActivo ?? false,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+            // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+            // ConstaBrigadistaReporteDTO solo devuelve `userRegistro`: las fechas y el editor quedan vacíos
+            // hasta que el backend los agregue.
+            fechaRegistro: res.fechaRegistro ?? "",
+            userRegistro: res.userRegistro ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+// ===== Mapeo: Body base =====
+// Campos propios del consentimiento (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => ({
+    norden: form.norden,
+    fecha: form.fecha,
+    esActivo: form.aptitud,
+    usuarioFirma: form.user_medicoFirma,
+});
+
+// Body completo (creación / actualización). ConstaBrigadistaDTO usa `userRegistro` para el usuario que registra.
+// El reporte (GET) aún no devuelve la fecha de registro, así que al editar, si no se conoce el creador, se
+// manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro || user,
+        fechaRegistro: form.fechaRegistro,
+    });
+
+// La aptitud es obligatoria tanto al guardar como al editar (devuelve false si falta algo, tras avisar).
+const validarFormulario = async (form) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
+        return false;
     }
     if (form.aptitud === undefined || form.aptitud === null) {
         await Swal.fire("Error", "Seleccione Aptitud", "error");
-        return;
+        return false;
     }
+    return true;
+};
 
-    const body = {
-        norden: form.norden,
-        fecha: form.fecha,
-        esActivo: form.aptitud,
-        userRegistro: user,
-        usuarioFirma: form.user_medicoFirma,
-    };
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await validarFormulario(form))) return;
+    await guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// ===== Editar (registro existente) =====
+export const UpdateDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await validarFormulario(form))) return;
+    await actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
 };
 
@@ -68,29 +121,23 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Búsqueda / verificación por N° Orden (valida también la sede) =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
+        onNuevo: () => GetInfoPac(nro, set, token, sede),
+        onExistente: () =>
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros del Consentimiento.",
                     "warning"
                 );
-            });
-        }
-    );
-};
+            }),
+    });
 
 const GetInfoPac = async (nro, set, token, sede) => {
     const res = await GetInfoPacDefault(nro, token, sede);
