@@ -1,4 +1,5 @@
 import { getDatePlus364Days, getDatePlusYearsMinusOneDay } from "../../../../../utils/helpers";
+import { crearRestriccionesFicha } from "../restriccionesFichaAptitud";
 
 export const DURACION_FA2_OPCIONES = [
   { label: "1 año", value: "1" },
@@ -16,6 +17,14 @@ export const inferirDuracionFA2 = (fechaValido, fechaVencimiento) =>
   fechaValido && fechaVencimiento && getFA2FechaVencimiento(fechaValido, "2") === fechaVencimiento
     ? "2"
     : "1";
+
+const restriccionesFA2 = crearRestriccionesFicha("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB");
+
+export const RESTRICCIONES_FA2 = restriccionesFA2.restricciones;
+export const RESTRICCIONES_FA2_NAMES = restriccionesFA2.nombres;
+export const RESTRICCIONES_FA2_DESMARCADAS = restriccionesFA2.desmarcadas;
+export const armarRestriccionesFA2 = restriccionesFA2.armar;
+export const inferirRestriccionesFA2 = restriccionesFA2.inferir;
 
 export const getFA2InitialFormState = ({ today, userlogued, userName }) => ({
   norden: "",

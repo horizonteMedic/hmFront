@@ -1,20 +1,29 @@
 import { InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useForm } from "../../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
     PrintHojaR,
     SubmitDataService,
+    UpdateDataService,
     VerifyTR,
 } from "./controllerConsentimientoInformado";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import ModalSubidaMasiva from "./modalSubidaMasiva/ModalSubidaMasiva";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "consentimientoInformado";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fecha"];
 
 const textoConsentimiento = `certifico que he sido informado/a acerca de la naturaleza y propósito del examen médico ocupacional así como pruebas complementarias determinada por la empresa:`;
 const textoFinalConsentimiento = `De acuerdo a los peligros y riesgos identificados en mi puesto de trabajo. En ese sentido en forma consciente y voluntaria doy mi consentimiento, para que se me realice el examen médico ocupacional de acuerdo a la Resolución ministerial N° 312-2011/MINSA. Y doy fe que la información brindada a HORIZONTE MEDIC es verídica. Así mismo, autorizo a HORIZONTE MEDIC para que brinde mi historia clínica y toda información resultante de mi examen médico ocupacional al Médico Ocupacional de mi empresa para que tenga acceso a mi Historia Clínica de acuerdo a la N.T.N° 022 MINSA/dgsp-V.02 y Ley N° 26842, Ley general de salud.`;
@@ -32,6 +41,15 @@ export default function ConsentimientoInformado() {
         dni: "",
         empresa: "",
         ocupacion: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -39,21 +57,53 @@ export default function ConsentimientoInformado() {
         setForm,
         handleChange,
         handleChangeSimple,
-        handleChangeNumberDecimals,
+        handleChangeNumber,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "consentimientoInformado" });
 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // ===== Búsqueda con botón =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
+    const hayRegistroCargado = Boolean(form.nombres);
+
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleUpdate = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
     };
 
     const handlePrint = () => {
@@ -61,6 +111,11 @@ export default function ConsentimientoInformado() {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -72,37 +127,53 @@ export default function ConsentimientoInformado() {
                     sede={selectedSede}
                 />
             )}
-            <div className="relative">
+
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            >
                 <button
                     type="button"
                     onClick={() => setShowModal(true)}
-                    className="verde-btn px-3 py-1 rounded flex items-center gap-2 text-sm absolute right-3 top-2 z-10"
+                    className="pointer-events-auto verde-btn px-3 py-1.5 rounded flex items-center gap-2"
                 >
                     Subida Masiva <FontAwesomeIcon icon={faUpload} />
                 </button>
-                <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+            </AccionesRegistroHeader>
+
+            <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+                <div className="flex gap-x-3 w-full">
                     <InputTextOneLine
                         label="N° Orden"
                         name="norden"
                         value={form.norden}
                         onKeyUp={handleSearch}
-                        onChange={handleChangeNumberDecimals}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        className="w-full"
                     />
-                    <InputTextOneLine
-                        label="Fecha"
-                        type="date"
-                        name="fecha"
-                        value={form.fecha}
-                        onChange={handleChangeSimple}
-                    />
-                    <InputTextOneLine
-                        label="Hora"
-                        name="hora"
-                        value={hora}
-                        disabled
-                    />
-                </SectionFieldset>
-            </div>
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
+                <InputTextOneLine
+                    label="Fecha"
+                    type="date"
+                    name="fecha"
+                    value={form.fecha}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
+                />
+                <InputTextOneLine
+                    label="Hora"
+                    name="hora"
+                    value={hora}
+                    disabled
+                />
+            </SectionFieldset>
 
             {/* Contenido del Consentimiento */}
             <SectionFieldset legend="Consentimiento Informado Ocupacional" className="space-y-3">
@@ -156,12 +227,28 @@ export default function ConsentimientoInformado() {
                 </div>
             </SectionFieldset>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleUpdate : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );
