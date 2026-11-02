@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { getToday } from "../../../../../../../utils/helpers";
 import { SubmitData } from "../../../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../../../utils/functionUtils";
+import { textoDocumento } from "../../../../../../../utils/documentoPaciente";
 
 const urlSubmit = "/api/v01/st/registros/admision"
 
@@ -65,7 +66,7 @@ const ReportePacientes = ({ onClose, sede, token }) => {
         const headers = [
             { key: "item", label: "N°", width: 6, destacado: false },
             { key: "norden", label: "N° ORDEN", width: 14, destacado: false },
-            { key: "dni", label: "DNI", width: 14, destacado: true },
+            { key: "dni", label: "N° Documento", documento: true, width: 14, destacado: true },
             { key: "apellidos", label: "APELLIDOS", width: 28, destacado: true },
             { key: "nombres", label: "NOMBRES", width: 24, destacado: true },
             { key: "edad", label: "EDAD", width: 8, destacado: false },
@@ -108,7 +109,7 @@ const ReportePacientes = ({ onClose, sede, token }) => {
             .filter(Boolean); // columnas 1-based destacadas
 
         data.forEach((item, rowIdx) => {
-            const values = headers.map(h => item[h.key] ?? "");
+            const values = headers.map(h => (h.documento ? textoDocumento(item[h.key]) : item[h.key] ?? ""));
             const dataRow = sheet.addRow(values);
             dataRow.height = 18;
 

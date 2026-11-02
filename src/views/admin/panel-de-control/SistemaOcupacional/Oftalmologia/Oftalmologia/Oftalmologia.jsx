@@ -36,6 +36,7 @@ import {
   CAMPOS_OFTALMOLOGIA_PARTE_II,
   CAMPOS_OFTALMOLOGIA_PARTE_III,
 } from "./camposOftalmologia";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = TABLA_OFTALMOLOGIA;
 const today = getToday();
@@ -507,7 +508,7 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
         <InputTextOneLine
           label="DNI"
           name="dni"
-          value={form.dni || ""}
+          value={textoDocumento(form.dni)}
           disabled
           labelWidth="90px"
         />

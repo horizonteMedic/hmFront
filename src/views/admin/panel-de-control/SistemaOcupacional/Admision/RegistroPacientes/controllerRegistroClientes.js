@@ -1,4 +1,5 @@
 import { isValid, parse } from 'date-fns';
+import { documentoDesdeBackend, TIPO_DNI } from '../../../../../utils/documentoPaciente';
 
 // ===== Listas fijas del formulario =====
 export const OPCIONES_SEXO = ['MASCULINO', 'FEMENINO'];
@@ -17,9 +18,9 @@ export const NIVELES_ESTUDIO = [
 export const ESTADOS_CIVILES = ['SOLTERO', 'CASADO', 'VIUDO', 'CONVIVIENTE', 'SEPARADO', 'DIVORCIADO'];
 
 // campo del formulario -> nombre que se muestra en el aviso de "Faltan completar"
-// (apellidosPa no es obligatorio: así funcionaba el formulario y se conserva)
+// (apellidosPa no es obligatorio: así funcionaba el formulario y se conserva; el documento se valida aparte
+// porque depende del tipo)
 export const CAMPOS_REQUERIDOS = {
-    codPa: 'DNI/LM',
     nombresPa: 'Nombres',
     fechaNaciminetoPa: 'Fecha de nacimiento',
     sexoPa: 'Sexo',
@@ -57,6 +58,10 @@ export const CAMPOS_EDITABLES = [
 // Estado de un formulario en blanco. Los campos "ocultos" son del DTO del paciente pero el formulario
 // no los muestra: se llenan al cargar un paciente existente y se reenvían tal cual al guardarlo.
 export const crearDatosIniciales = () => ({
+    // Documento del paciente (tipo + número en texto). codPa es el código interno que asigna el backend:
+    // no se muestra, solo se usa para la firma / huella / foto.
+    tipoDoc: TIPO_DNI,
+    nroDoc: '',
     codPa: '',
     nombresPa: '',
     apellidosPa: '',
@@ -79,7 +84,6 @@ export const crearDatosIniciales = () => ({
     fotoPa: '',
     codAleatorioPa: '',
     telTrabajoPa: '',
-    tipoDoc: '',
     cargo: '',
     area: '',
     tipoExamen: '',
@@ -108,8 +112,12 @@ const aFechaGuiones = (fecha) => {
 
 // ===== Mapeo: GET datosPaciente -> formulario =====
 // RequestDatosPacienteDTO. null -> '' para que el resaltado de "campo editado" no confunda null con ''.
-export const pacienteAFormulario = (res) => ({
+// `buscado` es el documento con el que se buscó, por si la respuesta no lo trae.
+// Sin codPa el paciente no está registrado (datos de RENIEC o formulario vacío): queda como nuevo.
+export const pacienteAFormulario = (res, buscado) => ({
     ...crearDatosIniciales(),
+    ...buscado,
+    ...(res.nroDoc || res.codPa ? documentoDesdeBackend(res) : {}),
     codPa: String(texto(res.codPa)),
     nombresPa: texto(res.nombresPa),
     apellidosPa: texto(res.apellidosPa),
@@ -131,7 +139,6 @@ export const pacienteAFormulario = (res) => ({
     fotoPa: texto(res.fotoPa),
     codAleatorioPa: texto(res.codAleatorioPa),
     telTrabajoPa: texto(res.telTrabajoPa),
-    tipoDoc: texto(res.tipoDoc),
     cargo: texto(res.cargo),
     area: texto(res.area),
     tipoExamen: texto(res.tipoExamen),
@@ -142,7 +149,7 @@ export const pacienteAFormulario = (res) => ({
     fechaRegistro: res.fechaRegistroPa
         ? `${String(res.fechaRegistroPa).slice(0, 10)}T${String(res.horaRegistroPa || '00:00:00').slice(0, 12)}`
         : '',
-    tieneRegistro: true,
+    tieneRegistro: Boolean(res.codPa),
 });
 
 // ===== Fecha de nacimiento: DD-MM-AAAA mientras se escribe =====

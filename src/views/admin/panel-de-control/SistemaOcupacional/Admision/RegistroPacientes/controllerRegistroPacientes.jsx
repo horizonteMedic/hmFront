@@ -6,6 +6,7 @@ import { SubmitHistoriaC, SubmitHistoriaCMasivo } from "../model/AdminHistoriaC"
 import { getToday } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
+import { TIPO_DNI, validarDocumento } from "../../../../../utils/documentoPaciente";
 
 export const handleSubirExcel = async (setData, setTotalPages) => {
     const { value: file } = await Swal.fire({
@@ -75,13 +76,20 @@ export const submitMasivo = async (data, sede, token) => {
                 cargo: row.cargo || "",
             }));
 
-            console.log(`Bloque ${i + 1}/${totalBloques} - Body a enviar:`, body);
+            // datosPacienteMasivo (RequestDatosPacienteV2DTO) aún no recibe nroDoc: solo se cargan DNIs. Las
+            // filas con otro documento no se envían y quedan con su error (se registran una por una).
+            const erroresDni = loteData.map((row) => validarDocumento(TIPO_DNI, row.codPa));
+            const enviar = body.filter((_, index) => !erroresDni[index]);
 
-            const response = await SubmitData(
-                body,
-                `/api/v01/ct/registroPacientes/datosPacienteMasivo/${sede}`,
-                token
-            );
+            console.log(`Bloque ${i + 1}/${totalBloques} - Body a enviar:`, enviar);
+
+            const response = enviar.length > 0
+                ? await SubmitData(
+                    enviar,
+                    `/api/v01/ct/registroPacientes/datosPacienteMasivo/${sede}`,
+                    token
+                )
+                : null;
 
             console.log(`Bloque ${i + 1}/${totalBloques} - Respuesta API:`, response);
 
@@ -103,7 +111,9 @@ export const submitMasivo = async (data, sede, token) => {
 
             const resultadosLote = body.map((registro, index) => {
                 const key = sinVariables(registro);
-                const motivo = erroresSet.get(key);
+                const motivo = erroresDni[index]
+                    ? `${erroresDni[index]} (la carga masiva solo acepta DNI; registre los demás documentos uno por uno)`
+                    : erroresSet.get(key);
                 return {
                     ok: !motivo,
                     error: motivo || null,

@@ -15,6 +15,7 @@ import {
   VerifyTR,
 } from "./controllerDeclaracionInformacionAptitudMedico";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "DECLA_INFO_APTITUD_MO";
 
@@ -178,7 +179,7 @@ export default function DeclaracionInformacionAptitudMedico() {
             <InputTextOneLine
               label="identificado con DNI"
               name="dni"
-              value={form.dni}
+              value={textoDocumento(form.dni)}
               disabled
               labelWidth="110px"
             />

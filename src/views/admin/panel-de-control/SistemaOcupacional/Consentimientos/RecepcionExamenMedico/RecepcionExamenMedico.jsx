@@ -15,6 +15,7 @@ import {
   VerifyTR,
 } from "./controllerRecepcionExamenMedico";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "CONSENT_RECOM_MEDIC";
 
@@ -169,7 +170,7 @@ export default function RecepcionExamenMedico() {
           <InputTextOneLine
             label="Identificado con DNI"
             name="dni"
-            value={form.dni}
+            value={textoDocumento(form.dni)}
             disabled
             labelWidth="140px"
           />

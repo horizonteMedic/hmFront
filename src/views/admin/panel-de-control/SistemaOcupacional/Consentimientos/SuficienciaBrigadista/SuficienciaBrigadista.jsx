@@ -16,6 +16,7 @@ import {
 } from "./controllerSuficienciaBrigadista";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "consta_brigadista";
 
@@ -189,7 +190,7 @@ export default function SuficienciaBrigadista() {
                         <InputTextOneLine
                             label="identificado con DNI"
                             name="dni"
-                            value={form.dni}
+                            value={textoDocumento(form.dni)}
                             disabled
                             labelWidth="110px"
                         />

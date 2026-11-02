@@ -15,6 +15,7 @@ import {
   VerifyTR,
 } from "./controllerDeclaracionJuradaAntecedentesPersonales";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "DECLA_JURA_ANTECE_PERSON_FAM";
 
@@ -175,7 +176,7 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
           <InputTextOneLine
             label="Identificado con DNI"
             name="dni"
-            value={form.dni}
+            value={textoDocumento(form.dni)}
             disabled
             labelWidth="140px"
           />

@@ -11,6 +11,7 @@ import { getFetch } from "../../../getFetch/getFetch";
 import { generatePdf } from "./PdfGenerado";
 import { VerifyHoF } from "../model/Submit";
 import { SubmitConsentimiento } from "../model/Consentimiento";
+import { textoDocumento } from "../../../../../utils/documentoPaciente";
 
 
 // ===== Configuración =====
@@ -135,11 +136,16 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, esAct
     }
 };
 
-const PrintValidation = async (dni, orderNumber, token) => {
+// La huella y la firma se guardan por codPa. El DTO del consentimiento solo trae `dni` (texto): se usa como
+// codPa mientras el backend no envíe codPa aparte. Si `dni` ya es el número de un pasaporte/carné, no
+// hay huella/firma que encontrar con él y el PDF sale sin ellas.
+const PrintValidation = async (res, orderNumber, token) => {
+    const codigoArchivos = res.codPa ?? res.dni;
+    const dni = textoDocumento(res.dni);
     try {
         const [Huella, Firma, jasper] = await Promise.all([
-            VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/HUELLA`),
-            VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`),
+            VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${codigoArchivos}/HUELLA`),
+            VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${codigoArchivos}/FIRMAP`),
             getFetch(
                 `${obtenerInfoConsentimientoUrl}/${orderNumber}`,
                 token
@@ -189,7 +195,7 @@ export const PrintHojaR = async (nro, token, tabla, datosFooter) => {
         );
 
         if (res && res.dni) {
-            await PrintValidation(res.dni, nro, token);
+            await PrintValidation(res, nro, token);
         } else {
             Swal.fire("Error", "No existe un consentimiento con este N° de Orden", "error");
         }

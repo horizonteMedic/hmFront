@@ -16,6 +16,7 @@ import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerFichaDatosPacientes";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "ficha_datos_paciente";
 const today = getToday();
@@ -491,7 +492,7 @@ export default function FichaDatosPacientes() {
                         <InputTextOneLine
                             label="DNI / C.Ext Nº"
                             name="dni"
-                            value={form.dni}
+                            value={textoDocumento(form.dni)}
                             disabled
                             labelWidth="120px"
                         />

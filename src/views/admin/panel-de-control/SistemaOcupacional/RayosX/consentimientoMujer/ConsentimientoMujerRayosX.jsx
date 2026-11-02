@@ -15,6 +15,7 @@ import AuditoriaRegistro from "../../../../../components/reusableComponents/Audi
 import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
 import { InputTextOneLine, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "consentimiento_rayosx";
 
@@ -177,7 +178,7 @@ export default function ConsentimientoMujerRayosX() {
             <InputTextOneLine
               label="identificado con DNI"
               name="dni"
-              value={form.dni}
+              value={textoDocumento(form.dni)}
               disabled
               labelWidth="110px"
             />

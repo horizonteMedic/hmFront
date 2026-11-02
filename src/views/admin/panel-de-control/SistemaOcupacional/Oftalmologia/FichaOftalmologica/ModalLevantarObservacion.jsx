@@ -8,6 +8,7 @@ import {
   faBroom,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./FichaOftalmologica";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "oftalmologia_lo";
 export default function ModalLevantarObservacion({
@@ -125,7 +126,7 @@ export default function ModalLevantarObservacion({
               <label className="font-semibold">DNI :</label>
               <input
                 name="dni"
-                value={form.dni || ""}
+                value={textoDocumento(form.dni)}
                 disabled
                 className="border rounded px-2 py-1 w-full"
               />

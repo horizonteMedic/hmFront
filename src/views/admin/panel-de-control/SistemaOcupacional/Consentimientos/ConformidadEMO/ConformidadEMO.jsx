@@ -11,6 +11,7 @@ import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerConformidadEMO";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "registro_conformidad_emo";
 
@@ -183,7 +184,7 @@ export default function ConformidadEMO() {
                         <InputTextOneLine
                             label="identificado con DNI"
                             name="dni"
-                            value={form.dni}
+                            value={textoDocumento(form.dni)}
                             disabled
                             labelWidth="110px"
                         />

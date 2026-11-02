@@ -6,6 +6,15 @@ import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileImport, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { SearchPacienteDNI } from '../../model/AdminPaciente';
+import CampoDocumento from '../../CampoDocumento';
+import {
+  documentoDesdeRegistro,
+  mensajeBackend,
+  TIPO_DNI,
+  tieneNumero,
+  validarDocumento,
+  validarDocumentoOrden,
+} from '../../../../../../utils/documentoPaciente';
 import { SubmitHistoriaC } from '../../model/AdminHistoriaC';
 import { getMasivoimport, ImportData } from '../../controller/HC';
 import { getFetch } from '../../../../getFetch/getFetch.js';
@@ -55,8 +64,8 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExamenMulti, ExplotacionMulti, MineralMulti, AlturaMulti, FormaPago, ListAuth } = listas;
 
   // — Estado del formulario —
-  const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), codPa: DNIG ? String(DNIG) : '' }));
-  const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el DNI se puede "Agregar" como nueva
+  const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), ...documentoDesdeRegistro(DNIG) }));
+  const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el documento se puede "Agregar" como nueva
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
   const [precioEditable, setPrecioEditable] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
@@ -80,7 +89,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   registrosRef.current = listado.registros;
 
   useEffect(() => {
-    if (DNIG) enfocar('codPa');
+    if (DNIG) enfocar('nroDoc');
   }, [DNIG]);
 
   useEffect(() => {
@@ -123,25 +132,35 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   };
 
   // — Paciente —
-  const alCambiarDni = (e) => {
-    setCampo('codPa', e.target.value.replace(/\D/g, '').slice(0, 8)); // solo números, hasta 8
+  // Otro documento es otro paciente: el codPa resuelto antes deja de valer
+  const cambiarDocumento = ({ tipoDoc, nroDoc }) => {
+    setDatos((d) => ({ ...d, tipoDoc, nroDoc, codPa: '' }));
     setDniEditado(true);
   };
+  const revertirDocumento = () => {
+    revertFields(['tipoDoc', 'nroDoc', 'codPa']);
+    setDniEditado(false);
+  };
+  const errorDocumento = validarDocumentoOrden(datos);
 
-  const consultarPaciente = async (dni) => {
-    const paciente = await SearchPacienteDNI(selectedSede, dni, token);
+  // Paciente registrado con ese tipo + número de documento (null si no existe)
+  const consultarPaciente = async ({ tipoDoc, nroDoc }) => {
+    const paciente = await SearchPacienteDNI(selectedSede, nroDoc, token, tipoDoc);
     return paciente?.codPa ? paciente : null;
   };
 
   const buscarPaciente = async (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
+    if (!tieneNumero(datos.tipoDoc)) return;
+    const error = validarDocumento(datos.tipoDoc, datos.nroDoc);
+    if (error) return Swal.fire('Error', error, 'error');
     mostrarCargando();
     setBuscandoPaciente(true);
     try {
-      const paciente = await consultarPaciente(datos.codPa);
-      if (!paciente) return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
-      setDatos((d) => ({ ...d, nombres: paciente.nombresPa, apellidos: paciente.apellidosPa }));
+      const paciente = await consultarPaciente(datos);
+      if (!paciente) return Swal.fire('Error', 'El paciente no existe: regístrelo antes de crear la orden', 'error');
+      setDatos((d) => ({ ...d, nombres: paciente.nombresPa, apellidos: paciente.apellidosPa, codPa: String(paciente.codPa) }));
       Swal.close();
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
@@ -151,9 +170,13 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   };
 
   // Trae los datos de la última historia del paciente (sin su N° de historia ni su pre-carga)
+  // La última historia se busca por codPa: con DNI es el propio número; con otro documento hay que buscar
+  // antes al paciente (Enter en N° Documento) para tener su codPa
   const importarUltimaHistoria = () => {
+    const codigo = datos.codPa || (Number(datos.tipoDoc) === TIPO_DNI ? datos.nroDoc : '');
+    if (!codigo) return Swal.fire('Error', 'Busque primero al paciente (Enter en N° Documento)', 'error');
     ImportData(
-      datos.codPa,
+      codigo,
       Swal,
       getFetch,
       token,
@@ -163,8 +186,10 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
   };
 
   const importarPreCarga = () => {
-    if (!datos.codPa) return Swal.fire('Error', 'Coloque un DNI válido', 'error');
-    getMasivoimport(datos.codPa, token, (resultados) => {
+    if (Number(datos.tipoDoc) !== TIPO_DNI) return Swal.fire('Aviso', 'Las pre-cargas solo se buscan por DNI', 'info');
+    const error = validarDocumento(TIPO_DNI, datos.nroDoc);
+    if (error) return Swal.fire('Error', error, 'error');
+    getMasivoimport(datos.nroDoc, token, (resultados) => {
       if (resultados.length === 0) return Swal.fire('Sin Resultado', 'No hay pre-cargas para este DNI', 'info');
       if (resultados.length === 1) return aplicarPreCarga(resultados[0]);
       setOpcionesPreCarga(resultados);
@@ -174,9 +199,9 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
 
   const aplicarPreCarga = async (item) => {
     try {
-      const paciente = await consultarPaciente(datos.codPa);
-      if (!paciente) return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
-      setDatos((d) => preCargaAFormulario(d, item, paciente));
+      const paciente = await consultarPaciente(datos);
+      if (!paciente) return Swal.fire('Error', 'El paciente no existe: regístrelo antes de crear la orden', 'error');
+      setDatos((d) => ({ ...preCargaAFormulario(d, item, paciente), codPa: String(paciente.codPa) }));
       Swal.close();
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
@@ -260,6 +285,10 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
 
   // — Guardar (1 = registrar, 2 = actualizar) —
   const guardar = async (tipoOperacion) => {
+    if (errorDocumento) {
+      setMostrarErrores(true);
+      return Swal.fire('Error', errorDocumento, 'error');
+    }
     const faltantes = Object.entries(CAMPOS_REQUERIDOS)
       .filter(([campo]) => !datos[campo])
       .map(([, etiqueta]) => etiqueta);
@@ -275,10 +304,11 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
     mostrarCargando();
     try {
       const res = await SubmitHistoriaC({ ...datos, user_registro: userlogued }, selectedSede, token, tipoOperacion);
+      // id es el N° de orden; 0 = error con mensaje
       if (!res?.id) {
         return Swal.fire(
           'Error',
-          tipoOperacion === 1 ? 'No se ha podido registrar la Historia Clínica' : 'No se ha podido editar la Historia Clínica',
+          mensajeBackend(res, tipoOperacion === 1 ? 'No se ha podido registrar la Historia Clínica' : 'No se ha podido editar la Historia Clínica'),
           'error'
         );
       }
@@ -310,7 +340,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
     if (!encontrado) Swal.fire('Sin Resultado', 'No se encontraron registros', 'warning');
   };
 
-  const hayRegistroCargado = Boolean(datos.tieneRegistro || datos.codPa || datos.nombres);
+  const hayRegistroCargado = Boolean(datos.tieneRegistro || datos.nroDoc || datos.codPa || datos.nombres);
   const puedeAgregarNueva = datos.tieneRegistro && edicionHabilitada && dniEditado;
   const auditoria = buildAuditoria(datos, { usuarioActual: userlogued, fechaHoraActual: getFechaHoraActual() });
   const puedeSubidaMasiva = tienePermisoEnVista?.('Admision', 'Subida Masiva Examenes Ocupacionales');
@@ -340,28 +370,27 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
             legend="Datos del Paciente"
             className="space-y-3"
           >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-              <InputTextOneLine
-                label="DNI"
-                name="codPa"
-                value={datos.codPa}
-                onChange={alCambiarDni}
-                onKeyUp={buscarPaciente}
-                disabled={buscandoPaciente || camposDeshabilitados}
-                labelWidth={LABEL}
-                className="min-w-0 sm:flex-1"
-                inputClassName={datos.idPreNorden ? 'border-orange-400 bg-orange-100' : ''}
-                inputMode="numeric"
-                maxLength={8}
-                placeholder="DNI y Enter para buscar"
-                autocomplete="off"
-                {...requerido('codPa')}
-                edited={isFieldEdited('codPa')}
-                onRevert={() => {
-                  revertField('codPa');
-                  setDniEditado(false);
-                }}
-              />
+            <CampoDocumento
+              tipoDoc={datos.tipoDoc}
+              nroDoc={datos.nroDoc}
+              onChange={cambiarDocumento}
+              onKeyUp={buscarPaciente}
+              disabled={buscandoPaciente || camposDeshabilitados}
+              labelWidth={LABEL}
+              inputClassName={datos.idPreNorden ? 'border-orange-400 bg-orange-100' : ''}
+              placeholder="N° y Enter para buscar"
+              required
+              error={mostrarErrores && errorDocumento ? errorDocumento : ''}
+              edited={isFieldEdited('tipoDoc') || isFieldEdited('nroDoc')}
+              onRevert={revertirDocumento}
+              avisoSinNumero={
+                datos.codPa
+                  ? datos.tipoDoc
+                    ? 'Sin documento (paciente ya registrado)'
+                    : 'Documento no disponible en la historia (paciente extranjero)'
+                  : 'Sin documento: regístrelo primero en Registro de Pacientes'
+              }
+            >
               <div className="flex gap-2">
                 <button type="button" onClick={importarUltimaHistoria} disabled={camposDeshabilitados} className={`${BOTON} bg-blue-800 hover:bg-blue-700`}>
                   <FontAwesomeIcon icon={faFileImport} />
@@ -372,7 +401,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
                   Pre-carga
                 </button>
               </div>
-            </div>
+            </CampoDocumento>
             {datos.idPreNorden && (
               <p className="mb-0 font-semibold text-orange-700">
                 Datos de la pre-carga N° {datos.idPreNorden}
@@ -688,7 +717,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
             hideEdit={!datos.tieneRegistro || edicionHabilitada}
           >
             {puedeAgregarNueva && (
-              <button type="button" onClick={() => guardar(1)} className={BOTON_FORM} title="Registra una historia nueva con el DNI y los datos actuales">
+              <button type="button" onClick={() => guardar(1)} className={BOTON_FORM} title="Registra una historia nueva con el documento y los datos actuales">
                 <FontAwesomeIcon icon={faPlus} /> Agregar como nueva
               </button>
             )}

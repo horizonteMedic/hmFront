@@ -8,6 +8,7 @@ import { getToday } from "../../../../../../../utils/helpers";
 import { SubmitData } from "../../../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../../../utils/functionUtils";
 import { useSessionData } from "../../../../../../../hooks/useSessionData";
+import { textoDocumento } from "../../../../../../../utils/documentoPaciente";
 
 const URL_SUBMIT = "/api/v01/st/registros/matrizOcupacional2026";
 
@@ -15,7 +16,7 @@ const BASIC_HEADERS = [
     { key: "item", label: "N° ORDEN", width: 14 },
     { key: "FECHAEMO", label: "FECHA EMO", width: 14 },
     { key: "NOMBRES", label: "NOMBRES", width: 28 },
-    { key: "DNI", label: "DNI", width: 14 },
+    { key: "DNI", label: "N° Documento", documento: true, width: 14 },
     { key: "SEXO", label: "SEXO", width: 8 },
     { key: "EDAD", label: "EDAD", width: 8 },
     { key: "CARGO", label: "CARGO", width: 22 },
@@ -156,7 +157,7 @@ const ModalContabilidad = ({ onClose, sede, token }) => {
 
         // ── Filas de datos ──────────────────────────────────────────────
         data.forEach((item, rowIdx) => {
-            const basicValues = BASIC_HEADERS.map(h => item[h.key] ?? "");
+            const basicValues = BASIC_HEADERS.map(h => (h.documento ? textoDocumento(item[h.key]) : item[h.key] ?? ""));
             const examValues = EXAM_HEADERS.map(h => {
                 const v = item[h.key];
                 if (typeof v === "boolean") return v ? "SI" : "";
