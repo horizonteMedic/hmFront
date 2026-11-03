@@ -1542,5 +1542,6 @@ export function dnicompletarConCeros(dni) {
     if (str === '') {
         return '';
     }
+    if (!/^\d+$/.test(str)) return str; // carné / pasaporte (p. ej. "L421"): tal cual
     return str.padStart(8, '0');
 }
