@@ -19,6 +19,7 @@ import {
     obtenerTriajeDeTicket,
 } from "../../../../../utils/resumenAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
+import { patologiasAdicionales } from "../../AntecedentesPatologicos/catalogoPatologias";
 import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
 import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
 import { ObtenerReceta, formFromReceta } from "../Receta/controllerReceta";
@@ -129,6 +130,8 @@ const formFromAntecedentes = (data) => {
         ap_mordedura_animales: siNo(marcados.ap_mordedura_animales || Boolean(mordedura)),
         tipoCancer: data.tipoCancer ?? "",
         descripcionMordedura: data.descripcionMordedura ?? "",
+        // Lo que tenga el paciente y el formulario no muestre como ítem fijo sale en "Patologías Adicionales".
+        patologiasAdicionales: patologiasAdicionales(data.antecedentesPatologicos, Object.values(AP_CLAVES).flat(), data),
     };
 };
 

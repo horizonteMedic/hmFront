@@ -5,6 +5,7 @@ import {
   RadioTable
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import PatologiasAdicionales from "../../AntecedentesPatologicos/PatologiasAdicionales";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import AvisoError from "../../../../../components/reusableComponents/AvisoError";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
@@ -144,6 +145,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     ap_alergia_medicamentos: undefined,
     ap_alergia_medicamentos_especificar: "",
     ap_transfusion_sanguinea: false,
+    patologiasAdicionales: [],
 
     // Antecedentes Patológicos Familiares (solo lectura, ver AntecedentesPatologicos)
     padre: "",
@@ -593,6 +595,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
               />
             )}
           </div>
+          <PatologiasAdicionales items={form.patologiasAdicionales} />
         </SectionFieldset>
       </div>
 

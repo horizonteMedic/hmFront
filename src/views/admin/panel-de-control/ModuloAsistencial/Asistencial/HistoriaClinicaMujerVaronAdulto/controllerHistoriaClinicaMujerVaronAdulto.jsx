@@ -18,6 +18,7 @@ import {
     obtenerTriajeDeTicket,
 } from "../../../../../utils/resumenAsistencialUtils";
 import { useAuthStore } from "../../../../../../store/auth";
+import { patologiasAdicionales } from "../../AntecedentesPatologicos/catalogoPatologias";
 import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
 import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
 import { ObtenerReceta, formFromReceta } from "../Receta/controllerReceta";
@@ -79,6 +80,12 @@ const AP_ENFERMEDAD_KEYS = {
 // antecedentesInformativos.reaccionAdversaMedicamentosEspecificar.
 const formFromAntecedentesInformativos = (antecedentesInformativos) => {
     const personales = new Set(antecedentesInformativos?.personales ?? []);
+    // Lo que tenga el paciente y el formulario no muestre como ítem fijo sale en "Patologías Adicionales".
+    const patologiasExtra = patologiasAdicionales(
+        antecedentesInformativos?.personales,
+        [...Object.values(AP_ENFERMEDAD_KEYS).flat(), "neoplasias"],
+        antecedentesInformativos
+    );
     const apEnfermedades = Object.fromEntries(
         Object.entries(AP_ENFERMEDAD_KEYS).map(([campo, claves]) => [
             campo,
@@ -92,6 +99,7 @@ const formFromAntecedentesInformativos = (antecedentesInformativos) => {
         ap_neoplasia: personales.has("neoplasias") ? "SI" : "",
         ap_alergia_medicamentos: alergiaEspecificar ? "SI" : "NO",
         ap_alergia_medicamentos_especificar: alergiaEspecificar,
+        patologiasAdicionales: patologiasExtra,
     };
 };
 
