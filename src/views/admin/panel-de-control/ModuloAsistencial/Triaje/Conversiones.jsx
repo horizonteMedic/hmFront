@@ -28,60 +28,59 @@ export const GetIMC = async (event, triaje, set, s) => {
             return
         }
         const IMC = triaje.peso / (triaje.talla * triaje.talla);
-        set(d => ({ ...d, imc: IMC.toFixed(2) }))
+        const imc = IMC.toFixed(2)
+        // El diagnóstico de IMC depende solo de talla y peso: se registra al calcularlo.
+        const clasificacion = ClasificarIMC(imc)
+        set(d => ({
+            ...d,
+            imc,
+            ...(clasificacion && { diagnostico: (d.diagnostico || '') + `- INDICE DE MASA CORPORAL: ${clasificacion}.` + "\n" }),
+        }))
         document.getElementById('cintura')?.focus();
     }
 }
 
+const ClasificarIMC = (imc) => {
+    if (imc < 18.5) return 'BAJO DE PESO'
+    if (imc < 25) return 'NORMAL'
+    if (imc < 30) return 'SOBREPESO'
+    if (imc < 35) return 'OBESIDAD I'
+    if (imc < 40) return 'OBESIDAD II'
+    return 'OBESIDAD III'
+}
+
+// Cintura es opcional: vacía solo pasa al siguiente campo.
 export const GetCintura = async (event, triaje, set, s) => {
-    if (!triaje.cintura) {
-        return
-    }
     if (event.key === 'Enter') {
-        if (triaje.cintura < 45 || triaje.cintura > 180) {
+        if (triaje.cintura && (triaje.cintura < 45 || triaje.cintura > 180)) {
             set(d => ({ ...d, cintura: '' }))
             await s.fire('Error', 'No se permite este dato', 'error')
             return
         }
-        if (triaje.imc) {
-            const imc = triaje.imc
-            if (imc < 18.5) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: BAJO DE PESO.' + "\n" }))
-            } else if (imc >= 18.5 && imc < 25) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: NORMAL.' + "\n" }))
-            } else if (imc >= 25 && imc < 30) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: SOBREPESO.' + "\n" }))
-            } else if (imc >= 30 && imc < 35) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.' + "\n" }))
-            } else if (imc >= 35 && imc < 40) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.' + "\n" }))
-            } else if (imc >= 40) {
-                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.' + "\n" }))
-            }
-        }
-
         document.getElementById('cadera')?.focus();
     }
 }
 
+// Cadera es opcional; el ICC solo se calcula si hay cintura y cadera, si no queda vacío.
 export const GetICC = async (event, triaje, set) => {
-    if (!triaje.cintura || !triaje.cadera) {
-        return
-    }
     if (event.key === 'Enter') {
-        if (triaje.cadera < 70 || triaje.cadera > 180) {
+        if (triaje.cadera && (triaje.cadera < 70 || triaje.cadera > 180)) {
             set(d => ({ ...d, cadera: '' }))
             await Swal.fire('Error', 'No se permite este dato', 'error')
             return
         }
-        const icc = triaje.cintura / triaje.cadera
-        set(d => ({ ...d, icc: icc.toFixed(2) }))
+        if (triaje.cintura && triaje.cadera) {
+            const icc = triaje.cintura / triaje.cadera
+            set(d => ({ ...d, icc: icc.toFixed(2) }))
+        } else {
+            set(d => ({ ...d, icc: '' }))
+        }
         document.getElementById('temperatura')?.focus();
     }
 }
 
 export const GetCC = async (event, triaje, set) => {
-    if (!triaje.icc) {
+    if (!triaje.temperatura) {
         return
     }
     if (event.key === 'Enter') {
@@ -118,7 +117,8 @@ export const GetCC = async (event, triaje, set) => {
         }
         const icc = triaje.icc
         const sexo = 'M'
-        if (sexo === 'M') {
+        // Sin ICC (cintura o cadera vacías) no hay diagnóstico de cintura-cadera
+        if (icc && sexo === 'M') {
             if (icc >= 0.78 && icc < 0.95) {
                 set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE CINTURA CADERA: NORMAL.' + "\n" }))
 
@@ -126,7 +126,7 @@ export const GetCC = async (event, triaje, set) => {
                 set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE CINTURA CADERA: OBESIDAD ABDOMIO VISCERAL.' + "\n" }))
             }
         }
-        if (sexo === 'F') {
+        if (icc && sexo === 'F') {
             if (icc >= 0.71 && icc < 0.86) {
                 set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE CINTURA CADERA: NORMAL.' + "\n" }))
 
@@ -169,11 +169,13 @@ export const GetFC = async (event, triaje, set) => {
     }
 }
 
+// Perímetro de cuello es opcional: vacío solo pasa al siguiente campo, sin diagnóstico.
 export const GetCuello = async (event, triaje, set) => {
-    if (!triaje.perimetroCuello) {
-        return
-    }
     if (event.key === 'Enter') {
+        if (!triaje.perimetroCuello) {
+            document.getElementById('sistolica')?.focus();
+            return
+        }
         if (triaje.perimetroCuello < 30 || triaje.perimetroCuello > 55) {
             set(d => ({ ...d, perimetroCuello: '' }))
             await Swal.fire('Error', 'No se permite este dato', 'error')

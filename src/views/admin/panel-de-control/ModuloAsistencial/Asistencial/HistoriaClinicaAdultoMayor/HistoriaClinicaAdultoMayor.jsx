@@ -5,6 +5,7 @@ import {
   RadioTable
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import PatologiasAdicionales from "../../AntecedentesPatologicos/PatologiasAdicionales";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import AvisoError from "../../../../../components/reusableComponents/AvisoError";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
@@ -222,6 +223,7 @@ export default function HistoriaClinicaAdultoMayor() {
     ap_depresion: undefined,
     ap_riesgo_ocupacional: undefined,
     ap_mordedura_animales: undefined,
+    patologiasAdicionales: [],
     descripcionMordedura: "",
 
     // Antecedentes Quirúrgicos (solo lectura, ver AntecedentesPatologicos)
@@ -627,6 +629,7 @@ export default function HistoriaClinicaAdultoMayor() {
             {...radioEditableProps}
           />
         </div>
+        <PatologiasAdicionales items={form.patologiasAdicionales} />
       </SectionFieldset>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3 items-start">

@@ -10,6 +10,7 @@ import FilaEtiquetaValorAsistencial, {
   medirEtiquetaValor,
 } from "../../components/filaEtiquetaValorAsistencial.jsx";
 import footerTR from "../../components/footerTR.jsx";
+import AntecedentesAdicionalesAsistencial from "../../components/antecedentesAdicionalesAsistencial.jsx";
 import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
 
 // Formato digitalizado de la hoja física "Historia Clínica del Adulto Mayor".
@@ -361,6 +362,21 @@ export default async function HistoriaClinicaAdultoMayor_Digitalizado(data = {},
   y = TituloSeccionAsistencial(doc, "ANTECEDENTES PERSONALES", { x: X, y, ancho: ANCHO });
   columnas.forEach((columna, i) => dibujarColumna(columna, X + i * ANCHO_ANTECEDENTES, y));
   y += altoAntecedentes;
+
+  // ----- Antecedentes adicionales: patologías del paciente sin fila fija arriba (empuja lo que sigue) -----
+  const patologiasAdicionales = (Array.isArray(data.patologiasAdicionales) ? data.patologiasAdicionales : [])
+    .map(texto)
+    .filter(Boolean);
+  y = await AntecedentesAdicionalesAsistencial(doc, patologiasAdicionales, {
+    x: X,
+    y,
+    ancho: ANCHO,
+    asegurarEspacio: async (yy, alto) => {
+      y = yy;
+      await asegurar(alto);
+      return y;
+    },
+  });
 
   // ----- Antecedentes patológicos familiares (texto por familiar) -----
   await seccion("ANTECEDENTES PATOLÓGICOS FAMILIARES");
