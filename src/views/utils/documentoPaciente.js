@@ -4,6 +4,8 @@
 // `codPa` es solo el código interno del backend: a los extranjeros les asigna 900,000,000 o más, así que
 // nunca se muestra como documento.
 
+import { getFetch } from './apiHelpers';
+
 export const TIPO_DNI = 1;
 export const TIPO_CARNE_EXTRANJERIA = 2;
 export const TIPO_PASAPORTE = 3;
@@ -119,6 +121,36 @@ export const tipoDocDesdeTexto = (valor) => {
   if (texto.includes('PASAP')) return TIPO_PASAPORTE;
   if (texto.startsWith('SIN')) return TIPO_SIN_DOCUMENTO;
   return '';
+};
+
+// Documento del paciente de una orden: { codPa, tipoDoc, tipoDocNombre, nroDoc }, o null si no existe o falla
+export const obtenerDocumentoPorOrden = async (nOrden, token) => {
+  try {
+    const res = await getFetch(`/api/v01/ct/registroPacientes/documento/orden/${encodeURIComponent(nOrden)}`, token);
+    return res && !res.error && res.nroDoc !== undefined ? res : null;
+  } catch {
+    return null;
+  }
+};
+
+// Rótulo corto (para "DNI:") y nombre (para el texto de indicaciones) de cada tipo
+const ROTULOS_DOCUMENTO = {
+  [TIPO_DNI]: { etiquetaDoc: 'DNI', nombreDoc: 'DNI' },
+  [TIPO_CARNE_EXTRANJERIA]: { etiquetaDoc: 'CE', nombreDoc: 'CARNÉ DE EXTRANJERÍA' },
+  [TIPO_PASAPORTE]: { etiquetaDoc: 'PAS', nombreDoc: 'PASAPORTE' },
+  [TIPO_SIN_DOCUMENTO]: { etiquetaDoc: 'DOC', nombreDoc: 'DOCUMENTO DE IDENTIDAD' },
+};
+
+// Datos de un PDF con el documento real: `dni` pasa a ser el número y se agregan etiquetaDoc / nombreDoc
+// para los rótulos. Sin documento (no se encontró) los datos quedan igual y el PDF dice "DNI".
+export const datosConDocumento = (datos, documento) => {
+  const rotulos = documento && ROTULOS_DOCUMENTO[Number(documento.tipoDoc)];
+  if (!rotulos) return datos;
+  return {
+    ...datos,
+    ...rotulos,
+    dni: Number(documento.tipoDoc) === TIPO_SIN_DOCUMENTO ? 'SIN DOCUMENTO' : documento.nroDoc || datos?.dni,
+  };
 };
 
 // Mensaje de error del backend (registro y órdenes responden id = 0 con mensaje)

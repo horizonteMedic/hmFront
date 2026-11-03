@@ -173,7 +173,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("DNI:", marginL + 5, currentY);
+    doc.text(`${datos.etiquetaDoc || "DNI"}:`, marginL + 5, currentY); // CE / PAS para extranjeros
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.text(String(datos.dni || ""), marginL + 15, currentY);
