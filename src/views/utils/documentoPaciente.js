@@ -11,12 +11,19 @@ export const TIPO_CARNE_EXTRANJERIA = 2;
 export const TIPO_PASAPORTE = 3;
 export const TIPO_SIN_DOCUMENTO = 4;
 
+// Por ahora no se registran pacientes sin documento: el tipo no se ofrece en los formularios ni se admite en
+// las cargas masivas. Los ya registrados se siguen mostrando (ver opcionesTipoDocumento).
 export const TIPOS_DOCUMENTO = [
   { value: TIPO_DNI, label: 'DNI' },
   { value: TIPO_CARNE_EXTRANJERIA, label: 'CARNÉ DE EXTRANJERÍA' },
   { value: TIPO_PASAPORTE, label: 'PASAPORTE' },
-  { value: TIPO_SIN_DOCUMENTO, label: 'SIN DOCUMENTO' },
 ];
+
+// Opciones del selector: "SIN DOCUMENTO" solo aparece si el paciente cargado ya lo tiene
+export const opcionesTipoDocumento = (tipoActual) =>
+  Number(tipoActual) === TIPO_SIN_DOCUMENTO
+    ? [...TIPOS_DOCUMENTO, { value: TIPO_SIN_DOCUMENTO, label: 'SIN DOCUMENTO' }]
+    : TIPOS_DOCUMENTO;
 
 const CODPA_INTERNO_DESDE = 900000000;
 
@@ -90,7 +97,7 @@ export const validarDocumentoOrden = ({ tipoDoc, nroDoc, codPa }) => {
   if (!tipoDoc || !tieneNumero(tipoDoc)) {
     if (codPa) return '';
     return tipoDoc
-      ? 'Paciente sin documento: regístrelo primero en Registro de Pacientes'
+      ? 'No se pueden crear órdenes de pacientes sin documento'
       : 'Seleccione el tipo de documento';
   }
   return validarDocumento(tipoDoc, nroDoc);
@@ -108,18 +115,17 @@ export const textoDocumento = (dni) => {
 };
 
 // Tipo de documento escrito en un Excel ("DNI", "Carnet Extra", "C.E.", "Pasaporte", "2"...). Vacío = DNI;
-// '' si no se reconoce.
+// '' si no se reconoce ("sin documento" tampoco se admite en las cargas masivas).
 export const tipoDocDesdeTexto = (valor) => {
   const texto = String(valor ?? '')
     .normalize('NFD')
     .replace(/[̀-ͯ.\s]/g, '')
     .toUpperCase();
   if (!texto) return TIPO_DNI;
-  if (/^[1-4]$/.test(texto)) return Number(texto);
+  if (/^[1-3]$/.test(texto)) return Number(texto);
   if (texto.startsWith('DNI')) return TIPO_DNI;
   if (texto.includes('CARN') || texto.includes('EXTRANJ') || texto === 'CE') return TIPO_CARNE_EXTRANJERIA;
   if (texto.includes('PASAP')) return TIPO_PASAPORTE;
-  if (texto.startsWith('SIN')) return TIPO_SIN_DOCUMENTO;
   return '';
 };
 
