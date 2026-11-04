@@ -3,33 +3,8 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { compressImage } from '../../../utils/helpers.js';
-
-// Mapeo de etiquetas a nombres de imágenes
-const labelsToImgs = {
-  Ausente: "imgAusente",
-  "Cariada por opturar": "imgPorOturar",
-  "Por extraer": "imgExtraer",
-  Fracturada: "imgFracturada",
-  Corona: "imgCorona",
-  "Obturacion Efectuada": "imgObturacionEfectuada",
-  Puente: "imgPuente",
-  "P.P.R Metalica": "imgPPRMetalica",
-  "P.P.R Acrilica": "imgPPRAcrilica",
-  "P.Total": "imgPTotal",
-};
-
-// Invertimos el objeto automáticamente
-const imgsToLabels = Object.fromEntries(
-  Object.entries(labelsToImgs).map(([label, img]) => [img, label])
-);
-
-// Función para interpretar URL y obtener el tipo de diente
-const interpretarUrlParaLeer = (url) => {
-  if (url == null) return "Normal";
-  const match = url.match(/([^/\\]+)(?=\.png$)/);
-  const nombreArchivo = match?.[1];
-  return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
-};
+import { drawEstadisticas, drawLeyenda, estadosDeDientes, ICONO_PNG } from './leyendaYTotales.js';
+import { dibujarEstadoVectorial, tieneDibujoVectorial } from './estadosVectoriales.js';
 
 // Header con logo, color box y título
 const drawHeader = async (doc, datos = {}) => {
@@ -185,20 +160,8 @@ const drawOdontograma = async (doc, yPosInicial, datos = {}) => {
   }
 
   // === COLOCAR ICONOS EN LOS DIENTES ===
-  // Mapeo de tipos de dientes a nombres de archivos de iconos
-  const mapeoTiposIconos = {
-    Ausente: "ausente",
-    "Cariada por opturar": "cariada",
-    "Por extraer": "por_extraer",
-    Fracturada: "fracturada",
-    Corona: "corona",
-    "Obturacion Efectuada": "obturacion",
-    Puente: "puente",
-    "P.P.R Metalica": "ppr_metalica",
-    "P.P.R Acrilica": "ppr_acrilica",
-    "P.Total": "p_total",
-    Normal: "normal",
-  };
+  // Los estados con ícono PNG están en ICONO_PNG (leyendaYTotales); el resto se dibuja con trazos (estadosVectoriales)
+  const mapeoTiposIconos = ICONO_PNG;
 
   // Posiciones de los dientes en el odontograma (ajustadas para la nueva imagen)
   // Estas posiciones son relativas a la imagen base y se escalarán según el scale
@@ -243,41 +206,8 @@ const drawOdontograma = async (doc, yPosInicial, datos = {}) => {
     32: { x: 525, y: 585, width: 50, height: 50 }, // Reflejo de 1 (x: 45 → 525)
   };
 
-  // Procesar datos de los dientes (lbl11-lbl48)
-  const datosDientes = {
-    d1: interpretarUrlParaLeer(datos.lbl18),
-    d2: interpretarUrlParaLeer(datos.lbl17),
-    d3: interpretarUrlParaLeer(datos.lbl16),
-    d4: interpretarUrlParaLeer(datos.lbl15),
-    d5: interpretarUrlParaLeer(datos.lbl14),
-    d6: interpretarUrlParaLeer(datos.lbl13),
-    d7: interpretarUrlParaLeer(datos.lbl12),
-    d8: interpretarUrlParaLeer(datos.lbl11),
-    d9: interpretarUrlParaLeer(datos.lbl21),
-    d10: interpretarUrlParaLeer(datos.lbl22),
-    d11: interpretarUrlParaLeer(datos.lbl23),
-    d12: interpretarUrlParaLeer(datos.lbl24),
-    d13: interpretarUrlParaLeer(datos.lbl25),
-    d14: interpretarUrlParaLeer(datos.lbl26),
-    d15: interpretarUrlParaLeer(datos.lbl27),
-    d16: interpretarUrlParaLeer(datos.lbl28),
-    d17: interpretarUrlParaLeer(datos.lbl48),
-    d18: interpretarUrlParaLeer(datos.lbl47),
-    d19: interpretarUrlParaLeer(datos.lbl46),
-    d20: interpretarUrlParaLeer(datos.lbl45),
-    d21: interpretarUrlParaLeer(datos.lbl44),
-    d22: interpretarUrlParaLeer(datos.lbl43),
-    d23: interpretarUrlParaLeer(datos.lbl42),
-    d24: interpretarUrlParaLeer(datos.lbl41),
-    d25: interpretarUrlParaLeer(datos.lbl31),
-    d26: interpretarUrlParaLeer(datos.lbl32),
-    d27: interpretarUrlParaLeer(datos.lbl33),
-    d28: interpretarUrlParaLeer(datos.lbl34),
-    d29: interpretarUrlParaLeer(datos.lbl35),
-    d30: interpretarUrlParaLeer(datos.lbl36),
-    d31: interpretarUrlParaLeer(datos.lbl37),
-    d32: interpretarUrlParaLeer(datos.lbl38),
-  };
+  // Estado de cada diente (lbl11-lbl48 del backend)
+  const datosDientes = estadosDeDientes(datos);
 
   // Función para colocar icono en un diente específico
   const colocarIconoEnDiente = async (numeroDiente, tipoDiente) => {
@@ -287,7 +217,7 @@ const drawOdontograma = async (doc, yPosInicial, datos = {}) => {
       posicionesDientesBase[numeroDiente]
     ) {
       const nombreIcono = mapeoTiposIconos[tipoDiente];
-      if (nombreIcono) {
+      if (nombreIcono || tieneDibujoVectorial(tipoDiente)) {
         const iconPath = `/img/iconos_odonto/Icon_${nombreIcono}.png`;
         const posicionBase = posicionesDientesBase[numeroDiente];
         
@@ -296,6 +226,11 @@ const drawOdontograma = async (doc, yPosInicial, datos = {}) => {
         const iconY = yPos + (posicionBase.y * scale);
         const iconWidth = (posicionBase.width || 8) * scale;
         const iconHeight = (posicionBase.height || 8) * scale;
+
+        if (!nombreIcono) {
+          dibujarEstadoVectorial(doc, tipoDiente, iconX, iconY, iconWidth, iconHeight);
+          return;
+        }
 
         try {
           // Cargar y comprimir el icono
@@ -329,124 +264,6 @@ const drawOdontograma = async (doc, yPosInicial, datos = {}) => {
   }
 };
 
-// Función helper para cargar y comprimir imágenes
-const loadImage = async (src) => {
-  try {
-    // Comprimir la imagen primero
-    const compressedDataUrl = await compressImage(src, 0.7, 200); // Calidad 0.7, maxWidth 200 para iconos pequeños
-    if (!compressedDataUrl) {
-      return null;
-    }
-    
-    // Cargar la imagen comprimida
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(`No se pudo cargar ${src}`);
-      img.src = compressedDataUrl;
-    });
-  } catch (error) {
-    console.error(`Error al comprimir/cargar imagen ${src}:`, error);
-    return null;
-  }
-};
-
-// Función para dibujar la leyenda de iconos
-const drawLeyenda = async (doc, yPosInicial) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15; // Margen derecho
-  const espacioIzquierdo = pageW * 0.45;
-  const inicioX = espacioIzquierdo;
-  const anchoDisponible = pageW - espacioIzquierdo - margin; // Ancho disponible desde inicioX hasta el margen
-  let yPos = yPosInicial + 4; // Espacio después de los datos personales (reducido)
-  
-  const iconSize = 5.5; // Tamaño de los iconos (aumentado)
-  const numColumnas = 4;
-  // Calcular espaciado entre columnas para que quepan todas
-  const colSpacing = anchoDisponible / numColumnas; // Distribuir el ancho disponible entre las columnas
-  const rowSpacing = 6; // Espacio entre filas
-
-  // Título LEYENDA
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("LEYENDA", inicioX, yPos);
-  yPos += 4; // Espacio reducido después del título
-
-  // Definir los elementos de la leyenda organizados por columnas
-  // Los iconos están en public/img/iconos_odonto/
-  const basePath = "/img/iconos_odonto/";
-  const leyendaItems = [
-    // Columna 1
-    [
-      { icon: `${basePath}Icon_ausente.png`, text: "Ausente" },
-      { icon: `${basePath}Icon_puente.png`, text: "Puente" },
-      { icon: `${basePath}Icon_p_total.png`, text: "P. Total" }
-    ],
-    // Columna 2
-    [
-      { icon: `${basePath}Icon_cariada.png`, text: "Cariada Por Oturar" },
-      { icon: `${basePath}Icon_ppr_metalica.png`, text: "P.P.R Metálica" },
-      { icon: `${basePath}Icon_corona.png`, text: "Corona" }
-    ],
-    // Columna 3
-    [
-      { icon: `${basePath}Icon_por_extraer.png`, text: "Por Extraer" },
-      { icon: `${basePath}Icon_ppr_acrilica.png`, text: "P.P.R Acrílica" },
-      { icon: `${basePath}Icon_obturacion.png`, text: "Obturación Efectuada" }
-    ],
-    // Columna 4
-    [
-      { icon: `${basePath}Icon_fracturada.png`, text: "Fracturada" },
-      { icon: `${basePath}Icon_normal.png`, text: "Normal" }
-    ]
-  ];
-
-  // Calcular altura total de la leyenda para el marco
-  const maxFilas = Math.max(...leyendaItems.map(col => col.length));
-  const alturaLeyenda = maxFilas * rowSpacing + 2;
-  const startY = yPos;
-
-  // Cargar todas las imágenes primero
-  const imagePromises = leyendaItems.flat().map(item => 
-    loadImage(item.icon).catch(() => null)
-  );
-  const images = await Promise.all(imagePromises);
-
-  // Dibujar cada columna
-  let imageIndex = 0;
-  
-  leyendaItems.forEach((columna, colIndex) => {
-    const colX = inicioX + (colIndex * colSpacing);
-    let currentY = startY;
-    
-    columna.forEach((item) => {
-      const img = images[imageIndex++];
-      if (img) {
-        try {
-          // Dibujar icono
-          doc.addImage(img, "PNG", colX, currentY, iconSize, iconSize);
-        } catch (error) {
-          console.error(`Error al dibujar icono ${item.icon}:`, error);
-        }
-      }
-      // Dibujar texto al lado del icono (con maxWidth para que no se salga)
-      doc.setFont("helvetica", "normal").setFontSize(7.5); // Tamaño de texto aumentado
-      const maxTextWidth = colSpacing - iconSize - 4; // Ancho máximo del texto
-      doc.text(item.text, colX + iconSize + 1.5, currentY + iconSize / 2 + 1, {
-        maxWidth: maxTextWidth
-      });
-      currentY += rowSpacing;
-    });
-  });
-
-  // Dibujar marco alrededor de la leyenda
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.rect(inicioX - 2, startY - 2, anchoDisponible + 4, alturaLeyenda + 2);
-
-  return startY + alturaLeyenda + 4;
-};
-
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return "";
@@ -454,92 +271,6 @@ const toDDMMYYYY = (fecha) => {
   const [anio, mes, dia] = fecha.split("-");
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
-};
-
-// Función para dibujar tabla de estadísticas dentales en 4 columnas
-const drawEstadisticas = (doc, datos = {}, yPosInicial) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  const espacioIzquierdo = pageW * 0.45;
-  const inicioX = espacioIzquierdo;
-  const margin = 15;
-  const anchoDisponible = pageW - espacioIzquierdo - margin;
-  let yPos = yPosInicial + 4; // Espacio reducido
-  
-  const filaAltura = 4; // Altura de fila reducida
-  const numColumnas = 4;
-  const colWidth = anchoDisponible / numColumnas; // Ancho de cada columna
-
-  // Definir las 4 columnas con sus datos
-  const columnas = [
-    {
-      titulo: "Piezas en mal estado",
-      valor: datos.txtPiezasMalEstado || 0,
-      subItems: [
-        { label: "P.P.R. Metálicas", value: datos.txtPprMetalicas || 0 },
-        { label: "P.P.R. Acrílicas", value: datos.txtPprAcrilicas || 0 }
-      ]
-    },
-    {
-      titulo: "Ausentes",
-      valor: datos.txtAusentes || 0,
-      subItems: [
-        { label: "Puentes", value: datos.txtPuentes || 0 },
-        { label: "Coronas", value: datos.txtCoronas || 0 }
-      ]
-    },
-    {
-      titulo: "Por Extraer",
-      valor: datos.txtPorExtraer || 0,
-      subItems: [
-        { label: "P. Totales", value: datos.txtPTotal || 0 },
-        { label: "Normales", value: datos.txtNormales || 0 }
-      ]
-    },
-    {
-      titulo: "Obturaciones Efectuadas",
-      valor: datos.txtObturacionesEfectuadas || 0,
-      subItems: [
-        { label: "Cariadas por Oturar", value: datos.txtCariadasOturar || 0 },
-        { label: "Fracturadas", value: datos.txtFracturada || 0 }
-      ]
-    }
-  ];
-
-  // Dibujar cada columna sin bordes, solo texto
-  const startY = yPos;
-  let maxY = yPos;
-  
-  columnas.forEach((columna, colIndex) => {
-    const colX = inicioX + (colIndex * colWidth);
-    let currentY = startY;
-    
-    // Título y valor (ambos labels en negrita)
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    const tituloText = columna.titulo + ":";
-    doc.text(tituloText, colX, currentY);
-    const tituloWidth = doc.getTextWidth(tituloText);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(String(columna.valor), colX + tituloWidth + 2, currentY);
-    currentY += filaAltura;
-    
-    // Subitems (labels en negrita)
-    columna.subItems.forEach((subItem) => {
-      doc.setFont("helvetica", "bold").setFontSize(8);
-      const subText = subItem.label + ":";
-      doc.text(subText, colX, currentY);
-      const subWidth = doc.getTextWidth(subText);
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text(String(subItem.value), colX + subWidth + 2, currentY);
-      currentY += filaAltura;
-    });
-    
-    // Actualizar la posición Y máxima
-    if (currentY > maxY) {
-      maxY = currentY;
-    }
-  });
-
-  return maxY;
 };
 
 // Función para dibujar observaciones
@@ -764,7 +495,7 @@ export default async function Odontograma_Digitalizado(datos = {}, docExistente 
   const yPosDatos = drawPatientData(doc, datos);
 
   // 5) Leyenda de iconos
-  const yPosLeyenda = await drawLeyenda(doc, yPosDatos);
+  const yPosLeyenda = await drawLeyenda(doc, datos, yPosDatos);
 
   // 6) Tabla de estadísticas dentales
   const yPosEstadisticas = drawEstadisticas(doc, datos, yPosLeyenda);

@@ -3,6 +3,7 @@ import { getFetch } from "../../getFetch/getFetch";
 import { SubmitData } from "./model";
 import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
 import { guardarRegistro, actualizarRegistro, validarSede } from "../../../../utils/registroOcupacionalUtils";
+import { imagenParaRegistrar as interpretarLabelParaRegistrar, labelParaLeer as interpretarUrlParaLeer } from "./estadosOdontograma";
 
 //===============Zona Modificación===============
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
@@ -20,38 +21,6 @@ const reporteConsultaUrl =
 
 const obtenerListaNordenUrl = "/api/v01/ct/odontograma/obtenerOdontogramaAnteriorPorNorden";
 const obtenerInfoPacienteUrl = "/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros";
-
-const labelsToImgs = {
-  Ausente: "imgAusente",
-  "Cariada por opturar": "imgPorOturar",
-  "Por extraer": "imgExtraer",
-  Fracturada: "imgFracturada",
-  Corona: "imgCorona",
-  "Obturacion Efectuada": "imgObturacionEfectuada",
-  Puente: "imgPuente",
-  "P.P.R Metalica": "imgPPRMetalica",
-  "P.P.R Acrilica": "imgPPRAcrilica",
-  "P.Total": "imgPTotal",
-};
-
-// Invertimos el objeto automáticamente
-const imgsToLabels = Object.fromEntries(
-  Object.entries(labelsToImgs).map(([label, img]) => [img, label])
-);
-
-const interpretarLabelParaRegistrar = (label) => {
-  if (label == "Normal") return null;
-  const prefijo = "jar:file:/C:/hmsoft/hmsoft.jar!/imagenes/odontograma/";
-  const sufijo = ".png";
-  const nombreArchivo = labelsToImgs[label];
-  return nombreArchivo ? `${prefijo}${nombreArchivo}${sufijo}` : "";
-};
-const interpretarUrlParaLeer = (url) => {
-  if (url == null) return "Normal";
-  const match = url.match(/([^/\\]+)(?=\.png$)/);
-  const nombreArchivo = match?.[1];
-  return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
-};
 
 export const GetInfoServicio = (
   nro,
@@ -187,8 +156,8 @@ const construirBase = (form) => ({
     txtFracturada: form.fracturada,
     txtObturacionesEfectuadas: form.obturacion,
     txtPuentes: form.puente,
-    txtPprMetalicas: form.pprMetalica,
-    txtPprAcrilicas: form.pprAcrilica,
+    txtPprMetalicas: form.ppr,
+    txtPprAcrilicas: 0,
     txtPTotal: form.pTotal,
     txtNormales: form.normal,
     txtCoronas: form.corona,
@@ -301,8 +270,8 @@ export const SubmitDataServiceLO = async (
     txtFracturada: form.fracturada,
     txtObturacionesEfectuadas: form.obturacion,
     txtPuentes: form.puente,
-    txtPprMetalicas: form.pprMetalica,
-    txtPprAcrilicas: form.pprAcrilica,
+    txtPprMetalicas: form.ppr,
+    txtPprAcrilicas: 0,
     txtPTotal: form.pTotal,
     txtNormales: form.normal,
     txtCoronas: form.corona,
@@ -795,8 +764,7 @@ export const GetInfoServicioParaNuevoRegistro = async (
     corona: res.txtCoronas ?? 0,
     obturacion: res.txtObturacionesEfectuadas ?? 0,
     puente: res.txtPuentes ?? 0,
-    pprMetalica: res.txtPprMetalicas ?? 0,
-    pprAcrilica: res.txtPprAcrilicas ?? 0,
+    ppr: (res.txtPprMetalicas ?? 0) + (res.txtPprAcrilicas ?? 0),
     pTotal: res.txtPTotal ?? 0,
     normal: res.txtNormales ?? 0,
     malEstado: res.txtPiezasMalEstado ?? 0,
