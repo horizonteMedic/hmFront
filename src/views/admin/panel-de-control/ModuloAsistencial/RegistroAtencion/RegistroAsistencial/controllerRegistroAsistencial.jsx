@@ -272,3 +272,39 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
     "success"
   );
 };
+
+// Búsqueda exacta por documento (CARNET_EXTRANJERIA). Igual que el pasaporte, no consulta
+// RENIEC (solo tiene DNI peruano): si no existe localmente, el usuario completa los datos a mano.
+export const BuscarPorCarnetExtranjeria = async (numero, token, setForm) => {
+  if (!numero) return;
+
+  LoadingDefault("Buscando Paciente");
+
+  const query = new URLSearchParams({ tipoDocumento: "CARNET_EXTRANJERIA", numeroDocumento: numero });
+  const res = await getFetch(`${buscarDocumentoUrl}?${query.toString()}`, token);
+
+  Swal.close();
+
+  console.log("buscarPorCarnetExtranjeria (documento) ->", res);
+
+  const data = res?.resultado;
+
+  const encontrado = data && (data.numeroDocumento || data.nombres || data.apellidos);
+
+  if (!res || res.error || !encontrado) {
+    Swal.fire(
+      "Sin registro",
+      "No se encontró un paciente con ese número de carnet de extranjería. Complete sus datos para registrarlo.",
+      "info"
+    );
+    return;
+  }
+
+  setFormFromPaciente(setForm, data);
+
+  Swal.fire(
+    "Paciente encontrado",
+    "Se completó el formulario con los datos registrados en el sistema.",
+    "success"
+  );
+};

@@ -66,8 +66,12 @@ export default async function TicketVenta({
     const margenInferior = 3;
     const anchoValor = margenLateral + 24; // columna donde arrancan todos los valores (Paciente/Documento/Edad/Médico)
 
+    // "Carnet Ext." abreviado a propósito: "Carnet de extranjería:" (32 mm en negrita 9pt) no cabe
+    // en la columna de etiquetas (24 mm) y pisaría el valor.
     const tipoDocLabel =
-        tipoDocumento === "PASAPORTE" ? "Pasaporte" : tipoDocumento === "SIN DNI" ? "Documento" : "DNI";
+        tipoDocumento === "PASAPORTE" ? "Pasaporte"
+            : tipoDocumento === "CARNET_EXTRANJERIA" ? "Carnet Ext."
+                : tipoDocumento === "SIN DNI" ? "Documento" : "DNI";
     const documentoValor = documentoIdentidad || (tipoDocumento === "SIN DNI" ? "SIN DNI" : "-");
 
     // Doc "medidor": mismo ancho, alto de sobra, solo para calcular cuántas líneas

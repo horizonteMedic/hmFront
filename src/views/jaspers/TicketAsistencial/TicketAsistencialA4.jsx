@@ -141,7 +141,11 @@ export default async function TicketAsistencialA4({
     y += 11;
 
     // ── Datos del formulario ──────────────────────────────────────────────────
-    const etiquetaDocumento = /pasaporte/i.test(tipoDocumento) ? "Pasaporte" : valor(tipoDocumento) === "-" ? "Documento" : tipoDocumento;
+    const etiquetaDocumento = /pasaporte/i.test(tipoDocumento)
+        ? "Pasaporte"
+        : /carnet/i.test(tipoDocumento)
+            ? "Carnet de extranjería"
+            : valor(tipoDocumento) === "-" ? "Documento" : tipoDocumento;
     const edadTexto = edad !== null && edad !== undefined && edad !== "" ? `${edad} años` : "-";
 
     y = fila(doc, [{ etiqueta: "Paciente", texto: valor(nombres), size: 14, bold: true }], y);
