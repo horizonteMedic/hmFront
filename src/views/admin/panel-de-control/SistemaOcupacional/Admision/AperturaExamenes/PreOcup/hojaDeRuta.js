@@ -1,6 +1,7 @@
 import Swal from 'sweetalert2';
 import { format } from 'date-fns';
 import { getFetch } from '../../../../getFetch/getFetch.js';
+import { datosConDocumento, obtenerDocumentoPorOrden } from '../../../../../../utils/documentoPaciente.js';
 import HojadeRutaDinamico from '../../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
 
 // Cada hoja de ruta es un jasper de src/views/jaspers cuyo nombre lo indica el backend.
@@ -45,11 +46,15 @@ const numeroOrdenDelDia = (registros, nOrden) => {
   return registros.filter((r) => r.fecha_apertura_po === hoy).length + 1;
 };
 
+// El formato dinámico rotula el documento según su tipo (DNI / CE / PAS): el tipo sale de documento/orden
 const imprimirPorProtocolo = async (nOrden, token) => {
-  const res = await getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${nOrden}`, token);
+  const [res, documento] = await Promise.all([
+    getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${nOrden}`, token),
+    obtenerDocumentoPorOrden(nOrden, token),
+  ]);
   if (res?.codigo !== 200) return Swal.close();
   const { isConfirmed } = await confirmarImpresion(nOrden);
-  if (isConfirmed) HojadeRutaDinamico(res.resultado);
+  if (isConfirmed) HojadeRutaDinamico(datosConDocumento(res.resultado, documento));
 };
 
 /**

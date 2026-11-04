@@ -4,17 +4,26 @@
 // `codPa` es solo el código interno del backend: a los extranjeros les asigna 900,000,000 o más, así que
 // nunca se muestra como documento.
 
+import { getFetch } from './apiHelpers';
+
 export const TIPO_DNI = 1;
 export const TIPO_CARNE_EXTRANJERIA = 2;
 export const TIPO_PASAPORTE = 3;
 export const TIPO_SIN_DOCUMENTO = 4;
 
+// Por ahora no se registran pacientes sin documento: el tipo no se ofrece en los formularios ni se admite en
+// las cargas masivas. Los ya registrados se siguen mostrando (ver opcionesTipoDocumento).
 export const TIPOS_DOCUMENTO = [
   { value: TIPO_DNI, label: 'DNI' },
   { value: TIPO_CARNE_EXTRANJERIA, label: 'CARNÉ DE EXTRANJERÍA' },
   { value: TIPO_PASAPORTE, label: 'PASAPORTE' },
-  { value: TIPO_SIN_DOCUMENTO, label: 'SIN DOCUMENTO' },
 ];
+
+// Opciones del selector: "SIN DOCUMENTO" solo aparece si el paciente cargado ya lo tiene
+export const opcionesTipoDocumento = (tipoActual) =>
+  Number(tipoActual) === TIPO_SIN_DOCUMENTO
+    ? [...TIPOS_DOCUMENTO, { value: TIPO_SIN_DOCUMENTO, label: 'SIN DOCUMENTO' }]
+    : TIPOS_DOCUMENTO;
 
 const CODPA_INTERNO_DESDE = 900000000;
 
@@ -88,7 +97,7 @@ export const validarDocumentoOrden = ({ tipoDoc, nroDoc, codPa }) => {
   if (!tipoDoc || !tieneNumero(tipoDoc)) {
     if (codPa) return '';
     return tipoDoc
-      ? 'Paciente sin documento: regístrelo primero en Registro de Pacientes'
+      ? 'No se pueden crear órdenes de pacientes sin documento'
       : 'Seleccione el tipo de documento';
   }
   return validarDocumento(tipoDoc, nroDoc);
@@ -106,19 +115,48 @@ export const textoDocumento = (dni) => {
 };
 
 // Tipo de documento escrito en un Excel ("DNI", "Carnet Extra", "C.E.", "Pasaporte", "2"...). Vacío = DNI;
-// '' si no se reconoce.
+// '' si no se reconoce ("sin documento" tampoco se admite en las cargas masivas).
 export const tipoDocDesdeTexto = (valor) => {
   const texto = String(valor ?? '')
     .normalize('NFD')
     .replace(/[̀-ͯ.\s]/g, '')
     .toUpperCase();
   if (!texto) return TIPO_DNI;
-  if (/^[1-4]$/.test(texto)) return Number(texto);
+  if (/^[1-3]$/.test(texto)) return Number(texto);
   if (texto.startsWith('DNI')) return TIPO_DNI;
   if (texto.includes('CARN') || texto.includes('EXTRANJ') || texto === 'CE') return TIPO_CARNE_EXTRANJERIA;
   if (texto.includes('PASAP')) return TIPO_PASAPORTE;
-  if (texto.startsWith('SIN')) return TIPO_SIN_DOCUMENTO;
   return '';
+};
+
+// Documento del paciente de una orden: { codPa, tipoDoc, tipoDocNombre, nroDoc }, o null si no existe o falla
+export const obtenerDocumentoPorOrden = async (nOrden, token) => {
+  try {
+    const res = await getFetch(`/api/v01/ct/registroPacientes/documento/orden/${encodeURIComponent(nOrden)}`, token);
+    return res && !res.error && res.nroDoc !== undefined ? res : null;
+  } catch {
+    return null;
+  }
+};
+
+// Rótulo corto (para "DNI:") y nombre (para el texto de indicaciones) de cada tipo
+const ROTULOS_DOCUMENTO = {
+  [TIPO_DNI]: { etiquetaDoc: 'DNI', nombreDoc: 'DNI' },
+  [TIPO_CARNE_EXTRANJERIA]: { etiquetaDoc: 'CE', nombreDoc: 'CARNÉ DE EXTRANJERÍA' },
+  [TIPO_PASAPORTE]: { etiquetaDoc: 'PAS', nombreDoc: 'PASAPORTE' },
+  [TIPO_SIN_DOCUMENTO]: { etiquetaDoc: 'DOC', nombreDoc: 'DOCUMENTO DE IDENTIDAD' },
+};
+
+// Datos de un PDF con el documento real: `dni` pasa a ser el número y se agregan etiquetaDoc / nombreDoc
+// para los rótulos. Sin documento (no se encontró) los datos quedan igual y el PDF dice "DNI".
+export const datosConDocumento = (datos, documento) => {
+  const rotulos = documento && ROTULOS_DOCUMENTO[Number(documento.tipoDoc)];
+  if (!rotulos) return datos;
+  return {
+    ...datos,
+    ...rotulos,
+    dni: Number(documento.tipoDoc) === TIPO_SIN_DOCUMENTO ? 'SIN DOCUMENTO' : documento.nroDoc || datos?.dni,
+  };
 };
 
 // Mensaje de error del backend (registro y órdenes responden id = 0 con mensaje)

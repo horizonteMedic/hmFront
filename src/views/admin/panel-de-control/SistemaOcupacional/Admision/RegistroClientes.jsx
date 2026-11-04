@@ -128,7 +128,6 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
 
   // ===== Búsqueda de paciente por tipo + número de documento =====
   const buscarPaciente = async () => {
-    if (!tieneNumero(form.tipoDoc)) return Swal.fire('Aviso', 'Un paciente sin documento no se puede buscar: complete sus datos y regístrelo', 'info');
     if (errorDocumento) return Swal.fire('Error', errorDocumento, 'error');
     const buscado = { tipoDoc: form.tipoDoc, nroDoc: form.nroDoc };
 
@@ -282,7 +281,6 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           className="w-full lg:col-span-2 lg:w-1/2 lg:pr-2"
           required
           error={mostrarErrores && errorDocumento ? errorDocumento : ''}
-          avisoSinNumero="Sin documento: complete los datos y registre"
         >
           {tieneNumero(form.tipoDoc) && <SearchButton onClick={buscarPaciente} disabled={form.tieneRegistro} />}
         </CampoDocumento>

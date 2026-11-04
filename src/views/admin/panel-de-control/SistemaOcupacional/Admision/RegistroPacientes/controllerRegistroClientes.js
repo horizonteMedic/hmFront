@@ -113,7 +113,8 @@ const aFechaGuiones = (fecha) => {
 // ===== Mapeo: GET datosPaciente -> formulario =====
 // RequestDatosPacienteDTO. null -> '' para que el resaltado de "campo editado" no confunda null con ''.
 // `buscado` es el documento con el que se buscó, por si la respuesta no lo trae.
-// Sin codPa el paciente no está registrado (datos de RENIEC o formulario vacío): queda como nuevo.
+// `registrado` dice si el paciente existe en la BD: los datos de RENIEC también traen codPa (= el DNI), así
+// que codPa solo se usa como respaldo si el backend no envía `registrado`.
 export const pacienteAFormulario = (res, buscado) => ({
     ...crearDatosIniciales(),
     ...buscado,
@@ -149,7 +150,7 @@ export const pacienteAFormulario = (res, buscado) => ({
     fechaRegistro: res.fechaRegistroPa
         ? `${String(res.fechaRegistroPa).slice(0, 10)}T${String(res.horaRegistroPa || '00:00:00').slice(0, 12)}`
         : '',
-    tieneRegistro: Boolean(res.codPa),
+    tieneRegistro: typeof res.registrado === 'boolean' ? res.registrado : Boolean(res.codPa),
 });
 
 // ===== Fecha de nacimiento: DD-MM-AAAA mientras se escribe =====

@@ -6,7 +6,7 @@ import { SubmitHistoriaC, SubmitHistoriaCMasivo } from "../model/AdminHistoriaC"
 import { getToday } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-import { TIPO_DNI, validarDocumento } from "../../../../../utils/documentoPaciente";
+import { TIPO_DNI, tipoDocDesdeTexto, validarDocumento } from "../../../../../utils/documentoPaciente";
 
 export const handleSubirExcel = async (setData, setTotalPages) => {
     const { value: file } = await Swal.fire({
@@ -65,20 +65,29 @@ export const submitMasivo = async (data, sede, token) => {
 
             LoadingDefault(`Subiendo Datos... Bloque ${i + 1}/${totalBloques}`);
 
-            const body = loteData.map(row => ({
-                codPa: row.codPa || null,
-                apellidosPa: row.apellidosPa || "",
-                nombresPa: row.nombresPa || "",
-                fechaNaciminetoPa: row.fechaNaciminetoPa || "",
-                sexoPa: row.sexoPa || "",
-                tipoDoc: 1,
-                area: row.area || "",
-                cargo: row.cargo || "",
-            }));
+            // datosPacienteMasivo (RequestDatosPacienteV2DTO) recibe tipoDoc + nroDoc: DNI, carné y pasaporte
+            // (RENIEC solo se consulta para DNI). "Sin documento" no se admite en masivo. codPa solo va con DNI
+            // (es el propio DNI); a los demás el backend les asigna el código interno.
+            const body = loteData.map(row => {
+                const tipoDoc = tipoDocDesdeTexto(row.tipoDoc);
+                return {
+                    codPa: tipoDoc === TIPO_DNI && row.nroDoc ? row.nroDoc : null,
+                    tipoDoc: tipoDoc || null,
+                    nroDoc: row.nroDoc || null,
+                    apellidosPa: row.apellidosPa || "",
+                    nombresPa: row.nombresPa || "",
+                    fechaNaciminetoPa: row.fechaNaciminetoPa || "",
+                    sexoPa: row.sexoPa || "",
+                    area: row.area || "",
+                    cargo: row.cargo || "",
+                };
+            });
 
-            // datosPacienteMasivo (RequestDatosPacienteV2DTO) aún no recibe nroDoc: solo se cargan DNIs. Las
-            // filas con otro documento no se envían y quedan con su error (se registran una por una).
-            const erroresDni = loteData.map((row) => validarDocumento(TIPO_DNI, row.codPa));
+            // Las filas con el documento inválido no se envían y quedan con su error
+            const erroresDni = body.map(({ tipoDoc, nroDoc }) => {
+                if (!tipoDoc) return "Tipo de documento no reconocido (use DNI, CARNET EXTRANJERIA o PASAPORTE)";
+                return validarDocumento(tipoDoc, nroDoc);
+            });
             const enviar = body.filter((_, index) => !erroresDni[index]);
 
             console.log(`Bloque ${i + 1}/${totalBloques} - Body a enviar:`, enviar);
@@ -111,9 +120,7 @@ export const submitMasivo = async (data, sede, token) => {
 
             const resultadosLote = body.map((registro, index) => {
                 const key = sinVariables(registro);
-                const motivo = erroresDni[index]
-                    ? `${erroresDni[index]} (la carga masiva solo acepta DNI; registre los demás documentos uno por uno)`
-                    : erroresSet.get(key);
+                const motivo = erroresDni[index] || erroresSet.get(key);
                 return {
                     ok: !motivo,
                     error: motivo || null,
@@ -145,7 +152,8 @@ const prepararDataExcel = (data) => {
             const sexoPa = rawSexo.startsWith("F") ? "F" : rawSexo.startsWith("M") ? "M" : rawSexo;
 
             return {
-                codPa: String(row["codPa"] || row["CODPA"] || "").trim().toUpperCase(),
+                tipoDoc: String(row["tipoDoc"] || row["TIPODOC"] || "").trim().toUpperCase(),
+                nroDoc: String(row["nroDoc"] || row["NRODOC"] || row["codPa"] || row["CODPA"] || "").trim().toUpperCase(),
                 apellidosPa: apellidosPa.toUpperCase(),
                 nombresPa: nombresPa.toUpperCase(),
                 fechaNaciminetoPa: convertirFecha(row["fechaNaciminetoPa"] || row["FECHANACIMINEOPA"] || ""),
@@ -161,8 +169,10 @@ export const descargarPlantillaExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("PLANTILLA");
 
+    // tipoDoc: DNI, CARNET EXTRANJERIA o PASAPORTE (vacío = DNI)
     const headers = [
-        "codPa",
+        "tipoDoc",
+        "nroDoc",
         "NombresYApellidos",
         "fechaNaciminetoPa",
         "sexoPa",
@@ -184,7 +194,7 @@ export const descargarPlantillaExcel = async () => {
 
     // Filas base vacías
     for (let i = 0; i < 50; i++) {
-        sheet.addRow(["", "", "", "", "", ""]);
+        sheet.addRow(headers.map(() => ""));
     }
 
     sheet.columns = headers.map(() => ({ width: 30 }));

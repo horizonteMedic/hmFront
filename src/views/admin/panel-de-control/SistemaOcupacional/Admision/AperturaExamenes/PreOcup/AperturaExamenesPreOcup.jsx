@@ -388,7 +388,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
                   ? datos.tipoDoc
                     ? 'Sin documento (paciente ya registrado)'
                     : 'Documento no disponible en la historia (paciente extranjero)'
-                  : 'Sin documento: regístrelo primero en Registro de Pacientes'
+                  : 'Documento no disponible'
               }
             >
               <div className="flex gap-2">

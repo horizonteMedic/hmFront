@@ -196,7 +196,7 @@ const headerHR = (doc, datos, opciones = {}) => {
   doc.text(cargoText, xCargo, yCargo);
 
   doc.setFont("helvetica", "bold");
-  doc.text("DNI:", margin + 100, y3);
+  doc.text(`${datos.etiquetaDoc || "DNI"}:`, margin + 100, y3); // CE / PAS para extranjeros (hoja de ruta dinámica)
   const dni = `${datos.dni || ""}`;
   const xdni = margin + 108;
   const ydni = y3;
