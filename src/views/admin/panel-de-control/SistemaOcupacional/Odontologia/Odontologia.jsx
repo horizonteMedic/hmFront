@@ -32,6 +32,7 @@ import AccionesRegistroHeader from "../../../../components/reusableComponents/Ac
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import BotonesForm from "../../../../components/templates/BotonesForm";
 import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
+import { CONTADORES_INICIALES } from "./estadosOdontograma";
 
 const tabla = TABLA_ODONTOLOGIA;
 const tablaLO = "odontograma_lo";
@@ -97,18 +98,7 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
     d31: "Normal",
     d32: "Normal",
 
-    ausente: 0,
-    cariada: 0,
-    porExtraer: 0,
-    fracturada: 0,
-    corona: 0,
-    obturacion: 0,
-    puente: 0,
-    pprMetalica: 0,
-    pprAcrilica: 0,
-    pTotal: 0,
-    normal: 32,
-    malEstado: 0,
+    ...CONTADORES_INICIALES,
 
     observaciones: "",
     observacionesCie10: "",
@@ -178,18 +168,7 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
     d31: "Normal",
     d32: "Normal",
 
-    ausente: 0,
-    cariada: 0,
-    porExtraer: 0,
-    fracturada: 0,
-    corona: 0,
-    obturacion: 0,
-    puente: 0,
-    pprMetalica: 0,
-    pprAcrilica: 0,
-    pTotal: 0,
-    normal: 32,
-    malEstado: 0,
+    ...CONTADORES_INICIALES,
 
     observaciones: "",
   };

@@ -5,6 +5,10 @@ import RevertButton from "./RevertButton";
 
 const MAX_SUGERENCIAS = 100;
 
+// Compara sin tildes ni mayúsculas ("depresion" encuentra "Depresión").
+const normalizar = (texto) =>
+  texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
 /**
  * Input con sugerencias, con la misma apariencia que InputTextOneLine (etiqueta en línea,
  * resaltado de campo editado + botón de revertir, error y asterisco de obligatorio).
@@ -64,8 +68,8 @@ export default function InputAutocomplete({
   const filtro = soloSeleccion ? escribiendo ?? "" : texto;
   const sugerencias = useMemo(() => {
     if (!abierto || (!filtro && !mostrarTodo && !soloSeleccion)) return [];
-    const buscado = filtro.toLowerCase();
-    return lista.filter((o) => getLabel(o).toLowerCase().includes(buscado)).slice(0, MAX_SUGERENCIAS);
+    const buscado = normalizar(filtro);
+    return lista.filter((o) => normalizar(getLabel(o)).includes(buscado)).slice(0, MAX_SUGERENCIAS);
     // getLabel suele ser una función en línea: depender de ella redibujaría la lista en cada render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [abierto, filtro, lista, mostrarTodo, soloSeleccion]);

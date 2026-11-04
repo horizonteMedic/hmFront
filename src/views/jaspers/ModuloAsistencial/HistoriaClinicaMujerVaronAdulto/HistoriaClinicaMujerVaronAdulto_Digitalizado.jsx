@@ -8,6 +8,7 @@ import FilaEtiquetaValorAsistencial, {
   medirEtiquetaValor,
 } from "../../components/filaEtiquetaValorAsistencial.jsx";
 import footerTR from "../../components/footerTR.jsx";
+import AntecedentesAdicionalesAsistencial from "../../components/antecedentesAdicionalesAsistencial.jsx";
 import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
 
 // Formato digitalizado de la hoja física "Historia Clínica de la Mujer y el Varón Adulto".
@@ -25,6 +26,8 @@ const ANCHO = 190;
 const CASILLA = 3.2;
 const FS = FUENTE_CUERPO;
 const PIE_OFFSET_Y = 8;
+// Tope del contenido: el pie de página (línea + 4 líneas de direcciones) empieza en ~276 mm.
+const LIMITE_Y = 272;
 
 const texto = (v) => String(v ?? "").trim();
 const sinAcentos = (v) => texto(v).normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
@@ -32,7 +35,7 @@ const fechaCorta = (v) => formatearFechaCorta(texto(v)) || texto(v);
 
 const normalizarDatos = (data) => {
   const nacionalidad = sinAcentos(data.nacionalidad);
-  
+
   const esPeruana = nacionalidad.startsWith("PERU");
 
   return {
@@ -42,6 +45,10 @@ const normalizarDatos = (data) => {
     dni: texto(data.dni),
     esPeruana,
     otraNacionalidad: nacionalidad && !esPeruana ? texto(data.nacionalidad) : "",
+    // Patologías del paciente que no tienen casilla en "Antecedentes patológicos" (ya redactadas por el controller).
+    patologiasAdicionales: (Array.isArray(data.patologiasAdicionales) ? data.patologiasAdicionales : [])
+      .map(texto)
+      .filter(Boolean),
     tienePagina2: [data.examenFisico, data.examenesAuxiliares, data.diagnostico, data.tratamiento].some(
       (v) => texto(v)
     ),
@@ -218,8 +225,19 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     );
   };
 
+  // Si lo que sigue no cabe encima del pie de página, cierra la página (con su pie) y sigue en una nueva con
+  // la misma cabecera. Devuelve la Y donde dibujar. Lo usan las secciones que pueden crecer con el contenido.
+  let paginaActual = 1;
+  const asegurarEspacio = async (y, alto) => {
+    if (y + alto <= LIMITE_Y) return y;
+    footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
+    doc.addPage();
+    paginaActual += 1;
+    return dibujarEncabezado(paginaActual);
+  };
+
   // ===== Página 1: réplica de la hoja =====
-  const dibujarPagina1 = (yInicio) => {
+  const dibujarPagina1 = async (yInicio) => {
     // ----- Datos personales (mismo diseño que Riesgo Cardiovascular) -----
     let y = DatosPersonalesAsistencial(doc, { ...data, nombreCompleto: d.nombreCompleto }, { x: X, y: yInicio, ancho: ANCHO });
 
@@ -370,7 +388,11 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
       y
     );
 
+    // ----- Antecedentes adicionales (debajo de los patológicos; empuja el resto) -----
+    y = await AntecedentesAdicionalesAsistencial(doc, d.patologiasAdicionales, { x: X, y, ancho: ANCHO, asegurarEspacio });
+
     // ----- Antecedentes patológicos familiares -----
+    y = await asegurarEspacio(y, ALTO_FILA * 4);
     y = barra("ANTECEDENTES FAMILIARES", y);
     FAMILIARES.forEach((fila) => {
       const ancho = ANCHO / fila.length;
@@ -381,6 +403,7 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     });
 
     // ----- Inmunizaciones -----
+    y = await asegurarEspacio(y, ALTO_FILA * 6);
     y = barra("INMUNIZACIONES", y);
     celda(X, y, 40, ALTO_FILA);
     celda(X + 40, y, 150, ALTO_FILA);
@@ -417,6 +440,7 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
     });
 
     // ----- Vigilancia de enfermedades no transmisibles -----
+    y = await asegurarEspacio(y, ALTO_FILA * 2);
     y = barra("VIGILANCIA DE ENFERMEDADES NO TRANSMISIBLES", y);
     const anchoVig = ANCHO / 3;
     [
@@ -436,7 +460,7 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
   };
 
   // ===== Página 2: atención (examen físico, auxiliares, diagnóstico, tratamiento) + firma =====
-  
+
   // const dibujarPagina2 = (yInicio) => {
   //   let y = yInicio;
   //   celda(X, y, ANCHO, ALTO_FILA);
@@ -480,7 +504,7 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
 
   // ===== Armado del documento =====
   const yContenido = await dibujarEncabezado(1);
-  dibujarPagina1(yContenido);
+  await dibujarPagina1(yContenido);
   footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
 
   // if (d.tienePagina2) {

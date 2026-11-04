@@ -9,6 +9,7 @@ import {
 import { DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import BotonesForm from "../../../../components/templates/BotonesForm";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import InputAutocomplete from "../../../../components/reusableComponents/InputAutocomplete";
 import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -17,6 +18,7 @@ import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
 import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import { SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
+import { ENFERMEDADES, ENFERMEDADES_CON_DETALLE } from "./catalogoPatologias";
 
 const tabla = "antecedentes_patologicos_asistencial";
 
@@ -42,113 +44,32 @@ const CAMPOS_EDITABLES = [
     "nombre_medico",
 ];
 
-// Enfermedades a marcar (Antecedentes Patológicos Personales)
-const ENFERMEDADES = [
-    ["accidentes", "Accidentes"],
-    ["acv", "ACV (Acc. Cerebro Vascular)"],
-    ["alergias", "Alergias"],
-    ["amigdalitisCronica", "Amigdalitis crónica"],
-    ["amputacion", "Amputación"],
-    ["anemia", "Anemia"],
-    ["arritmiasCardiacas", "Arritmias cardiacas"],
-    ["asma", "Asma"],
-    ["bocio", "Bocio"],
-    ["bronconeumonia", "Bronconeumonía"],
-    ["bronquitisRepeticion", "Bronquitis a repetición"],
-    ["cariesGingivitis", "Caries o gingivitis"],
-    ["colecistitis", "Colecistitis"],
-    ["columna", "Columna"],
-    ["convulsiones", "Convulsiones"],
-    ["dengue", "Dengue"],
-    ["depresion", "Depresión"], 
-    ["dermatitis", "Dermatitis"],
-    ["diabetes", "Diabetes"],
-    ["discopatias", "Discopatías"],
-    ["dislipidemia", "Dislipidemia"],
-    ["disenteria", "Disentería"],
-    ["enfCorazon", "Enfermedades del corazón"],
-    ["enfOculares", "Enf. Oculares"],
-    ["enfPiel", "Enf de la Piel"],
-    ["enfPsiquiatricas", "Enf Psiquiátricas"],
-    ["enfPulmonares", "Enf Pulmonares"],
-    ["enfReumatica", "Enf Reumática"],
-    ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
-    ["ets", "ETS"],
-    ["faringitisCronica", "Faringitis crónica"],
-    ["fiebreMalta", "Fiebre malta"],
-    ["fiebreReumatica", "Fiebre Reumática"],
-    ["fiebreTifoidea", "Fiebre tifoidea"],
-    ["fobias", "Fobias"],
-    ["forunculosis", "Forunculosis"],
-    ["fracturas", "Fracturas"],
-    ["gastritisCronica", "Gastritis crónica"],
-    ["glaucoma", "Glaucoma"],
-    ["gonorrea", "Gonorrea"],
-    ["gota", "Gota"],
-    ["hemorroides", "Hemorroides"],
-    ["hepatitis", "Hepatitis"],
-    ["hernias", "Hernias"],
-    ["hipertensionArterial", "Hipertensión Arterial"],
-    ["hospitalizacionUlt3Anios", "Hospitalización Últ 3 años"],
-    ["ima", "IMA (Infarto agudo al miocardio)"],
-    ["infUrinariasRepetidas", "Inf. Urinarias repetidas"],
-    ["insuficienciaCardiaca", "Insuficiencia Cardíaca"],
-    ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
-    ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
-    ["intervQuirurgica", "Interv. Quirúrgica"],
-    ["intoxicaciones", "Intoxicaciones"],
-    ["its", "ITS"],
-    ["litiasisUrinaria", "Litiasis Urinaria"],
-    ["meningitis", "Meningitis"],
-    ["migrana", "Migraña"],
-    ["neoplasias", "Neoplasias"],
-    ["neuritisRepeticion", "Neuritis a Repetición"],
-    ["obesidad", "Obesidad"],
-    ["onicomicosis", "Onicomicosis"],
-    ["osteoporosis", "Osteoporosis"],
-    ["osteoartrosis", "Osteoartrosis"],
-    ["otitisMedia", "Otitis Media"],
-    ["paludismoMalaria", "Paludismo o malaria"],
-    ["parasitosisIntestinal", "Parasitosis Intestinal"],
-    ["parotiditis", "Parotiditis"],
-    ["pleuresia", "Pleuresia"],
-    ["plumbismo", "Plumbismo"],
-    ["poliomielitis", "Poliomielitis"],
-    ["portadorMarcapaso", "Portador de Marcapaso"],
-    ["presionAltaBaja", "Presión alta o baja"],
-    ["protesisCardiacasValvulares", "Prótesis Cardiacas Valvulares"],
-    ["quemaduras", "Quemaduras"],
-    ["resfriosFrecuentes", "Resfríos frecuentes"],
-    ["reumatismoRepeticion", "Reumatismo a repetición"],
-    ["riesgoOcupacional", "Riesgo Ocupacional"],
-    ["sarampion", "Sarampión"],
-    ["sifilis", "Sífilis"],
-    ["silicosis", "Silicosis"],
-    ["sinusitisCronica", "Sinusitis crónica"],
-    ["sordera", "Sordera"],
-    ["tbc", "TBC"],
-    ["tendinitis", "Tendinitis"],
-    ["tifoidea", "Tifoidea"],
-    ["tosConvulsiva", "Tos convulsiva"],
-    ["transfusionSanguinea", "Transfusión Sanguínea"],
-    ["trastornosNerviosos", "Trastornos Nerviosos"],
-    ["traumatismoEncefalocraneano", "Traumatismo encefalocraneano"],
-    ["tuberculosis", "Tuberculosis"],
-    ["tumoresQuistes", "Tumores - quistes"],
-    ["ulceraPeptica", "Ulcera péptica"],
-    ["varicela", "Varicela"],
-    ["varices", "Várices"],
-    ["varicocele", "Varicocele"],
-    ["vertigos", "Vértigos"],
-    ["vih", "VIH"],
-];
-
-// Enfermedades que, además del checkbox, piden especificar (checkbox, label, campo de detalle).
-// Igual que "Reacción adversa a medicamentos", se muestran fuera de la grilla con su input.
-const ENFERMEDADES_CON_DETALLE = [
-    ["cancer", "Cáncer", "tipoCancer"],
-    ["mordeduraAnimales", "Mordedura de Animales", "descripcionMordedura"],
-];
+// Patologías que se muestran por defecto (las marcadas en la hoja de Antecedentes Personales).
+// El resto del catálogo sigue existiendo (se guarda y se carga igual) pero queda oculto: se
+// encuentra con el buscador y, al elegirla, aparece en "Patologías Adicionales".
+const ENFERMEDADES_VISIBLES = new Set([
+    "accidentes",
+    "acv",
+    "alergias",
+    "amputacion",
+    "asma",
+    "diabetes",
+    "enfCorazon",
+    "enfMusculoesqueleticas",
+    "enfOculares",
+    "enfPiel",
+    "enfPulmonares",
+    "epilepsiaConvulsiones",
+    "fobias",
+    "fracturas",
+    "hernias",
+    "hipertensionArterial",
+    "intervQuirurgica",
+    "migrana",
+    "quemaduras",
+    "tbc",
+    "vertigos",
+]);
 
 const VACUNAS_COL1 = [
     ["antitetanica", "Antitetánica"],
@@ -172,6 +93,14 @@ const chunkColumns = (arr, columnas) => {
         arr.slice(i * porColumna, (i + 1) * porColumna)
     );
 };
+
+const ENFERMEDADES_PRINCIPALES = ENFERMEDADES.filter(([key]) => ENFERMEDADES_VISIBLES.has(key));
+
+// Catálogo completo (visibles y ocultas) para el buscador; `detalle` solo en las que piden especificar.
+const CATALOGO_PATOLOGIAS = [...ENFERMEDADES, ...ENFERMEDADES_CON_DETALLE]
+    .map(([key, label, detalle]) => ({ key, label, detalle, enHoja: ENFERMEDADES_VISIBLES.has(key) }))
+    .sort((a, b) => a.label.localeCompare(b.label, "es"));
+const PATOLOGIAS_OCULTAS = CATALOGO_PATOLOGIAS.filter((p) => !p.enHoja);
 
 const ENFERMEDADES_KEYS = [...ENFERMEDADES, ...ENFERMEDADES_CON_DETALLE].map(([key]) => key);
 const VACUNAS_KEYS = [...VACUNAS_COL1, ...VACUNAS_COL2].map(([key]) => key);
@@ -275,7 +204,15 @@ export default function AntecedentesPatologicos() {
         fechaHoraActual: getFechaHoraActual(),
     });
 
-    const enfermedadesColumnas = chunkColumns(ENFERMEDADES, 4);
+    const enfermedadesColumnas = chunkColumns(ENFERMEDADES_PRINCIPALES, 4);
+
+    // Las ocultas marcadas (elegidas en el buscador o ya guardadas en el registro) se muestran abajo;
+    // al desmarcarlas dejan de mostrarse.
+    const patologiasAdicionales = PATOLOGIAS_OCULTAS.filter((p) => form[p.key]);
+
+    const handleElegirPatologia = (patologia) => {
+        setForm((prev) => ({ ...prev, [patologia.key]: true }));
+    };
 
     const handleSave = () => {
         SubmitDataService(
@@ -370,6 +307,21 @@ export default function AntecedentesPatologicos() {
             <DatosPersonalesLaborales form={form} laborales={false} />
 
             <SectionFieldset legend="Antecedentes Patológicos Personales" collapsible>
+                <InputAutocomplete
+                    label="Buscar patología"
+                    name="buscarPatologia"
+                    value=""
+                    options={CATALOGO_PATOLOGIAS}
+                    getLabel={(p) => p.label}
+                    getKey={(p) => p.key}
+                    onSelect={handleElegirPatologia}
+                    placeholder="Buscar en todas las patologías..."
+                    disabled={camposDeshabilitados}
+                    labelWidth="140px"
+                    className="mb-3"
+                    soloSeleccion
+                    mostrarTodo
+                />
                 <p className="mb-3 font-semibold text-red-600">
                     Marcar todas las enfermedades que ha tenido o tiene
                 </p>
@@ -389,29 +341,50 @@ export default function AntecedentesPatologicos() {
                         </div>
                     ))}
                 </div>
-                {ENFERMEDADES_CON_DETALLE.map(([name, label, detalle]) => (
-                    <div key={name} className="flex flex-wrap items-center gap-3 my-3">
-                        <InputCheckbox
-                            label={label}
-                            name={name}
-                            checked={form[name]}
-                            onChange={handleCheckBoxChange}
-                            disabled={camposDeshabilitados}
-                        />
-                        <div className="flex-1 min-w-[250px]">
-                            <InputTextOneLine
-                                label="Especificar"
-                                name={detalle}
-                                value={form[detalle]}
-                                onChange={handleChange}
-                                disabled={camposDeshabilitados || !form[name]}
-                                edited={isFieldEdited(detalle)}
-                                onRevert={() => revertField(detalle)}
-                                labelWidth="90px"
-                            />
+                {patologiasAdicionales.length > 0 && (
+                    <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50/50 p-3">
+                        <h4 className="mb-2 font-semibold text-blue-800">Patologías Adicionales</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-1">
+                            {patologiasAdicionales
+                                .filter((p) => !p.detalle)
+                                .map(({ key, label }) => (
+                                    <InputCheckbox
+                                        key={key}
+                                        label={label}
+                                        name={key}
+                                        checked={form[key]}
+                                        onChange={handleCheckBoxChange}
+                                        disabled={camposDeshabilitados}
+                                    />
+                                ))}
                         </div>
+                        {patologiasAdicionales
+                            .filter((p) => p.detalle)
+                            .map(({ key, label, detalle }) => (
+                                <div key={key} className="flex flex-wrap items-center gap-3 mt-3">
+                                    <InputCheckbox
+                                        label={label}
+                                        name={key}
+                                        checked={form[key]}
+                                        onChange={handleCheckBoxChange}
+                                        disabled={camposDeshabilitados}
+                                    />
+                                    <div className="flex-1 min-w-[250px]">
+                                        <InputTextOneLine
+                                            label="Especificar"
+                                            name={detalle}
+                                            value={form[detalle]}
+                                            onChange={handleChange}
+                                            disabled={camposDeshabilitados || !form[key]}
+                                            edited={isFieldEdited(detalle)}
+                                            onRevert={() => revertField(detalle)}
+                                            labelWidth="90px"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                     </div>
-                ))}
+                )}
                 <div className="flex flex-wrap items-center gap-3 my-3">
                     <InputCheckbox
                         label="Reacción adversa a medicamentos"

@@ -1,9 +1,9 @@
 import InputTextOneLine from '../../../../components/reusableComponents/InputTextOneLine';
 import { SelectField } from '../../../../components/reusableComponents/InputSelect';
-import { aTipoDoc, limpiarNroDoc, TIPO_DNI, TIPOS_DOCUMENTO, tieneNumero } from '../../../../utils/documentoPaciente';
+import { aTipoDoc, limpiarNroDoc, opcionesTipoDocumento, TIPO_DNI, tieneNumero } from '../../../../utils/documentoPaciente';
 
 // Tipo + número de documento del paciente. Al cambiar el tipo el número se vuelve a filtrar con las reglas
-// del nuevo tipo (y queda vacío con "sin documento", que no tiene número).
+// del nuevo tipo.
 const CampoDocumento = ({
   tipoDoc,
   nroDoc,
@@ -38,7 +38,7 @@ const CampoDocumento = ({
         name="tipoDoc"
         value={tipoDoc ?? ''}
         onChange={alCambiarTipo}
-        options={TIPOS_DOCUMENTO}
+        options={opcionesTipoDocumento(tipoDoc)}
         placeholder="No disponible"
         hidePlaceHolder={Boolean(tipoDoc)}
         disabled={disabledTipo}

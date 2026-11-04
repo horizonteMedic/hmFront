@@ -6,7 +6,7 @@ import { SubmitHistoriaC, SubmitHistoriaCMasivo } from "../model/AdminHistoriaC"
 import { getToday } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-import { TIPO_DNI, TIPO_SIN_DOCUMENTO, tipoDocDesdeTexto, validarDocumento } from "../../../../../utils/documentoPaciente";
+import { TIPO_DNI, tipoDocDesdeTexto, validarDocumento } from "../../../../../utils/documentoPaciente";
 
 export const handleSubirExcel = async (setData, setTotalPages) => {
     const { value: file } = await Swal.fire({
@@ -86,7 +86,6 @@ export const submitMasivo = async (data, sede, token) => {
             // Las filas con el documento inválido no se envían y quedan con su error
             const erroresDni = body.map(({ tipoDoc, nroDoc }) => {
                 if (!tipoDoc) return "Tipo de documento no reconocido (use DNI, CARNET EXTRANJERIA o PASAPORTE)";
-                if (tipoDoc === TIPO_SIN_DOCUMENTO) return "La carga masiva no admite pacientes sin documento; regístrelo uno por uno";
                 return validarDocumento(tipoDoc, nroDoc);
             });
             const enviar = body.filter((_, index) => !erroresDni[index]);

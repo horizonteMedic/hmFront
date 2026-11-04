@@ -287,39 +287,42 @@ export const VerDetalleTriaje = async (id, token) => {
     });
 };
 
+// Cintura, cadera y perímetro de cuello son opcionales: no se exigen y, si vienen vacíos, no se validan.
 const RANGOS = [
-    ["cintura", "Cintura"],
-    ["cadera", "Cadera"],
     ["temperatura", "Temperatura"],
     ["fCardiaca", "F. Cardiaca"],
     ["sat02", "SAT. 02"],
-    ["perimetroCuello", "Perímetro Cuello"],
     ["sistolica", "Sistólica"],
     ["diastolica", "Diastólica"],
     ["fRespiratoria", "F. Respiratoria"],
 ];
 
+const tieneValor = (v) => v !== "" && v != null;
+
 const validarRangos = (form) => {
     const vacios = RANGOS.filter(([campo]) => !form[campo]).map(([, label]) => label);
     if (vacios.length > 0) return `Faltan completar: ${vacios.join(", ")}`;
 
-    const tieneValor = (v) => v !== "" && v != null;
     if (tieneValor(form.talla) && (form.talla < 1.3 || form.talla > 2.8)) return "No se permite este dato en Talla";
     if (tieneValor(form.peso) && (form.peso < 40 || form.peso > 150)) return "No se permite este dato en Peso";
-    if (form.cintura < 45 || form.cintura > 180) return "No se permite este dato en Cintura";
-    if (form.cadera < 70 || form.cadera > 180) return "No se permite este dato en Cadera";
+    if (tieneValor(form.cintura) && (form.cintura < 45 || form.cintura > 180)) return "No se permite este dato en Cintura";
+    if (tieneValor(form.cadera) && (form.cadera < 70 || form.cadera > 180)) return "No se permite este dato en Cadera";
     if (form.temperatura < 35 || form.temperatura >= 40) return "No se permite este dato en Temperatura";
     if (form.fCardiaca <= 39) return "No se permite este dato en Frecuencia Cardiaca";
     // La Arena: los valores de hipoxia son válidos (el diagnóstico los califica), así que no hay mínimo.
     // El resto de clientes exige 92% como mínimo.
     if (form.sat02 < (form.esArena ? 1 : 92) || form.sat02 > 100) return "No se permite este dato en Sat02";
-    if (form.perimetroCuello < 30 || form.perimetroCuello > 55) return "No se permite este dato en Perímetro Cuello";
+    if (tieneValor(form.perimetroCuello) && (form.perimetroCuello < 30 || form.perimetroCuello > 55)) {
+        return "No se permite este dato en Perímetro Cuello";
+    }
     if (form.sistolica < 90 || form.sistolica >= 250) return "No se permite este dato en Sistólica";
     if (form.diastolica < 60 || form.diastolica >= 150) return "No se permite este dato en Diastólica";
     if (form.fRespiratoria == 0) return "No se permite este dato en Frecuencia Respiratoria";
 
     return null;
 };
+
+const opcional = (valor) => (tieneValor(valor) ? valor : null);
 
 const construirBody = (form) => ({
     id: form.id ?? null,
@@ -330,13 +333,14 @@ const construirBody = (form) => ({
     tallaCm: form.talla,
     pesoKg: form.peso,
     imc: form.imc,
-    cinturaCm: form.cintura,
-    icc: form.icc,
-    caderaCm: form.cadera,
+    // Opcionales: vacíos viajan como null. Sin cintura o cadera no hay ICC (evita guardar uno de un cálculo anterior).
+    cinturaCm: opcional(form.cintura),
+    icc: tieneValor(form.cintura) && tieneValor(form.cadera) ? opcional(form.icc) : null,
+    caderaCm: opcional(form.cadera),
     temperaturaC: form.temperatura,
     frecuenciaCardiaca: form.fCardiaca,
     saturacionO2: form.sat02,
-    perimetroCuelloCm: form.perimetroCuello,
+    perimetroCuelloCm: opcional(form.perimetroCuello),
     presionSistolica: form.sistolica,
     presionDiastolica: form.diastolica,
     frecuenciaRespiratoria: form.fRespiratoria,
