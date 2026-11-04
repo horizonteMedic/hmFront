@@ -1,38 +1,49 @@
 // Estados que puede tener un diente en el odontograma: única fuente para el menú del click derecho, el indicador
 // sobre el diente, la leyenda, los contadores y la conversión de/hacia lo que guarda el backend.
 //
-// Qué guarda el backend por diente (lbl11..lbl48): la ruta de una imagen del sistema anterior
-// ("jar:file:/C:/hmsoft/hmsoft.jar!/imagenes/odontograma/<imagen>.png"); null si el diente está Normal.
-// Por eso cada estado tiene su `imagen`: renombrar un estado en pantalla no cambia lo ya guardado.
+// Qué guarda el backend:
+//  - por diente (lbl11..lbl48): el nombre del estado en texto ("Normal", "Caries", "Resina buen estado"...), que es
+//    el `valor` de cada estado;
+//  - los contadores con nombres propios (txtAusentes, cariesDental, resinaBuenEstado...), que es el `campo`.
 //
 // - `clave`: campo del formulario donde se cuenta cuántos dientes tienen ese estado.
 // - `grupo`: estados que el menú agrupa en un submenú (Resina, Amalgama).
 // - `legacy`: ya no se ofrece en el menú, pero los odontogramas guardados con él se siguen leyendo, mostrando
-//   y contando (su leyenda y su contador solo aparecen si el odontograma actual lo tiene).
-// - `alias`: otras imágenes antiguas que se leen como este mismo estado (PPR Metálica / PPR Acrílica -> PPR).
+//   y contando (su leyenda y su contador solo aparecen si el odontograma actual lo tiene). No tiene `campo`.
+// - `imagen` / `alias`: nombres de imagen del sistema anterior ("…/imagenes/odontograma/<imagen>.png"). Ya no se
+//   guardan, pero un odontograma antiguo puede traerlos y se siguen leyendo (PPR Metálica / Acrílica -> PPR).
 // - `malEstado`: cuenta para "Dientes en mal estado".
 
 export const ESTADOS = [
-  { label: "Ausente", clave: "ausente", simbolo: "✕", color: "text-blue-500", tamano: "text-6xl", imagen: "imgAusente" },
-  { label: "Carie Dental", clave: "cariada", simbolo: "●", color: "text-red-500", tamano: "text-7xl", imagen: "imgPorOturar", malEstado: true },
-  { label: "Fractura", clave: "fracturada", simbolo: "╱", color: "text-red-500", tamano: "text-6xl", imagen: "imgFracturada", malEstado: true },
-  { label: "Corona", clave: "corona", simbolo: "©", color: "text-blue-500", tamano: "text-6xl", imagen: "imgCorona" },
-  { label: "Puente", clave: "puente", simbolo: "▭", color: "text-black", tamano: "text-6xl", imagen: "imgPuente" },
-  { label: "PPR", clave: "ppr", simbolo: "=", color: "text-blue-500", tamano: "text-6xl", imagen: "imgPPR", alias: ["imgPPRMetalica", "imgPPRAcrilica"] },
-  { label: "Implante", clave: "implante", simbolo: "⊥", color: "text-black", tamano: "text-6xl", imagen: "imgImplante" },
-  { label: "Resina Roja", clave: "resinaRoja", simbolo: "■", color: "text-red-500", tamano: "text-6xl", imagen: "imgResinaRoja", grupo: "Resina" },
-  { label: "Resina Azul", clave: "resinaAzul", simbolo: "■", color: "text-blue-500", tamano: "text-6xl", imagen: "imgResinaAzul", grupo: "Resina" },
-  { label: "Amalgama Roja", clave: "amalgamaRoja", simbolo: "◆", color: "text-red-500", tamano: "text-6xl", imagen: "imgAmalgamaRoja", grupo: "Amalgama" },
-  { label: "Amalgama Azul", clave: "amalgamaAzul", simbolo: "◆", color: "text-blue-500", tamano: "text-6xl", imagen: "imgAmalgamaAzul", grupo: "Amalgama" },
-  { label: "Remanente Radicular", clave: "remanenteRadicular", simbolo: "RR", color: "text-black", tamano: "text-4xl font-bold", imagen: "imgRemanenteRadicular" },
-  { label: "P.Total", clave: "pTotal", simbolo: "≈", color: "text-black", tamano: "text-6xl", imagen: "imgPTotal" },
-  { label: "Normal", clave: "normal", simbolo: "☑", color: "text-green-500", tamano: "text-6xl", imagen: null },
+  { label: "Ausente", valor: "Ausente", clave: "ausente", campo: "txtAusentes", simbolo: "✕", color: "text-blue-500", tamano: "text-6xl", imagen: "imgAusente" },
+  { label: "Carie Dental", valor: "Caries", clave: "cariada", campo: "cariesDental", simbolo: "●", color: "text-red-500", tamano: "text-7xl", imagen: "imgPorOturar", malEstado: true },
+  { label: "Fractura", valor: "Fractura", clave: "fracturada", campo: "fractura", simbolo: "╱", color: "text-red-500", tamano: "text-6xl", imagen: "imgFracturada", malEstado: true },
+  { label: "Corona", valor: "Corona", clave: "corona", campo: "corona", simbolo: "©", color: "text-blue-500", tamano: "text-6xl", imagen: "imgCorona" },
+  { label: "Puente", valor: "Puente", clave: "puente", campo: "txtPuentes", simbolo: "▭", color: "text-black", tamano: "text-6xl", imagen: "imgPuente" },
+  { label: "PPR", valor: "PPR", clave: "ppr", campo: "ppr", simbolo: "=", color: "text-blue-500", tamano: "text-6xl", imagen: "imgPPR", alias: ["imgPPRMetalica", "imgPPRAcrilica"] },
+  { label: "Implante", valor: "Implante", clave: "implante", campo: "implante", simbolo: "⊥", color: "text-black", tamano: "text-6xl", imagen: "imgImplante" },
+  { label: "Resina Roja", valor: "Resina mal estado", clave: "resinaRoja", campo: "resinaMalEstado", simbolo: "■", color: "text-red-500", tamano: "text-6xl", imagen: "imgResinaRoja", grupo: "Resina" },
+  { label: "Resina Azul", valor: "Resina buen estado", clave: "resinaAzul", campo: "resinaBuenEstado", simbolo: "■", color: "text-blue-500", tamano: "text-6xl", imagen: "imgResinaAzul", grupo: "Resina" },
+  { label: "Amalgama Roja", valor: "Amalgama mal estado", clave: "amalgamaRoja", campo: "amalgamaMalEstado", simbolo: "◆", color: "text-red-500", tamano: "text-6xl", imagen: "imgAmalgamaRoja", grupo: "Amalgama" },
+  { label: "Amalgama Azul", valor: "Amalgama buen estado", clave: "amalgamaAzul", campo: "amalgamaBuenEstado", simbolo: "◆", color: "text-blue-500", tamano: "text-6xl", imagen: "imgAmalgamaAzul", grupo: "Amalgama" },
+  { label: "Remanente Radicular", valor: "Remanente radicular", clave: "remanenteRadicular", campo: "remanenteRadicular", simbolo: "RR", color: "text-black", tamano: "text-4xl font-bold", imagen: "imgRemanenteRadicular", malEstado: true },
+  { label: "P.Total", valor: "P.Total", clave: "pTotal", campo: "txtPTotal", simbolo: "≈", color: "text-black", tamano: "text-6xl", imagen: "imgPTotal" },
+  { label: "Normal", valor: "Normal", clave: "normal", campo: "txtNormales", simbolo: "☑", color: "text-green-500", tamano: "text-6xl", imagen: null },
   // Ya no se ofrecen (solo se leen de odontogramas guardados)
-  { label: "Por extraer", clave: "porExtraer", simbolo: "⊗", color: "text-red-500", tamano: "text-6xl", imagen: "imgExtraer", legacy: true, malEstado: true },
-  { label: "Obturacion Efectuada", clave: "obturacion", simbolo: "●", color: "text-blue-500", tamano: "text-7xl", imagen: "imgObturacionEfectuada", legacy: true },
+  { label: "Por extraer", valor: "Por extraer", clave: "porExtraer", simbolo: "⊗", color: "text-red-500", tamano: "text-6xl", imagen: "imgExtraer", legacy: true, malEstado: true },
+  { label: "Obturacion Efectuada", valor: "Obturacion Efectuada", clave: "obturacion", simbolo: "●", color: "text-blue-500", tamano: "text-7xl", imagen: "imgObturacionEfectuada", legacy: true },
 ];
 
+// Sin tildes, mayúsculas ni signos: "Remanente radicular", "remanente Radicular" y "REMANENTE-RADICULAR" son lo mismo.
+const normalizar = (texto) =>
+  String(texto ?? "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toLowerCase();
+
 const porLabel = new Map(ESTADOS.map((estado) => [estado.label, estado]));
+const porValor = new Map(ESTADOS.map((estado) => [normalizar(estado.valor), estado]));
 const porImagen = new Map(
   ESTADOS.flatMap((estado) => [estado.imagen, ...(estado.alias ?? [])].filter(Boolean).map((imagen) => [imagen, estado]))
 );
@@ -60,18 +71,23 @@ export const contarEstados = (form) => {
 };
 
 // ===== Conversión de/hacia el backend =====
-const PREFIJO_IMAGEN = "jar:file:/C:/hmsoft/hmsoft.jar!/imagenes/odontograma/";
+// Estado del diente (lo que muestra el formulario) -> texto que se guarda en lblXX.
+export const valorParaRegistrar = (label) => estadoDe(label)?.valor ?? "";
 
-export const imagenParaRegistrar = (label) => {
-  if (label === "Normal") return null;
-  const imagen = estadoDe(label)?.imagen;
-  return imagen ? `${PREFIJO_IMAGEN}${imagen}.png` : "";
-};
+// Contadores del formulario -> campos del backend (txtPiezasMalEstado, txtAusentes, cariesDental, implante...).
+export const contadoresParaRegistrar = (form) => ({
+  txtPiezasMalEstado: form.malEstado,
+  ...Object.fromEntries(ESTADOS.filter(({ campo }) => campo).map(({ campo, clave }) => [campo, form[clave]])),
+});
 
-export const labelParaLeer = (url) => {
-  if (url == null) return "Normal";
-  const nombre = url.match(/([^/\\]+)(?=\.png$)/)?.[1];
-  return porImagen.get(nombre)?.label ?? "";
+// lblXX del backend -> estado del diente. Vacío = Normal. Se aceptan también las imágenes del sistema anterior que
+// pueda traer un odontograma antiguo. Un valor desconocido devuelve "" (diente sin estado reconocido).
+export const labelParaLeer = (valor) => {
+  if (valor == null || valor === "") return "Normal";
+  const texto = String(valor);
+  const imagen = texto.match(/([^/\\]+)(?=\.png$)/)?.[1];
+  const estado = imagen ? porImagen.get(imagen) : porValor.get(normalizar(texto));
+  return estado?.label ?? "";
 };
 
 // ===== Menú del click derecho =====
