@@ -16,7 +16,7 @@
 
 export const ESTADOS = [
   { label: "Ausente", valor: "Ausente", clave: "ausente", campo: "txtAusentes", simbolo: "✕", color: "text-blue-500", tamano: "text-6xl", imagen: "imgAusente" },
-  { label: "Carie Dental", valor: "Caries", clave: "cariada", campo: "cariesDental", simbolo: "●", color: "text-red-500", tamano: "text-7xl", imagen: "imgPorOturar", malEstado: true },
+  { label: "Caries Dental", valor: "Caries", clave: "cariada", campo: "cariesDental", simbolo: "●", color: "text-red-500", tamano: "text-7xl", imagen: "imgPorOturar", malEstado: true },
   { label: "Fractura", valor: "Fractura", clave: "fracturada", campo: "fractura", simbolo: "╱", color: "text-red-500", tamano: "text-6xl", imagen: "imgFracturada", malEstado: true },
   { label: "Corona", valor: "Corona", clave: "corona", campo: "corona", simbolo: "©", color: "text-blue-500", tamano: "text-6xl", imagen: "imgCorona" },
   { label: "Puente", valor: "Puente", clave: "puente", campo: "txtPuentes", simbolo: "▭", color: "text-black", tamano: "text-6xl", imagen: "imgPuente" },
