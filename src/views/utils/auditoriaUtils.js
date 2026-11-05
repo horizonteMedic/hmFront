@@ -1,4 +1,4 @@
-import { formatearFechaHora } from "./formatDateUtils";
+import { formatearFechaAuditoria } from "./formatDateUtils";
 import { getTimestampActual } from "./helpers";
 
 /**
@@ -21,9 +21,9 @@ export const buildAuditoria = (form, { usuarioActual, fechaHoraActual }) =>
   form.tieneRegistro
     ? {
         // Registro existente: creación y actualización REALES (obtenerReporte).
-        fechaCreacion: formatearFechaHora(form.fechaRegistro),
+        fechaCreacion: formatearFechaAuditoria(form.fechaRegistro),
         usuarioRegistro: form.userRegistro,
-        fechaActualizacion: formatearFechaHora(form.fechaActualizacion),
+        fechaActualizacion: formatearFechaAuditoria(form.fechaActualizacion),
         usuarioActualizacion: form.usuarioActualizacion,
       }
     : {

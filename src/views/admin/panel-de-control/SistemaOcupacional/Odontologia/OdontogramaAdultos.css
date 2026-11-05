@@ -141,7 +141,43 @@
   border: 1px solid #e5e7eb;
   z-index: 1000;
   min-width: 200px;
+  /* visible (no hidden): los submenús salen por fuera de la caja del menú */
+  overflow: visible;
+}
+
+.context-menu > .context-menu-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.context-menu > .context-menu-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Opción con submenú (Resina, Amalgama): el submenú aparece al pasar el mouse */
+.context-menu-grupo {
+  position: relative;
+}
+
+.context-submenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 190px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
   overflow: hidden;
+}
+
+.context-submenu-izquierda {
+  left: auto;
+  right: 100%;
+}
+
+.context-menu-grupo:hover > .context-submenu {
+  display: block;
 }
 
 .context-menu-item {

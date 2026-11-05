@@ -130,6 +130,8 @@ export const actualizarRegistro = async ({
  *  - Se valida primero que el N° Orden pertenezca a la sede actual (si se pasa `sede`).
  *  - Sin registro previo (id === 0) -> onNuevo()      (cargar datos del paciente).
  *  - Con registro previo            -> onExistente()  (cargar para edición).
+ *  - Necesita un examen previo (id === 2) -> onNecesitaExamen(), SOLO si se pasa (formularios Poderosa que exigen
+ *    Triaje u otro examen antes de registrar). Sin ese callback, id === 2 se trata como registro existente.
  *
  * @param {object}   p
  * @param {string}   p.nro
@@ -138,6 +140,7 @@ export const actualizarRegistro = async ({
  * @param {string}   [p.sede]         Si se pasa, valida que la Orden pertenezca a la sede.
  * @param {Function} [p.onNuevo]
  * @param {Function} [p.onExistente]
+ * @param {Function} [p.onNecesitaExamen]
  */
 export const verificarRegistro = async ({
   nro,
@@ -146,6 +149,7 @@ export const verificarRegistro = async ({
   sede,
   onNuevo = () => {},
   onExistente = () => {},
+  onNecesitaExamen,
 }) => {
   if (!nro) {
     await Swal.fire({
@@ -197,6 +201,12 @@ export const verificarRegistro = async ({
   if (res.id === 0) {
     // No tiene registro de este examen -> se cargan los datos del paciente.
     onNuevo();
+    return;
+  }
+
+  if (res.id === 2 && onNecesitaExamen) {
+    // Aún no puede registrarse aquí: necesita otro examen previo (p. ej. Triaje).
+    onNecesitaExamen();
     return;
   }
 

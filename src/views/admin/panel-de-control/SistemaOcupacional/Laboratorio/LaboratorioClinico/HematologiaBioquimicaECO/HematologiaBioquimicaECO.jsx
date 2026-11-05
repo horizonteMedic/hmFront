@@ -23,6 +23,7 @@ import BotonesForm from "../../../../../../components/templates/BotonesForm";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 const tabla = TABLA_LAB_CLINICO;
 
@@ -500,7 +501,7 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
             <InputTextOneLine
               label="DNI"
               name="dni"
-              value={form.dni}
+              value={textoDocumento(form.dni)}
               labelWidth="120px"
               disabled
             />

@@ -15,6 +15,7 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "consentimientobuenasalud";
 
@@ -171,7 +172,7 @@ export default function ConsentimientoBuenaSalud() {
                         <InputTextOneLine
                             label="identificado con DNI"
                             name="dni"
-                            value={form.dni}
+                            value={textoDocumento(form.dni)}
                             disabled
                             labelWidth="110px"
                         />

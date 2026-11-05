@@ -20,6 +20,7 @@ import AccionesRegistroHeader from "../../../../../../components/reusableCompone
 import AuditoriaRegistro from "../../../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 const tabla = "ac_coproparasitologico";
 const colorOptions = ["MARRON", "MOSTAZA", "VERDOSO"];
@@ -545,7 +546,7 @@ export default function Coproparasitologia() {
           <InputTextOneLine
             label="DNI"
             name="dni"
-            value={form.dni}
+            value={textoDocumento(form.dni)}
             labelWidth="120px"
             disabled
           />

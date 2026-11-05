@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { TIPO_DNI } from '../../../../../../utils/documentoPaciente';
 
 // "Autorizado por" que se aplica al cargar una pre-carga
 export const AUTORIZA_PRECARGA = 'DR. ARTEMIO';
@@ -42,7 +43,7 @@ export const EXAMENES_ADICIONALES = [
 
 // campo del formulario -> nombre que se muestra en el aviso de "Faltan completar"
 export const CAMPOS_REQUERIDOS = {
-  codPa: 'DNI',
+  // el documento (tipoDoc + nroDoc) se valida aparte porque depende del tipo
   nombres: 'Nombres',
   apellidos: 'Apellidos',
   razonEmpresa: 'Empresa',
@@ -54,10 +55,12 @@ export const CAMPOS_REQUERIDOS = {
 };
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
-// `codPa` entra porque, con la edición habilitada, cambiar el DNI permite registrar una historia nueva;
+// El documento entra porque, con la edición habilitada, cambiarlo permite registrar una historia nueva;
 // `rucEmpresa` no tiene campo propio: se revierte junto con la empresa.
 export const CAMPOS_EDITABLES = [
-  'codPa',
+  'tipoDoc',
+  'nroDoc',
+  'codPa', // sin campo propio: se revierte junto con el documento
   'nombres',
   'apellidos',
   'razonEmpresa',
@@ -81,6 +84,10 @@ export const CAMPOS_EDITABLES = [
 
 // Estado de un formulario en blanco
 export const crearDatosIniciales = () => ({
+  // Documento del paciente (número en texto). codPa es el código interno del backend: no se muestra; solo
+  // viaja cuando no hay número (sin documento o historia de extranjero cargada, que solo trae codPa)
+  tipoDoc: TIPO_DNI,
+  nroDoc: '',
   codPa: '',
   nombres: '',
   apellidos: '',

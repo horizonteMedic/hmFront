@@ -3,6 +3,8 @@ import "./OdontogramaAdultos.css";
 import CIE10List from "../../../../components/reusableComponents/CIE10List";
 import RevertButton from "../../../../components/reusableComponents/RevertButton";
 import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
+import { contarEstados, estadoDe, estadosVisibles } from "./estadosOdontograma";
+import MenuContextualOdontograma, { posicionMenu } from "./MenuContextualOdontograma";
 
 export default function OdontogramaAdultos({
   form,
@@ -63,49 +65,7 @@ export default function OdontogramaAdultos({
     event.preventDefault();
     event.stopPropagation();
 
-    // Calcular posición del menú
-    const menuHeight = 400; // Altura del menú
-    const windowHeight = window.innerHeight;
-    const mouseY = event.clientY;
-    const mouseX = event.clientX;
-
-    // Determinar si es un diente inferior (dientes 17-32)
-    const isDienteInferior = diente >= 17 && diente <= 32;
-
-    let menuY;
-    let menuX = mouseX - 2;
-
-    // Para dientes inferiores, siempre mostrar arriba
-    if (isDienteInferior) {
-      menuY = mouseY - menuHeight - 10;
-    } else {
-      // Para dientes superiores, verificar espacio disponible
-      if (mouseY + menuHeight > windowHeight) {
-        menuY = mouseY - menuHeight - 10;
-      } else {
-        menuY = mouseY - 4;
-      }
-    }
-
-    // Asegurar que el menú no se salga por arriba
-    if (menuY < 10) {
-      menuY = 10;
-    }
-
-    // Asegurar que el menú no se salga por los lados
-    const menuWidth = 200;
-    if (menuX + menuWidth > window.innerWidth) {
-      menuX = window.innerWidth - menuWidth - 10;
-    }
-    if (menuX < 10) {
-      menuX = 10;
-    }
-
-    setContextMenu({
-      mouseX: menuX,
-      mouseY: menuY,
-      diente,
-    });
+    setContextMenu(posicionMenu(event, diente));
   };
 
   //Registrar cambio
@@ -144,46 +104,7 @@ export default function OdontogramaAdultos({
   };
 
   useEffect(() => {
-    const estadosContados = {
-      Ausente: 0,
-      "Cariada por opturar": 0,
-      "Por extraer": 0,
-      Fracturada: 0,
-      Corona: 0,
-      "Obturacion Efectuada": 0,
-      Puente: 0,
-      "P.P.R Metalica": 0,
-      "P.P.R Acrilica": 0,
-      "P.Total": 0,
-      Normal: 0,
-      "Dientes en mal estado": 0,
-    };
-
-    for (let i = 1; i <= 32; i++) {
-      const estado = form[`d${i}`];
-      if (estadosContados.hasOwnProperty(estado)) {
-        estadosContados[estado]++;
-      }
-    }
-
-    setForm((prev) => ({
-      ...prev,
-      ausente: estadosContados["Ausente"],
-      cariada: estadosContados["Cariada por opturar"],
-      porExtraer: estadosContados["Por extraer"],
-      fracturada: estadosContados["Fracturada"],
-      corona: estadosContados["Corona"],
-      obturacion: estadosContados["Obturacion Efectuada"],
-      puente: estadosContados["Puente"],
-      pprMetalica: estadosContados["P.P.R Metalica"],
-      pprAcrilica: estadosContados["P.P.R Acrilica"],
-      pTotal: Math.floor(estadosContados["P.Total"] / 16),
-      normal: estadosContados["Normal"],
-      malEstado:
-        estadosContados["Cariada por opturar"] +
-        estadosContados["Por extraer"] +
-        estadosContados["Fracturada"],
-    }));
+    setForm((prev) => ({ ...prev, ...contarEstados(form) }));
   }, [
     // Se puede hacer dinámicamente si tienes todos los nombres como "d1" a "d32"
     ...Array.from({ length: 32 }, (_, i) => form[`d${i + 1}`]),
@@ -221,79 +142,9 @@ export default function OdontogramaAdultos({
   );
 
   const renderIndicator = (option) => {
-    switch (option) {
-      case "Ausente":
-        return <span className="text-blue-500 text-6xl">✕</span>;
-      case "Cariada por opturar":
-        return <span className="text-red-500 text-7xl">●</span>;
-      case "Por extraer":
-        return <span className="text-red-500 text-6xl">⊗</span>;
-      case "Fracturada":
-        return <span className="text-black text-6xl">╱</span>;
-      case "Corona":
-        return <span className="text-blue-500 text-6xl">▲</span>;
-      case "Obturacion Efectuada":
-        return <span className="text-blue-500 text-7xl">●</span>;
-      case "Puente":
-        return <span className="text-black text-6xl">▭</span>;
-      case "P.P.R Metalica":
-        return <span className="text-black text-6xl">―</span>;
-      case "P.P.R Acrilica":
-        return <span className="text-black text-6xl">=</span>;
-      case "P.Total":
-        return <span className="text-black text-6xl">≈</span>;
-      case "Normal":
-        return <span className="text-green-500 text-6xl">☑</span>;
-
-      default:
-        return null;
-    }
+    const estado = estadoDe(option);
+    return estado ? <span className={`${estado.color} ${estado.tamano}`}>{estado.simbolo}</span> : null;
   };
-
-  const menuOptions = [
-    { label: "Ausente", key: "ausente", icon: "✕", color: "text-blue-500" },
-    {
-      label: "Cariada por opturar",
-      key: "cariada",
-      icon: "●",
-      color: "text-red-500",
-    },
-    {
-      label: "Por extraer",
-      key: "porExtraer",
-      icon: "⊗",
-      color: "text-red-500",
-    },
-    { label: "Fracturada", key: "fracturada", icon: "╱", color: "text-black" },
-    { label: "Corona", key: "corona", icon: "▲", color: "text-blue-500" },
-    {
-      label: "Obturacion Efectuada",
-      key: "obturacion",
-      icon: "●",
-      color: "text-blue-500",
-    },
-    { label: "Puente", key: "puente", icon: "▭", color: "text-black" },
-    {
-      label: "P.P.R Metalica",
-      key: "pprMetalica",
-      icon: "―",
-      color: "text-black",
-    },
-    {
-      label: "P.P.R Acrilica",
-      key: "pprAcrilica",
-      icon: "=",
-      color: "text-black",
-    },
-    { label: "P.Total", key: "pTotal", icon: "≈", color: "text-black" },
-    { label: "Normal", key: "normal", icon: "☑", color: "text-green-500" },
-    // {
-    //   label: "Dientes en mal estado",
-    //   key: "malEstado",
-    //   icon: "●",
-    //   color: "text-yellow-500",
-    // },
-  ];
 
   return (
     <div className="odontograma-container">
@@ -373,10 +224,10 @@ export default function OdontogramaAdultos({
       {/*LEYENDA*/}
       <div className="bg-white border rounded">
         <div className="leyenda-container mx-auto max-w-[800px]">
-          {menuOptions.map((option) => (
-            <div key={option.label} className="leyenda-item">
-              <span className={`${option.color} `}>{option.icon}</span>
-              <span className="text-[12px]">{option.label}</span>
+          {estadosVisibles(form).map((estado) => (
+            <div key={estado.label} className="leyenda-item">
+              <span className={`${estado.color} `}>{estado.simbolo}</span>
+              <span className="text-[12px]">{estado.label}</span>
             </div>
           ))}
         </div>
@@ -384,17 +235,7 @@ export default function OdontogramaAdultos({
       {/*CONTADORES*/}
       <div className="contador-container">
         {[
-          { label: "Ausente", key: "ausente" },
-          { label: "Cariada por opturar", key: "cariada" },
-          { label: "Por extraer", key: "porExtraer" },
-          { label: "Fracturada", key: "fracturada" },
-          { label: "Corona", key: "corona" },
-          { label: "Obturacion Efectuada", key: "obturacion" },
-          { label: "Puente", key: "puente" },
-          { label: "P.P.R Metalica", key: "pprMetalica" },
-          { label: "P.P.R Acrilica", key: "pprAcrilica" },
-          { label: "P.Total", key: "pTotal" },
-          { label: "Normal", key: "normal" },
+          ...estadosVisibles(form).map(({ label, clave }) => ({ label, key: clave })),
           { label: "Dientes en mal estado", key: "malEstado" },
         ].map((opcion) => (
           <div key={opcion.key}>{renderInput(opcion.label, opcion.key)}</div>
@@ -455,23 +296,7 @@ export default function OdontogramaAdultos({
         </div>
       </div>
 
-      {contextMenu && (
-        <div
-          className="context-menu"
-          style={{ top: contextMenu.mouseY, left: contextMenu.mouseX }}
-        >
-          {menuOptions.map((option) => (
-            <div
-              key={option.label}
-              className="context-menu-item"
-              onClick={() => handleOptionClick(option.label)}
-            >
-              <span className={`${option.color} text-xl`}>{option.icon}</span>
-              <span>{option.label}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      <MenuContextualOdontograma menu={contextMenu} onElegir={handleOptionClick} />
     </div>
   );
 }

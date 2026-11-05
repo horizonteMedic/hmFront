@@ -12,6 +12,7 @@ import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from './co
 import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
 import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -223,7 +224,7 @@ const Panel2D = ({ nOrdenInicial, onGuardado }) => {
             <span>años de edad, identificado con DNI nº</span>
             <input
               name="dni"
-              value={form.dni || ''}
+              value={textoDocumento(form.dni)}
               readOnly
               className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[120px] text-base bg-gray-100 cursor-not-allowed"
               style={{ width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px` }}

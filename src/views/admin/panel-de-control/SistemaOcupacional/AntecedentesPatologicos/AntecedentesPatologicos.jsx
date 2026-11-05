@@ -24,6 +24,7 @@ import {
   UpdateDataService,
   VerifyTR,
 } from "./controllerAntecedentesPatologicos";
+import { textoDocumento } from '../../../../utils/documentoPaciente';
 
 const tabla = TABLA_ANTECEDENTES_PATOLOGICOS;
 
@@ -564,7 +565,7 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
       {/* ===== SECCIÓN: DATOS DEL PACIENTE ===== */}
       <SectionFieldset legend="Datos del Paciente" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
         <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="120px" />
-        <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="120px" />
+        <InputTextOneLine label="DNI" name="dni" value={textoDocumento(form.dni)} disabled labelWidth="120px" />
         <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="120px" />
         <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="120px" />
       </SectionFieldset>

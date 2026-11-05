@@ -19,6 +19,7 @@ import ModalSubidaMasiva from "./modalSubidaMasiva/ModalSubidaMasiva";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "consentimientoInformado";
 
@@ -190,7 +191,7 @@ export default function ConsentimientoInformado() {
                     <InputTextOneLine
                         label="Identificado con DNI"
                         name="dni"
-                        value={form.dni}
+                        value={textoDocumento(form.dni)}
                         disabled
                         labelWidth="140px"
                     />

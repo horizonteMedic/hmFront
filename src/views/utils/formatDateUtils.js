@@ -55,6 +55,15 @@ export function formatearFechaHora(fechaStr) {
     return isNaN(fecha.getTime()) ? "" : format(fecha, "dd/MM/yyyy HH:mm:ss");
 }
 
+export function formatearFechaAuditoria(valor) {
+    // Fecha de auditoría tal como la manda el backend: unos reportes traen fecha-hora y otros SOLO fecha
+    // ("2026-10-31", sin hora). Una fecha sin hora no debe pasar por formatearFechaHora: el navegador la toma
+    // como UTC y mostraría el día anterior (con la hora 19:00:00). Vacío / inválido => "".
+    if (!valor) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(valor).trim())) return formatearFechaCorta(valor);
+    return formatearFechaHora(valor);
+}
+
 export function formatearHora(horaStr) {
     // INPUT: "16:57:08.318"
     // OUTPUT: "16:57"

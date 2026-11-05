@@ -6,6 +6,7 @@ import {
   InputTextOneLine,
   SectionFieldset,
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 export default function DatosPersonales({
   form,
@@ -98,7 +99,7 @@ export default function DatosPersonales({
               <InputTextOneLine
                 label="DNI"
                 name="dni"
-                value={form.dni}
+                value={textoDocumento(form.dni)}
                 disabled
                 labelWidth="65px"
               />

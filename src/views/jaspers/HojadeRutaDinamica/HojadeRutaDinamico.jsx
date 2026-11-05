@@ -260,7 +260,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
     const indicacionesTexto =
-        "- DEJAR UNA COPIA A COLOR DE SU DNI VIGENTE\n" +
+        `- DEJAR UNA COPIA A COLOR DE SU ${datos.nombreDoc || "DNI"} VIGENTE\n` +
         "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR VIGENTE, SI VA A CONDUCIR VEHICULO\nY/O SE REALIZARÁ EXAMEN PSICOSENSOMETRICO";
 
     doc.text(indicacionesTexto, 12, startY + 9, { maxWidth: 126, lineHeightFactor: 1.4 });

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 const MARCAS = [
   {
@@ -135,7 +136,7 @@ export default function ExamenCuantitativo({ apiBase, token, selectedSede }) {
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">DNI :</label>
-          <input name="dni" value={form.dni} disabled className="border rounded px-3 py-2 w-32 text-base bg-gray-100 cursor-not-allowed" />
+          <input name="dni" value={textoDocumento(form.dni)} disabled className="border rounded px-3 py-2 w-32 text-base bg-gray-100 cursor-not-allowed" />
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">Edad :</label>

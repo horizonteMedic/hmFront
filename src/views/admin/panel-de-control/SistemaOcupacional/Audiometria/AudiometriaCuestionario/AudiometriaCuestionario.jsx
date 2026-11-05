@@ -20,6 +20,7 @@ import InputsRadioGroup from "../../../../../components/reusableComponents/Input
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = TABLA_CUESTIONARIO_AUDIOMETRIA;
 
@@ -339,7 +340,7 @@ export default function AudiometriaCuestionario({ nOrdenInicial, onGuardado }) {
           {...revertible("fecha")}
         />
         <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="120px" />
-        <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="120px" />
+        <InputTextOneLine label="DNI" name="dni" value={textoDocumento(form.dni)} disabled labelWidth="120px" />
         <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="120px" />
         <InputsRadioGroup
           label="Género"

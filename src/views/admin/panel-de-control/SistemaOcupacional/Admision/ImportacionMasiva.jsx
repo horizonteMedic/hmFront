@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faTimes, faDownload, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import { SubmitMasivoRegistarPaciente, SubmitCitas } from './model/AdminMasivoPaciente';
 import { ComboboxContratas, ComboboxEmpresas } from './model/Combobox';
+import { TIPO_DNI, tipoDocDesdeTexto, validarDocumento } from '../../../../utils/documentoPaciente';
 Modal.setAppElement('#root');
 
 const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlogued }) => {
@@ -109,7 +110,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       data.forEach((row, rowIndex) => {
         columnTitles.forEach((title) => {
           const value = row[title];
-          if (!validateCell(title, value)) {
+          if (!validateCell(title, value, row)) {
             errors.push({ rowIndex, title });
           }
 
@@ -153,14 +154,12 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
     reader.readAsBinaryString(file);
   };
 
-  const validateCell = (colTitle, value) => {
+  // La columna DNI lleva el número del documento de la columna opcional TipoDocumento (DNI, Carnet Extra,
+  // Pasaporte; sin ella, DNI). Un tipo no reconocido marca el número como inválido.
+  const validateCell = (colTitle, value, row) => {
     switch (colTitle) {
       case 'DNI':
-        const dniRegex = /^[0-9]{8}$/;
-        return dniRegex.test(value);
-      case 'Tipo de Documento':
-        const tiposDocumentoPermitidos = ['DNI', 'Pasaporte', 'Carnet Extra'];
-        return tiposDocumentoPermitidos.includes(value);
+        return !validarDocumento(tipoDocDesdeTexto(row?.TipoDocumento), value);
       case 'Nombres':
       case 'Apellidos':
       case 'Ocupación':
@@ -201,7 +200,9 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
 
         // Si el registro fue exitoso, registramos la cita
-        if (res.id) {
+        if (res.id && tipoDocDesdeTexto(patient.TipoDocumento) !== TIPO_DNI) {
+          failedCitasPatients.push(patient.DNI); // la cita aún solo acepta DNI
+        } else if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
           const datos = {

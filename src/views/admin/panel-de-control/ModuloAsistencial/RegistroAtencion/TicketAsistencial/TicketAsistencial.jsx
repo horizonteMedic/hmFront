@@ -14,7 +14,7 @@ import { useEsSedeLaArena } from "../../../../../hooks/useLaArena";
 import { getToday, getEdadDesdeFecha } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero, ObtenerPacientePorId } from "./controllerTicketAsistencial";
+import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, BuscarPorCarnetExtranjeria, RegistrarTicket, ObtenerTicketPorNumero, ObtenerPacientePorId, OfrecerUltimoContexto } from "./controllerTicketAsistencial";
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
 import TicketAsistencialA4 from "../../../../../jaspers/TicketAsistencial/TicketAsistencialA4";
 import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
@@ -495,7 +495,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         document.getElementsByName("documentoIdentidad")[0]?.focus();
     }, [precarga.key]);
 
-    const handleSeleccionarPacienteSinDni = (item) => {
+    const handleSeleccionarPacienteSinDni = async (item) => {
         setPacienteSeleccionado({
             idDatos: item.id,
             label: `${item.apellidos ?? ""} ${item.nombres ?? ""}`.trim(),
@@ -509,6 +509,10 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             NHCL: item.numeroHistoriaClinica ? parseInt(item.numeroHistoriaClinica) : null,
             fechaNacimiento: item.fechaNacimiento ?? null,
         }));
+
+        // Si el paciente elegido tiene documento y ya tuvo tickets, se ofrece reutilizar su último
+        // contexto (empresa/cargo/área). Sin documento (SIN_DOCUMENTO) no hay con qué consultarlo.
+        await OfrecerUltimoContexto(item.numeroDocumento, token, setForm);
     };
 
     const handleLimpiarPacienteSinDni = () => {
@@ -599,6 +603,8 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             BuscarPorDni(form.documentoIdentidad, token, setForm);
         } else if (form.tipoDocumento === "PASAPORTE") {
             BuscarPorPasaporte(form.documentoIdentidad, token, setForm);
+        } else if (form.tipoDocumento === "CARNET_EXTRANJERIA") {
+            BuscarPorCarnetExtranjeria(form.documentoIdentidad, token, setForm);
         }
     };
 
@@ -786,10 +792,13 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     };
 
     // Arma e imprime el ticket de venta de 80mm (Horizonte Medic) a partir del ticket ya
-    // persistido (ver imprimirTicket).
-    const imprimirTicketVenta = (ticket) => {
+    // persistido (ver imprimirTicket). El ticket no trae el tipo de documento, así que se toma de
+    // la ficha del paciente (como en el A4); si esa consulta falla, sale como "DNI".
+    const imprimirTicketVenta = async (ticket) => {
+        const paciente = await ObtenerPacientePorId(ticket.pacienteId, token);
+
         TicketVenta({
-            tipoDocumento: "DNI",
+            tipoDocumento: paciente?.tipoDocumento || "DNI",
             documentoIdentidad: ticket.pacienteDni,
             nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
             edad: ticket.pacienteEdad,
@@ -852,7 +861,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         }
 
         if (ticket.esArena) await imprimirTicketA4(ticket);
-        else imprimirTicketVenta(ticket);
+        else await imprimirTicketVenta(ticket);
         return true;
     };
 
@@ -901,6 +910,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
+                        { label: "Carnet de extranjería", value: "CARNET_EXTRANJERIA" },
                         { label: "Sin DNI", value: "SIN DNI" },
                     ]}
                     className="xl:col-span-full"
@@ -918,7 +928,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     />
                     :
                     <InputTextOneLine
-                        label={`${form.tipoDocumento === "DNI" ? "DNI" : "Pasaporte"}`}
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Carnet de extranjería"}`}
                         name="documentoIdentidad"
                         value={form.documentoIdentidad}
                         onChange={handleChange}

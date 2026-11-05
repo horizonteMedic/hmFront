@@ -3,6 +3,15 @@ import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileImport, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { SearchPacienteDNI } from '../../model/AdminPaciente';
+import CampoDocumento from '../../CampoDocumento';
+import {
+  documentoDesdeRegistro,
+  mensajeBackend,
+  TIPO_DNI,
+  tieneNumero,
+  validarDocumento,
+  validarDocumentoOrden,
+} from '../../../../../../utils/documentoPaciente';
 import { SubmitHistoriaC } from '../../model/AdminHistoriaC';
 import { getMasivoimport, ImportData } from '../../controller/HC';
 import { getFetch } from '../../../../getFetch/getFetch.js';
@@ -13,7 +22,6 @@ import AccionesRegistroHeader from '../../../../../../components/reusableCompone
 import AuditoriaRegistro from '../../../../../../components/reusableComponents/AuditoriaRegistro.jsx';
 import InputAutocomplete from '../../../../../../components/reusableComponents/InputAutocomplete.jsx';
 import InputTextOneLine from '../../../../../../components/reusableComponents/InputTextOneLine.jsx';
-import SearchButton from '../../../../../../components/reusableComponents/SearchButton.jsx';
 import { SelectField } from '../../../../../../components/reusableComponents/InputSelect.jsx';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset.jsx';
 import BotonesForm from '../../../../../../components/templates/BotonesForm.jsx';
@@ -45,7 +53,6 @@ const BOTON_FORM = 'disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-6
 const textoOpcion = (opcion) => opcion.mensaje || opcion.descripcion;
 const aOpciones = (lista) => (Array.isArray(lista) ? lista : []).map((o) => ({ value: textoOpcion(o), label: textoOpcion(o) }));
 const enfocar = (id) => document.getElementById(id)?.focus();
-const normalizar = (valor) => String(valor ?? '').trim().toUpperCase();
 
 // Apertura de exámenes ocupacionales exclusiva de LA ARENA S.A.
 const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued, ChangeDNI }) => {
@@ -60,19 +67,17 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   const rucEmpresa = empresa?.rucEmpresa;
 
   // — Estado del formulario —
-  const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), codPa: DNIG ? String(DNIG) : '' }));
+  const [datos, setDatos] = useState(() => ({ ...crearDatosIniciales(), ...documentoDesdeRegistro(DNIG) }));
   const [protocolos, setProtocolos] = useState([]); // protocolos de la empresa, para la lista
-  const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el DNI se puede "Agregar" como nueva
+  const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el documento se puede "Agregar" como nueva
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-  const [nordenBusqueda, setNordenBusqueda] = useState(''); // N° de orden que se está escribiendo (distinto de datos.n_orden, que viaja al guardar)
-  const [buscandoOrden, setBuscandoOrden] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
   const [modal, setModal] = useState(null); // 'contrata' | 'preCarga' | 'reportePacientes' | 'reportePacientes2' | 'contabilidad'
   const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
   const [cargaId, setCargaId] = useState(0); // cambia cada vez que se carga una historia de la tabla (aunque sea la misma)
 
   // Una historia cargada desde la tabla queda bloqueada hasta "Habilitar edición"; al cargar otra se vuelve a bloquear
-  const { edicionHabilitada, habilitarEdicion, camposDeshabilitados, isFieldEdited, revertField } = useRegistroEditable(datos, setDatos, {
+  const { edicionHabilitada, habilitarEdicion, camposDeshabilitados, isFieldEdited, revertField, revertFields } = useRegistroEditable(datos, setDatos, {
     tieneRegistro: datos.tieneRegistro,
     camposEditables: CAMPOS_EDITABLES,
     resetKey: cargaId,
@@ -83,7 +88,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   registrosRef.current = listado.registros;
 
   useEffect(() => {
-    if (DNIG) enfocar('codPa');
+    if (DNIG) enfocar('nroDoc');
   }, [DNIG]);
 
   // Lista de protocolos de la empresa
@@ -127,30 +132,39 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     setDatos(crearDatosIniciales());
     setDniEditado(false);
     setMostrarErrores(false);
-    setNordenBusqueda('');
     ChangeDNI?.('');
   };
 
   // — Paciente —
-  const alCambiarDni = (e) => {
-    setCampo('codPa', e.target.value.replace(/\D/g, '').slice(0, 8)); // solo números, hasta 8
+  // Otro documento es otro paciente: el codPa resuelto antes deja de valer
+  const cambiarDocumento = ({ tipoDoc, nroDoc }) => {
+    setDatos((d) => ({ ...d, tipoDoc, nroDoc, codPa: '' }));
     setDniEditado(true);
   };
+  const revertirDocumento = () => {
+    revertFields(['tipoDoc', 'nroDoc', 'codPa']);
+    setDniEditado(false);
+  };
+  const errorDocumento = validarDocumentoOrden(datos);
 
-  const consultarPaciente = async (dni) => {
-    const paciente = await SearchPacienteDNI(selectedSede, dni, token);
+  // Paciente registrado con ese tipo + número de documento (null si no existe)
+  const consultarPaciente = async ({ tipoDoc, nroDoc }) => {
+    const paciente = await SearchPacienteDNI(selectedSede, nroDoc, token, tipoDoc);
     return paciente?.codPa ? paciente : null;
   };
 
   const buscarPaciente = async (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
+    if (!tieneNumero(datos.tipoDoc)) return;
+    const error = validarDocumento(datos.tipoDoc, datos.nroDoc);
+    if (error) return Swal.fire('Error', error, 'error');
     mostrarCargando();
     setBuscandoPaciente(true);
     try {
-      const paciente = await consultarPaciente(datos.codPa);
-      if (!paciente) return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
-      setDatos((d) => ({ ...d, nombres: paciente.nombresPa, apellidos: paciente.apellidosPa }));
+      const paciente = await consultarPaciente(datos);
+      if (!paciente) return Swal.fire('Error', 'El paciente no existe: regístrelo antes de crear la orden', 'error');
+      setDatos((d) => ({ ...d, nombres: paciente.nombresPa, apellidos: paciente.apellidosPa, codPa: String(paciente.codPa) }));
       Swal.close();
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
@@ -160,9 +174,13 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   };
 
   // Trae los datos de la última historia del paciente (sin su N° de historia ni su pre-carga)
+  // La última historia se busca por codPa: con DNI es el propio número; con otro documento hay que buscar
+  // antes al paciente (Enter en N° Documento) para tener su codPa
   const importarUltimaHistoria = () => {
+    const codigo = datos.codPa || (Number(datos.tipoDoc) === TIPO_DNI ? datos.nroDoc : '');
+    if (!codigo) return Swal.fire('Error', 'Busque primero al paciente (Enter en N° Documento)', 'error');
     ImportData(
-      datos.codPa,
+      codigo,
       Swal,
       getFetch,
       token,
@@ -172,8 +190,10 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   };
 
   const importarPreCarga = () => {
-    if (!datos.codPa) return Swal.fire('Error', 'Coloque un DNI válido', 'error');
-    getMasivoimport(datos.codPa, token, (todas) => {
+    if (Number(datos.tipoDoc) !== TIPO_DNI) return Swal.fire('Aviso', 'Las pre-cargas solo se buscan por DNI', 'info');
+    const error = validarDocumento(TIPO_DNI, datos.nroDoc);
+    if (error) return Swal.fire('Error', error, 'error');
+    getMasivoimport(datos.nroDoc, token, (todas) => {
       const delaArena = todas.filter((p) => esEmpresaLaArena(p.razonEmpresa));
       if (delaArena.length === 0) {
         return Swal.fire('Sin Resultado', `No hay pre-cargas de ${razonEmpresa} para este DNI`, 'info');
@@ -186,9 +206,9 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
 
   const aplicarPreCarga = async (item) => {
     try {
-      const paciente = await consultarPaciente(datos.codPa);
-      if (!paciente) return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
-      setDatos((d) => preCargaAFormulario(d, item, paciente));
+      const paciente = await consultarPaciente(datos);
+      if (!paciente) return Swal.fire('Error', 'El paciente no existe: regístrelo antes de crear la orden', 'error');
+      setDatos((d) => ({ ...preCargaAFormulario(d, item, paciente), codPa: String(paciente.codPa) }));
       Swal.close();
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
@@ -212,7 +232,6 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     setCargaId((id) => id + 1);
     setDniEditado(false);
     setMostrarErrores(false);
-    setNordenBusqueda('');
   }, []);
 
   const cargarHistoria = useCallback(
@@ -227,45 +246,6 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     },
     [token, mostrarHistoria]
   );
-
-  const alCambiarOrden = (e) => setNordenBusqueda(e.target.value.replace(/\D/g, '').slice(0, 7)); // solo números, como el filtro del listado
-
-  const buscarPorOrden = async () => {
-    if (!nordenBusqueda) return Swal.fire('Error', 'Debe colocar un N° de Orden', 'error');
-    mostrarCargando();
-    setBuscandoOrden(true);
-    try {
-      const res = await getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${nordenBusqueda}`, token);
-      if (res?.error && res.status >= 500) throw new Error('servidor');
-      if (!res || res.error || !res.n_orden) {
-        return Swal.fire('Sin Resultado', `No se encontró la historia clínica N° ${nordenBusqueda}`, 'warning');
-      }
-      // Guardar cambios reescribe la sede de la historia con la sede actual (SubmitHistoriaC): no se abre la de otra sede
-      if (normalizar(res.codSede) && normalizar(res.codSede) !== normalizar(selectedSede)) {
-        return Swal.fire(
-          'Otra sede',
-          `La historia N° ${res.n_orden} pertenece a la sede ${res.codSede}, distinta de la sede actual (${selectedSede}).`,
-          'warning'
-        );
-      }
-      // Este formulario es solo de La Arena (como su listado): la historia de otra empresa se abre en Apertura Exámenes
-      if (!esEmpresaLaArena(res.razonEmpresa)) {
-        return Swal.fire(
-          'Otra empresa',
-          `La historia N° ${res.n_orden} es de ${res.razonEmpresa || 'otra empresa'}. Este formulario solo abre historias de ${razonEmpresa}; búsquela en Apertura Exámenes.`,
-          'warning'
-        );
-      }
-      mostrarHistoria(res);
-      Swal.close();
-    } catch {
-      Swal.fire('Error', 'No se pudo cargar la historia clínica', 'error');
-    } finally {
-      setBuscandoOrden(false);
-    }
-  };
-
-  const alTeclearOrden = (e) => e.key === 'Enter' && buscarPorOrden();
 
   const imprimirHistoria = useCallback(
     async (registro) => {
@@ -309,6 +289,10 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
       nomExamen: tipoOperacion === 1 ? EXAMEN_ANUAL : datos.nomExamen || EXAMEN_ANUAL,
       razonEmpresa: tipoOperacion === 1 ? razonEmpresa : datos.razonEmpresa || razonEmpresa,
     };
+    if (errorDocumento) {
+      setMostrarErrores(true);
+      return Swal.fire('Error', errorDocumento, 'error');
+    }
     const faltantes = Object.entries(CAMPOS_REQUERIDOS)
       .filter(([campo]) => !envio[campo])
       .map(([, etiqueta]) => etiqueta);
@@ -324,10 +308,11 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     mostrarCargando();
     try {
       const res = await SubmitHistoriaC({ ...envio, user_registro: userlogued }, selectedSede, token, tipoOperacion);
+      // id es el N° de orden; 0 = error con mensaje
       if (!res?.id) {
         return Swal.fire(
           'Error',
-          tipoOperacion === 1 ? 'No se ha podido registrar la Historia Clínica' : 'No se ha podido editar la Historia Clínica',
+          mensajeBackend(res, tipoOperacion === 1 ? 'No se ha podido registrar la Historia Clínica' : 'No se ha podido editar la Historia Clínica'),
           'error'
         );
       }
@@ -359,7 +344,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     if (!encontrado) Swal.fire('Sin Resultado', 'No se encontraron registros', 'warning');
   };
 
-  const hayRegistroCargado = Boolean(datos.tieneRegistro || datos.codPa || datos.nombres);
+  const hayRegistroCargado = Boolean(datos.tieneRegistro || datos.nroDoc || datos.codPa || datos.nombres);
   const puedeAgregarNueva = datos.tieneRegistro && edicionHabilitada && dniEditado;
   const auditoria = buildAuditoria(datos, { usuarioActual: userlogued, fechaHoraActual: getFechaHoraActual() });
 
@@ -382,28 +367,27 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
             legend="Datos del Paciente"
             className="space-y-3"
           >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-              <InputTextOneLine
-                label="DNI"
-                name="codPa"
-                value={datos.codPa}
-                onChange={alCambiarDni}
-                onKeyUp={buscarPaciente}
-                disabled={buscandoPaciente || camposDeshabilitados}
-                labelWidth={LABEL}
-                className="min-w-0 sm:flex-1"
-                inputClassName={datos.idPreNorden ? 'border-orange-400 bg-orange-100' : ''}
-                inputMode="numeric"
-                maxLength={8}
-                placeholder="DNI y Enter para buscar"
-                autocomplete="off"
-                {...requerido('codPa')}
-                edited={isFieldEdited('codPa')}
-                onRevert={() => {
-                  revertField('codPa');
-                  setDniEditado(false);
-                }}
-              />
+            <CampoDocumento
+              tipoDoc={datos.tipoDoc}
+              nroDoc={datos.nroDoc}
+              onChange={cambiarDocumento}
+              onKeyUp={buscarPaciente}
+              disabled={buscandoPaciente || camposDeshabilitados}
+              labelWidth={LABEL}
+              inputClassName={datos.idPreNorden ? 'border-orange-400 bg-orange-100' : ''}
+              placeholder="N° y Enter para buscar"
+              required
+              error={mostrarErrores && errorDocumento ? errorDocumento : ''}
+              edited={isFieldEdited('tipoDoc') || isFieldEdited('nroDoc')}
+              onRevert={revertirDocumento}
+              avisoSinNumero={
+                datos.codPa
+                  ? datos.tipoDoc
+                    ? 'Sin documento (paciente ya registrado)'
+                    : 'Documento no disponible en la historia (paciente extranjero)'
+                  : 'Documento no disponible'
+              }
+            >
               <div className="flex gap-2">
                 <button type="button" onClick={importarUltimaHistoria} disabled={camposDeshabilitados} className={`${BOTON} bg-blue-800 hover:bg-blue-700`}>
                   <FontAwesomeIcon icon={faFileImport} />
@@ -414,7 +398,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
                   Pre-carga
                 </button>
               </div>
-            </div>
+            </CampoDocumento>
             {datos.idPreNorden && (
               <p className="mb-0 font-semibold text-orange-700">
                 Datos de la pre-carga N° {datos.idPreNorden}
@@ -443,22 +427,15 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
               {...requerido('apellidos')}
               {...revertible('apellidos')}
             />
-            <div className="flex w-full gap-x-3">
+            {datos.tieneRegistro && (
               <InputTextOneLine
                 label="N° Orden"
                 name="norden"
-                value={datos.tieneRegistro ? datos.n_orden : nordenBusqueda}
-                onChange={alCambiarOrden}
-                onKeyUp={alTeclearOrden}
-                disabled={datos.tieneRegistro || buscandoOrden}
+                value={datos.n_orden}
+                disabled
                 labelWidth={LABEL}
-                className="w-full"
-                inputMode="numeric"
-                placeholder="N° orden y Enter para buscar"
-                autocomplete="off"
               />
-              <SearchButton onClick={buscarPorOrden} disabled={datos.tieneRegistro || buscandoOrden} className="lg:hidden" />
-            </div>
+            )}
           </SectionFieldset>
 
           <SectionFieldset legend="Empresa y Atención" className="space-y-3">
@@ -651,7 +628,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
             hideEdit={!datos.tieneRegistro || edicionHabilitada}
           >
             {puedeAgregarNueva && (
-              <button type="button" onClick={() => guardar(1)} className={BOTON_FORM} title="Registra una historia nueva con el DNI y los datos actuales">
+              <button type="button" onClick={() => guardar(1)} className={BOTON_FORM} title="Registra una historia nueva con el documento y los datos actuales">
                 <FontAwesomeIcon icon={faPlus} /> Agregar como nueva
               </button>
             )}

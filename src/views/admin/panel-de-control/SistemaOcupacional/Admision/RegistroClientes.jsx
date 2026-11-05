@@ -22,6 +22,8 @@ import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import FotoPaciente from './foto/FotoPaciente';
 import SubidaMasiva from './RegistroPacientes/MasivoRegistroPacientes';
+import CampoDocumento from './CampoDocumento';
+import { mensajeBackend, TIPO_DNI, tieneNumero, validarDocumento } from '../../../../utils/documentoPaciente';
 import {
   CAMPOS_EDITABLES,
   CAMPOS_REQUERIDOS,
@@ -50,7 +52,8 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
   const { Profesiones = [], Departamentos = [], Provincias = [], Distritos = [] } = listas;
   const { userlogued } = useSessionData();
 
-  const { form, setForm, handleChange, handleClear } = useForm(DATOS_INICIALES, { storageKey: 'RegistroPacientes' });
+  // V2: el borrador guardado antes tenía el DNI en codPa; con otra clave no se mezcla con el formato nuevo
+  const { form, setForm, handleChange, handleClear } = useForm(DATOS_INICIALES, { storageKey: 'RegistroPacientesV2' });
 
   const { edicionHabilitada, habilitarEdicion, camposDeshabilitados, isFieldEdited, revertField } = useRegistroEditable(
     form,
@@ -113,19 +116,20 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
     setFotoP(SIN_ARCHIVO);
   };
 
-  // Limpia el formulario; `conservarDni` deja el DNI buscado para seguir llenando un paciente nuevo
-  const limpiar = ({ conservarDni = false } = {}) => {
-    const dni = form.codPa;
+  const limpiar = () => {
     setMostrarErrores(false);
     archivosVacios();
-    if (conservarDni) setForm({ ...DATOS_INICIALES, codPa: dni });
-    else handleClear();
-    document.getElementById('codPa')?.focus();
+    handleClear();
+    document.getElementById('nroDoc')?.focus();
   };
 
-  // ===== Búsqueda de paciente por DNI =====
+  const errorDocumento = validarDocumento(form.tipoDoc, form.nroDoc);
+  const cambiarDocumento = ({ tipoDoc, nroDoc }) => setForm((f) => ({ ...f, tipoDoc, nroDoc }));
+
+  // ===== Búsqueda de paciente por tipo + número de documento =====
   const buscarPaciente = async () => {
-    if (!form.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
+    if (errorDocumento) return Swal.fire('Error', errorDocumento, 'error');
+    const buscado = { tipoDoc: form.tipoDoc, nroDoc: form.nroDoc };
 
     Swal.fire({
       title: 'Buscando datos',
@@ -136,10 +140,11 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
     });
 
     try {
-      const res = await SearchPacienteDNI(selectedSede, form.codPa, token);
+      const res = await SearchPacienteDNI(selectedSede, form.nroDoc, token, form.tipoDoc);
       Swal.close();
 
-      // Paciente nuevo: se conserva el DNI y se sigue con los demás datos
+      // Paciente nuevo: se conserva el documento y lo que haya traído el backend (con DNI, los datos de
+      // RENIEC) y se sigue con los demás datos
       if (!res?.codPa) {
         await Swal.fire({
           toast: true,
@@ -152,13 +157,15 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           timer: 1200,
           customClass: { icon: 'swal2-icon-scale' },
         });
-        limpiar({ conservarDni: true });
+        setMostrarErrores(false);
+        archivosVacios();
+        setForm(res && !res.error && typeof res.json !== 'function' ? pacienteAFormulario(res, buscado) : { ...DATOS_INICIALES, ...buscado });
         setTimeout(() => document.getElementById('nombresPa')?.focus(), 0);
         return;
       }
 
       setMostrarErrores(false);
-      setForm(pacienteAFormulario(res));
+      setForm(pacienteAFormulario(res, buscado));
 
       // Huella, firma y foto ya tomadas
       const [H, F, FO] = await Promise.all(
@@ -177,6 +184,10 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
 
   // ===== Guardar / Guardar cambios =====
   const guardar = () => {
+    if (errorDocumento) {
+      setMostrarErrores(true);
+      return Swal.fire('Error', errorDocumento, 'error');
+    }
     const faltantes = Object.entries(CAMPOS_REQUERIDOS)
       .filter(([campo]) => !String(form[campo] ?? '').trim())
       .map(([, etiqueta]) => etiqueta);
@@ -189,7 +200,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
       return Swal.fire('Error', 'La fecha de nacimiento debe ser una fecha válida con el formato DD-MM-AAAA', 'error');
     }
 
-    const dni = form.codPa;
+    const { tipoDoc, nroDoc } = form;
     const esEdicion = form.tieneRegistro;
 
     Swal.fire({
@@ -203,14 +214,17 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
     SubmitRegistrarPaciente(form, selectedSede, token)
       .then((r) => {
         Swal.close();
-        if (!r.id) {
-          Swal.fire('Error', esEdicion ? 'No se pudo actualizar' : 'No se pudo registrar', 'error');
+        // id: 1 actualizó, 2 creó, 0 error con mensaje
+        if (!r?.id) {
+          Swal.fire('Error', mensajeBackend(r, esEdicion ? 'No se pudo actualizar' : 'No se pudo registrar'), 'error');
           return;
         }
         Swal.fire(esEdicion ? 'Actualizado' : 'Registrado', esEdicion ? 'Paciente actualizado' : 'Paciente registrado', 'success');
         limpiar();
         tabHC();
-        ChangeDNI(dni);
+        // La apertura recibe el documento; codPaAsignado hace falta para el paciente sin documento, que no
+        // tiene número con que resolverlo
+        ChangeDNI({ tipoDoc, nroDoc: tieneNumero(tipoDoc) ? nroDoc : '', codPa: r.codPaAsignado ?? form.codPa ?? '' });
       })
       .catch(() => {
         Swal.close();
@@ -218,13 +232,21 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
       });
   };
 
-  // Firma, huella y foto necesitan el DNI del paciente
+  // Firma, huella y foto se guardan con el codPa del paciente. Con DNI, el codPa de un paciente nuevo es el
+  // propio DNI (como siempre); a un extranjero o sin documento el backend se lo asigna al registrarlo.
+  const codPaArchivos = form.codPa || (Number(form.tipoDoc) === TIPO_DNI && !errorDocumento ? form.nroDoc : '');
   const abrirCaptura = (tipo) => {
-    if (!form.codPa) return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+    if (!codPaArchivos) {
+      return Swal.fire(
+        'Error',
+        Number(form.tipoDoc) === TIPO_DNI ? 'Ingresa el DNI del cliente' : 'Registre primero al paciente y vuelva a buscarlo para tomar firma, huella o foto',
+        'error'
+      );
+    }
     setModal(tipo);
   };
 
-  const hayRegistroCargado = Boolean(form.codPa || form.nombresPa);
+  const hayRegistroCargado = Boolean(form.nroDoc || form.codPa || form.nombresPa);
   const auditoria = buildAuditoria(form, { usuarioActual: userlogued, fechaHoraActual: getFechaHoraActual() });
 
   const documentos = [
@@ -249,21 +271,19 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
 
       {/* ===== SECCIÓN: DATOS PERSONALES ===== */}
       <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-        <div className="flex gap-x-3 w-full lg:col-span-2">
-          <InputTextOneLine
-            label="DNI/LM"
-            name="codPa"
-            value={form.codPa}
-            onChange={campoNumerico}
-            onKeyUp={(e) => e.key === 'Enter' && buscarPaciente()}
-            disabled={form.tieneRegistro}
-            labelWidth="120px"
-            className="w-full lg:w-1/2 lg:pr-2"
-            inputMode="numeric"
-            {...requerido('codPa')}
-          />
-          <SearchButton onClick={buscarPaciente} disabled={form.tieneRegistro} />
-        </div>
+        <CampoDocumento
+          tipoDoc={form.tipoDoc}
+          nroDoc={form.nroDoc}
+          onChange={cambiarDocumento}
+          onKeyUp={(e) => e.key === 'Enter' && buscarPaciente()}
+          disabled={form.tieneRegistro}
+          labelWidth="120px"
+          className="w-full lg:col-span-2 lg:w-1/2 lg:pr-2"
+          required
+          error={mostrarErrores && errorDocumento ? errorDocumento : ''}
+        >
+          {tieneNumero(form.tipoDoc) && <SearchButton onClick={buscarPaciente} disabled={form.tieneRegistro} />}
+        </CampoDocumento>
 
         <InputTextOneLine
           label="Nombres"
@@ -525,13 +545,13 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
       />
 
       {modal === 'huella' && (
-        <NewHuellaFut close={cerrarModal} DNI={form.codPa} Huella={HuellaP} setHuella={() => setHuellaP({ id: 1 })} />
+        <NewHuellaFut close={cerrarModal} DNI={codPaArchivos} Huella={HuellaP} setHuella={() => setHuellaP({ id: 1 })} />
       )}
       {modal === 'foto' && (
-        <FotoPaciente close={cerrarModal} DNI={form.codPa} Foto={FotoP} setFoto={(url) => setFotoP({ id: 1, url })} />
+        <FotoPaciente close={cerrarModal} DNI={codPaArchivos} Foto={FotoP} setFoto={(url) => setFotoP({ id: 1, url })} />
       )}
       {modal === 'pad' && (
-        <NewPad close={cerrarModal} DNI={form.codPa} Firma={FirmaP} setFirma={() => setFirmaP({ id: 1 })} />
+        <NewPad close={cerrarModal} DNI={codPaArchivos} Firma={FirmaP} setFirma={() => setFirmaP({ id: 1 })} />
       )}
       {modal === 'masivo' && <SubidaMasiva onClose={cerrarModal} sede={selectedSede} token={token} />}
     </div>

@@ -1,4 +1,5 @@
 import { AUTORIZA_PRECARGA, aFechaDMA, crearDatosIniciales, EXAMEN_ANUAL, hoyDMA } from './constantes.js';
+import { documentoDesdeBackend } from '../../../../../../utils/documentoPaciente';
 
 // Capa de mapeo entre el backend y el formulario. Las claves del usuario que registra cambian según el
 // endpoint, y aquí quedan todas juntas:
@@ -14,6 +15,8 @@ export const historiaAFormulario = (res) => ({
   ...crearDatosIniciales(),
   ...res, // el resto del DTO viaja tal cual al actualizar (lo que el formulario no muestra se conserva)
   codPa: String(texto(res.codPa)),
+  // La historia solo trae codPa: de un DNI se saca el número; de un extranjero, no (se envía su codPa)
+  ...documentoDesdeBackend(res),
   nombres: texto(res.nombres),
   apellidos: texto(res.apellidos),
   razonContrata: texto(res.razonContrata),

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBacterium, faBoxesStacked, faNotesMedical, faSearch, faStethoscope, faTruckMedical, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faBacterium, faBoxesStacked, faNotesMedical, faSearch, faStethoscope, faTooth, faTruckMedical, faUserCheck, faVial } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabSelector";
 import TriajeAsistencial from "./Triaje/Triaje";
@@ -12,6 +12,7 @@ import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector";
 import HojaReferencia from "./HojaReferencia/HojaReferencia";
 import ReportesTabSelector from "./Reportes/ReportesTabSelector";
 import InventarioTabSelector from "./Inventario/InventarioTabSelector";
+import Odontologia from "./Odontologia/Odontologia";
 
 const sections = [
     { tab: 1, vista: "Registro de Atencion", label: "Registro de Atención", icon: faUserCheck, component: RegistroAtencionTabSelector },
@@ -22,6 +23,7 @@ const sections = [
     { tab: 6, vista: "Hoja de Referencia", label: "Hoja de Referencia", icon: faTruckMedical, component: HojaReferencia },
     { tab: 7, vista: "Reportes Asistencial", label: "Reportes", icon: faSearch, component: ReportesTabSelector },
     { tab: 8, vista: "Inventario Asistencial", label: "Inventario", icon: faBoxesStacked, component: InventarioTabSelector },
+    { tab: 9, vista: "Odontologia Asistencial", label: "Odontologia Asistencial", icon: faTooth, component: Odontologia },
 ];
 
 const ModuloAsistencial = () => {

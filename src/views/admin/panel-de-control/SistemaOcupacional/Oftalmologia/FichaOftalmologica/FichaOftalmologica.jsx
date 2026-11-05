@@ -20,6 +20,7 @@ import { getToday } from "../../../../../utils/helpers";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "oftalmologia";
 
@@ -281,7 +282,7 @@ export default function FichaOftalmologica() {
               <label className="font-semibold">DNI :</label>
               <input
                 name="dni"
-                value={form.dni || ""}
+                value={textoDocumento(form.dni)}
                 disabled
                 className="border rounded px-2 py-1 w-full"
               />
