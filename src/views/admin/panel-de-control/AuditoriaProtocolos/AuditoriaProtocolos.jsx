@@ -10,11 +10,13 @@ import ResumenProgreso from "./components/ResumenProgreso";
 import { formularioDe } from "./config/formulariosExamen";
 import useAccesoFormularios from "./hooks/useAccesoFormularios";
 import useHojaRuta from "./hooks/useHojaRuta";
+import useSedeActual from "./hooks/useSedeActual";
 import { resumirExamenes } from "./utils/progreso";
 
 export default function AuditoriaProtocolos() {
     const navigate = useNavigate();
     const token = useAuthStore((state) => state.token);
+    const sede = useSedeActual();
     const { hoja, cargando, error, buscar, refrescar } = useHojaRuta(token);
     const { puedeAbrir, avisarSinAcceso } = useAccesoFormularios();
     // Se guarda solo la clave del examen abierto: el examen se toma siempre de la hoja, así su estado está al día
@@ -36,7 +38,7 @@ export default function AuditoriaProtocolos() {
 
     const buscarOrden = (orden) => {
         setClaveAbierta(null);
-        buscar(orden);
+        buscar(orden, sede);
     };
 
     return (
