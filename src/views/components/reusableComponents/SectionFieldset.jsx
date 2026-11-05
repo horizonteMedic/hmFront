@@ -20,6 +20,7 @@ export default function SectionFieldset({
         if (!contentRef.current) return;
         if (open) {
             const measure = () => {
+                if (!contentRef.current) return;
                 const h = contentRef.current.scrollHeight;
                 setMaxHeight(h + "px");
             };
