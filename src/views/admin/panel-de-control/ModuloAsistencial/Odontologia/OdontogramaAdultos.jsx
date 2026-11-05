@@ -293,8 +293,10 @@ export default function OdontogramaAdultos({
               checked={form.observaciones.includes("NO PASO EXAMEN ODONTOLOGICO")}
               disabled={disabled}
               onChange={(e) => {
+                // Si no pasó el examen, el odontograma no tiene hallazgos: todas las piezas vuelven a Normal
                 setForm((prev) => ({
                   ...prev,
+                  ...(e.target.checked ? Object.fromEntries(CAMPOS_DIENTES.map((campo) => [campo, "Normal"])) : {}),
                   observaciones: e.target.checked ? "NO PASO EXAMEN ODONTOLOGICO" : "",
                 }));
                 handleCheckBoxChange(e);

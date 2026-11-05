@@ -309,9 +309,8 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
 
   return (
     <div className="w-full  mx-auto bg-white p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">ODONTOLOGÍA</h2>
       {/* overflow-clip (no overflow-hidden): recorta igual pero no rompe la barra superior fija del registro */}
-      <div className="mx-auto bg-white rounded-lg overflow-clip relative mt-6">
+      <div className="mx-auto bg-white rounded-lg overflow-clip relative">
         <div className="container mx-auto mt-1 mb-12 px-4 sm:px-6 lg:px-8">
           <div className="pt-4">
             {(embebido || activeTab === 1) && (
@@ -411,28 +410,28 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
 
             {/* Tabs (incrustado solo se muestra el odontograma) */}
             {!embebido && (
-            <div className="flex gap-1">
-              <div
-                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold  cursor-pointer   focus:outline-none flex items-center whitespace-nowrap ${activeTab === 1
-                  ? "bg-[#233245] text-white font-bold"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  } ${activeTab === 1 ? "border-b-0" : "border-b"}`}
-                onClick={() => changeTab(1)}
-              >
-                <FontAwesomeIcon icon={faUsers} className="mr-2" />
-                Odontograma Adultos
+              <div className="flex gap-1">
+                <div
+                  className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold  cursor-pointer   focus:outline-none flex items-center whitespace-nowrap ${activeTab === 1
+                    ? "bg-[#233245] text-white font-bold"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    } ${activeTab === 1 ? "border-b-0" : "border-b"}`}
+                  onClick={() => changeTab(1)}
+                >
+                  <FontAwesomeIcon icon={faUsers} className="mr-2" />
+                  Odontograma Adultos
+                </div>
+                <div
+                  className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold cursor-pointer  focus:outline-none flex items-center whitespace-nowrap ${activeTab === 2
+                    ? "bg-[#233245] text-white font-bold"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    } ${activeTab === 2 ? "border-b-0" : "border-b"}`}
+                  onClick={() => changeTab(2)}
+                >
+                  <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
+                  Reportes
+                </div>
               </div>
-              <div
-                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold cursor-pointer  focus:outline-none flex items-center whitespace-nowrap ${activeTab === 2
-                  ? "bg-[#233245] text-white font-bold"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  } ${activeTab === 2 ? "border-b-0" : "border-b"}`}
-                onClick={() => changeTab(2)}
-              >
-                <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
-                Reportes
-              </div>
-            </div>
             )}
 
             {/* Contenido de los tabs */}
@@ -509,7 +508,7 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
                 datosFooter={datosFooter}
               />
             )}
-           
+
           </div>
         </div>
 

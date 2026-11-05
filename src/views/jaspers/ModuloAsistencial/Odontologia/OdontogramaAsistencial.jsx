@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
-import footerTR from '../../components/footerTR.jsx';
 import { compressImage } from '../../../utils/helpers.js';
 import { drawEstadisticas, drawLeyenda, estadosDeDientes, ICONO_PNG } from './OdontogramaDigitalizado/leyendaYTotales.js';
 import { dibujarEstadoVectorial, tieneDibujoVectorial } from './OdontogramaDigitalizado/estadosVectoriales.js';
@@ -505,9 +504,6 @@ export default async function OdontogramaAsistencial(datos = {}, docExistente = 
 
   // 9) Firmas en la columna derecha
   await drawFirmasColumnaDerecha(doc, datos, yPosLugarFecha);
-
-  // 10) Footer
-  footerTR(doc, { footerData: datos, footerOffsetY: 8, fontSize: 8 });
 
   if (docExistente) {
     return doc;
