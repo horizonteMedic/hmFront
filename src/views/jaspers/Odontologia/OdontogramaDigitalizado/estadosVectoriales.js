@@ -28,36 +28,26 @@ const DIBUJOS = {
     doc.line(x + w * 0.15, cy - h * 0.08, x + w * 0.85, cy - h * 0.08);
     doc.line(x + w * 0.15, cy + h * 0.08, x + w * 0.85, cy + h * 0.08);
   },
-  Implante: (doc, { cx, cy, w, h }) => {
-    doc.setDrawColor(...NEGRO);
-    doc.setLineWidth(0.5);
-    doc.line(cx, cy - h * 0.3, cx, cy + h * 0.3);
-    doc.line(cx - w * 0.3, cy + h * 0.3, cx + w * 0.3, cy + h * 0.3);
-  },
-  "Resina Roja": (doc, forma) => cuadrado(doc, forma, ROJO),
-  "Resina Azul": (doc, forma) => cuadrado(doc, forma, AZUL),
-  "Amalgama Roja": (doc, forma) => rombo(doc, forma, ROJO),
-  "Amalgama Azul": (doc, forma) => rombo(doc, forma, AZUL),
-  "Remanente Radicular": (doc, { cx, cy, h }) => {
-    doc.setTextColor(...NEGRO);
-    doc.setFont("helvetica", "bold").setFontSize(h * 1.1);
-    doc.text("RR", cx, cy + h * 0.15, { align: "center" });
-    doc.setFont("helvetica", "normal");
-  },
+  Implante: (doc, forma) => etiqueta(doc, "IMP", forma, AZUL, 1.25),
+  "Resina Roja": (doc, forma) => etiqueta(doc, "R", forma, ROJO, 1.9),
+  "Resina Azul": (doc, forma) => etiqueta(doc, "R", forma, AZUL, 1.9),
+  "Amalgama Roja": (doc, forma) => etiqueta(doc, "AM", forma, ROJO, 1.35),
+  "Amalgama Azul": (doc, forma) => etiqueta(doc, "AM", forma, AZUL, 1.35),
+  "Remanente Radicular": (doc, forma) => etiqueta(doc, "RR", forma, ROJO, 1.45),
 };
 
-function cuadrado(doc, { cx, cy, w, h }, color) {
-  const lado = Math.min(w, h) * 0.55;
-  doc.setFillColor(...color);
-  doc.rect(cx - lado / 2, cy - lado / 2, lado, lado, "F");
-}
-
-function rombo(doc, { cx, cy, w, h }, color) {
-  const rx = w * 0.32;
-  const ry = h * 0.32;
-  doc.setFillColor(...color);
-  doc.triangle(cx - rx, cy, cx, cy - ry, cx + rx, cy, "F");
-  doc.triangle(cx - rx, cy, cx, cy + ry, cx + rx, cy, "F");
+// Texto en negrita centrado en el diente; "factor" ajusta el tamaño de la letra respecto al alto del recuadro y, si no
+// cabe a lo ancho (diente angosto), se achica hasta que ocupe como máximo el 92% del recuadro.
+function etiqueta(doc, texto, { cx, cy, w, h }, color, factor) {
+  let size = h * factor;
+  doc.setTextColor(...color);
+  doc.setFont("helvetica", "bold").setFontSize(size);
+  while (size > 4 && doc.getTextWidth(texto) > w * 0.92) {
+    size -= 0.25;
+    doc.setFontSize(size);
+  }
+  doc.text(texto, cx, cy + size * 0.127, { align: "center" });
+  doc.setFont("helvetica", "normal");
 }
 
 // Marco del diente (igual al de los PNG): cuadrado con sus diagonales y un cuadrado interior.
