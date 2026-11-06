@@ -2,6 +2,7 @@ import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import RayosXToraxPA from "./rayosXToraxPA/RayosXToraxPA";
 import RayosXColumna from "./rayosXColumna/RayosXColumna";
 import ConsentimientoMujerRayosX from "./consentimientoMujer/ConsentimientoMujerRayosX";
+import ConsentimientoRayosX from "./consentimientoRayosX/ConsentimientoRayosX";
 
 export default function RayosXTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -22,6 +23,12 @@ export default function RayosXTabSelector({ tieneVista }) {
       permission: "Consentimiento Mujeres",
       label: "Consentimiento Mujeres",
       component: ConsentimientoMujerRayosX
+    },
+    {
+      id: 3,
+      permission: "Consentimiento Rayos X",
+      label: "Consentimiento Rayos X",
+      component: ConsentimientoRayosX
     }
   ];
 

@@ -66,6 +66,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "LABORATORIO_CLINICO",           // 10
     "PERFIL_LIPIDICO",               // 11
     "OIT",                           // 12
+    "CONSENTIMIENTO_RAYOS_X",
     "CONSENTIMIENTO_MUJER_RAYOS_X",
     "RADIOGRAFIA_TORAX",             // 13
     "ELECTROCARDIOGRAMA",            // 14
@@ -162,6 +163,7 @@ const ExamenesListCOMPLETO_BASE = [ // Completo
     "INMUNOLOGIA_VIH",
     "INMUNOLOGIA_THEVENON",
 
+    "CONSENTIMIENTO_RAYOS_X",
     "CONSENTIMIENTO_MUJER_RAYOS_X",
     "OIT",                           // 14
     "RADIOGRAFIA_TORAX",             // 15
