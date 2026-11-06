@@ -785,6 +785,12 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/oit/obtenerReporteOit",
     },
 
+    CONSENTIMIENTO_RAYOS_X: {
+        nombre: "DECLARACION JURADA DE ACEPTACION PARA LA TOMA DE PLACA RADIOGRAFICA",
+        tabla: "consentimiento_rayosx_general",
+        url: "/api/v01/ct/rayosX/obtenerReporteConsentimientoRayosXGeneral",
+    },
+
     CONSENTIMIENTO_MUJER_RAYOS_X: {
         nombre: "CONSENTIMIENTO DE TOMA RADIOGRAFICA EN MUJERES EN EDAD FERTIL",
         tabla: "consentimiento_rayosx",
