@@ -8,6 +8,8 @@ import AccionesRegistroHeader from "../../../../../components/reusableComponents
 import PatologiasAdicionales from "../../AntecedentesPatologicos/PatologiasAdicionales";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import AvisoError from "../../../../../components/reusableComponents/AvisoError";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
@@ -68,9 +70,13 @@ const CAMPOS_EDITABLES = [
   "diagnostico",
   "tratamiento",
   "seguimientoYControl",
+  "diagnosticoCie10",
   "user_medicoFirma",
   "nombre_medico",
 ];
+
+// Campos que el bloque CIE10 resalta/revierte en conjunto.
+const CAMPOS_CIE10 = ["diagnosticoCie10"];
 
 export default function HistoriaClinicaMujerVaronAdulto() {
   const today = getToday();
@@ -182,6 +188,8 @@ export default function HistoriaClinicaMujerVaronAdulto() {
     diagnostico: "",
     tratamiento: "",
     seguimientoYControl: "",
+    // Diagnósticos CIE10 elegidos con el buscador (texto "CIE 10: <código> - <descripción>", uno por línea).
+    diagnosticoCie10: "",
     // true tras un intento de guardar: recién ahí se muestran los errores de campos obligatorios (Diagnóstico y
     // Tratamiento). Vuelve a false con cualquier limpieza/búsqueda, porque parten del estado inicial.
     intentoGuardar: false,
@@ -325,7 +333,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
       <AvisoError mensaje={errorEdad} className="mb-0" />
 
-      <SectionFieldset legend="Header" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <SectionFieldset legend="Datos del registro" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputTextOneLine
           label="N° Ticket"
           name="n_hcl"
@@ -349,7 +357,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
       <DatosPersonalesLaborales form={form} laborales={false} />
 
-      <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 sm:grid-cols-2 gap-3" collapsible>
+      <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 sm:grid-cols-2 gap-3" collapsible defaultOpen={false}>
         <InputTextOneLine
           label="Nombre del Padre"
           name="nombre_padre"
@@ -749,6 +757,24 @@ export default function HistoriaClinicaMujerVaronAdulto() {
           labelWidth="180px"
           rows={3}
         />
+      </SectionFieldset>
+
+      <SectionFieldset legend="CIE10">
+        {CAMPOS_CIE10.some(isFieldEdited) && (
+          <div className="flex justify-end mb-1">
+            <RevertButton onClick={() => revertFields(CAMPOS_CIE10)} title="Revertir CIE10" />
+          </div>
+        )}
+        <div className="bg-green-200 p-3 rounded-xl">
+          <CIE10List
+            value={form.diagnosticoCie10}
+            fieldName="diagnosticoCie10"
+            label="Diagnósticos CIE10"
+            token={token}
+            setForm={setForm}
+            disabled={camposDeshabilitados}
+          />
+        </div>
       </SectionFieldset>
 
       <SectionFieldset legend="Asignación de Médico">

@@ -193,6 +193,7 @@ const formFromHistoriaPropia = (data, today) => ({
     diagnostico: data.diagnostico ?? "",
     tratamiento: data.tratamiento ?? "",
     seguimientoYControl: data.seguimientoYControl ?? "",
+    diagnosticoCie10: data.diagnosticoCie10 ?? "",
 });
 
 // Campos de solo lectura que vienen de OTRO formulario (AntecedentesPatologicos): familiares y
@@ -387,6 +388,7 @@ const construirBody = (form) => ({
     diagnostico: form.diagnostico ?? "",
     tratamiento: form.tratamiento ?? "",
     seguimientoYControl: form.seguimientoYControl ?? "",
+    diagnosticoCie10: form.diagnosticoCie10 ?? "",
     doctorAsignado: form.nombre_medico ?? "",
 });
 

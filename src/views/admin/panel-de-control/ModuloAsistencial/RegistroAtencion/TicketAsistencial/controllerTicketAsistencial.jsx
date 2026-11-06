@@ -7,7 +7,7 @@ const serviciosGeneralesUrl = "/api/servicios-generales";
 const buscarReniecUrl = "/api/pacientes-asistencial/reniec";
 const buscarDocumentoUrl = "/api/pacientes-asistencial/documento";
 const ticketsUrl = "/api/tickets";
-const ultimoContextoUrl = "/api/tickets/ultimo-contexto";
+const historialUrl = "/api/tickets/historial";
 const pacientesUrl = "/api/pacientes-asistencial";
 
 
@@ -64,113 +64,51 @@ const setFormFromPaciente = (setForm, data) => {
   }));
 };
 
-const escapeHtml = (valor) =>
-  String(valor ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-
-// Último contexto (empresa / cargo / área) con el que se registró un ticket del paciente:
-// GET /api/tickets/ultimo-contexto?dni=... -> { tienePrevio, empresa, cargo, area }.
-// Devuelve null si es su primera atención (tienePrevio=false), si no hay documento con qué
-// consultar o si la consulta falla: es una ayuda opcional y nunca debe frenar la búsqueda
+// Historial de tickets del paciente: GET /api/tickets/historial?documento=... (DNI, pasaporte,
+// carnet de extranjería, etc.) -> { resultado: [ticket, ...] }. Cada ticket trae numeroTicket,
+// fechaTicket/horaTicket, empresa, cargo, area y los datos del paciente (pacienteTipoDocumento,
+// pacienteNumeroDocumento...). Se devuelve del más reciente al más antiguo.
+// Devuelve [] si no hay documento, si nunca tuvo tickets o si la consulta falla: es una ayuda
+// opcional (alimenta la barra lateral de "Tickets anteriores") y nunca debe frenar la búsqueda
 // del paciente.
-export const ObtenerUltimoContexto = async (documento, token) => {
-  const dni = String(documento ?? "").trim();
-  if (!dni) return null;
+export const ListarHistorialTickets = async (documento, token) => {
+  const numero = String(documento ?? "").trim();
+  if (!numero) return [];
 
   try {
-    const res = await getFetch(`${ultimoContextoUrl}?dni=${encodeURIComponent(dni)}`, token);
-    if (!res || res.error) return null;
+    const res = await getFetch(`${historialUrl}?documento=${encodeURIComponent(numero)}`, token);
+    if (!res || res.error) return [];
 
-    // El backend puede devolver el objeto directo o envuelto en { resultado }.
-    const data = res.resultado ?? res;
-    if (!data?.tienePrevio) return null;
+    // El backend puede devolver la lista directa o envuelta en { resultado }.
+    const lista = res.resultado ?? res;
+    if (!Array.isArray(lista)) return [];
 
-    const contexto = {
-      empresa: String(data.empresa ?? "").trim(),
-      cargo: String(data.cargo ?? "").trim(),
-      area: String(data.area ?? "").trim(),
-    };
-    return contexto.empresa || contexto.cargo || contexto.area ? contexto : null;
+    return [...lista].sort(
+      (a, b) =>
+        `${b.fechaTicket ?? ""} ${b.horaTicket ?? ""}`.localeCompare(`${a.fechaTicket ?? ""} ${a.horaTicket ?? ""}`) ||
+        (b.id ?? 0) - (a.id ?? 0)
+    );
   } catch {
-    return null;
+    return [];
   }
 };
 
-// Si el paciente ya tuvo tickets, abre un modal con su último contexto y, si el usuario acepta,
-// completa Empresa / Cargo / Área del formulario (misma idea que OpenModalAntecedentesPrevios
-// en AntecedentesPatologicos, pero aquí el backend entrega un único contexto: se confirma o no).
-// Un dato que no vino (null/vacío) no pisa lo que ya hay en el formulario.
-// Devuelve true si mostró el modal (haya aceptado o no) y false si no había contexto previo,
-// para que quien llama decida si todavía debe avisar "Paciente encontrado".
-export const OfrecerUltimoContexto = async (
-  documento,
-  token,
-  setForm,
-  { titulo = "Último ticket del paciente", mensaje = "" } = {}
-) => {
-  const contexto = await ObtenerUltimoContexto(documento, token);
-  if (!contexto) return false;
-
-  const filas = [
-    ["Empresa", contexto.empresa],
-    ["Cargo", contexto.cargo],
-    ["Área", contexto.area],
-  ]
-    .map(
-      ([etiqueta, valor]) => `
-        <tr>
-          <td style="padding:4px 10px 4px 0;font-weight:600;color:#475569;white-space:nowrap;">${etiqueta}:</td>
-          <td style="padding:4px 0;color:#1f2937;">${valor ? escapeHtml(valor) : "—"}</td>
-        </tr>`
-    )
-    .join("");
-
-  const resultado = await Swal.fire({
-    icon: "question",
-    title: titulo,
-    html: `
-      ${mensaje ? `<p style="margin:0 0 8px;">${escapeHtml(mensaje)}</p>` : ""}
-      <p style="margin:0 0 8px;color:#64748b;font-size:0.9em;">
-        El paciente ya tuvo tickets. Con estos datos se registró el último; ¿desea usarlos para completar el formulario?
-      </p>
-      <table style="margin:0 auto;text-align:left;font-size:0.95em;">${filas}</table>
-    `,
-    showCancelButton: true,
-    confirmButtonText: "Usar estos datos",
-    cancelButtonText: "No usar",
-    allowOutsideClick: false,
-  });
-
-  if (resultado.isConfirmed) {
-    setForm((prev) => ({
-      ...prev,
-      empresa: contexto.empresa || prev.empresa,
-      cargo: contexto.cargo || prev.cargo,
-      area: contexto.area || prev.area,
-    }));
-  }
-
-  return true;
-};
-
-// Paciente ya validado por alguno de los buscadores: llena el formulario y, si ya tuvo tickets,
-// ofrece reutilizar su último contexto en el mismo modal del aviso; si no (primera atención),
-// queda el aviso de siempre. El documento sale de la ficha del paciente (si no, del que se
-// escribió) y la consulta corre con el cuadro "Espere por favor" todavía abierto.
-const CompletarPacienteEncontrado = async (paciente, documentoBuscado, token, setForm) => {
-  const mensaje = "Se completó el formulario con los datos registrados en el sistema.";
-
+// Paciente ya validado por alguno de los buscadores: llena el formulario, avisa y entrega el
+// documento a `onEncontrado` (en el formulario, carga su historial de tickets en la barra lateral).
+// El documento sale de la ficha del paciente (si no, del que se escribió).
+const CompletarPacienteEncontrado = (paciente, documentoBuscado, setForm, onEncontrado) => {
   setFormFromPaciente(setForm, paciente);
 
-  const ofrecido = await OfrecerUltimoContexto(
-    paciente.numeroDocumento || documentoBuscado,
-    token,
-    setForm,
-    { titulo: "Paciente encontrado", mensaje }
+  Swal.fire(
+    "Paciente encontrado",
+    "Se completó el formulario con los datos registrados en el sistema.",
+    "success"
   );
-  if (!ofrecido) Swal.fire("Paciente encontrado", mensaje, "success");
+
+  onEncontrado?.(paciente.numeroDocumento || documentoBuscado);
 };
 
-export const BuscarPorDni = async (dni, token, setForm) => {
+export const BuscarPorDni = async (dni, token, setForm, onEncontrado) => {
   if (!dni) return;
 
   LoadingDefault("Buscando Paciente");
@@ -189,11 +127,11 @@ export const BuscarPorDni = async (dni, token, setForm) => {
     return;
   }
 
-  await CompletarPacienteEncontrado(resultado.paciente ?? {}, dni, token, setForm);
+  CompletarPacienteEncontrado(resultado.paciente ?? {}, dni, setForm, onEncontrado);
 };
 
 // Búsqueda exacta por documento (PASAPORTE), mismo endpoint que RegistroAsistencial. 
-export const BuscarPorPasaporte = async (numero, token, setForm) => {
+export const BuscarPorPasaporte = async (numero, token, setForm, onEncontrado) => {
   if (!numero) return;
 
   LoadingDefault("Buscando Paciente");
@@ -214,11 +152,11 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
     return;
   }
 
-  await CompletarPacienteEncontrado(data, numero, token, setForm);
+  CompletarPacienteEncontrado(data, numero, setForm, onEncontrado);
 };
 
 // Búsqueda exacta por documento (CARNET_EXTRANJERIA), mismo endpoint que RegistroAsistencial.
-export const BuscarPorCarnetExtranjeria = async (numero, token, setForm) => {
+export const BuscarPorCarnetExtranjeria = async (numero, token, setForm, onEncontrado) => {
   if (!numero) return;
 
   LoadingDefault("Buscando Paciente");
@@ -239,7 +177,7 @@ export const BuscarPorCarnetExtranjeria = async (numero, token, setForm) => {
     return;
   }
 
-  await CompletarPacienteEncontrado(data, numero, token, setForm);
+  CompletarPacienteEncontrado(data, numero, setForm, onEncontrado);
 };
 
 // Registra el ticket con todas sus líneas. El backend calcula precioTotal/total a partir

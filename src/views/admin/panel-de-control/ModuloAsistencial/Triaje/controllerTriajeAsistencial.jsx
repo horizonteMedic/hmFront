@@ -3,8 +3,10 @@ import { getFetch } from "../../../../utils/apiHelpers";
 import {
     GetInfoPacNroTicketDefault,
     LoadingDefault,
+    MostrarOpcionesImpresion,
     RegistrarServicioAsistencialDefault,
 } from "../../../../utils/functionUtils";
+import { ObtenerTicketPorNumero } from "../RegistroAtencion/TicketAsistencial/controllerTicketAsistencial";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { convertirGenero, fixEncodingModern } from "../../../../utils/helpers";
 import { useAuthStore } from "../../../../../store/auth";
@@ -378,7 +380,8 @@ export const RegistrarTriaje = async (form, token, usuario, onSuccess, datosFoot
         url,
         onSuccess,
         "Triaje registrado correctamente.",
-        () => PrintTriaje(numeroTicket, token, datosFooter)
+        null,
+        opcionesImpresion(numeroTicket, token, datosFooter)
     );
 };
 
@@ -436,7 +439,7 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
         const triaje = unwrap(resTriaje);
 
         if (!resTriaje || resTriaje.error || !triaje) {
-            Swal.fire(
+            await Swal.fire(
                 "Sin Triaje",
                 `El ticket N° ${numeroTicket} todavía no tiene un Triaje registrado.`,
                 "warning"
@@ -448,14 +451,14 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
         const ticket = resTicket?.resultado;
 
         if (!ticket) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
             return;
         }
 
         const modulo = await jasperModules[rutaJasper]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasper} no exporta una función por defecto`);
-            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            await Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
             return;
         }
 
@@ -468,25 +471,72 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);
-        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
     }
 };
 
-// Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime.
+// Ticket de atención (80 mm, ticketera): triaje guardado (signos vitales) + ticket (GET /api/tickets/numero/{n}:
+// paciente, tipo de documento, empresa, cargo, área, médico, fecha y hora de creación).
+export const PrintTicketAtencion = async (numeroTicket, token) => {
+    LoadingDefault("Cargando Ticket de Atención");
+
+    try {
+        const resTriaje = await getFetch(`${triajeUrl}/numero-ticket/${numeroTicket}`, token);
+        const triaje = unwrap(resTriaje);
+
+        if (!resTriaje || resTriaje.error || !triaje) {
+            await Swal.fire(
+                "Sin Triaje",
+                `El ticket N° ${numeroTicket} todavía no tiene un Triaje registrado.`,
+                "warning"
+            );
+            return;
+        }
+
+        const ticket = await ObtenerTicketPorNumero(numeroTicket, token);
+        if (!ticket) {
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            return;
+        }
+
+        const modulo = await import("../../../../jaspers/ModuloAsistencial/Triaje/TicketAtencionTriaje.jsx");
+
+        await modulo.default({
+            numeroTicket: ticket.numeroTicket ?? numeroTicket,
+            nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
+            tipoDocumento: ticket.pacienteTipoDocumento || "DNI",
+            documentoIdentidad: ticket.pacienteDni,
+            fecha: ticket.fechaTicket,
+            hora: ticket.horaTicket,
+            empresa: ticket.empresa,
+            cargo: ticket.cargo,
+            area: ticket.area,
+            medico: ticket.medico,
+            ...formFromTriaje(triaje),
+        });
+        Swal.close();
+    } catch (error) {
+        console.error("Error al generar el ticket de atención:", error);
+        Swal.fire("Error", "Ocurrió un error al generar el ticket de atención.", "error");
+    }
+};
+
+// Impresiones disponibles del Triaje (ver MostrarOpcionesImpresion). Cada acción espera su propio aviso.
+const opcionesImpresion = (numeroTicket, token, datosFooter) => [
+    { etiqueta: "Historia asistencial", accion: () => PrintTriaje(numeroTicket, token, datosFooter) },
+    { etiqueta: "Ticket atención", accion: () => PrintTicketAtencion(numeroTicket, token) },
+];
+
+// Botón IMPRIMIR: ofrece las impresiones disponibles (historia asistencial / ticket atención) por N° de Ticket.
 export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;
     }
 
-    const { isConfirmed } = await Swal.fire({
-        title: "¿Desea Imprimir Reporte?",
-        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b></div>`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Sí, Imprimir",
-        cancelButtonText: "Cancelar",
-    });
-
-    if (isConfirmed) PrintTriaje(numeroTicket, token, datosFooter);
+    await MostrarOpcionesImpresion(
+        `<b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b>`,
+        opcionesImpresion(numeroTicket, token, datosFooter),
+        { titulo: "Imprimir", icono: "question" }
+    );
 };

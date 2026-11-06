@@ -223,6 +223,7 @@ const formFromHistoriaPropia = (data, today) => ({
     diagnostico: data.diagnostico ?? "",
     tratamiento: data.tratamiento ?? "",
     seguimientoYControl: data.seguimientoYControl ?? "",
+    diagnosticoCie10: data.diagnosticoCie10 ?? "",
 });
 
 // Campos de SOLO LECTURA que el backend arma a partir de OTROS módulos (AntecedentesPatologicos): no se
@@ -444,6 +445,7 @@ const construirBody = (form) => {
         diagnostico: form.diagnostico ?? "",
         tratamiento: form.tratamiento ?? "",
         seguimientoYControl: form.seguimientoYControl ?? "",
+        diagnosticoCie10: form.diagnosticoCie10 ?? "",
 
         doctorAsignado: form.nombre_medico ?? "",
     };
