@@ -376,9 +376,9 @@ const Navbar = () => {
       )}
 
       <div className="hidden md:flex items-center">
-        {URLAzure == "https://testbackendhm.azurewebsites.net" && (
+        {URLAzure == "https://testbackendlaarena-agcjbpezhybshteb.eastus2-01.azurewebsites.net" && (
           <>
-            <p className='font-bold mr-5'>HOST DESARROLLO</p>
+            <p className='font-bold mr-5'>HOST DESARROLLO ARENA</p>
             <div className={`text-white px-4 py-2 rounded-full flex items-center mr-5 ${diasParaPago === 0 ? 'bg-green-600' :
               diasParaPago <= 3 ? 'bg-yellow-500' :
                 diasParaPago <= 7 ? 'bg-orange-500' :
@@ -497,7 +497,7 @@ const Navbar = () => {
       )}
 
       {/* Animación de celebración */}
-      {URLAzure == "https://testbackendhm.azurewebsites.net" && (
+      {URLAzure == "https://testbackendlaarena-agcjbpezhybshteb.eastus2-01.azurewebsites.net" && (
         <CelebrationAnimation show={showCelebration} />
       )}
     </nav>
