@@ -357,7 +357,7 @@ export default function TriajeAsistencial() {
                                     value={form.cintura}
                                     onChange={handleTriajeChange}
                                     onKeyUp={(e) => GetCintura(e, form, setForm, Swal)}
-                                    disabled={camposDeshabilitados}
+                                    disabled
                                     edited={isFieldEdited('cintura')}
                                     onRevert={() => revertField('cintura')}
                                     labelWidth="120px"
@@ -379,7 +379,7 @@ export default function TriajeAsistencial() {
                                     value={form.cadera}
                                     onChange={handleTriajeChange}
                                     onKeyUp={(e) => GetICC(e, form, setForm, Swal)}
-                                    disabled={camposDeshabilitados}
+                                    disabled
                                     edited={isFieldEdited('cadera')}
                                     onRevert={() => revertField('cadera')}
                                     labelWidth="120px"
@@ -425,7 +425,7 @@ export default function TriajeAsistencial() {
                                     value={form.perimetroCuello}
                                     onChange={handleTriajeChange}
                                     onKeyUp={(e) => GetCuello(e, form, setForm, Swal)}
-                                    disabled={camposDeshabilitados}
+                                    disabled
                                     edited={isFieldEdited('perimetroCuello')}
                                     onRevert={() => revertField('perimetroCuello')}
                                     labelWidth="120px"
