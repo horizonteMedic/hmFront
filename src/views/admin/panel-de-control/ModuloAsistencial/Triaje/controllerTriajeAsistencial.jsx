@@ -311,9 +311,8 @@ const validarRangos = (form) => {
     if (tieneValor(form.cadera) && (form.cadera < 70 || form.cadera > 180)) return "No se permite este dato en Cadera";
     if (form.temperatura < 35 || form.temperatura >= 40) return "No se permite este dato en Temperatura";
     if (form.fCardiaca <= 39) return "No se permite este dato en Frecuencia Cardiaca";
-    // La Arena: los valores de hipoxia son válidos (el diagnóstico los califica), así que no hay mínimo.
-    // El resto de clientes exige 92% como mínimo.
-    if (form.sat02 < (form.esArena ? 1 : 92) || form.sat02 > 100) return "No se permite este dato en Sat02";
+    // A ~3500 msnm los valores de hipoxia son válidos (el diagnóstico los califica), así que no hay mínimo.
+    if (form.sat02 < 1 || form.sat02 > 100) return "No se permite este dato en Sat02";
     if (tieneValor(form.perimetroCuello) && (form.perimetroCuello < 30 || form.perimetroCuello > 55)) {
         return "No se permite este dato en Perímetro Cuello";
     }

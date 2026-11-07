@@ -36,7 +36,8 @@ export const GetIMC = async (event, triaje, set, s) => {
             imc,
             ...(clasificacion && { diagnostico: (d.diagnostico || '') + `- INDICE DE MASA CORPORAL: ${clasificacion}.` + "\n" }),
         }))
-        document.getElementById('cintura')?.focus();
+        // Cintura, cadera y perímetro de cuello están bloqueados: se salta a temperatura.
+        document.getElementById('temperatura')?.focus();
     }
 }
 
@@ -269,12 +270,12 @@ export const GetPA = async (event, triaje, set) => {
     }
 }
 
-// Grado de hipoxia según el criterio La Arena; null si la saturación es normal (>= 93%).
-// Los umbrales son continuos para cubrir valores con decimales (p. ej. 92.5 = leve).
+// Grado de hipoxia ajustado a ~3500 msnm; null si la saturación es normal (>= 90%).
+// Los umbrales son continuos para cubrir valores con decimales (p. ej. 89.5 = leve).
 export const GetHipoxiaLaArena = (saturacion) => {
-    if (saturacion < 85) return 'HIPOXIA SEVERA'
-    if (saturacion < 89) return 'HIPOXIA MODERADA'
-    if (saturacion < 93) return 'HIPOXIA LEVE'
+    if (saturacion < 80) return 'HIPOXIA SEVERA'
+    if (saturacion < 85) return 'HIPOXIA MODERADA'
+    if (saturacion < 90) return 'HIPOXIA LEVE'
     return null
 }
 
@@ -289,12 +290,12 @@ export const GetSat = async (event, triaje, set) => {
             await Swal.fire('Valor Absurdo', 'Ingrese otro dato por favor.', 'error')
             return
         }
-        // Criterio La Arena: normal desde 93%; por debajo se acepta el valor y el diagnóstico
-        // indica el grado de hipoxia (severa < 85, moderada 85-88, leve 89-92).
-        const hipoxia = triaje.esArena ? GetHipoxiaLaArena(Saturacion) : null
+        // Criterio de altura (~3500 msnm): normal desde 90%; por debajo se acepta el valor y el
+        // diagnóstico indica el grado de hipoxia (severa < 80, moderada 80-84, leve 85-89).
+        const hipoxia = GetHipoxiaLaArena(Saturacion)
         if (hipoxia) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + `- SATURACIÓN DE OXIGENO: ${hipoxia}.` + "\n" }))
-        } else if (Saturacion >= (triaje.esArena ? 93 : 90) && Saturacion <= 100) {
+        } else if (Saturacion >= 90 && Saturacion <= 100) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- SATURACIÓN DE OXIGENO: NORMAL.' + "\n" }))
         } else if (Saturacion >= 101) {
             set(d => ({ ...d, sat02: '' }))
@@ -302,7 +303,7 @@ export const GetSat = async (event, triaje, set) => {
             return
         }
 
-        document.getElementById('perimetroCuello')?.focus();
+        document.getElementById('sistolica')?.focus();
     }
 }
 
