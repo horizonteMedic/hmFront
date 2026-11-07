@@ -9,8 +9,6 @@ import { usePacientesPantalla } from "./hooks/usePacientesPantalla";
 import { usePaginaRotativa } from "./hooks/usePaginaRotativa";
 import { usePantallaCompleta } from "./hooks/usePantallaCompleta";
 import { armarColumnas } from "./utils/columnasExamenes";
-import { useVersionUpdateStore } from "../../../store/versionUpdate";
-
 // Escena de diseño fija (Full HD). Se escala para llenar cualquier TV/monitor.
 const ANCHO_ESCENA = 1920;
 const ALTO_ESCENA = 1080;
@@ -39,14 +37,6 @@ const PantallaPacientes = () => {
     console.log(datos)
     return (
         <div className="fixed inset-0 z-50 overflow-hidden bg-[#d6e6f6]">
-            {/* BOTÓN DE PRUEBA TEMPORAL: quitar junto con el import de useVersionUpdateStore */}
-            <button
-                type="button"
-                className="absolute bottom-3 right-3 z-[60] rounded-full bg-purple-500 px-3 py-2 text-sm font-bold text-white"
-                onClick={() => useVersionUpdateStore.getState().simulateNewVersion()}
-            >
-                Probar actualización
-            </button>
             <div
                 className="absolute left-1/2 top-1/2 flex flex-col bg-gradient-to-b from-[#eef5fc] to-[#d6e6f6] font-sans"
                 style={{
