@@ -14,9 +14,10 @@ import { useEsSedeLaArena } from "../../../../../hooks/useLaArena";
 import { getToday, getEdadDesdeFecha } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, RegistrarTicket, ObtenerTicketPorNumero, ObtenerPacientePorId } from "./controllerTicketAsistencial";
+import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPorPasaporte, BuscarPorCarnetExtranjeria, RegistrarTicket, ObtenerTicketPorNumero, ObtenerPacientePorId, ListarHistorialTickets } from "./controllerTicketAsistencial";
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
 import TicketAsistencialA4 from "../../../../../jaspers/TicketAsistencial/TicketAsistencialA4";
+import HistorialTickets from "./HistorialTickets";
 import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
 
 const METODOS_PAGO = [
@@ -451,12 +452,48 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     // Paciente elegido en el buscador de "Sin DNI" (bloquea el input tras seleccionarlo)
     const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
+    // Tickets anteriores del paciente cargado (GET /api/tickets/historial), que alimentan la barra
+    // lateral: solo aparece si el paciente ya tuvo tickets. `historialReq` descarta respuestas
+    // tardías: si se limpia el formulario o se cambia de paciente con la consulta en vuelo, su
+    // resultado ya no corresponde y no debe pintarse.
+    const [historial, setHistorial] = useState([]);
+    const [ticketHistorialId, setTicketHistorialId] = useState(null);
+    const historialReq = useRef(0);
+
+    const limpiarHistorial = () => {
+        historialReq.current += 1;
+        setHistorial([]);
+        setTicketHistorialId(null);
+    };
+
+    const cargarHistorial = async (documento) => {
+        const req = ++historialReq.current;
+        setTicketHistorialId(null);
+        const lista = await ListarHistorialTickets(documento, token);
+        if (req === historialReq.current) setHistorial(lista);
+    };
+
+    // Elegir un ticket anterior completa Empresa / Cargo / Área con los datos con que se registró.
+    // Es una elección explícita, así que reemplaza lo escrito; un dato que ese ticket no tenía queda
+    // vacío en lugar de arrastrar el del ticket elegido antes.
+    const handleSeleccionarTicketHistorial = (ticket) => {
+        setTicketHistorialId(ticket.id);
+        setForm((f) => ({
+            ...f,
+            empresa: ticket.empresa ?? "",
+            cargo: ticket.cargo ?? "",
+            area: ticket.area ?? "",
+        }));
+        if (ticket.empresa) setErrors((prev) => ({ ...prev, empresa: undefined }));
+    };
+
     // Cambiar el tipo de documento invalida cualquier dato ya cargado/tipeado, así que el
     // formulario se limpia por completo y solo conserva el nuevo tipo elegido.
     const handleTipoDocumentoChange = (e, value) => {
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
+        limpiarHistorial();
         setForm({ ...initialFormState, tipoDocumento: value });
     };
 
@@ -467,6 +504,13 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     // remontaje del buscador y dispara el foco; 0 = todavía no hay precarga.
     const [precarga, setPrecarga] = useState({ key: 0, textoSinDni: "", pacienteId: null });
 
+    // useForm restaura el formulario desde localStorage (al volver a esta pestaña o recargar): si ya
+    // había un paciente cargado, se vuelve a pedir su historial para que la barra lateral reaparezca.
+    // Va antes del efecto de la precarga: si llega un paciente nuevo, este resultado queda descartado.
+    useEffect(() => {
+        if (form.dni) cargarHistorial(form.dni);
+    }, []);
+
     useEffect(() => {
         if (!pacienteReciente) return;
         const { id, tipoDocumento, numeroDocumento, nombres, apellidos } = pacienteReciente;
@@ -475,6 +519,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         setPacienteSeleccionado(null);
         setErrors({});
         setErrorImprimirTicket("");
+        limpiarHistorial();
         setForm({
             ...initialFormState,
             tipoDocumento: sinDocumento ? "SIN DNI" : tipoDocumento,
@@ -509,10 +554,15 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             NHCL: item.numeroHistoriaClinica ? parseInt(item.numeroHistoriaClinica) : null,
             fechaNacimiento: item.fechaNacimiento ?? null,
         }));
+
+        // Si el paciente elegido tiene documento y ya tuvo tickets, aparece su historial en la barra
+        // lateral. Sin documento (SIN_DOCUMENTO) no hay con qué consultarlo.
+        cargarHistorial(item.numeroDocumento);
     };
 
     const handleLimpiarPacienteSinDni = () => {
         setPacienteSeleccionado(null);
+        limpiarHistorial();
         setForm((f) => ({
             ...f,
             idDatos: null,
@@ -596,9 +646,11 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         if (e.key !== "Enter") return;
         if (!form.documentoIdentidad) return;
         if (form.tipoDocumento === "DNI") {
-            BuscarPorDni(form.documentoIdentidad, token, setForm);
+            BuscarPorDni(form.documentoIdentidad, token, setForm, cargarHistorial);
         } else if (form.tipoDocumento === "PASAPORTE") {
-            BuscarPorPasaporte(form.documentoIdentidad, token, setForm);
+            BuscarPorPasaporte(form.documentoIdentidad, token, setForm, cargarHistorial);
+        } else if (form.tipoDocumento === "CARNET_EXTRANJERIA") {
+            BuscarPorCarnetExtranjeria(form.documentoIdentidad, token, setForm, cargarHistorial);
         }
     };
 
@@ -704,6 +756,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         setErrors({});
         setErrorImprimirTicket("");
         setPacienteSeleccionado(null);
+        limpiarHistorial();
         handleClear();
     };
 
@@ -765,6 +818,8 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         const numeroTicketCreado = creado.numeroTicket ?? form.nroTicket;
         setErrorImprimirTicket("");
         setForm((f) => ({ ...f, nroTicket: numeroTicketCreado }));
+        // El ticket recién creado ya forma parte del historial del paciente.
+        cargarHistorial(form.dni ?? form.documentoIdentidad);
 
         Swal.fire({
             title: "Ticket registrado",
@@ -786,10 +841,13 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     };
 
     // Arma e imprime el ticket de venta de 80mm (Horizonte Medic) a partir del ticket ya
-    // persistido (ver imprimirTicket).
-    const imprimirTicketVenta = (ticket) => {
+    // persistido (ver imprimirTicket). El ticket no trae el tipo de documento, así que se toma de
+    // la ficha del paciente (como en el A4); si esa consulta falla, sale como "DNI".
+    const imprimirTicketVenta = async (ticket) => {
+        const paciente = await ObtenerPacientePorId(ticket.pacienteId, token);
+
         TicketVenta({
-            tipoDocumento: "DNI",
+            tipoDocumento: paciente?.tipoDocumento || "DNI",
             documentoIdentidad: ticket.pacienteDni,
             nombres: `${ticket.pacienteApellidos ?? ""} ${ticket.pacienteNombres ?? ""}`.trim(),
             edad: ticket.pacienteEdad,
@@ -852,7 +910,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         }
 
         if (ticket.esArena) await imprimirTicketA4(ticket);
-        else imprimirTicketVenta(ticket);
+        else await imprimirTicketVenta(ticket);
         return true;
     };
 
@@ -886,8 +944,26 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
     const esAdultoMayor = edadPaciente !== null && edadPaciente >= EDAD_ADULTO_MAYOR;
     const esAdulto = edadPaciente !== null && edadPaciente >= EDAD_ADULTO && !esAdultoMayor;
 
+    // Con historial, el contenedor se ensancha 256px y los reserva como relleno a la derecha (lg+): el
+    // formulario conserva el ancho de siempre y la barra queda en ese margen, sin apretar las columnas.
+    // En pantallas chicas la barra se apila arriba del formulario.
+    const hayHistorial = historial.length > 0;
+
     return (
-        <div className="mx-auto max-w-[90%] lg:max-w-[80%] grid gap-y-3 gap-x-4 py-4">
+        <div
+            className={`relative mx-auto grid gap-y-3 gap-x-4 py-4 ${hayHistorial
+                ? "max-w-[96%] lg:max-w-[min(96%,calc(80%+256px))] lg:pr-[256px]"
+                : "max-w-[90%] lg:max-w-[80%]"
+                }`}
+        >
+            {hayHistorial && (
+                <HistorialTickets
+                    tickets={historial}
+                    seleccionadoId={ticketHistorialId}
+                    contextoActual={{ empresa: form.empresa, cargo: form.cargo, area: form.area }}
+                    onSelect={handleSeleccionarTicketHistorial}
+                />
+            )}
             <SectionFieldset
                 legend="Información del Examen"
                 className={`grid ${esArena ? "xl:grid-cols-3" : "xl:grid-cols-4"} gap-y-3 gap-x-4`}
@@ -901,6 +977,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
+                        { label: "Carnet de extranjería", value: "CARNET_EXTRANJERIA" },
                         { label: "Sin DNI", value: "SIN DNI" },
                     ]}
                     className="xl:col-span-full"
@@ -918,7 +995,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     />
                     :
                     <InputTextOneLine
-                        label={`${form.tipoDocumento === "DNI" ? "DNI" : "Pasaporte"}`}
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "Carnet de extranjería"}`}
                         name="documentoIdentidad"
                         value={form.documentoIdentidad}
                         onChange={handleChange}

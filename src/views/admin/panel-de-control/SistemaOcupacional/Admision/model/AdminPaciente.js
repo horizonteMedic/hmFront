@@ -1,4 +1,5 @@
 import { URLAzure } from "../../../../../config/config";
+import { TIPO_DNI, TIPO_SIN_DOCUMENTO } from "../../../../../utils/documentoPaciente";
 
 //12.16
 
@@ -19,8 +20,14 @@ export function SubmitRegistrarPaciente(data,sede,token) {
   // los campos del DTO que el formulario no muestra, para que al editar no se sobrescriban con la fecha de
   // hoy ni se borren. Paciente nuevo: fecha-hora actual y esos campos en null, como siempre.
   const existente = Boolean(data.tieneRegistro && data.fechaRegistroPa);
+  // El backend identifica al paciente por (tipoDoc, nroDoc). codPa solo viaja cuando no hay número
+  // (paciente "sin documento" ya registrado); para los demás tipos se omite.
+  const tipoDoc = Number(data.tipoDoc) || TIPO_DNI;
+  const sinDocumento = tipoDoc === TIPO_SIN_DOCUMENTO;
   const body = {
-    codPa: data.codPa,
+    tipoDoc,
+    nroDoc: sinDocumento ? null : String(data.nroDoc ?? '').trim(),
+    ...(sinDocumento && data.codPa ? { codPa: data.codPa } : {}),
     nombresPa: data.nombresPa,
     fechaNaciminetoPa: fechaFormateada,
     sexoPa: data.sexoPa,
@@ -42,7 +49,6 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     fechaRegistroPa: existente ? data.fechaRegistroPa : `${year}-${month}-${day}`,
     apellidosPa: data.apellidosPa,
     horaRegistroPa: existente && data.horaRegistroPa ? data.horaRegistroPa : `${hours}:${minutes}:${seconds}`,
-    tipoDoc: data.tipoDoc || 1,
     ...(data.cargo ? { cargo: data.cargo } : {}),
     ...(data.area ? { area: data.area } : {}),
     ...(data.tipoExamen ? { tipoExamen: data.tipoExamen } : {}),
@@ -65,9 +71,11 @@ export function SubmitRegistrarPaciente(data,sede,token) {
 }
 
 //12.17
-export function SearchPacienteDNI(sede,dni,token) {
-  
-  const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}/${dni}`
+// Busca por número de documento; tipoDoc es opcional (el backend asume DNI). Si no existe: con DNI
+// devuelve los datos de RENIEC; con otro tipo, un formulario vacío con tipoDoc y nroDoc ya puestos.
+export function SearchPacienteDNI(sede,nroDoc,token,tipoDoc = TIPO_DNI) {
+
+  const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}/${encodeURIComponent(String(nroDoc).trim())}?tipoDoc=${tipoDoc}`
     const options = {
         method: 'GET',
         headers: {

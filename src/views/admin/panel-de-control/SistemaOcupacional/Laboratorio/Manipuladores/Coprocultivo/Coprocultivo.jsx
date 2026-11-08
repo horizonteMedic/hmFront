@@ -19,6 +19,7 @@ import {
 } from "./controllerCoprocultivo";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesForm from "../../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 const tabla = "ac_coprocultivo";
 const colorOptions = ["Marrón", "Mostaza", "Verdoso"];
@@ -313,7 +314,7 @@ export default function Coprocultivo() {
           <InputTextOneLine
             label="DNI"
             name="dni"
-            value={form.dni}
+            value={textoDocumento(form.dni)}
             labelWidth="120px"
             disabled
           />

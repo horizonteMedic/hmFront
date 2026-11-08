@@ -2,15 +2,17 @@ import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
     handleSubidaMasiva,
-    handleSubirArchivoDefault,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
     ReadArchivosFormDefault,
-    SubmitDataServiceDefault,
-    VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+} from "../../../../utils/registroOcupacionalUtils";
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_ALTURA_18 = "certificacion_medica_altura";
@@ -21,6 +23,10 @@ const registrarUrl =
     "/api/v01/ct/certificacionMedicinaAltura/registrarActualizarCertificacionMedicinaAltura";
 const registrarPDF =
     "/api/v01/ct/archivos/archivoInterconsulta"
+// CertificadoMedicaAlturaReporteDTO separa `nombresPaciente` y `apellidosPaciente`: se muestran juntos.
+const nombreCompleto = (res) =>
+    `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`.trim();
+
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -113,18 +119,18 @@ export const GetInfoServicio = async (
             examen: examen,
             dni: res.dniPaciente ?? "",
 
-            nombres: res.nombresPaciente ?? "",
+            nombres: nombreCompleto(res),
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
             // Datos Laborales
-            empresa: res.empresa,
-            contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
 
             //oftalmo
             vcOD: res.visionCercaSinCorregiroOd_v_cerca_s_od ?? "",
@@ -157,6 +163,13 @@ export const GetInfoServicio = async (
             usoPermanenteLentesCorrectores: usoPermanenteLentesCorrectores,
 
             observacionesYRecomendaciones: concatenacionObservacion,
+
+            // Registro nuevo: sin auditoría previa.
+            userRegistro: "",
+            fechaRegistro: "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: false,
         }));
     }
 };
@@ -180,7 +193,10 @@ export const GetInfoServicioEditar = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaCertificacion,
+            fecha: res.fechaCertificacion ?? prev.fecha,
+            // Antes no se leía: al editar un registro de "Trabajos en espacios confinados" el título volvía al
+            // predeterminado y se reenviaba así al guardar.
+            tituloExamen: res.tituloExamen ?? prev.tituloExamen,
             aniosExperiencia: res.tiempoExperiencia ?? "",
             examen: res.primeraActitud ? "PRIMERA ACTITUD" : res.revalidacion ? "REVALIDACIÓN" : "",
 
@@ -189,18 +205,18 @@ export const GetInfoServicioEditar = async (
             nombreExamen: res.tipoExamen ?? "",
             dni: res.dniPaciente ?? "",
 
-            nombres: res.nombresPaciente ?? "",
+            nombres: nombreCompleto(res),
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
             //Datos Laborales
-            empresa: res.empresa,
-            contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
 
             //Antecedentes del Registro Médico
             miedoAlturas: res.tieneFobiaSi ? "SI" : "NO",
@@ -243,7 +259,8 @@ export const GetInfoServicioEditar = async (
             hallazgoCodo: res.hallazgoAnormalCodoSi ? "SI" : "NO",
             hallazgoRodilla: res.hallazgoAnormalRodillaSi ? "SI" : "NO",
             hallazgoTobillo: res.hallazgoAnormalTobilloSi ? "SI" : "NO",
-            otrosHallazgosMusculoEsqueleticos: res.anormalidadMovimientosOcularesSi ? "SI" : "NO",
+            // Antes leía `anormalidadMovimientosOcularesSi` (otro campo): salía igual que "movimientos oculares".
+            otrosHallazgosMusculoEsqueleticos: res.otrosHallazgosSi ? "SI" : "NO",
 
             hallazgosAnormales: res.detalleinformacionactual ?? "",
 
@@ -293,131 +310,166 @@ export const GetInfoServicioEditar = async (
             corregirAgudezaLecturaCerca: (res.observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
+            user_doctorAsignado: res.doctorAsignado ?? "",
 
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
+
+            // Auditoría. CertificadoMedicaAlturaReporteDTO no devuelve quién registró ni fechas de registro/edición:
+            // quedan vacías (la sección las muestra como "—"). Si el backend las agrega, se leen solas.
+            userRegistro: res.userRegistro ?? res.usuarioRegistro ?? "",
+            fechaRegistro: res.fechaRegistro ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
+// El tipo de examen es obligatorio tanto al guardar como al editar.
+const datosCompletos = async (form) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
+        return false;
     }
-    if (!form.examen || form.examen === "") {
+    if (!form.examen) {
         await Swal.fire("Error", "Seleccione Examen", "error");
-        return;
+        return false;
     }
-    const body = {
-        norden: form.norden,
-        tituloExamen: form.tituloExamen,
-        codigoCertificadoAltura: form.codigoCertificadoAltura,
-        fechaCertificacion: form.fecha,
-        primeraActitud: form.examen == "PRIMERA ACTITUD",
-        revalidacion: form.examen == "REVALIDACIÓN",
+    return true;
+};
 
-        tieneFobiaNo: form.miedoAlturas == "NO",
-        epilepsiaNo: form.epilepsiaa == "NO",
-        alcoholismoNo: form.alcoholismo == "NO",
-        tieneFobiaSi: form.miedoAlturas == "SI",
-        epilepsiaSi: form.epilepsiaa == "SI",
-        alcoholismoSi: form.alcoholismo == "SI",
-        portadorPsiquiatricaSi: form.enfermedadPsiquiatrica == "SI",
-        diabetesMellitusSi: form.diabetesNoControlada == "SI",
-        miagranaSi: form.migranaNoControlada == "SI",
-        insuficienciaCardiacaSi: form.insuficienciaCardiaca == "SI",
-        asmaBronquialSi: form.asma == "SI",
-        hipertensionArterialSi: form.hipertensionNoControlada == "SI",
-        hipoacusiaSeveraSi: form.hipoacusia == "SI",
-        alteracionAgudezaVisualSi: form.alteracionVisual == "SI",
-        declaroNoAptoSi: form.noAptoAltura == "SI",
+// ===== Mapeo: Body =====
+// CertificacionMedicaAlturaDTO usa `usuarioRegistro` para el usuario que registra y NO declara campos de fecha de
+// registro / actualización, por eso no se sella auditoría (sellarAuditoria agregaría campos que el DTO no tiene). El
+// reporte (GET) tampoco devuelve el creador: se manda el usuario en sesión, como siempre. `codigoCertificadoAltura`
+// (null al registrar) es lo que hace que el backend actualice en vez de crear.
+const construirBody = (form, user) => ({
+    norden: form.norden,
+    tituloExamen: form.tituloExamen,
+    codigoCertificadoAltura: form.codigoCertificadoAltura,
+    fechaCertificacion: form.fecha,
+    primeraActitud: form.examen == "PRIMERA ACTITUD",
+    revalidacion: form.examen == "REVALIDACIÓN",
 
-        portadorPsiquiatricaNo: form.enfermedadPsiquiatrica == "NO",
-        diabetesMellitusNo: form.diabetesNoControlada == "NO",
-        miagranaNo: form.migranaNoControlada == "NO",
-        insuficienciaCardiacaNo: form.insuficienciaCardiaca == "NO",
-        asmaBronquialNo: form.asma == "NO",
-        hipertensionArterialNo: form.hipertensionNoControlada == "NO",
-        hipoacusiaSeveraNo: form.hipoacusia == "NO",
-        alteracionAgudezaVisualNo: form.alteracionVisual == "NO",
-        declaroNoAptoNo: form.noAptoAltura == "NO",
+    tieneFobiaNo: form.miedoAlturas == "NO",
+    epilepsiaNo: form.epilepsiaa == "NO",
+    alcoholismoNo: form.alcoholismo == "NO",
+    tieneFobiaSi: form.miedoAlturas == "SI",
+    epilepsiaSi: form.epilepsiaa == "SI",
+    alcoholismoSi: form.alcoholismo == "SI",
+    portadorPsiquiatricaSi: form.enfermedadPsiquiatrica == "SI",
+    diabetesMellitusSi: form.diabetesNoControlada == "SI",
+    miagranaSi: form.migranaNoControlada == "SI",
+    insuficienciaCardiacaSi: form.insuficienciaCardiaca == "SI",
+    asmaBronquialSi: form.asma == "SI",
+    hipertensionArterialSi: form.hipertensionNoControlada == "SI",
+    hipoacusiaSeveraSi: form.hipoacusia == "SI",
+    alteracionAgudezaVisualSi: form.alteracionVisual == "SI",
+    declaroNoAptoSi: form.noAptoAltura == "SI",
 
-        resfriadoSi: form.resfriado == "SI",
-        vertigoMareoSi: form.vertigoMareo == "SI",
-        consumioLicorSi: form.alcohol24h == "SI",
-        frecuenciaCefaleasSi: form.frecuenciaCefaleas == "SI",
-        resfriadoNo: form.resfriado == "NO",
-        vertigoMareoNo: form.vertigoMareo == "NO",
-        consumioLicorNo: form.alcohol24h == "NO",
-        frecuenciaCefaleasNo: form.frecuenciaCefaleas == "NO",
+    portadorPsiquiatricaNo: form.enfermedadPsiquiatrica == "NO",
+    diabetesMellitusNo: form.diabetesNoControlada == "NO",
+    miagranaNo: form.migranaNoControlada == "NO",
+    insuficienciaCardiacaNo: form.insuficienciaCardiaca == "NO",
+    asmaBronquialNo: form.asma == "NO",
+    hipertensionArterialNo: form.hipertensionNoControlada == "NO",
+    hipoacusiaSeveraNo: form.hipoacusia == "NO",
+    alteracionAgudezaVisualNo: form.alteracionVisual == "NO",
+    declaroNoAptoNo: form.noAptoAltura == "NO",
 
-        limitacionFuerzaSi: form.limitacionFuerzaMovilidad == "SI",
-        alteracionEquilibrioSi: form.alteracionEquilibrio == "SI",
-        anormalidadMarchaSi: form.anormalidadMarcha == "SI",
-        anormalidadFuerzaSi: form.anormalidadFuerzaMiembros == "SI",
-        lenguajeAnormalSi: form.lenguajeAnormal == "SI",
-        alteracionCoordinacionPresenteSi: form.alteracionCoordinacion == "SI",
-        presenciaNisfagmusSi: form.nistagmus == "SI",
-        anormalidadMovimientosOcularesSi: form.anormalidadMovOculares == "SI",
-        pupilasCirlaSi: form.pupilasCIRLA == "SI",
-        asimetriaFacialSi: form.asimetriaFacial == "SI",
+    resfriadoSi: form.resfriado == "SI",
+    vertigoMareoSi: form.vertigoMareo == "SI",
+    consumioLicorSi: form.alcohol24h == "SI",
+    frecuenciaCefaleasSi: form.frecuenciaCefaleas == "SI",
+    resfriadoNo: form.resfriado == "NO",
+    vertigoMareoNo: form.vertigoMareo == "NO",
+    consumioLicorNo: form.alcohol24h == "NO",
+    frecuenciaCefaleasNo: form.frecuenciaCefaleas == "NO",
 
-        otrosHallazgosSi: form.otrosHallazgosMusculoEsqueleticos == "SI",
-        hallazgoAnormalTobilloSi: form.hallazgoTobillo == "SI",
-        hallazgoAnormalRodillaSi: form.hallazgoRodilla == "SI",
-        hallazgoAnormalCodoSi: form.hallazgoCodo == "SI",
-        hallazgoAnormalHombroSi: form.hallazgoHombro == "SI",
+    limitacionFuerzaSi: form.limitacionFuerzaMovilidad == "SI",
+    alteracionEquilibrioSi: form.alteracionEquilibrio == "SI",
+    anormalidadMarchaSi: form.anormalidadMarcha == "SI",
+    anormalidadFuerzaSi: form.anormalidadFuerzaMiembros == "SI",
+    lenguajeAnormalSi: form.lenguajeAnormal == "SI",
+    alteracionCoordinacionPresenteSi: form.alteracionCoordinacion == "SI",
+    presenciaNisfagmusSi: form.nistagmus == "SI",
+    anormalidadMovimientosOcularesSi: form.anormalidadMovOculares == "SI",
+    pupilasCirlaSi: form.pupilasCIRLA == "SI",
+    asimetriaFacialSi: form.asimetriaFacial == "SI",
 
-        limitacionFuerzaNo: form.limitacionFuerzaMovilidad == "NO",
-        alteracionEquilibrioNo: form.alteracionEquilibrio == "NO",
-        anormalidadMarchaNo: form.anormalidadMarcha == "NO",
-        anormalidadFuerzaNo: form.anormalidadFuerzaMiembros == "NO",
-        lenguajeAnormalNo: form.lenguajeAnormal == "NO",
+    otrosHallazgosSi: form.otrosHallazgosMusculoEsqueleticos == "SI",
+    hallazgoAnormalTobilloSi: form.hallazgoTobillo == "SI",
+    hallazgoAnormalRodillaSi: form.hallazgoRodilla == "SI",
+    hallazgoAnormalCodoSi: form.hallazgoCodo == "SI",
+    hallazgoAnormalHombroSi: form.hallazgoHombro == "SI",
 
-        alteracionCoordinacionPresenteNo: form.alteracionCoordinacion == "NO",
-        presenciaNisfagmusNo: form.nistagmus == "NO",
-        anormalidadMovimientosOcularesNo: form.anormalidadMovOculares == "NO",
-        pupilasCirlaNo: form.pupilasCIRLA == "NO",
-        asimetriaFacialNo: form.asimetriaFacial == "NO",
-        otrosHallazgosNo: form.otrosHallazgosMusculoEsqueleticos == "NO",
-        hallazgoAnormalTobilloNo: form.hallazgoTobillo == "NO",
-        hallazgoAnormalRodillaNo: form.hallazgoRodilla == "NO",
-        hallazgoAnormalCodoNo: form.hallazgoCodo == "NO",
-        hallazgoAnormalHombroNo: form.hallazgoHombro == "NO",
+    limitacionFuerzaNo: form.limitacionFuerzaMovilidad == "NO",
+    alteracionEquilibrioNo: form.alteracionEquilibrio == "NO",
+    anormalidadMarchaNo: form.anormalidadMarcha == "NO",
+    anormalidadFuerzaNo: form.anormalidadFuerzaMiembros == "NO",
+    lenguajeAnormalNo: form.lenguajeAnormal == "NO",
 
-        aptoTrabajar18metrosSi: form.apto18 == "SI",
-        usoLentesCorrectoresSi: form.usoPermanenteLentesCorrectores == "SI",
-        usoAudifonosSi: form.usoPermanenteAudifonos == "SI",
-        aptoTrabajar18metrosNo: form.apto18 == "NO",
-        usoLentesCorrectoresNo: form.usoPermanenteLentesCorrectores == "NO",
-        usoAudifonosNo: form.usoPermanenteAudifonos == "NO",
+    alteracionCoordinacionPresenteNo: form.alteracionCoordinacion == "NO",
+    presenciaNisfagmusNo: form.nistagmus == "NO",
+    anormalidadMovimientosOcularesNo: form.anormalidadMovOculares == "NO",
+    pupilasCirlaNo: form.pupilasCIRLA == "NO",
+    asimetriaFacialNo: form.asimetriaFacial == "NO",
+    otrosHallazgosNo: form.otrosHallazgosMusculoEsqueleticos == "NO",
+    hallazgoAnormalTobilloNo: form.hallazgoTobillo == "NO",
+    hallazgoAnormalRodillaNo: form.hallazgoRodilla == "NO",
+    hallazgoAnormalCodoNo: form.hallazgoCodo == "NO",
+    hallazgoAnormalHombroNo: form.hallazgoHombro == "NO",
 
-        comentarios: form.comentarios,
-        detalleMedicinas: form.medicinasTomando,
-        detalleinformacionactual: form.hallazgosAnormales,
-        otraRestriccion: form.otraRestriccion,
-        observaciones: form.observacionesYRecomendaciones,
-        edad: "",
-        dni: form.dniusuario,
-        tiempoExperiencia: form.aniosExperiencia,
+    aptoTrabajar18metrosSi: form.apto18 == "SI",
+    usoLentesCorrectoresSi: form.usoPermanenteLentesCorrectores == "SI",
+    usoAudifonosSi: form.usoPermanenteAudifonos == "SI",
+    aptoTrabajar18metrosNo: form.apto18 == "NO",
+    usoLentesCorrectoresNo: form.usoPermanenteLentesCorrectores == "NO",
+    usoAudifonosNo: form.usoPermanenteAudifonos == "NO",
 
-        usuarioRegistro: user,
+    comentarios: form.comentarios,
+    detalleMedicinas: form.medicinasTomando,
+    detalleinformacionactual: form.hallazgosAnormales,
+    otraRestriccion: form.otraRestriccion,
+    observaciones: form.observacionesYRecomendaciones,
+    edad: "",
+    dni: form.dniusuario,
+    tiempoExperiencia: form.aniosExperiencia,
 
-        usuarioFirma: form.user_medicoFirma,
-        doctorAsignado: form.user_doctorAsignado,
-    };
+    usuarioRegistro: user,
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
+});
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await datosCompletos(form))) return;
+    await guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await datosCompletos(form))) return;
+    await actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
 };
 
@@ -436,19 +488,17 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 
 // `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
 // "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
-export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
-    VerifyTRPerzonalizadoDefault(
+// verificarRegistro valida la sede del N° Orden y decide nuevo / existente / necesita Triaje.
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
-        },
-        () => {
-            //Tiene registro
+        // NO tiene registro: se cargan los datos del paciente.
+        onNuevo: () => GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); }),
+        // SÍ tiene registro
+        onExistente: () =>
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 if (silencioso) {
                     Swal.close();
@@ -459,18 +509,16 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
                     "Este paciente ya cuenta con registros de Altura 1.8",
                     "warning"
                 );
-            });
-        },
-        () => {
-            //Necesita
+            }),
+        // Necesita pasar por Triaje antes de registrar.
+        onNecesitaExamen: () =>
             Swal.fire(
                 "Alerta",
                 "El paciente necesita pasar por Triaje.",
                 "warning"
-            );
-        }
-    );
-};
+            ),
+    });
+
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };

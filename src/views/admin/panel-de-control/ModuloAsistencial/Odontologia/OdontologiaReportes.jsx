@@ -1,0 +1,238 @@
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComments } from "@fortawesome/free-solid-svg-icons";
+import {
+  GetInfoPac,
+  GetInfoServicio,
+  Loading,
+  PrintHojaR,
+} from "./controllerOdontologia";
+import Swal from "sweetalert2";
+
+const OdontologiaReportes = ({
+  form,
+  setForm,
+  handleChange,
+  handleEjecutarConsulta,
+  tabla,
+  token,
+  handleClear,
+  dataTabla,
+  setActiveTab,
+  obtenerInfoTabla,
+  selectedSede,
+  datosFooter
+}) => {
+  return (
+    <div>
+      <div className="flex flex-col gap-4 w-full ">
+        {/* IZQUIERDA 50% */}
+        <div className=" bg-white rounded border space-y-6">
+          <div className="rounded-md p-4 space-y-4">
+            <div>
+              <p className="mb-2 font-semibold">Buscar por fechas</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <label className="font-semibold">Fecha desde :</label>
+                  <input
+                    name="fechaDesde"
+                    type="date"
+                    value={form.fechaDesde}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 w-full"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold">Fecha hasta :</label>
+                  <input
+                    name="fechaHasta"
+                    type="date"
+                    value={form.fechaHasta}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 w-full"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={handleEjecutarConsulta}
+                className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* DERECHA 50% */}
+        <div className="border rounded p-4 flex flex-col flex-1">
+          <p className="mb-2 font-semibold">Buscar - Imprimir Reportes</p>
+          <div className="grid grid-cols-2 gap-2 mb-2 items-center justify-center w-full">
+            <div>
+              <label className="font-semibold">Nombre :</label>
+              <input
+                className="border rounded px-2 py-1 w-full"
+                name="nombres_search"
+                value={form.nombres_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    obtenerInfoTabla();
+                  }
+                }}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+                }}
+              />
+            </div>
+            <div>
+              <label className="font-semibold ml-2">Codigo:</label>
+              <input
+                className="border rounded px-2 py-1  w-full"
+                name="codigo_search"
+                value={form.codigo_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    obtenerInfoTabla();
+                  }
+                }}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  if (/^[\d/]*$/.test(value)) {
+                    setForm((f) => ({
+                      ...f,
+                      [name]: value,
+                      nombres_search: "",
+                    }));
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <div className="mb-2">
+            <div className="font-semibold ">Agregados Recientemente</div>
+          </div>
+          <div className="flex-1">
+            <Table
+              data={dataTabla}
+              tabla={tabla}
+              set={setForm}
+              token={token}
+              clean={handleClear}
+              setActiveTab={setActiveTab}
+              sede={selectedSede}
+              datosFooter={datosFooter}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Co
+function Table({ data, tabla, set, token, clean, setActiveTab, sede, datosFooter }) {
+  // confirmación antes de imprimir
+  const handlePrintConfirm = (nro) => {
+    Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir la ficha Nº ${nro}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(nro, token, tabla, datosFooter);
+      }
+    });
+  };
+
+  function clicktable(nro, codOD) {
+    clean();
+    Loading("Importando Datos");
+    if (codOD != null) {
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.close();
+        setActiveTab(1);
+      });
+    } else {
+      GetInfoPac(nro, set, token, sede, () => {
+        Swal.close();
+        setActiveTab(1);
+      });
+    }
+  }
+  function convertirFecha(fecha) {
+    if (fecha == null || fecha === "") return "";
+    const [dia, mes, anio] = fecha.split("-");
+    return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
+  }
+
+  return (
+    <div
+      className="overflow-y-auto max-w-[1000px] mx-auto"
+      style={{ maxHeight: "450px" }}
+    >
+      <table className="w-full table-auto border-collapse ">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Nombres y Apellidos
+            </th>
+            <th className="border px-2 py-1 text-left text-lg">Empresa</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Tipo de Examen
+            </th>
+            <th className="border px-2 py-1 text-left text-lg">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`bg-[${row.codigoColor}] hover:brightness-75  cursor-pointer text-lg `}
+                onClick={() => clicktable(row.norden, row.codOD)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  if (row.codOD != null) {
+                    handlePrintConfirm(row.norden);
+                  }
+                }}
+              >
+                <td className="border px-2 py-1 font-bold">
+                  {row.norden || ""}
+                </td>
+                <td className="border px-2 py-1 ">{row.nombres || ""}</td>
+                <td className="border px-2 py-1 max-w-[200px]">
+                  {row.empresa || ""}
+                </td>
+                <td className="border px-2 py-1">{row.tipoExamen || ""}</td>
+
+                <td className="border px-2 py-1">
+                  {convertirFecha(row.fechaOd)}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={5}
+                className="text-center py-4 text-gray-500 text-lg"
+              >
+                No hay datos
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default OdontologiaReportes;

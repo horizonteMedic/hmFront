@@ -137,6 +137,9 @@ const textoDe = (valor) => String(valor ?? "").trim();
  * @param {object}   detalles  { tipoCancer, descripcionMordedura, otrasPatologias } del mismo registro.
  */
 export const patologiasAdicionales = (marcadas = [], cubiertas = [], detalles = {}) => {
+    // El backend puede mandar `null` (el default solo cubre `undefined`).
+    detalles = detalles ?? {};
+    cubiertas = cubiertas ?? [];
     const claves = new Set((marcadas ?? []).map((m) => CLAVE_POR_TEXTO.get(normalizar(m)) ?? m));
     // Cáncer / Mordedura también cuentan si solo llega su detalle.
     Object.entries(CAMPO_DETALLE).forEach(([clave, campo]) => {

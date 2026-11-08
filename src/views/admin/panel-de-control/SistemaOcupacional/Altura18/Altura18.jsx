@@ -7,10 +7,17 @@ import {
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, TABLA_ALTURA_18, VerifyTR } from "./controllerAltura18";
-import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, UpdateDataService, TABLA_ALTURA_18, VerifyTR } from "./controllerAltura18";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { useEffect, useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
@@ -18,6 +25,97 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = TABLA_ALTURA_18;
+
+const OPCIONES_SI_NO = [
+    { value: "SI", label: "SI" },
+    { value: "NO", label: "NO" },
+];
+
+// ===== Preguntas Sí/No (se declaran fuera del componente: también definen los campos editables) =====
+const ANTECEDENTES_REGISTRO_1 = [
+    { name: "miedoAlturas", label: "Tiene fobia (miedo) a las alturas" },
+    { name: "epilepsiaa", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
+    { name: "alcoholismo", label: "Alcoholismo o abuso de sustancias (adicción)" },
+    { name: "enfermedadPsiquiatrica", label: "Portador de enfermedad psiquiátrica o hallazgo psicológico como rasgos de ansiedad, trastornos impulsivos o compulsivos" },
+    { name: "diabetesNoControlada", label: "Diabetes mellitus o hipoglicemia no controlada" },
+    { name: "migranaNoControlada", label: "Migraña no controlada" },
+];
+const ANTECEDENTES_REGISTRO_2 = [
+    { name: "insuficienciaCardiaca", label: "Insuficiencia cardiaca, enfermedad coronaria, arritmias, porta marcapaso, prótesis valvular" },
+    { name: "asma", label: "Asma bronquial - Patrón obstructivo moderado o severo" },
+    { name: "hipertensionNoControlada", label: "Hipertensión arterial no controlada" },
+    { name: "hipoacusia", label: "Hipoacusia severa" },
+    { name: "alteracionVisual", label: "Alteración de la agudeza visual (de lejos) y/o estereopsia" },
+    { name: "noAptoAltura", label: "Declarado NO APTO para labor de altura en último examen ocupacional" },
+];
+const ENTREVISTA_1 = [
+    { name: "resfriado", label: "Se encuentra resfriado o con algún cuadro respiratorio" },
+    { name: "vertigoMareo", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
+];
+const ENTREVISTA_2 = [
+    { name: "alcohol24h", label: "Consumió alcohol en las últimas 24 horas" },
+    { name: "frecuenciaCefaleas", label: "Frecuencia de cefaleas" },
+];
+const EXAMEN_FISICO = [
+    { name: "limitacionFuerzaMovilidad", label: "Limitación en Fuerza y/o movilidad de extremidades" },
+    { name: "alteracionEquilibrio", label: "Alteración del equilibrio" },
+    { name: "anormalidadMarcha", label: "Anormalidad en la marcha" },
+    { name: "anormalidadFuerzaMiembros", label: "Anormalidad en la fuerza de los miembros" },
+    { name: "lenguajeAnormal", label: "Lenguaje anormal" },
+
+    { name: "alteracionCoordinacion", label: "Alteración de la coordinación Presente" },
+    { name: "nistagmus", label: "Presencia de nistagmus" },
+    { name: "anormalidadMovOculares", label: "Anormalidad en movimientos oculares" },
+    { name: "pupilasCIRLA", label: "Pupilas CIRLA" },
+    { name: "asimetriaFacial", label: "Asimetría facial" },
+
+    { name: "hallazgoHombro", label: "Hallazgos Anormales Hombro: Cirugías, Accidentes, Congénitos" },
+    { name: "hallazgoCodo", label: "Hallazgos Anormales Codo: Cirugías, Accidentes, Congénitos" },
+    { name: "hallazgoRodilla", label: "Hallazgos Anormales Rodilla: Cirugías, Accidentes, Congénitos" },
+    { name: "hallazgoTobillo", label: "Hallazgos Anormales Tobillo: Cirugías, Accidentes, Congénitos" },
+    { name: "otrosHallazgosMusculoEsqueleticos", label: "Otros Hallazgos Alteración Musculo-Esqueléticos" },
+];
+const CONCLUSION = [
+    { name: "apto18", label: "Apto para trabajar encima de los 1.8 metros" },
+    { name: "usoPermanenteLentesCorrectores", label: "Uso Permanente de Lentes Correctores" },
+    { name: "usoPermanenteAudifonos", label: "Uso Permanente de Audífonos" },
+];
+
+// Las casillas de recomendaciones escriben su texto en `observacionesYRecomendaciones`: se revierten juntas.
+const CHECKS_RECOMENDACIONES = [
+    "sobrepesoObesidadHipocalorica",
+    "corregirAgudezaVisual",
+    "corregirAgudezaVisualTotal",
+    "obesidadDietaHipocalorica",
+    "usoLentesCorrectoresLecturaCerca",
+    "corregirAgudezaLecturaCerca",
+];
+const CAMPOS_RECOMENDACIONES = ["observacionesYRecomendaciones", ...CHECKS_RECOMENDACIONES];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fecha",
+    "tituloExamen",
+    "examen",
+    "aniosExperiencia",
+    ...[
+        ...ANTECEDENTES_REGISTRO_1,
+        ...ANTECEDENTES_REGISTRO_2,
+        ...ENTREVISTA_1,
+        ...ENTREVISTA_2,
+        ...EXAMEN_FISICO,
+        ...CONCLUSION,
+    ].map((item) => item.name),
+    "comentarios",
+    "medicinasTomando",
+    "hallazgosAnormales",
+    "otraRestriccion",
+    ...CAMPOS_RECOMENDACIONES,
+    "user_medicoFirma",
+    "nombre_medico",
+    "user_doctorAsignado",
+    "nombre_doctorAsignado",
+];
 
 // Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
 // no guarda su borrador, sin Limpiar/Imprimir, y avisa con `onGuardado` al registrar o actualizar la certificación.
@@ -153,6 +251,15 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
 
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
     const {
@@ -168,11 +275,58 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: embebido ? undefined : "altura1.8" });
 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // Los médicos se componen de 2 campos (id + nombre): se detecta el cambio por el id y se revierten ambos.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+    const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+    const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
+
+    // Observaciones y casillas de recomendaciones van juntas.
+    const isRecomendacionesEdited = CAMPOS_RECOMENDACIONES.some(isFieldEdited);
+    const revertRecomendaciones = () => revertFields(CAMPOS_RECOMENDACIONES);
+
+    // Props comunes de un campo de texto: bloqueo, resaltado de cambios y botón de revertir.
+    const campo = (name, onChange = handleChange) => ({
+        name,
+        value: form[name] ?? "",
+        onChange,
+        disabled: camposDeshabilitados,
+        edited: isFieldEdited(name),
+        onRevert: () => revertField(name),
+    });
+
+    // Tabla de preguntas SI/NO con bloqueo, resaltado de cambios y botón de revertir por fila.
+    const tablaSiNo = (items) => (
+        <RadioTable
+            items={items}
+            options={OPCIONES_SI_NO}
+            labelColumns={6}
+            form={form}
+            handleRadioButton={handleRadioButton}
+            disabled={camposDeshabilitados}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
+        />
+    );
+
     // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
     const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
     };
 
     // Incrustado: abre la orden recibida (datos del paciente si aún no hay certificación; si ya existe, sus resultados)
@@ -182,10 +336,28 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
         }
     }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
+        }
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
     };
 
@@ -208,28 +380,47 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
         handleCheckBoxWriteOnText(e, "observacionesYRecomendaciones", recomendacionesTextMap);
     }
 
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = embebido || hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las dos columnas de la parte
     // inferior quedan muy angostas, así que se apilan.
     return (
         <div className={embebido ? "space-y-3 px-4 max-[1599px]:[&>.grid]:grid-cols-1" : "space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto"}>
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+                mostrarLimpiar={!embebido}
+            />
+
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    <InputTextOneLine
-                        label="N° Orden"
-                        name="norden"
-                        value={form.norden}
-                        onChange={handleChangeNumberDecimals}
-                        onKeyUp={handleSearch}
-                        disabled={embebido}
-                        labelWidth="120px"
-                    />
+                    <div className="flex gap-x-3 w-full">
+                        <InputTextOneLine
+                            label="N° Orden"
+                            name="norden"
+                            value={form.norden}
+                            onChange={handleChangeNumberDecimals}
+                            onKeyUp={handleSearch}
+                            disabled={nordenDisabled}
+                            labelWidth="120px"
+                            className="w-full"
+                        />
+                        {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
+                    </div>
                     <InputTextOneLine
                         label="Fecha"
-                        name="fecha"
                         type="date"
-                        value={form.fecha}
-                        onChange={handleChangeSimple}
                         labelWidth="120px"
+                        {...campo("fecha", handleChangeSimple)}
                     />
                     <div className="flex gap-4 items-center ">
                         <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
@@ -237,7 +428,8 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                             name="tituloExamen"
                             value={form.tituloExamen}
                             onChange={handleChangeSimple}
-                            className="border rounded px-2 py-1 text-base w-full"
+                            disabled={camposDeshabilitados}
+                            className={`border rounded px-2 py-1 text-base w-full ${camposDeshabilitados ? "bg-gray-300" : ""} ${isFieldEdited("tituloExamen") ? "border-orange-400 bg-orange-100" : ""}`}
                         >
                             <option value="CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA">
                                 CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA
@@ -246,6 +438,9 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                                 TRABAJOS EN ESPACIOS CONFINADOS
                             </option>
                         </select>
+                        {isFieldEdited("tituloExamen") && (
+                            <RevertButton onClick={() => revertField("tituloExamen")} />
+                        )}
                     </div>
                     <InputTextOneLine
                         label="Nombre del Examen"
@@ -264,13 +459,14 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                             { label: "Revalidación", value: "REVALIDACIÓN" },
                         ]}
                         onChange={handleRadioButton}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("examen")}
+                        onRevert={() => revertField("examen")}
                     />
                     <InputTextOneLine
                         label="Años Experiencia"
-                        name="aniosExperiencia"
-                        value={form.aniosExperiencia}
-                        onChange={handleChange}
                         labelWidth="120px"
+                        {...campo("aniosExperiencia")}
                     />
                     <ButtonsPDF
                         {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
@@ -284,154 +480,49 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
 
             <SectionFieldset legend="Antecedentes del Registro Médico" collapsible>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <RadioTable
-                        items={[
-                            { name: "miedoAlturas", label: "Tiene fobia (miedo) a las alturas" },
-                            { name: "epilepsiaa", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
-                            { name: "alcoholismo", label: "Alcoholismo o abuso de sustancias (adicción)" },
-                            { name: "enfermedadPsiquiatrica", label: "Portador de enfermedad psiquiátrica o hallazgo psicológico como rasgos de ansiedad, trastornos impulsivos o compulsivos" },
-                            { name: "diabetesNoControlada", label: "Diabetes mellitus o hipoglicemia no controlada" },
-                            { name: "migranaNoControlada", label: "Migraña no controlada" },
-                        ]}
-                        options={[
-                            { value: "SI", label: "SI" },
-                            { value: "NO", label: "NO" }
-                        ]}
-                        labelColumns={6}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                    />
-                    <RadioTable
-                        items={[
-                            { name: "insuficienciaCardiaca", label: "Insuficiencia cardiaca, enfermedad coronaria, arritmias, porta marcapaso, prótesis valvular" },
-                            { name: "asma", label: "Asma bronquial - Patrón obstructivo moderado o severo" },
-                            { name: "hipertensionNoControlada", label: "Hipertensión arterial no controlada" },
-                            { name: "hipoacusia", label: "Hipoacusia severa" },
-                            { name: "alteracionVisual", label: "Alteración de la agudeza visual (de lejos) y/o estereopsia" },
-                            { name: "noAptoAltura", label: "Declarado NO APTO para labor de altura en último examen ocupacional" },
-                        ]}
-                        options={[
-                            { value: "SI", label: "SI" },
-                            { value: "NO", label: "NO" }
-                        ]}
-                        labelColumns={6}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                    />
+                    {tablaSiNo(ANTECEDENTES_REGISTRO_1)}
+                    {tablaSiNo(ANTECEDENTES_REGISTRO_2)}
                 </div>
                 <InputTextArea
                     label="Comentarios y Detalles"
-                    name="comentarios"
-                    value={form.comentarios}
-                    onChange={handleChange}
                     className="ml-4 mt-4"
                     rows={4}
-
+                    {...campo("comentarios")}
                 />
             </SectionFieldset>
 
             <SectionFieldset legend="Antecedentes de la Entrevista con el Paciente" collapsible>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <RadioTable
-                        items={[
-                            { name: "resfriado", label: "Se encuentra resfriado o con algún cuadro respiratorio" },
-                            { name: "vertigoMareo", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
-                        ]}
-                        options={[
-                            { value: "SI", label: "SI" },
-                            { value: "NO", label: "NO" }
-                        ]}
-                        labelColumns={6}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                    />
-                    <RadioTable
-                        items={[
-                            { name: "alcohol24h", label: "Consumió alcohol en las últimas 24 horas" },
-                            { name: "frecuenciaCefaleas", label: "Frecuencia de cefaleas" },
-                        ]}
-                        options={[
-                            { value: "SI", label: "SI" },
-                            { value: "NO", label: "NO" }
-                        ]}
-                        labelColumns={6}
-                        form={form}
-                        handleRadioButton={handleRadioButton}
-                    />
+                    {tablaSiNo(ENTREVISTA_1)}
+                    {tablaSiNo(ENTREVISTA_2)}
                 </div>
                 <InputTextArea
                     label="Detalle de las Medicinas que está Tomando"
-                    name="medicinasTomando"
-                    value={form.medicinasTomando}
-                    onChange={handleChange}
                     className="ml-4 mt-4"
                     rows={4}
+                    {...campo("medicinasTomando")}
                 />
             </SectionFieldset>
 
             <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
                 <div className="flex flex-col gap-y-3">
                     <SectionFieldset legend="Examen Físico" collapsible>
-                        <RadioTable
-                            items={[
-                                { name: "limitacionFuerzaMovilidad", label: "Limitación en Fuerza y/o movilidad de extremidades" },
-                                { name: "alteracionEquilibrio", label: "Alteración del equilibrio" },
-                                { name: "anormalidadMarcha", label: "Anormalidad en la marcha" },
-                                { name: "anormalidadFuerzaMiembros", label: "Anormalidad en la fuerza de los miembros" },
-                                { name: "lenguajeAnormal", label: "Lenguaje anormal" },
-
-                                { name: "alteracionCoordinacion", label: "Alteración de la coordinación Presente" },
-                                { name: "nistagmus", label: "Presencia de nistagmus" },
-                                { name: "anormalidadMovOculares", label: "Anormalidad en movimientos oculares" },
-                                { name: "pupilasCIRLA", label: "Pupilas CIRLA" },
-                                { name: "asimetriaFacial", label: "Asimetría facial" },
-
-                                { name: "hallazgoHombro", label: "Hallazgos Anormales Hombro: Cirugías, Accidentes, Congénitos" },
-                                { name: "hallazgoCodo", label: "Hallazgos Anormales Codo: Cirugías, Accidentes, Congénitos" },
-                                { name: "hallazgoRodilla", label: "Hallazgos Anormales Rodilla: Cirugías, Accidentes, Congénitos" },
-                                { name: "hallazgoTobillo", label: "Hallazgos Anormales Tobillo: Cirugías, Accidentes, Congénitos" },
-                                { name: "otrosHallazgosMusculoEsqueleticos", label: "Otros Hallazgos Alteración Musculo-Esqueléticos" },
-                            ]}
-                            options={[
-                                { value: "SI", label: "SI" },
-                                { value: "NO", label: "NO" }
-                            ]}
-                            labelColumns={6}
-                            form={form}
-                            handleRadioButton={handleRadioButton}
-                        />
+                        {tablaSiNo(EXAMEN_FISICO)}
                         <InputTextArea
                             label="Hallazos Anormales en Articulaciones Específicas (Alteraciones Musculoesqueléticas)"
-                            name="hallazgosAnormales"
-                            value={form.hallazgosAnormales}
-                            onChange={handleChange}
                             className="ml-4 mt-4"
                             rows={4}
+                            {...campo("hallazgosAnormales")}
                         />
                     </SectionFieldset>
 
                     <SectionFieldset legend="Conclusión" collapsible>
-                        <RadioTable
-                            items={[
-                                { name: "apto18", label: "Apto para trabajar encima de los 1.8 metros" },
-                                { name: "usoPermanenteLentesCorrectores", label: "Uso Permanente de Lentes Correctores" },
-                                { name: "usoPermanenteAudifonos", label: "Uso Permanente de Audífonos" },
-                            ]}
-                            options={[
-                                { value: "SI", label: "SI" },
-                                { value: "NO", label: "NO" }
-                            ]}
-                            labelColumns={6}
-                            form={form}
-                            handleRadioButton={handleRadioButton}
-                        />
+                        {tablaSiNo(CONCLUSION)}
                         <InputTextArea
                             label="Otra Restricción"
-                            name="otraRestriccion"
-                            value={form.otraRestriccion}
-                            onChange={handleChange}
                             className="ml-4 mt-4"
                             rows={4}
+                            {...campo("otraRestriccion")}
                         />
                     </SectionFieldset>
                 </div>
@@ -595,10 +686,10 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                     <SectionFieldset legend="Recomendaciones" className="grid gap-y-3 grid-cols-2 gap-4" collapsible>
                         <InputTextArea
                             label="Observaciones y Recomendaciones"
-                            name="observacionesYRecomendaciones"
-                            value={form?.observacionesYRecomendaciones}
-                            onChange={handleChange}
                             rows={6}
+                            {...campo("observacionesYRecomendaciones")}
+                            edited={isRecomendacionesEdited}
+                            onRevert={revertRecomendaciones}
                         />
                         <div className="grid grid-cols-1 gap-2">
                             <InputCheckbox
@@ -606,36 +697,42 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                                 name="sobrepesoObesidadHipocalorica"
                                 checked={form?.sobrepesoObesidadHipocalorica}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                             <InputCheckbox
                                 label="Corregir Agudeza Visual"
                                 name="corregirAgudezaVisual"
                                 checked={form?.corregirAgudezaVisual}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                             <InputCheckbox
                                 label="Corregir Agudeza Visual Total"
                                 name="corregirAgudezaVisualTotal"
                                 checked={form?.corregirAgudezaVisualTotal}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                             <InputCheckbox
                                 label="Obesidad - Dieta Hipocalórica"
                                 name="obesidadDietaHipocalorica"
                                 checked={form?.obesidadDietaHipocalorica}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                             <InputCheckbox
                                 label="Uso de Lentes Correctores para Lectura de Cerca"
                                 name="usoLentesCorrectoresLecturaCerca"
                                 checked={form?.usoLentesCorrectoresLecturaCerca}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                             <InputCheckbox
                                 label="Corregir Agudeza para Lectura de Cerca"
                                 name="corregirAgudezaLecturaCerca"
                                 checked={form?.corregirAgudezaLecturaCerca}
                                 onChange={handleCheckboxRecomendaciones}
+                                disabled={camposDeshabilitados}
                             />
                         </div>
 
@@ -646,6 +743,9 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                             label="Especialista"
                             form={form}
                             onChange={handleChangeSimple}
+                            disabled={camposDeshabilitados}
+                            edited={isMedicoEdited}
+                            onRevert={revertMedico}
                         />
                         <EmpleadoComboBox
                             value={form.nombre_doctorAsignado}
@@ -654,17 +754,37 @@ export default function Altura18({ nOrdenInicial, onGuardado }) {
                             onChange={handleChangeSimple}
                             nameField="nombre_doctorAsignado"
                             idField="user_doctorAsignado"
+                            disabled={camposDeshabilitados}
+                            edited={isDoctorEdited}
+                            onRevert={revertDoctor}
                         />
                     </SectionFieldset>
                 </div>
             </div>
 
-            <BotonesAccion
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
                 hideClear={embebido}
                 hidePrint={embebido}
             />

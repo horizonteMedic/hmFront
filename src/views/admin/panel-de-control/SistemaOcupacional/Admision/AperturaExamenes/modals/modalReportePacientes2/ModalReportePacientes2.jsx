@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { getToday } from "../../../../../../../utils/helpers";
 import { getFetch, SubmitData } from "../../../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../../../utils/functionUtils";
+import { textoDocumento } from "../../../../../../../utils/documentoPaciente";
 
 const urlSubmit = "/api/v01/ct/clientes/completo"
 const GetExamenesComplementarios = '/api/v01/ct/campana/obtenerEstados'
@@ -66,7 +67,7 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
 
         const headersFijos = [
             { key: "norden", label: "N° ORDEN", width: 14, seccion: "general" },
-            { key: "dni", label: "DNI", width: 14, seccion: "general" },
+            { key: "dni", label: "N° Documento", documento: true, width: 14, seccion: "general" },
             { key: "apellidos", label: "APELLIDOS", width: 28, seccion: "general" },
             { key: "nombres", label: "NOMBRES", width: 24, seccion: "general" },
             { key: "edad", label: "EDAD", width: 8, seccion: "general" },
@@ -157,6 +158,7 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
                     const bk = preRegistroMap.find(p => p.key === h.key)?.backendKey;
                     return preReg[bk] === "PASÓ" ? "SÍ" : "NO";
                 }
+                if (h.documento) return textoDocumento(item[h.key]);
                 return item[h.key] ?? "";
             });
 

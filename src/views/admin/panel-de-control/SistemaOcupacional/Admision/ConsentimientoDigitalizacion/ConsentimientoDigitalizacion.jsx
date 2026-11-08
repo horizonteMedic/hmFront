@@ -24,6 +24,7 @@ import {
 } from "./controllerConsentimientoDigitalizacion";
 import ModalGenerarMasivo from "./ModalGenerarMasivo";
 import ModalVisorArchivo from "./ModalVisorArchivo";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "consen_digit";
 const today = getToday();
@@ -204,7 +205,7 @@ const ConsentimientoDigitalizacion = () => {
           labelWidth="120px"
           className="lg:col-span-2"
         />
-        <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="60px" />
+        <InputTextOneLine label="DNI" name="dni" value={textoDocumento(form.dni)} disabled labelWidth="60px" />
         <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="60px" />
       </SectionFieldset>
 

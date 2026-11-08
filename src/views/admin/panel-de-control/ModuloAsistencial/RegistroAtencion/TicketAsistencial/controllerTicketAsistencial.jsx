@@ -7,6 +7,7 @@ const serviciosGeneralesUrl = "/api/servicios-generales";
 const buscarReniecUrl = "/api/pacientes-asistencial/reniec";
 const buscarDocumentoUrl = "/api/pacientes-asistencial/documento";
 const ticketsUrl = "/api/tickets";
+const historialUrl = "/api/tickets/historial";
 const pacientesUrl = "/api/pacientes-asistencial";
 
 
@@ -62,19 +63,62 @@ const setFormFromPaciente = (setForm, data) => {
     fechaNacimiento: data.fechaNacimiento ?? null,
   }));
 };
- 
-export const BuscarPorDni = async (dni, token, setForm) => {
+
+// Historial de tickets del paciente: GET /api/tickets/historial?documento=... (DNI, pasaporte,
+// carnet de extranjería, etc.) -> { resultado: [ticket, ...] }. Cada ticket trae numeroTicket,
+// fechaTicket/horaTicket, empresa, cargo, area y los datos del paciente (pacienteTipoDocumento,
+// pacienteNumeroDocumento...). Se devuelve del más reciente al más antiguo.
+// Devuelve [] si no hay documento, si nunca tuvo tickets o si la consulta falla: es una ayuda
+// opcional (alimenta la barra lateral de "Tickets anteriores") y nunca debe frenar la búsqueda
+// del paciente.
+export const ListarHistorialTickets = async (documento, token) => {
+  const numero = String(documento ?? "").trim();
+  if (!numero) return [];
+
+  try {
+    const res = await getFetch(`${historialUrl}?documento=${encodeURIComponent(numero)}`, token);
+    if (!res || res.error) return [];
+
+    // El backend puede devolver la lista directa o envuelta en { resultado }.
+    const lista = res.resultado ?? res;
+    if (!Array.isArray(lista)) return [];
+
+    return [...lista].sort(
+      (a, b) =>
+        `${b.fechaTicket ?? ""} ${b.horaTicket ?? ""}`.localeCompare(`${a.fechaTicket ?? ""} ${a.horaTicket ?? ""}`) ||
+        (b.id ?? 0) - (a.id ?? 0)
+    );
+  } catch {
+    return [];
+  }
+};
+
+// Paciente ya validado por alguno de los buscadores: llena el formulario, avisa y entrega el
+// documento a `onEncontrado` (en el formulario, carga su historial de tickets en la barra lateral).
+// El documento sale de la ficha del paciente (si no, del que se escribió).
+const CompletarPacienteEncontrado = (paciente, documentoBuscado, setForm, onEncontrado) => {
+  setFormFromPaciente(setForm, paciente);
+
+  Swal.fire(
+    "Paciente encontrado",
+    "Se completó el formulario con los datos registrados en el sistema.",
+    "success"
+  );
+
+  onEncontrado?.(paciente.numeroDocumento || documentoBuscado);
+};
+
+export const BuscarPorDni = async (dni, token, setForm, onEncontrado) => {
   if (!dni) return;
 
   LoadingDefault("Buscando Paciente");
 
   const res = await getFetch(`${buscarReniecUrl}/${dni}`, token);
 
-  Swal.close();
-
   const resultado = res?.resultado;
 
   if (!res || res.error || !resultado || !resultado.yaRegistrado) {
+    Swal.close();
     Swal.fire(
       "DNI no registrado",
       "Este DNI no está registrado en el sistema (sin historia clínica). No se puede generar el ticket.",
@@ -83,16 +127,11 @@ export const BuscarPorDni = async (dni, token, setForm) => {
     return;
   }
 
-  setFormFromPaciente(setForm, resultado.paciente ?? {});
-  Swal.fire(
-    "Paciente encontrado",
-    "Se completó el formulario con los datos registrados en el sistema.",
-    "success"
-  );
+  CompletarPacienteEncontrado(resultado.paciente ?? {}, dni, setForm, onEncontrado);
 };
 
 // Búsqueda exacta por documento (PASAPORTE), mismo endpoint que RegistroAsistencial. 
-export const BuscarPorPasaporte = async (numero, token, setForm) => {
+export const BuscarPorPasaporte = async (numero, token, setForm, onEncontrado) => {
   if (!numero) return;
 
   LoadingDefault("Buscando Paciente");
@@ -100,12 +139,11 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
   const query = new URLSearchParams({ tipoDocumento: "PASAPORTE", numeroDocumento: numero });
   const res = await getFetch(`${buscarDocumentoUrl}?${query.toString()}`, token);
 
-  Swal.close();
-
   const data = res?.resultado;
   const encontrado = data && (data.numeroDocumento || data.nombres || data.apellidos);
 
   if (!res || res.error || !encontrado) {
+    Swal.close();
     Swal.fire(
       "Sin registro",
       "No se encontró un paciente con ese número de pasaporte.",
@@ -114,13 +152,32 @@ export const BuscarPorPasaporte = async (numero, token, setForm) => {
     return;
   }
 
-  setFormFromPaciente(setForm, data);
+  CompletarPacienteEncontrado(data, numero, setForm, onEncontrado);
+};
 
-  Swal.fire(
-    "Paciente encontrado",
-    "Se completó el formulario con los datos registrados en el sistema.",
-    "success"
-  );
+// Búsqueda exacta por documento (CARNET_EXTRANJERIA), mismo endpoint que RegistroAsistencial.
+export const BuscarPorCarnetExtranjeria = async (numero, token, setForm, onEncontrado) => {
+  if (!numero) return;
+
+  LoadingDefault("Buscando Paciente");
+
+  const query = new URLSearchParams({ tipoDocumento: "CARNET_EXTRANJERIA", numeroDocumento: numero });
+  const res = await getFetch(`${buscarDocumentoUrl}?${query.toString()}`, token);
+
+  const data = res?.resultado;
+  const encontrado = data && (data.numeroDocumento || data.nombres || data.apellidos);
+
+  if (!res || res.error || !encontrado) {
+    Swal.close();
+    Swal.fire(
+      "Sin registro",
+      "No se encontró un paciente con ese número de carnet de extranjería.",
+      "info"
+    );
+    return;
+  }
+
+  CompletarPacienteEncontrado(data, numero, setForm, onEncontrado);
 };
 
 // Registra el ticket con todas sus líneas. El backend calcula precioTotal/total a partir

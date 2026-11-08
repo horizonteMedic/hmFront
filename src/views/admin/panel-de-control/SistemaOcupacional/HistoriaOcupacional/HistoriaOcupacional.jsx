@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import AutoResizeInput from "./Inputs";
+import ListaOpciones from "./ListaOpciones";
 import {
   handleSearch,
   handleSelect,
@@ -788,7 +789,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredEmpresa.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
+                            <ListaOpciones anchorRef={empresaRef}>
                               {filteredEmpresa.map((opt) => (
                                 <li
                                   key={opt.id}
@@ -808,7 +809,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -868,7 +869,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredAltitud.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                            <ListaOpciones anchorRef={altitudRef}>
                               {filteredAltitud.map((opt) => (
                                 <li
                                   key={opt.id}
@@ -888,7 +889,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -935,7 +936,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredActividad.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                            <ListaOpciones anchorRef={actividadRef}>
                               {filteredActividad.map((opt) => (
                                 <li
                                   key={opt.id}
@@ -948,7 +949,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -994,7 +995,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredArea.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-10">
+                            <ListaOpciones anchorRef={areaRef}>
                               {filteredArea.map((opt) => (
                                 <li
                                   key={opt.id}
@@ -1014,7 +1015,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -1065,7 +1066,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredCargoOcupacion.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
+                            <ListaOpciones anchorRef={ocupacionRef}>
                               {filteredCargoOcupacion.map((opt, index) => (
                                 <li
                                   key={index}
@@ -1084,7 +1085,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -1142,7 +1143,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredSuperficie.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                            <ListaOpciones anchorRef={superficieRef}>
                               {filteredSuperficie.map((sug, i) => (
                                 <li
                                   key={i}
@@ -1155,7 +1156,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {sug}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -1208,7 +1209,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredSocavon.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                            <ListaOpciones anchorRef={socavonRef}>
                               {filteredSocavon.map((sug, i) => (
                                 <li
                                   key={i}
@@ -1221,7 +1222,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {sug}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -1269,7 +1270,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredRiesgo.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                            <ListaOpciones anchorRef={riesgoRef}>
                               {filteredRiesgo.map((opt, index) => (
                                 <li
                                   key={index}
@@ -1289,7 +1290,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.title}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>
@@ -1333,7 +1334,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                             }
                           />
                           {filteredProt.length > 0 && (
-                            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-40">
+                            <ListaOpciones anchorRef={protRef}>
                               {filteredProt.map((opt) => (
                                 <li
                                   key={opt.id}
@@ -1353,7 +1354,7 @@ const HistoriaOcupacional = ({ listas, nOrdenInicial, onGuardado }) => {
                                   {opt.mensaje}
                                 </li>
                               ))}
-                            </ul>
+                            </ListaOpciones>
                           )}
                         </div>
                       </div>

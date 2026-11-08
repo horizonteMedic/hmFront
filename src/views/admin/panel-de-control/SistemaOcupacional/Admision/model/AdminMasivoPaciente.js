@@ -1,4 +1,5 @@
 import { URLAzure } from "../../../../../config/config";
+import { TIPO_DNI, tipoDocDesdeTexto } from "../../../../../utils/documentoPaciente";
 
 //12.16
 export function SubmitMasivoRegistarPaciente(data,sede,token) {
@@ -11,8 +12,10 @@ export function SubmitMasivoRegistarPaciente(data,sede,token) {
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
     
+  // La columna DNI lleva el número del documento indicado en la columna opcional TipoDocumento (sin ella, DNI)
   const body = {
-    codPa: data.DNI,
+    tipoDoc: tipoDocDesdeTexto(data.TipoDocumento) || TIPO_DNI,
+    nroDoc: String(data.DNI ?? '').trim(),
     nombresPa: data.Nombres,
     fechaNaciminetoPa: data.FechaNacimiento,
     sexoPa: data.Sexo,
@@ -34,8 +37,7 @@ export function SubmitMasivoRegistarPaciente(data,sede,token) {
     fechaRegistroPa: `${year}-${month}-${day}`,
     apellidosPa: data.Apellidos,
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
-    tipoDoc: 1
-  };    
+  };
 
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`

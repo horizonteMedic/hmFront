@@ -4,6 +4,8 @@ import { useVersionUpdateStore } from "../../store/versionUpdate";
 
 const GRACE_PERIOD_SECONDS = 90; // 1:30 min
 const WARNING_AT_SECONDS = 20;
+// Rutas donde la nueva versión se aplica sola, sin preguntar.
+const AUTO_UPDATE_ROUTES = ["/pantalla-pacientes"];
 
 // Función para borrar todas las cookies
 const clearAllCookies = () => {
@@ -109,6 +111,11 @@ function useAppVersionChecker(intervalMs = 180000) {
         };
 
         const showUpdateChoiceAlert = async (newVersion) => {
+            // Pantalla de pacientes (TV): sin modal, se actualiza automáticamente.
+            if (AUTO_UPDATE_ROUTES.includes(window.location.pathname)) {
+                await finishWithUpdate(newVersion);
+                return;
+            }
             const result = await Swal.fire({
                 title: "Nueva versión disponible 🚀",
                 html: "Se detectó una nueva versión del sistema.<br/>¿Deseas actualizar ahora o continuar usando el sistema por <b>1:30 min</b> para guardar tus cambios antes de actualizar?",

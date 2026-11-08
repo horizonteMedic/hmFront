@@ -15,6 +15,7 @@ import {
     VerifyTR,
 } from "./controllerSintomaticoRespiratorio";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "CONSENT_SINTOMATICO";
 
@@ -167,7 +168,7 @@ export default function SintomaticoRespiratorio() {
                     <InputTextOneLine
                         label="Identificado con DNI"
                         name="dni"
-                        value={form.dni}
+                        value={textoDocumento(form.dni)}
                         disabled
                         labelWidth="140px"
                     />

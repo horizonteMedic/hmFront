@@ -22,6 +22,7 @@ import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { getAnexo16AInitialFormState } from "./anexo16aFormDefaults";
 import CargaMasivaAnexo16A from "./CargaMasivaAnexo16A/CargaMasivaAnexo16A";
+import { textoDocumento } from '../../../../utils/documentoPaciente';
 
 const tabla = TABLA_ANEXO16A;
 
@@ -179,7 +180,7 @@ export default function Anexo16A({ nOrdenInicial, onGuardado }) {
               </div>
               {/* Fila 2: DNI, Sexo y Edad */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                <InputTextOneLine label="DNI" name="dni" value={form?.dni} disabled labelWidth="60px" />
+                <InputTextOneLine label="DNI" name="dni" value={textoDocumento(form?.dni)} disabled labelWidth="60px" />
                 <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="50px" />
                 <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled labelWidth="50px" />
               </div>

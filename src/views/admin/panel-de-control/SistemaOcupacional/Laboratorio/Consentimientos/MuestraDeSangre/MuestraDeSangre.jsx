@@ -11,6 +11,7 @@ import { PrintHojaR, SubmitConsentimientoLab, UpdateConsentimientoLab, VerifyTR 
 import { getToday, getFechaHoraActual } from '../../../../../../utils/helpers';
 import { buildAuditoria } from '../../../../../../utils/auditoriaUtils';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import { textoDocumento } from '../../../../../../utils/documentoPaciente';
 
 const tabla = 'consent_Muestra_Sangre';
 
@@ -177,10 +178,10 @@ const MuestraDeSangre = () => {
             <span>años de edad, identificado con DNI nº</span>
             <input
               name="dni"
-              value={form.dni || ''}
+              value={textoDocumento(form.dni)}
               readOnly
-              className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[120px] text-base bg-gray-100 cursor-not-allowed"
-              style={{ width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px` }}
+              className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[160px] text-base bg-gray-100 cursor-not-allowed"
+              style={{ width: `${Math.min(160, Math.max(80, textoDocumento(form.dni).length * 10))}px` }}
             />
           </div>
           <div className="text-justify text-base">

@@ -1,5 +1,6 @@
 import InputTextOneLine from "../reusableComponents/InputTextOneLine";
 import SectionFieldset from "../reusableComponents/SectionFieldset";
+import { textoDocumento } from '../../utils/documentoPaciente';
 
 export default function DatosPersonalesLaborales({ form, personales = true, laborales = true, minSizePrincipal = "lg", minSizeSecundario = "lg" }) {
     // minSizePrincipal / minSizeSecundario === "none" => nunca se divide en 2 columnas.
@@ -44,7 +45,7 @@ export default function DatosPersonalesLaborales({ form, personales = true, labo
                         <InputTextOneLine
                             label="DNI"
                             name="dni"
-                            value={form.dni}
+                            value={textoDocumento(form.dni)}
                             labelWidth="120px"
                             disabled
                         />

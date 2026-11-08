@@ -24,6 +24,7 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
+import { textoDocumento } from '../../../../../utils/documentoPaciente';
 
 const tabla = "audiometria_po";
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
@@ -821,7 +822,7 @@ export default function AudiometriaOhla({
               </label>
               <input
                 name="dni"
-                value={form.dni}
+                value={textoDocumento(form.dni)}
                 disabled
                 className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
               />

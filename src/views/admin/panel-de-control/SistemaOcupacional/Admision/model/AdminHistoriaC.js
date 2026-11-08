@@ -29,7 +29,11 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
 
     tipoOperacion: operacion,
     n_orden: data.n_orden ? data.n_orden : null,
-    codPa: data.codPa,
+    // Paciente: por (tipoDoc, nroDoc) cuando hay número; si no (sin documento, o una historia de extranjero
+    // cargada que solo trae codPa) va el codPa interno
+    ...(data.nroDoc
+      ? { tipoDoc: Number(data.tipoDoc) || 1, nroDoc: String(data.nroDoc).trim() }
+      : { codPa: data.codPa || null }),
     razonEmpresa: data.razonEmpresa,
     razonContrata: data.razonContrata,
     nomEx: data.nomEx,

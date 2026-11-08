@@ -11,7 +11,7 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
-import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte } from "./controllerRegistroAsistencial";
+import { SubmitDataService, BuscarPorDni, BuscarPorPasaporte, BuscarPorCarnetExtranjeria } from "./controllerRegistroAsistencial";
 import ArchivosPaciente from "./ArchivosPaciente/ArchivosPaciente";
 import {
     ComboboxProfesión,
@@ -287,6 +287,8 @@ export default function RegistroAsistencial({ onPacienteRegistrado }) {
                 BuscarPorDni(form.documentoIdentidad, token, setForm);
             } else if (form.tipoDocumento === "PASAPORTE") {
                 BuscarPorPasaporte(form.documentoIdentidad, token, setForm);
+            } else if (form.tipoDocumento === "CARNET_EXTRANJERIA") {
+                BuscarPorCarnetExtranjeria(form.documentoIdentidad, token, setForm);
             }
         }
     };
@@ -346,6 +348,7 @@ export default function RegistroAsistencial({ onPacienteRegistrado }) {
                     options={[
                         { label: "DNI", value: "DNI" },
                         { label: "Pasaporte", value: "PASAPORTE" },
+                        { label: "Carnet de Extranjería", value: "CARNET_EXTRANJERIA" },
                         { label: "Sin Documento", value: "SIN_DOCUMENTO" },
                     ]}
                     className="col-span-3"
@@ -354,7 +357,7 @@ export default function RegistroAsistencial({ onPacienteRegistrado }) {
                     <h1>Sin Documento</h1>
                     :
                     <InputTextOneLine
-                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : "SIN_DOCUMENTO"}`}
+                        label={`${form.tipoDocumento === "DNI" ? "DNI" : form.tipoDocumento === "PASAPORTE" ? "Pasaporte" : form.tipoDocumento === "CARNET_EXTRANJERIA" ? "Carnet de Extranjería" : "SIN_DOCUMENTO"}`}
                         name="documentoIdentidad"
                         value={form.documentoIdentidad}
                         onChange={handleChange}
