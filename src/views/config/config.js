@@ -1,6 +1,6 @@
 //Este archivo sirve para poder cambiar de rutas para las apis
 // dev arena https://testbackendlaarena-agcjbpezhybshteb.eastus2-01.azurewebsites.net
 // main arena https://laarenaintegracion.azurewebsites.net
-export const URLAzure = 'https://testbackendlaarena-agcjbpezhybshteb.eastus2-01.azurewebsites.net'
+export const URLAzure = 'https://laarenaintegracion.azurewebsites.net'
 export const URLAPIREST = 'http://go.server.net.pe:3000/api/v2'
 export const TokenURL = 'horizontemedic_dtcm9'
