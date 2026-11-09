@@ -29,5 +29,6 @@ export default function AudiometriaTabSelector({ tieneVista }) {
     },
   ];
 
+
   return <TabSelector tieneVista={tieneVista} tabsConfig={tabsConfig} />;
 }
