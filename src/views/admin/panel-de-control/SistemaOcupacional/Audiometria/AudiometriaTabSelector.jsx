@@ -1,39 +1,34 @@
+import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import Audiometria from "./Audiometria/Audiometria";
-import AudiometriaCuestionario from "./AudiometriaCuestionario/AudiometriaCuestionario";
-import AudiometriaOhlaTabSelector from "./AudiometriaOhla/AudiometriaOhlaTabSelector";
 import AudiometriaOhlaN from "./AudiometriaOhlaN/AudiometriaOhlaN";
-import { useSessionData } from "../../../../hooks/useSessionData";
+import AudiometriaCuestionario from "./AudiometriaCuestionario/AudiometriaCuestionario";
 
-export default function AudiometriaTabSelector({
-  token,
-  selectedSede,
-  listas,
-  subTab,
-}) {
-
-  const { userlogued } = useSessionData();
-
+// El acceso al módulo lo da la vista "Audiometria" (tarjeta en SistemaOcupacional); cada examen
+// tiene además su propio permiso. Los nombres deben coincidir exactamente con las vistas del backend.
+export default function AudiometriaTabSelector({ tieneVista }) {
   // Cada formulario guarda su propio borrador (useForm con storageKey), así que no hace falta
   // mantener su estado aquí para que sobreviva al cambiar de pestaña.
-  return (
-    <>
-      {subTab === 0 && (
-        <Audiometria />
-      )}
-      {subTab === 1 && (
-        <AudiometriaOhlaTabSelector
-          token={token}
-          userlogued={userlogued}
-          selectedSede={selectedSede}
-          listas={listas}
-        />
-      )}
-      {subTab === 2 && (
-        <AudiometriaCuestionario />
-      )}
-      {subTab === 3 && (
-        <AudiometriaOhlaN />
-      )}
-    </>
-  );
+  const tabsConfig = [
+    {
+      id: 0,
+      permission: "Audiometria Normal",
+      label: "Audiometria",
+      component: Audiometria,
+    },
+    {
+      id: 1,
+      permission: "Audiometria-Ohla",
+      label: "Audiometria OHLA",
+      component: AudiometriaOhlaN,
+    },
+    {
+      id: 2,
+      permission: "Cuestionario Audiometria",
+      label: "Cuestionario de Audiometria",
+      component: AudiometriaCuestionario,
+    },
+  ];
+
+
+  return <TabSelector tieneVista={tieneVista} tabsConfig={tabsConfig} />;
 }

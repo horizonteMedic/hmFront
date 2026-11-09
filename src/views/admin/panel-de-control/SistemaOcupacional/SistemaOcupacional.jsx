@@ -139,7 +139,6 @@ const hiddenExamTabs = [
 
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(null); // null: dashboard, 0: Admisión, 1: Triaje, 2: Laboratorio
-  const [subTab, setSubTab] = useState(0); // Para tabs internos de Audiometría
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [DNIG, setDNIG] = useState("");
@@ -403,69 +402,6 @@ const TabComponent = () => {
               />
             </div>
           )}
-          {activeTab === 15 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => {
-                    setActiveTab(null), setSubTab(0);
-                  }}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Audiometria
-                </h2>
-              </div>
-              <div>
-                <div className={styles.tabHeader}>
-                  {/*Esto se va a mostrar por defecto */}
-                  <button
-                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(0)}
-                  >
-                    Audiometria
-                  </button>
-
-                  {/* <button
-                    className={`${styles.tabButton} ${subTab === 1 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(1)}
-                  >
-                    Audiometria Ohla
-                  </button> */}
-                
-                  <button
-                    className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(3)}
-                  >
-                    Audiometria OHLA
-                  </button>
-                  <button
-                    className={`${styles.tabButton} ${subTab === 2 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(2)}
-                  >
-                    Cuestionario de Audiometria
-                  </button>
-                </div>
-                <div>
-                  <AudiometriaTabSelector
-                    token={token}
-                    userlogued={userlogued}
-                    selectedSede={selectSede}
-                    listas={listasCombos}
-                    subTab={subTab}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
           {(() => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
@@ -482,6 +418,7 @@ const TabComponent = () => {
               12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
               13: { title: "Electrocardiograma", child: <EKG /> },
               14: { title: "Espirometría", child: <Espirometria /> },
+              15: { title: "Audiometria", child: <AudiometriaTabSelector tieneVista={tieneVista} /> },
               16: {
                 title: "Historia Ocupacional", child: (
                   <HistoriaOcupacional
@@ -586,43 +523,42 @@ const TabComponent = () => {
           // Optimized navigation handling using a configuration map
           const navConfig = {
             Inicio: { activeTab: null },
-            Admision: { activeTab: 0, subTab: 0 },
-            Triaje: { activeTab: 1, subTab: 0 },
+            Admision: { activeTab: 0 },
+            Triaje: { activeTab: 1 },
             "Laboratorio Clinico": { activeTab: 2 },
-            "Rayos X": { activeTab: 12, subTab: 0 },
-            EKG: { activeTab: 13, subTab: 0 },
-            Espirometria: { activeTab: 14, subTab: 0 },
-            Audiometria: { activeTab: 15, subTab: 0 },
-            "Historia Ocupacional": { activeTab: 16, subTab: 0 },
-            Oftalmologia: { activeTab: 17, subTab: 0 },
-            Odontologia: { activeTab: 18, subTab: 0 },
-            "Evaluación Musculoesquelética": { activeTab: 22, subTab: 0 },
-            "Cuestionario Nordico": { activeTab: 21, subTab: 0 },
-            "Test Fatiga": { activeTab: 23, subTab: 0 },
-            "Antecedentes de Altura": { activeTab: 25, subTab: 0 },
-            "Anexo 2": { activeTab: 26, subTab: 0 },
-            "Anexo 16": { activeTab: 27, subTab: 0 },
-            "Anexo 16 A": { activeTab: 28, subTab: 0 },
-            "Antecedentes Patologicos": { activeTab: 29, subTab: 0 },
-            "Fichas Aptitud": { activeTab: 30, subTab: 0 },
-            "Ficha SAS": { activeTab: 31, subTab: 0 },
-            "Ficha Conduccion de Vehiculos": { activeTab: 32, subTab: 0 },
-            "Ficha Certificado de Altura": { activeTab: 33, subTab: 0 },
-            "Constancia Certificado Medico Ocupacional": { activeTab: 34, subTab: 0 },
-            "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
-            "Uso de Respiradores": { activeTab: 36, subTab: 0 },
-            "Poderosa": { activeTab: 37, subTab: 0 },
-            "Eliminar Examenes": { activeTab: 38, subTab: 0 },
-            "Altura 1.8": { activeTab: 39, subTab: 0 },
-            "Folio": { activeTab: 40, subTab: 0 },
-            "Plantillas de Correo": { activeTab: 41, subTab: 0 },
-            "Generador de Reportes": { activeTab: 47, subTab: 0 },
+            "Rayos X": { activeTab: 12 },
+            EKG: { activeTab: 13 },
+            Espirometria: { activeTab: 14 },
+            Audiometria: { activeTab: 15 },
+            "Historia Ocupacional": { activeTab: 16 },
+            Oftalmologia: { activeTab: 17 },
+            Odontologia: { activeTab: 18 },
+            "Evaluación Musculoesquelética": { activeTab: 22 },
+            "Cuestionario Nordico": { activeTab: 21 },
+            "Test Fatiga": { activeTab: 23 },
+            "Antecedentes de Altura": { activeTab: 25 },
+            "Anexo 2": { activeTab: 26 },
+            "Anexo 16": { activeTab: 27 },
+            "Anexo 16 A": { activeTab: 28 },
+            "Antecedentes Patologicos": { activeTab: 29 },
+            "Fichas Aptitud": { activeTab: 30 },
+            "Ficha SAS": { activeTab: 31 },
+            "Ficha Conduccion de Vehiculos": { activeTab: 32 },
+            "Ficha Certificado de Altura": { activeTab: 33 },
+            "Constancia Certificado Medico Ocupacional": { activeTab: 34 },
+            "Ficha Interconsulta": { activeTab: 35 },
+            "Uso de Respiradores": { activeTab: 36 },
+            "Poderosa": { activeTab: 37 },
+            "Eliminar Examenes": { activeTab: 38 },
+            "Altura 1.8": { activeTab: 39 },
+            "Folio": { activeTab: 40 },
+            "Plantillas de Correo": { activeTab: 41 },
+            "Generador de Reportes": { activeTab: 47 },
           };
 
           const config = navConfig[idx];
           if (config) {
             setActiveTab(config.activeTab);
-            if (config.subTab !== undefined) setSubTab(config.subTab);
           }
         }}
         activeIndex={activeTab}

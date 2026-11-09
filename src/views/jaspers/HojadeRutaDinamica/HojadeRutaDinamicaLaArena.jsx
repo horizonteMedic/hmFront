@@ -9,8 +9,6 @@ import hojaTomaMuestra from "../components/hojaTomaMuestra";
 // grandes entren en la misma hoja.
 const FONT_CUADRO = 6.5;
 const INTERLINEADO = 1.15; // el que usa jsPDF-autotable por defecto
-const EDAD_MINIMA_EKG = 45;
-
 const ORDEN_AREAS = [
     "LABORATORIO",
     "LABORATORIO PLOMO",
@@ -35,9 +33,6 @@ export default async function HojadeRutaDinamicaLaArena(datos = {}) {
     const getCategorizedExams = (d) => {
         if (!Array.isArray(d?.areas)) return [];
 
-        const edadParseada = parseInt(d?.edad);
-        const edad = Number.isNaN(edadParseada) ? Infinity : edadParseada;
-
         const mapped = d.areas.map((area) => {
             const examenesNormales = (area.examenes || []).map(ex => ({
                 nombre: ex.nombre,
@@ -53,14 +48,7 @@ export default async function HojadeRutaDinamicaLaArena(datos = {}) {
                 area: area.nombre.toUpperCase(),
                 examenes: [...examenesNormales, ...examenesAdicionales]
             };
-        }).filter(g => {
-            if (g.examenes.length === 0) return false;
-
-            // EKG solo aparece si el paciente tiene 45 años o más (sin edad conocida se mantiene)
-            if (g.area.includes("EKG") && edad < EDAD_MINIMA_EKG) return false;
-
-            return true;
-        });
+        }).filter(g => g.examenes.length > 0);
 
         return mapped.sort((a, b) => {
             const idxA = ORDEN_AREAS.findIndex(o => a.area.includes(o) || o.includes(a.area));
