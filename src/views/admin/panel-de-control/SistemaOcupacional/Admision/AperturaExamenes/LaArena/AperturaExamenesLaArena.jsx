@@ -56,7 +56,7 @@ const enfocar = (id) => document.getElementById(id)?.focus();
 
 // Apertura de exámenes ocupacionales exclusiva de LA ARENA S.A.
 const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued, ChangeDNI }) => {
-  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExplotacionMulti, MineralMulti, AlturaMulti, ListAuth } = listas;
+  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExplotacionMulti, MineralMulti, AlturaMulti } = listas;
 
   // Empresa tal como viene en la lista del backend (nombre exacto y RUC)
   const empresa = useMemo(() => {
@@ -547,7 +547,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
               label="Altura"
               name="alturaPo"
               value={datos.alturaPo ?? ''}
-              onChange={alElegirYEnfocar('autoriza')}
+              onChange={alElegirYEnfocar('fechaAperturaPo')}
               options={aOpciones(AlturaMulti)}
               placeholder="Seleccione una opción..."
               disabled={camposDeshabilitados}
@@ -556,19 +556,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
             />
           </SectionFieldset>
 
-          <SectionFieldset legend="Autorización y Observaciones" className="space-y-3">
-            <SelectField
-              inline
-              label="Autorizado por"
-              name="autoriza"
-              value={datos.autoriza ?? ''}
-              onChange={(e) => setCampo('autoriza', e.target.value)}
-              options={aOpciones(ListAuth)}
-              placeholder="Seleccionar"
-              disabled={camposDeshabilitados}
-              labelWidth={LABEL}
-              {...revertible('autoriza')}
-            />
+          <SectionFieldset legend="Apertura y Observaciones" className="space-y-3">
             <InputTextOneLine
               label="Fecha de apertura"
               name="fechaAperturaPo"

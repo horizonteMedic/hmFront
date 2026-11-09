@@ -4,9 +4,6 @@ import { TIPO_DNI } from '../../../../../../utils/documentoPaciente';
 // Empresa exclusiva de este formulario: no se elige ni se agrega otra.
 export const EMPRESA_LA_ARENA = 'LA ARENA S.A.';
 
-// "Autorizado por" que se aplica al cargar una pre-carga
-export const AUTORIZA_PRECARGA = 'DR. ARTEMIO';
-
 // Examen médico fijo de este formulario
 export const EXAMEN_ANUAL = 'ANUAL';
 
@@ -40,6 +37,7 @@ export const VALORES_OCULTOS = {
   precioPo: '',
   tipoPago: '',
   precioAdic: '',
+  autoriza: '',
   ...Object.fromEntries(EXAMENES_ADICIONALES.map((name) => [name, false])),
 };
 
@@ -73,7 +71,6 @@ export const CAMPOS_EDITABLES = [
   'nomEx',
   'mineralPo',
   'alturaPo',
-  'autoriza',
   'fechaAperturaPo',
   'textObserv1',
   'textObserv2',
@@ -110,7 +107,6 @@ export const crearDatosIniciales = () => ({
   nomEx: '',
   mineralPo: '',
   alturaPo: '',
-  autoriza: '',
   fechaAperturaPo: hoyDMA(),
   textObserv1: '',
   textObserv2: '',

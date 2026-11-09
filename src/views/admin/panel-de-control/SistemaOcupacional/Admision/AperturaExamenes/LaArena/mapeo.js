@@ -1,4 +1,4 @@
-import { AUTORIZA_PRECARGA, aFechaDMA, crearDatosIniciales, EXAMEN_ANUAL, hoyDMA } from './constantes.js';
+import { aFechaDMA, crearDatosIniciales, EXAMEN_ANUAL, hoyDMA } from './constantes.js';
 import { documentoDesdeBackend } from '../../../../../../utils/documentoPaciente';
 
 // Capa de mapeo entre el backend y el formulario. Las claves del usuario que registra cambian según el
@@ -27,7 +27,6 @@ export const historiaAFormulario = (res) => ({
   nomEx: texto(res.nomEx),
   mineralPo: texto(res.mineralPo),
   alturaPo: texto(res.alturaPo),
-  autoriza: texto(res.autoriza),
   textObserv1: texto(res.textObserv1),
   textObserv2: texto(res.textObserv2),
   fechaAperturaPo: aFechaDMA(res.fechaAperturaPo),
@@ -64,6 +63,5 @@ export const preCargaAFormulario = (actual, item, paciente) => ({
   nomEx: item.nomEx,
   mineralPo: item.mineral,
   alturaPo: item.altura,
-  autoriza: AUTORIZA_PRECARGA,
   nomExamen: EXAMEN_ANUAL,
 });
