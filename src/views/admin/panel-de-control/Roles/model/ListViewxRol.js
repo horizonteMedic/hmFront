@@ -1,25 +1,25 @@
 import { URLAzure } from "../../../../config/config";
+import { leerRespuesta } from "./respuesta";
 
-export function ListViewxRol(id,token) {
-    const URL = `${URLAzure}/api/v01/ct/privilegioRol/busquedaPorIdRol/${id}`
-    const options = {
-        method: 'GET', 
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    }
+const headers = (token) => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+});
 
-    return fetch(URL,options)
-    .then(res => res.json()).then(response => response)
+// Vistas (privilegios) asignadas a un rol: [{ id, id_opcion_interfaz, ... }]
+export function ListViewxRol(id, token) {
+    return fetch(`${URLAzure}/api/v01/ct/privilegioRol/busquedaPorIdRol/${id}`, {
+        method: 'GET',
+        headers: headers(token)
+    }).then(leerRespuesta);
 }
 
-export function NewVistaxRol(datos,user,token) {
-
-    const currentDate = new Date(); // Obtiene la fecha y hora actual
-    const year = currentDate.getFullYear(); // Obtiene el año actual
-    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
-    const day = ('0' + currentDate.getDate()).slice(-2); 
+// Asigna una vista al rol.
+export function NewVistaxRol(datos, user, token) {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ('0' + currentDate.getDate()).slice(-2);
 
     const data = {
         descripcion: datos.descripcion,
@@ -30,30 +30,19 @@ export function NewVistaxRol(datos,user,token) {
         userActualizacion: null,
         id_rol: datos.id_rol,
         id_opcion_interfaz: datos.id_opcion_interfaz
-    }
-    const options = {
-        method: 'POST', 
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+    };
+
+    return fetch(`${URLAzure}/api/v01/ct/privilegioRol`, {
+        method: 'POST',
+        headers: headers(token),
         body: JSON.stringify(data)
-    }
-    return fetch(`${URLAzure}/api/v01/ct/privilegioRol`,options)
-    .then(res => res.json()).then(response => response)
-        
-    }
+    }).then(leerRespuesta);
+}
 
-export function DeleteVistaxRol(id,token) {
-
-        const options = {
-            method: 'DELETE', 
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        }
-        return fetch(`${URLAzure}/api/v01/ct/privilegioRol/${id}`,options)
-        .then(res => res.json()).then(response => response)
-            
-        }
+// Quita la vista del rol (`id` = id del privilegio, no de la vista).
+export function DeleteVistaxRol(id, token) {
+    return fetch(`${URLAzure}/api/v01/ct/privilegioRol/${id}`, {
+        method: 'DELETE',
+        headers: headers(token)
+    }).then(leerRespuesta);
+}

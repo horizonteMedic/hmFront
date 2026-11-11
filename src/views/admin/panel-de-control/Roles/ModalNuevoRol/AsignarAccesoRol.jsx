@@ -1,312 +1,244 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownToLine, faHandshake, faNotesMedical, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faSearch, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { getFetch } from '../../getFetch/getFetch';
 import { ListViewxRol, NewVistaxRol, DeleteVistaxRol } from '../model/ListViewxRol';
-import Swal from 'sweetalert2';
 import ModalAsignacionesSub from './modalasiganacionessub';
-import { useAuthStore } from '../../../../../store/auth';
-const iconMapping = {
-  'Sistema': faCogs,
-  'Menú de Roles': faUser,
-  'Menú de Accesos': faLock,
-  'Reportes': faFileAlt,
-  'Matriz Postulante': faList,
-  'Configuracion': faCogs,
-  'Administrar Archivos': faFileAlt,
-  'Administrar Sedes': faTentArrowDownToLine,
-  'Agregar Campaña': faNotesMedical,
-  'Administrar Empresas': faBuilding,
-  'Administrar Contratas': faHandshake
-};
+import ModalShell, { EstadoCargando, EstadoError } from './ModalShell';
+import FilaVista from './FilaVista';
+import { avisar, confirmarQuitar } from './avisos';
+import { construirArbol, contarDescendientes, filtrarArbol, normalizar } from './vistasTree';
 
-const ArrowIcon = ({ isOpen, toggle }) => {
-  return (
-    <svg
-      className="w-6 h-6 ml-2 cursor-pointer transform transition-transform duration-300"
-      onClick={toggle}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{ transition: 'transform 0.3s ease' }}
-    >
-      {isOpen ? (
-        <polyline points="6 9 12 15 18 9" />
-      ) : (
-        <polyline points="18 15 12 9 6 15" />
-      )}
-    </svg>
-  );
-};
+const FILTROS = [
+  { id: 'todas', texto: 'Todas' },
+  { id: 'asignadas', texto: 'Asignadas' },
+  { id: 'sin', texto: 'Sin asignar' },
+];
 
-const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgpag, depth = 0 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [idAsignation, setIdAsignation] = useState('');
-  const [showSubModal, setShowSubModal] = useState(false);
-  const [ListPermis, setListPermis] = useState([])
-  const AccesUser =  useAuthStore((state) => state.listAccesos);
-  const [AccesUserCheck, SetAccesUserCheck] = useState({})
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+/**
+ * Modal "Asignar vistas" de un rol: árbol de vistas con interruptores (cada cambio se guarda al instante y la fila
+ * muestra un spinner mientras tanto), búsqueda, filtro por estado y acceso a las acciones de cada sub-vista.
+ */
+const MyTreeView = ({ closeModal, token, userlogued, ID_ROL, Nombre }) => {
+  const [opciones, setOpciones] = useState([]);
+  const [privilegios, setPrivilegios] = useState([]); // vistas asignadas al rol: [{ id, id_opcion_interfaz }]
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(false);
+  const [texto, setTexto] = useState('');
+  const [filtro, setFiltro] = useState('todas');
+  const [abiertos, setAbiertos] = useState(() => new Set());
+  const [ocupados, setOcupados] = useState(() => new Set());
+  const [vistaAcciones, setVistaAcciones] = useState(null);
+  const ultimaCarga = useRef(0);
+  const abiertosIniciales = useRef(false);
+
+  // Recarga las vistas asignadas. Si llegan varias respuestas desordenadas, solo cuenta la más reciente.
+  const cargarAsignadas = useCallback(async () => {
+    const id = ++ultimaCarga.current;
+    const res = await ListViewxRol(ID_ROL, token);
+    if (!Array.isArray(res)) throw new Error('Respuesta inválida de privilegios');
+    if (id === ultimaCarga.current) setPrivilegios(res);
+  }, [ID_ROL, token]);
+
+  const cargarTodo = useCallback(async () => {
+    setCargando(true);
+    setError(false);
+    try {
+      const [lista] = await Promise.all([getFetch('/api/v01/ct/opcionesInterfaz', token), cargarAsignadas()]);
+      if (!Array.isArray(lista)) throw new Error('Respuesta inválida de opciones');
+      setOpciones(lista);
+    } catch (e) {
+      console.error(e);
+      setError(true);
+    } finally {
+      setCargando(false);
+    }
+  }, [token, cargarAsignadas]);
 
   useEffect(() => {
-    const assignedNode = asigned.find(item => item.id_opcion_interfaz === node.id);
-    setIsChecked(assignedNode ? true : false);
-    setIdAsignation(assignedNode ? assignedNode.id : '');
-  }, [node.id, asigned]);
+    cargarTodo();
+  }, [cargarTodo]);
 
-  const handleCheckboxChange = () => {
-    if (isChecked) {
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Deseas quitar esta vista al Rol?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#e74c3c',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true,
-        customClass: {
-          popup: 'swal2-popup-custom',
-          confirmButton: 'swal2-confirm-custom',
-          cancelButton: 'swal2-cancel-custom'
-        },
-        backdrop: `rgba(44,62,80,0.7)`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          DeleteVistaxRol(idAsignation, token)
-            .then(() => {
-              Swal.fire({
-                title: '¡Eliminado!',
-                text: 'Se ha quitado la asignación.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false,
-                background: '#f8f9fa',
-                color: '#233245'
-              });
-              setIsChecked(false);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        }
-      });
-    } else {
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Deseas asignar esta vista a este Rol?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#233245',
-        cancelButtonColor: '#fc6b03',
-        confirmButtonText: 'Sí, asignar',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true,
-        customClass: {
-          popup: 'swal2-popup-custom',
-          confirmButton: 'swal2-confirm-custom',
-          cancelButton: 'swal2-cancel-custom'
-        },
-        backdrop: `rgba(44,62,80,0.7)`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const datos = {
-            descripcion: `Acceso a ${node.label}`,
-            id_rol: ID_ROL,
-            id_opcion_interfaz: node.id
-          };
-          NewVistaxRol(datos, userlogued, token)
-            .then(() => {
-              Swal.fire({
-                title: '¡Asignado!',
-                text: 'Se ha asignado correctamente.',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false,
-                background: '#f8f9fa',
-                color: '#233245'
-              });
-              setIsChecked(true);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        }
-      });
+  const arbol = useMemo(() => construirArbol(opciones), [opciones]);
+  const privilegioPorVista = useMemo(() => new Map(privilegios.map((p) => [p.id_opcion_interfaz, p.id])), [privilegios]);
+  const asignadas = useMemo(() => new Set(privilegioPorVista.keys()), [privilegioPorVista]);
+  const conteos = useMemo(() => contarDescendientes(arbol, asignadas), [arbol, asignadas]);
+
+  const totalVistas = opciones.length;
+  const totalAsignadas = opciones.filter((o) => asignadas.has(o.id)).length;
+  const porcentaje = totalVistas ? Math.round((totalAsignadas / totalVistas) * 100) : 0;
+
+  // Al abrir, se despliegan los grupos que ya tienen sub-vistas asignadas.
+  useEffect(() => {
+    if (cargando || error || abiertosIniciales.current) return;
+    abiertosIniciales.current = true;
+    setAbiertos(new Set([...conteos].filter(([, c]) => c.asignados > 0).map(([id]) => id)));
+  }, [cargando, error, conteos]);
+
+  const filtrando = Boolean(texto.trim()) || filtro !== 'todas';
+  const arbolVisible = useMemo(() => {
+    if (!filtrando) return arbol;
+    const buscado = normalizar(texto);
+    return filtrarArbol(arbol, (nodo) =>
+      (!buscado || normalizar(nodo.label).includes(buscado)) &&
+      (filtro === 'todas' || (filtro === 'asignadas') === asignadas.has(nodo.id))
+    );
+  }, [arbol, asignadas, filtrando, texto, filtro]);
+
+  const setOcupado = (id, valor) =>
+    setOcupados((prev) => {
+      const sig = new Set(prev);
+      if (valor) sig.add(id); else sig.delete(id);
+      return sig;
+    });
+
+  const alternarAbierto = (id) =>
+    setAbiertos((prev) => {
+      const sig = new Set(prev);
+      if (sig.has(id)) sig.delete(id); else sig.add(id);
+      return sig;
+    });
+
+  const expandirTodo = () => setAbiertos(new Set([...conteos].filter(([, c]) => c.total > 0).map(([id]) => id)));
+
+  // Asigna o quita una vista del rol. Quitar pide confirmación; asignar se aplica directo (es reversible).
+  const alternarVista = async (nodo) => {
+    const privilegioId = privilegioPorVista.get(nodo.id);
+
+    if (privilegioId && !(await confirmarQuitar(`¿Quitar "${nodo.label}"?`, `El rol ${Nombre} dejará de acceder a esta vista.`))) {
+      return;
+    }
+
+    setOcupado(nodo.id, true);
+    try {
+      if (privilegioId) {
+        await DeleteVistaxRol(privilegioId, token);
+      } else {
+        await NewVistaxRol({ descripcion: `Acceso a ${nodo.label}`, id_rol: ID_ROL, id_opcion_interfaz: nodo.id }, userlogued, token);
+      }
+      await cargarAsignadas(); // trae el id real del privilegio, necesario para poder quitarlo después
+      avisar('success', privilegioId ? `Se quitó "${nodo.label}"` : `Se asignó "${nodo.label}"`);
+    } catch (e) {
+      console.error(e);
+      avisar('error', `No se pudo ${privilegioId ? 'quitar' : 'asignar'} "${nodo.label}"`);
+    } finally {
+      setOcupado(nodo.id, false);
     }
   };
 
-  const handleSubModalOpen = async (e,id,nombre) => {
-    e.stopPropagation();
-    console.log(ID_ROL)
-    const PermisosRol = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${ID_ROL}`,token)
-    const permisoEncontrado = PermisosRol.find(item => item.nombre === nombre);
-    const listaPermisos = permisoEncontrado ? permisoEncontrado.listaPermisos : [];
-    SetAccesUserCheck(listaPermisos)
-    const res = await getFetch(`/api/v01/ct/posiblesPermisosSistema/listadoPermisosPorVista/${id}`,token)
-    console.log(listaPermisos)
-    console.log(res)
-    setListPermis(res)
-    setShowSubModal(true);
-  };
+  const cuerpo = () => {
+    if (cargando) return <EstadoCargando texto="Cargando vistas del sistema…" />;
+    if (error) return <EstadoError texto="No se pudieron cargar las vistas. Verifica tu conexión e inténtalo de nuevo." onReintentar={cargarTodo} />;
 
-  const handleSubModalClose = () => {
-    setShowSubModal(false);
-  };
-  
-
-  return (
-    <div className={`mt-2 mb-2 ${isParent ? '' : ''}`} style={{ marginLeft: depth * 20 }}>
-      <div className="flex items-center">
-        {node.children && node.children.length > 0 && (
-          <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
-        )}
-        {isParent ? null : <span className="mr-1">-</span>}
-        <button
-          className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
-          style={{ backgroundColor: isParent ? '#233245 ' : '#fc6b03' }}
-          onClick={isParent ? undefined : ((e) => {handleSubModalOpen(e,node.id,node.label)})}
-          type="button"
-        >
-          {iconMapping[node.label] && (
-            <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
-          )}
-          {node.label}
-        </button>
-        <input
-          type="checkbox"
-          className="ml-auto pointer"
-          checked={isChecked}
-          onChange={handleCheckboxChange}
-        />
-      </div>
-      {isOpen && node.children && node.children.length > 0 && (
-        <div >
-          {node.children.map((child) => (
-            <TreeNode
-              key={child.id}
-              node={child}
-              isParent={false}
-              asigned={asigned}
-              ID_ROL={ID_ROL}
-              userlogued={userlogued}
-              token={token}
-              Refresgpag={Refresgpag}
-              depth={depth + 1}
-            />
-          ))}
-        </div>
-      )}
-      {/* Modal para asignar acciones a sub vista */}
-      {!isParent && (
-        <ModalAsignacionesSub
-          open={showSubModal}
-          onClose={handleSubModalClose}
-          nombre={node.label}
-          get={getFetch}
-          IDView={node.id}
-          token={token}
-          ListPerm={ListPermis}
-          ListPermCheck={AccesUserCheck}
-          ID_ROL={ID_ROL}
-        />
-      )}
-    </div>
-  );
-};
-
-const MyTreeView = ({ closeModal, token, Refresgpag, userlogued, ID_ROL, Nombre }) => {
-  const [data, setData] = useState([]);
-  const [dataasignacion, setDataasignacion] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [refres, setRefresh] = useState(0);
-
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      getFetch('/api/v01/ct/opcionesInterfaz', token),
-      ListViewxRol(ID_ROL, token)
-    ])
-      .then(([opcionesInterfazResponse, listViewxRolResponse]) => {
-        setData(opcionesInterfazResponse);
-        setDataasignacion(listViewxRolResponse);
-      })
-      .catch((error) => {
-        throw new Error('Network response was not ok.', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  const buildTree = (data, parentId = null) => {
-    const items = data
-      .filter((item) => item.idPadre === parentId)
-      .map((item) => {
-        return {
-          id: item.id,
-          label: item.nombre,
-          children: buildTree(data, item.id),
-          descripcion: item.descripcion
-        };
-      });
-
-    // Sort items: items with children first, then items without children
-    return items.sort((a, b) => {
-      const aHasChildren = a.children && a.children.length > 0;
-      const bHasChildren = b.children && b.children.length > 0;
-      if (aHasChildren && !bHasChildren) return -1;
-      if (!aHasChildren && bHasChildren) return 1;
-      return 0;
-    });
-  };
-
-  const treeData = buildTree(data);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
-        <FontAwesomeIcon
-          icon={faTimes}
-          className="absolute top-0 right-0 m-3 cursor-pointer color-blanco"
-          onClick={closeModal}
-        />
-        <div className="p azuloscurobackground flex justify-between p-3.5">
-          <p className="text-start font-bold color-azul text-white">Asignar vistas a: {Nombre}</p>
-        </div>
-        <div className="p-4">
-          <div
-            className="modal-body relative"
-            style={{ maxHeight: '400px', overflowY: 'auto' }}
-          >
-            <div className="tree smart-form">
-              <ul role="tree">
-                {treeData.map((node) => (
-                  <TreeNode
-                    key={node.id}
-                    node={node}
-                    isParent={true}
-                    asigned={dataasignacion}
-                    ID_ROL={ID_ROL}
-                    userlogued={userlogued}
-                    token={token}
-                    Refresgpag={Refresgpag}
-                  />
-                ))}
-              </ul>
+    return (
+      <>
+        <div className="sticky top-0 z-10 space-y-3 border-b border-gray-200 bg-white p-3 sm:p-4">
+          <div>
+            <div className="mb-1 flex items-baseline justify-between text-sm">
+              <span className="font-semibold text-[#233245]">
+                {totalAsignadas} de {totalVistas} vistas asignadas
+              </span>
+              <span className="text-xs text-gray-500">{porcentaje}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-200" role="progressbar" aria-valuenow={porcentaje} aria-valuemin={0} aria-valuemax={100}>
+              <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${porcentaje}%` }} />
             </div>
           </div>
+
+          <div className="relative">
+            <FontAwesomeIcon icon={faSearch} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              placeholder="Buscar una vista…"
+              aria-label="Buscar una vista"
+              className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-9 text-sm focus:border-[#fc6b03] focus:outline-none focus:ring-2 focus:ring-[#fc6b03]/30"
+            />
+            {texto && (
+              <button
+                type="button"
+                onClick={() => setTexto('')}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <FontAwesomeIcon icon={faTimesCircle} />
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="inline-flex rounded-lg bg-gray-100 p-0.5" role="group" aria-label="Filtrar por estado">
+              {FILTROS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFiltro(f.id)}
+                  aria-pressed={filtro === f.id}
+                  className={`rounded-md px-3 py-1 text-xs font-semibold transition
+                    ${filtro === f.id ? 'bg-white text-[#233245] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  {f.texto}
+                </button>
+              ))}
+            </div>
+            {!filtrando && (
+              <div className="flex gap-3 text-xs font-semibold">
+                <button type="button" onClick={expandirTodo} className="text-[#fc6b03] hover:underline">Expandir todo</button>
+                <button type="button" onClick={() => setAbiertos(new Set())} className="text-gray-500 hover:underline">Contraer todo</button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+
+        <div className="space-y-1.5 p-3 sm:p-4">
+          {arbolVisible.length === 0 ? (
+            <p className="py-10 text-center text-sm text-gray-500">No se encontraron vistas con ese criterio.</p>
+          ) : (
+            arbolVisible.map((nodo) => (
+              <FilaVista
+                key={nodo.id}
+                nodo={nodo}
+                asignadas={asignadas}
+                ocupados={ocupados}
+                abiertos={abiertos}
+                forzarAbrir={filtrando}
+                conteos={conteos}
+                onToggleAbierto={alternarAbierto}
+                onAlternar={alternarVista}
+                onAcciones={setVistaAcciones}
+              />
+            ))
+          )}
+        </div>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <ModalShell
+        icono={faLock}
+        titulo="Asignar vistas"
+        subtitulo={`Rol: ${Nombre}`}
+        onClose={closeModal}
+        cerrarConEsc={!vistaAcciones}
+        pie={<p className="text-xs text-gray-500">Los cambios se guardan automáticamente al activar o desactivar una vista.</p>}
+      >
+        {cuerpo()}
+      </ModalShell>
+
+      {vistaAcciones && (
+        <ModalAsignacionesSub
+          onClose={() => setVistaAcciones(null)}
+          nombre={vistaAcciones.label}
+          IDView={vistaAcciones.id}
+          token={token}
+          ID_ROL={ID_ROL}
+          nombreRol={Nombre}
+        />
+      )}
+    </>
   );
 };
 

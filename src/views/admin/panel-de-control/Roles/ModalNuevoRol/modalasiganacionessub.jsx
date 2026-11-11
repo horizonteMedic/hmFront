@@ -1,173 +1,130 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { faSliders } from '@fortawesome/free-solid-svg-icons';
+import { getFetch } from '../../getFetch/getFetch';
 import { DeletePermiso, NewPermiso } from './model';
-import Swal from 'sweetalert2';
-import { useAuthStore } from '../../../../../store/auth';
+import ModalShell, { EstadoCargando, EstadoError } from './ModalShell';
+import ToggleSwitch from './ToggleSwitch';
+import { avisar, confirmarQuitar } from './avisos';
 
-const ModalAsignacionesSub = ({ open, onClose, nombre, get, IDView, token, ListPerm, ListPermCheck, ID_ROL }) => {
-  if (!open) return null;
-  console.log(ListPermCheck)
-  const [permisos, setPermisos] = useState(ListPerm)
-  const [checkedPermisos, setCheckedPermisos] = useState(ListPermCheck);
-  const listAccesos = useAuthStore((state) => state.listAccesos);
-  const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
-  
-  //GLOBAL
-  const eliminarPermisoGlobal = (vistaNombre, accion) => {
-    const nuevaLista = listAccesos.map((item) => {
-      if (item.nombre === vistaNombre) {
-        const nuevaListaPermisos = item.listaPermisos.filter(p => p !== accion);
-        return {
-          ...item,
-          listaPermisos: nuevaListaPermisos
-        };
-      }
-      return item;
-    }).filter(item => item.listaPermisos.length > 0); // elimina entradas vacías
+/**
+ * Acciones (permisos) que un rol puede ejecutar dentro de una vista. Cada interruptor se guarda al instante y
+ * muestra un spinner mientras dura el cambio.
+ */
+const ModalAsignacionesSub = ({ onClose, nombre, IDView, token, ID_ROL, nombreRol }) => {
+  const [acciones, setAcciones] = useState([]); // todas las acciones posibles de la vista
+  const [habilitadas, setHabilitadas] = useState([]); // las que el rol ya tiene
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(false);
+  const [ocupadas, setOcupadas] = useState(() => new Set());
 
-    setlistAccesos(nuevaLista);
-  };
+  const cargar = useCallback(async () => {
+    setCargando(true);
+    setError(false);
+    try {
+      const [permisosRol, posibles] = await Promise.all([
+        getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${ID_ROL}`, token),
+        getFetch(`/api/v01/ct/posiblesPermisosSistema/listadoPermisosPorVista/${IDView}`, token),
+      ]);
+      if (!Array.isArray(permisosRol) || !posibles || posibles.error) throw new Error('Respuesta inválida de permisos');
 
-  const agregarPermisoGlobal = (vistaNombre, accion) => {
-    const existeVista = listAccesos.find(item => item.nombre === vistaNombre);
-
-    let nuevaLista;
-    if (existeVista) {
-      const yaExisteAccion = existeVista.listaPermisos.includes(accion);
-      nuevaLista = listAccesos.map((item) => {
-        if (item.nombre === vistaNombre) {
-          return {
-            ...item,
-            listaPermisos: yaExisteAccion
-              ? item.listaPermisos
-              : [...item.listaPermisos, accion]
-          };
-        }
-        return item;
-      });
-    } else {
-      nuevaLista = [
-        ...listAccesos,
-        { nombre: vistaNombre, listaPermisos: [accion] }
-      ];
+      setHabilitadas(permisosRol.find((item) => item.nombre === nombre)?.listaPermisos ?? []);
+      setAcciones(posibles.namePermiso ?? []);
+    } catch (e) {
+      console.error(e);
+      setError(true);
+    } finally {
+      setCargando(false);
     }
-    console.log(nuevaLista)
-    setlistAccesos(nuevaLista);
-  };
-  //FIN GLOBAL
+  }, [ID_ROL, IDView, nombre, token]);
 
-  const agregarPermiso = (accion) => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¿Deseas asignar esta vista a este Rol?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#233245',
-      cancelButtonColor: '#fc6b03',
-      confirmButtonText: 'Sí, asignar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true,
-      customClass: {
-        popup: 'swal2-popup-custom',
-        confirmButton: 'swal2-confirm-custom',
-        cancelButton: 'swal2-cancel-custom'
-      },
-      backdrop: `rgba(44,62,80,0.7)`
-    }).then((result) => {
-      if (result.isConfirmed) {
-        NewPermiso(IDView,accion,ID_ROL,token)
-        .then((res) => {
-          Swal.fire({
-            title: '¡Asignado!',
-            text: 'Se ha asignado correctamente.',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false,
-            background: '#f8f9fa',
-            color: '#233245'
-          });
-          setCheckedPermisos([...checkedPermisos, accion]);
-        })
-      }
-    })}
-  ;
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
 
-  const quitarPermiso = (accion) => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¿Deseas quitar esta vista al Rol?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#e74c3c',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true,
-      customClass: {
-        popup: 'swal2-popup-custom',
-        confirmButton: 'swal2-confirm-custom',
-        cancelButton: 'swal2-cancel-custom'
-      },
-      backdrop: `rgba(44,62,80,0.7)`
-    }).then((result) => {
-      if (result.isConfirmed) {
-        DeletePermiso(IDView,accion,ID_ROL,token)
-        .then((res) => {
-          console.log(res)
-          Swal.fire({
-            title: '¡Eliminado!',
-            text: 'Se ha quitado la asignación.',
-            icon: 'success',
-            timer: 1500,
-            showConfirmButton: false,
-            background: '#f8f9fa',
-            color: '#233245'
-          });
-          const nuevosPermisos = checkedPermisos.filter((perm) => perm !== accion);
-          setCheckedPermisos(nuevosPermisos);
-        })
-      }
-    })
-    
-  };
+  const setOcupada = (accion, valor) =>
+    setOcupadas((prev) => {
+      const sig = new Set(prev);
+      if (valor) sig.add(accion); else sig.delete(accion);
+      return sig;
+    });
 
-  const handleCheckboxChange = (accion, isChecked) => {
-    console.log(accion)
-    if (isChecked) {
-      if (!checkedPermisos.includes(accion)) {
-        agregarPermiso(accion);
-         
+  const alternar = async (accion) => {
+    const habilitada = habilitadas.includes(accion);
+    if (habilitada && !(await confirmarQuitar(`¿Quitar "${accion}"?`, `El rol ${nombreRol} ya no podrá hacerlo en ${nombre}.`))) {
+      return;
+    }
+
+    setOcupada(accion, true);
+    try {
+      if (habilitada) {
+        await DeletePermiso(IDView, accion, ID_ROL, token);
+        setHabilitadas((prev) => prev.filter((p) => p !== accion));
+      } else {
+        await NewPermiso(IDView, accion, ID_ROL, token);
+        setHabilitadas((prev) => (prev.includes(accion) ? prev : [...prev, accion]));
       }
-    } else {
-      quitarPermiso(accion);
+      avisar('success', habilitada ? `Se quitó "${accion}"` : `Se habilitó "${accion}"`);
+    } catch (e) {
+      console.error(e);
+      avisar('error', `No se pudo ${habilitada ? 'quitar' : 'habilitar'} "${accion}"`);
+    } finally {
+      setOcupada(accion, false);
     }
   };
-  console.log(checkedPermisos)
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-md w-[350px] relative p-6">
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          onClick={onClose}
-        >
-          ×
-        </button>
-        <h2 className="text-lg font-bold mb-4 text-center">Asignar acciones a: <span className="text-blue-700">{nombre}</span></h2>
-        <div className="flex flex-col gap-2">
-            {permisos.namePermiso?.map((accion, index) => (
-              <label key={index} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={checkedPermisos.includes(accion)}
-                  onChange={(e) => handleCheckboxChange(accion, e.target.checked)}
-                />
-                {accion}
-              </label>
-            ))}
-        </div>
+
+  const cuerpo = () => {
+    if (cargando) return <EstadoCargando texto="Cargando acciones…" />;
+    if (error) return <EstadoError texto="No se pudieron cargar las acciones de esta vista." onReintentar={cargar} />;
+    if (acciones.length === 0) {
+      return <p className="px-6 py-12 text-center text-sm text-gray-500">Esta vista no tiene acciones configurables.</p>;
+    }
+
+    return (
+      <div className="space-y-3 p-3 sm:p-4">
+        <p className="text-sm font-semibold text-[#233245]">
+          {acciones.filter((a) => habilitadas.includes(a)).length} de {acciones.length} acciones habilitadas
+        </p>
+        <ul className="space-y-1.5">
+          {acciones.map((accion) => {
+            const habilitada = habilitadas.includes(accion);
+            const ocupada = ocupadas.has(accion);
+            return (
+              <li
+                key={accion}
+                className={`flex items-center justify-between gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition-colors hover:bg-gray-50 ${ocupada ? 'opacity-70' : ''}`}
+              >
+                <span className="min-w-0 truncate text-sm font-medium text-gray-800">{accion}</span>
+                <span className="flex shrink-0 items-center gap-3">
+                  <span className={`hidden text-xs font-semibold sm:inline ${ocupada ? 'text-gray-500' : habilitada ? 'text-emerald-600' : 'text-gray-400'}`}>
+                    {ocupada ? 'Guardando…' : habilitada ? 'Habilitada' : 'Deshabilitada'}
+                  </span>
+                  <ToggleSwitch
+                    checked={habilitada}
+                    loading={ocupada}
+                    onChange={() => alternar(accion)}
+                    label={`${habilitada ? 'Quitar' : 'Habilitar'} ${accion}`}
+                  />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
+    );
+  };
+
+  return (
+    <ModalShell
+      icono={faSliders}
+      titulo={`Acciones de ${nombre}`}
+      subtitulo={`Rol: ${nombreRol}`}
+      onClose={onClose}
+      ancho="max-w-md"
+      capa="z-[60]"
+    >
+      {cuerpo()}
+    </ModalShell>
   );
 };
 
-export default ModalAsignacionesSub; 
+export default ModalAsignacionesSub;
