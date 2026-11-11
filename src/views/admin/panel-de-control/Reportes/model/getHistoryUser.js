@@ -1,6 +1,6 @@
 import {URLAzure} from '../../../../config/config'
 
-export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,empresa,contrata,token) {
+export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,empresa,contrata,token,remoto = false) {
     const data = {
         userName: user,
         fechaInicio: fechai,
@@ -8,7 +8,8 @@ export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,empresa,contrata,
         sedeUser: sede,
         dniUser: dniUser,
         rucEmpresa: empresa,
-        rucContrata: contrata
+        rucContrata: contrata,
+        remoto: remoto
     }
  
     const options = {
