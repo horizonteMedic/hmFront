@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faRotate, faEye, faXmark, faFile, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faRotate, faEye, faXmark, faFile, faFileExcel, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -13,6 +13,10 @@ import { TEXTO_ADAPTATIVO, BOTON_BASE, InfoTooltip, fechaDMA } from '../ReporteU
 import SelectorTipoArchivo from './SelectorTipoArchivo';
 
 const EXTENSIONES_IMAGEN = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+
+// Para mostrar nombres de archivo dentro del html de SweetAlert sin que se interpreten como etiquetas.
+const escaparHtml = (texto) =>
+  String(texto ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces, remoto = false }) => {
 
@@ -243,38 +247,57 @@ const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo,
       })
   };
 
-  const DeleteBase64 = (id, nombreArchivo,) => {
-    console.log(id, nombreArchivo)
-    Swal.fire({
-      title: "¿Estás Seguro?",
-      html: `Está por eliminar: <strong>${nombreArchivo}</strong><br>Estos cambios no pueden ser revertidos.`,
+  // Ids de archivos que se están eliminando: se muestran con un spinner y no se pueden abrir ni volver a eliminar.
+  const [eliminando, setEliminando] = useState({});
+
+  const DeleteBase64 = async (id, nombreArchivo) => {
+    if (remoto || eliminando[id]) return;
+    const confirmacion = await Swal.fire({
+      title: "¿Eliminar archivo?",
+      html: `Está por eliminar: <strong>${escaparHtml(nombreArchivo || 'archivo sin nombre')}</strong><br>Este cambio no se puede revertir.`,
       icon: "warning",
-      iconColor: '#e7333f', // Configuración directa del color del ícono
+      iconColor: '#e7333f',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si, Eliminar!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        DeleteArchivos64(id, token)
-          .then(() => {
-            Swal.fire({
-              title: "Eliminado!",
-              text: "El Archivo ha sido eliminado de la base de datos.",
-              icon: "success"
-            }).then((result) => {
-              if (result.isConfirmed) reloadread();
-            });
-          })
-          .catch(() => {
-            Swal.fire({
-              title: "Error!",
-              text: "El Archivo no se ha podido eliminar!",
-              icon: "error"
-            });
-          });
-      }
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      focusCancel: true,
     });
+    if (!confirmacion.isConfirmed) return;
+
+    setEliminando(prev => ({ ...prev, [id]: true }));
+    try {
+      await DeleteArchivos64(id, token);
+      // Se quita de la lista al instante y luego se refresca desde el servidor.
+      setRead(prev => Object.fromEntries(
+        Object.entries(prev).map(([hc, lista]) => [hc, Array.isArray(lista) ? lista.filter(a => a.id !== id) : lista])
+      ));
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Archivo eliminado',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+      reloadread();
+    } catch (error) {
+      console.error('Error al eliminar archivo', id, error);
+      Swal.fire({
+        title: "No se pudo eliminar",
+        html: `${escaparHtml(nombreArchivo || 'El archivo')} no se eliminó.<br><span style="color:#6b7280">${escaparHtml(error?.message || 'Error desconocido.')}</span>`,
+        icon: "error",
+        confirmButtonColor: "#233245",
+      });
+    } finally {
+      setEliminando(prev => {
+        const resto = { ...prev };
+        delete resto[id];
+        return resto;
+      });
+    }
   };
 
 
@@ -285,9 +308,13 @@ const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo,
     });
   }
 
-  const puedeSubir = Acces("Reportes", "Subir Reportes");
+  // Para pacientes remotos la columna "Subir" no se muestra nunca, aunque el usuario tenga el permiso.
+  // Para pacientes locales depende del permiso "Subir Reportes".
+  const puedeSubir = !remoto && Acces("Reportes", "Subir Reportes");
   const puedeDescargar = Acces("Reportes", "Descargar Reportes");
-  const puedeEliminar = Acces("Reportes", "Eliminar Reportes");
+  // Igual que "Subir": los archivos de pacientes remotos no se pueden eliminar, aunque el usuario tenga el permiso.
+  // Con esto tampoco aparece el "i" de la cabecera ni el clic derecho sobre los archivos.
+  const puedeEliminar = !remoto && Acces("Reportes", "Eliminar Reportes");
   // Columnas de correo ocultas por ahora ("Gestionar correo" y "Enviar correo").
   // Para volver a mostrarlas según permisos, descomentar estas dos líneas y borrar las dos de abajo.
   // const puedeGestionarCorreo = Acces("Reportes", "Registrar Correo a Enviar");
@@ -466,24 +493,33 @@ const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo,
                                   <>
                               {visibles.map((readItem, readIndex) => {
                                 const info = infoArchivo(readItem);
+                                const borrando = !!eliminando[readItem.id];
                                 return (
                                   <button
-                                    key={readIndex}
+                                    key={readItem.id ?? readIndex}
                                     type="button"
-                                    disabled={openview}
-                                    {...(puedeEliminar ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id, readItem.nombreArchivo); } } : {})}
+                                    disabled={openview || borrando}
+                                    aria-busy={borrando}
+                                    {...(puedeEliminar ? { onContextMenu: (e) => { e.preventDefault(); if (!borrando) DeleteBase64(readItem.id, readItem.nombreArchivo); } } : {})}
                                     onClick={() => GetBase64(dataItem.historiaClinica, readItem)}
-                                    title={info.nombreArchivo}
-                                    className="flex w-full items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-1 text-left transition hover:brightness-95 disabled:cursor-wait disabled:opacity-50"
-                                    style={{
+                                    title={borrando ? `Eliminando ${info.nombreArchivo}…` : info.nombreArchivo}
+                                    className={`flex w-full items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-1 text-left transition hover:brightness-95 disabled:cursor-wait ${borrando ? '' : 'disabled:opacity-50'}`}
+                                    style={borrando ? {
+                                      backgroundColor: '#fef2f2',
+                                      borderColor: '#fca5a5',
+                                    } : {
                                       backgroundColor: `color-mix(in srgb, ${info.color} 12%, white)`,
                                       borderColor: `color-mix(in srgb, ${info.color} 35%, white)`,
                                     }}
                                   >
                                     {/* Una sola línea: ícono, nomenclatura y nombre del archivo subido */}
-                                    <FontAwesomeIcon icon={info.icono} className="shrink-0 text-[1.2em]" style={{ color: info.color }} />
-                                    {info.nomenclatura && <span className="shrink-0 font-bold text-gray-800">{info.nomenclatura}</span>}
-                                    {info.nombreArchivo && (
+                                    {borrando
+                                      ? <FontAwesomeIcon icon={faSpinner} spin className="shrink-0 text-[1.2em] text-red-500" />
+                                      : <FontAwesomeIcon icon={info.icono} className="shrink-0 text-[1.2em]" style={{ color: info.color }} />}
+                                    {info.nomenclatura && <span className={`shrink-0 font-bold ${borrando ? 'text-red-700/60' : 'text-gray-800'}`}>{info.nomenclatura}</span>}
+                                    {borrando ? (
+                                      <span className="min-w-0 max-w-[280px] truncate font-semibold text-red-600">Eliminando…</span>
+                                    ) : info.nombreArchivo && (
                                       <span className="min-w-0 max-w-[280px] truncate text-gray-500">{info.nombreArchivo}</span>
                                     )}
                                   </button>

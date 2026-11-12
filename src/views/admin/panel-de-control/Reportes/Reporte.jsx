@@ -12,7 +12,7 @@ import ModalEditCorreo from './ModalCorreo/ModalEditCorreo';
 import { GetListArchivos } from './ModalCorreo/controllerModalCorreo';
 import InputTextOneLine from '../../../components/reusableComponents/InputTextOneLine';
 import { SelectField } from '../../../components/reusableComponents/InputSelect';
-import PaginadorTabla from '../../../components/reusableComponents/PaginadorTabla';
+import PaginadorReporte from './PaginadorReporte';
 import { usePagination } from '../../../utils/listUtils';
 import { Seccion, TEXTO_ADAPTATIVO, BOTON_BASE, fechaDMA } from './ReporteUI';
 
@@ -332,7 +332,7 @@ const HistorialPaciente = () => {
           </table>
         </div>
 
-        <PaginadorTabla paginacion={paginacion} total={filteredData.length} etiqueta="pacientes" />
+        <PaginadorReporte paginacion={paginacion} total={filteredData.length} etiqueta="pacientes" />
       </Seccion>
 
       {pacienteSel && (
