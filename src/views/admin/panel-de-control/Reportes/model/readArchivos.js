@@ -1,8 +1,7 @@
-import {URLAzure, URLHM} from '../../../../config/config'
+import {URLAzure} from '../../../../config/config'
 //Esto es para ver los archivos ya subidos del paciente
-// Los archivos de pacientes remotos se abren desde el backend de HM (URLHM).
+// remoto: true cuando el paciente viene de un servidor remoto; se envía como ?remoto=true
 export function ReadArchivos(historia,id_archivo,token,remoto = false) {
-    const baseUrl = remoto ? URLHM : URLAzure
 
     const options = {
         method: 'GET', 
@@ -12,7 +11,7 @@ export function ReadArchivos(historia,id_archivo,token,remoto = false) {
         }
     }
 
-    return fetch(`${baseUrl}/api/v01/ct/archivos/detalleArchivo/${historia}/${id_archivo}`,options)
+    return fetch(`${URLAzure}/api/v01/ct/archivos/detalleArchivo/${historia}/${id_archivo}${remoto ? '?remoto=true' : ''}`,options)
     .then(res => res.json()).then(response => response)
 }
 

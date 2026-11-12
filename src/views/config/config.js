@@ -3,6 +3,6 @@
 // main arena https://laarenaintegracion.azurewebsites.net
 export const esProduccion = false; //Solo cambiar este si se quiere cambiar dev o prod
 export const URLAzure = esProduccion ? "https://laarenaintegracion.azurewebsites.net" : 'https://testbackendlaarena-agcjbpezhybshteb.eastus2-01.azurewebsites.net'
-export const URLHM = esProduccion ? "https://hmintegracion.azurewebsites.net" : "https://testbackendhm.azurewebsites.net";
+// export const URLHM = esProduccion ? "https://hmintegracion.azurewebsites.net" : "https://testbackendhm.azurewebsites.net";
 export const URLAPIREST = 'http://go.server.net.pe:3000/api/v2'
 export const TokenURL = 'horizontemedic_dtcm9'

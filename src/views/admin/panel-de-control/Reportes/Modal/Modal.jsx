@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faRotate, faEye, faXmark, faFile } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faRotate, faEye, faXmark, faFile, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -11,6 +11,8 @@ import { AutorizarEnvioCorreo, GetCorreosGuardados } from '../ModalCorreo/contro
 import ModalListaCorreos from '../ModalCorreo/ModalListaCorreos';
 import { TEXTO_ADAPTATIVO, BOTON_BASE, InfoTooltip, fechaDMA } from '../ReporteUI';
 import SelectorTipoArchivo from './SelectorTipoArchivo';
+
+const EXTENSIONES_IMAGEN = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
 
 const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces, remoto = false }) => {
 
@@ -200,17 +202,24 @@ const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo,
   };
 
   const ReadFileBase64 = (response) => {
-    const fileType = response.nombreArchivo.split('.').pop();
+    const fileType = String(response.nombreArchivo ?? '').split('.').pop().toLowerCase();
     const byteCharacters = atob(response.fileBase64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: `application/${fileType}` });
+    // Solo PDF e imágenes se pueden previsualizar; el resto (Excel, Word…) solo se descarga.
+    const vista = fileType === 'pdf' ? 'pdf' : EXTENSIONES_IMAGEN.includes(fileType) ? 'imagen' : 'descarga';
+    const mime = vista === 'pdf'
+      ? 'application/pdf'
+      : vista === 'imagen'
+        ? `image/${fileType === 'jpg' ? 'jpeg' : fileType}`
+        : 'application/octet-stream';
+    const blob = new Blob([byteArray], { type: mime });
 
     const fileDataUri = URL.createObjectURL(blob);
-    setCurrentFile({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
+    setCurrentFile({ uri: fileDataUri, name: response.nombreArchivo, type: mime, vista, extension: fileType });
   };
 
 
@@ -567,11 +576,27 @@ const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo,
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
-            <div className="flex flex-1 items-center justify-center overflow-auto bg-gray-100 p-4">
-              {currentFile.type === 'application/pdf' ? (
+            <div className={`flex flex-1 items-center justify-center overflow-auto bg-gray-100 ${currentFile.vista === 'imagen' ? 'px-4 py-8' : 'p-4'}`}>
+              {currentFile.vista === 'pdf' && (
                 <embed src={currentFile.uri} type="application/pdf" className="h-[70vh] w-full" />
-              ) : (
-                <img src={currentFile.uri} alt={currentFile.name} className="h-auto max-w-full" />
+              )}
+              {currentFile.vista === 'imagen' && (
+                <img
+                  src={currentFile.uri}
+                  alt={currentFile.name}
+                  className="h-auto max-h-[65vh] max-w-full rounded shadow-sm"
+                  onError={() => setCurrentFile(prev => prev && { ...prev, vista: 'descarga' })}
+                />
+              )}
+              {currentFile.vista === 'descarga' && (
+                <div className="flex flex-col items-center gap-2 py-6 text-center text-gray-600">
+                  <FontAwesomeIcon
+                    icon={['xlsx', 'xls', 'csv'].includes(currentFile.extension) ? faFileExcel : faFile}
+                    className={`text-[3em] ${['xlsx', 'xls', 'csv'].includes(currentFile.extension) ? 'text-green-600' : 'text-gray-400'}`}
+                  />
+                  <p className="font-semibold text-gray-700">Este archivo no se puede previsualizar</p>
+                  <p>Descárgalo para abrirlo{currentFile.extension ? ` (.${currentFile.extension})` : ''}.</p>
+                </div>
               )}
             </div>
             <div className="flex justify-center border-t p-3">
