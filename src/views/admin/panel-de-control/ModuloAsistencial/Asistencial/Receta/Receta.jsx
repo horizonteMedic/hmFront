@@ -13,10 +13,15 @@ import {
     cantidadStock,
     crearItemReceta,
     detalleStockReceta,
+    estadoDeReceta,
     estadoItemReceta,
+    formNuevaReceta,
+    numeroDeReceta,
+    puedeAbrirNuevaReceta,
     recetaBloqueada,
     validarLineaReceta,
 } from "./controllerReceta";
+import RecetaGuardada from "./RecetaGuardada";
 import { useMedicamentosReceta } from "./useMedicamentosReceta";
 
 const ANCHO_ETIQUETA = "150px";
@@ -41,18 +46,23 @@ const ESTADOS_ITEM = {
  * con la receta ya registrada pasa a ser el inventario que registró el backend, bloqueado. Una receta ya registrada
  * (pendiente o entregada) queda de solo lectura: se crea una sola vez; `disabled` la bloquea también (registro
  * existente sin "Habilitar edición").
+ *
+ * Un ticket puede tener varias recetas (una pendiente a la vez). Todas las ya guardadas se muestran completas, cada una
+ * en su bloque (ver RecetaGuardada), y la PENDIENTE va primero y destacada para que se note que falta entregarla. Los
+ * campos para armar una receta solo aparecen cuando se puede crear una: el ticket aún no tiene ninguna, o se pulsó
+ * «Nueva receta» (disponible cuando no queda ninguna pendiente; `recetaNueva`: el guardado envía `nuevaReceta`).
  * `acciones` (opcional) son los botones o sellos de la barra del título (ver ComplementoDesplegable).
  */
 export default function Receta({ form, setForm, token, usuario, disabled = false, acciones = null }) {
+    const registrada = recetaBloqueada(form);
+    // Los medicamentos solo se necesitan para armar una receta: con la actual ya registrada no se piden.
     const { cargando, error, inventarios, inventario, medicamentos, recargar } = useMedicamentosReceta(
         token,
-        Boolean(form.pacienteId),
+        Boolean(form.pacienteId) && !registrada,
         form.recetaInventarioId
     );
     const [errores, setErrores] = useState({});
 
-    const entregada = form.recetaEstado === "entregada";
-    const registrada = recetaBloqueada(form);
     const soloLectura = disabled || registrada;
 
     // El combo muestra el central mientras no se elija otro (o si el elegido ya no existe): se deja ese id en el
@@ -65,6 +75,11 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
         setForm((f) => ({ ...f, recetaInventarioId: idInventarioMostrado }));
     }, [soloLectura, idInventarioMostrado, idInventarioForm, setForm]);
     const items = form.recetaItems ?? [];
+    const historial = form.recetaHistorial ?? [];
+    // La pendiente (si hay) va destacada arriba; el resto de las recetas guardadas, debajo, de la más reciente a la más antigua.
+    const pendiente = historial.find((receta) => estadoDeReceta(receta) === "pendiente") ?? null;
+    const otras = historial.filter((receta) => receta !== pendiente);
+    const bloque = (receta) => <RecetaGuardada key={receta.id} receta={receta} numero={numeroDeReceta(historial, receta)} />;
     const medicamento = medicamentos.find((m) => String(m.id) === form.recetaMedicamentoId) ?? null;
     // Sin el dato de stock (el backend no lo trajo) no se puede afirmar que supere lo disponible.
     const pideMasDeLoDisponible =
@@ -118,6 +133,12 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
         setForm((f) => ({ ...f, recetaItems: [...(f.recetaItems ?? []), crearItemReceta(f, medicamento)], ...RECETA_LINEA_VACIA }));
     };
 
+    // Abre una receta nueva: lista y línea en blanco (lo entregado sigue a la vista en el historial).
+    const handleNuevaReceta = () => {
+        setErrores({});
+        setForm((f) => ({ ...f, ...formNuevaReceta(f) }));
+    };
+
     const quitarItem = (uid) => setForm((f) => ({ ...f, recetaItems: f.recetaItems.filter((item) => item.uid !== uid) }));
 
     const columnas = [
@@ -167,130 +188,153 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
 
     return (
         <SectionFieldset legend="Receta (Reserva de Medicamentos)" className="space-y-3" actions={acciones}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                <InputTextOneLine label="Entregado" name="recetaEntregado" value={entregada ? "SÍ" : "NO"} disabled labelWidth={ANCHO_ETIQUETA} />
-                <InputTextOneLine
-                    label="Fecha y hora de creación"
-                    name="recetaFechaRegistro"
-                    value={form.recetaFechaRegistro ? formatearFechaHora(form.recetaFechaRegistro) : "Se asigna al guardar"}
-                    disabled
-                    labelWidth={ANCHO_ETIQUETA}
-                />
-                {soloLectura ? (
-                    <InputTextOneLine
-                        label="Inventario"
-                        name="recetaInventario"
-                        value={form.recetaInventario || inventario?.nombre || ""}
-                        disabled
-                        labelWidth={ANCHO_ETIQUETA}
-                        className="lg:col-span-2"
-                    />
-                ) : (
-                    <div className="lg:col-span-2">
-                        <SelectorInventario
-                            inventarios={inventarios}
-                            inventarioId={idInventarioMostrado}
-                            onChange={onCambiarInventario}
-                            name="recetaInventarioId"
+            {/* La receta pendiente va primero y destacada: es la que todavía falta entregar. */}
+            {pendiente && bloque(pendiente)}
+
+            {/* Armado de una receta: solo cuando se puede crear (el ticket no tiene ninguna, o se abrió una nueva). */}
+            {!registrada && (
+                <div className="space-y-3">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                        <InputTextOneLine label="Entregado" name="recetaEntregado" value="NO" disabled labelWidth={ANCHO_ETIQUETA} />
+                        <InputTextOneLine
+                            label="Fecha y hora de creación"
+                            name="recetaFechaRegistro"
+                            value="Se asigna al guardar"
+                            disabled
                             labelWidth={ANCHO_ETIQUETA}
                         />
+                        {disabled ? (
+                            <InputTextOneLine
+                                label="Inventario"
+                                name="recetaInventario"
+                                value={form.recetaInventario || inventario?.nombre || ""}
+                                disabled
+                                labelWidth={ANCHO_ETIQUETA}
+                                className="lg:col-span-2"
+                            />
+                        ) : (
+                            <div className="lg:col-span-2">
+                                <SelectorInventario
+                                    inventarios={inventarios}
+                                    inventarioId={idInventarioMostrado}
+                                    onChange={onCambiarInventario}
+                                    name="recetaInventarioId"
+                                    labelWidth={ANCHO_ETIQUETA}
+                                />
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
 
-            {form.recetaEstado === "anulada" && (
-                <p className="p-2 rounded border border-red-300 bg-red-50 text-red-700 text-sm">
-                    La receta anterior de este ticket fue anulada{form.recetaMotivoAnulacion ? ` (motivo: ${form.recetaMotivoAnulacion})` : ""}: ya no reserva
-                    medicamentos. Puede armar una nueva.
-                </p>
-            )}
-            {registrada && (
-                <p className="p-2 rounded border border-emerald-300 bg-emerald-50 text-emerald-700 text-sm">
-                    {entregada
-                        ? "La receta ya fue entregada por farmacia: no se puede modificar."
-                        : "La receta ya fue registrada y tiene los medicamentos reservados: no se puede modificar."}
-                </p>
-            )}
-            {form.recetaEstado === "pendiente" && form.recetaConFaltante && (
-                <p className="p-2 rounded border border-amber-300 bg-amber-50 text-amber-800 text-sm">
-                    La receta quedó con faltante de stock en algún medicamento (ver la tabla).
-                </p>
-            )}
-
-            {!soloLectura && (
-                <div className="space-y-3">
-                    <AvisoError mensaje={error} onRetry={recargar} className="" />
-                    {!form.pacienteId && <p className="text-sm italic text-gray-600">Busque un N° de ticket para cargar los medicamentos disponibles.</p>}
-
-                    <BuscadorMedicamentoStock
-                        id="medicamentoReceta"
-                        labelWidth={ANCHO_ETIQUETA}
-                        label="Medicamento"
-                        filas={medicamentos}
-                        texto={form.recetaMedicamentoTexto}
-                        onTextoChange={onTextoMedicamento}
-                        onSelect={onSelectMedicamento}
-                        detalleCantidad={detalleStockReceta}
-                        nextFocusId="recetaCantidad"
-                        placeholder={cargando ? "Cargando medicamentos..." : "Escriba para buscar..."}
-                        error={errores.medicamento}
-                    />
-                    {medicamento && (
-                        <div className="text-sm text-gray-600">
-                            <p>
-                                Disponible: <strong>{cantidadStock(medicamento.stockDisponible)}</strong> · Stock físico: {cantidadStock(medicamento.stockActual)} ·
-                                Reservado por otras recetas: {cantidadStock(medicamento.stockReservado)}
-                            </p>
-                            {avisoSinDisponible(medicamento) && <p className="text-amber-700">{avisoSinDisponible(medicamento)}</p>}
-                        </div>
+                    {form.recetaEstado === "anulada" && (
+                        <p className="p-2 rounded border border-red-300 bg-red-50 text-red-700 text-sm">
+                            La receta anterior de este ticket fue anulada{form.recetaMotivoAnulacion ? ` (motivo: ${form.recetaMotivoAnulacion})` : ""}: ya no
+                            reserva medicamentos. Puede armar una nueva.
+                        </p>
                     )}
-
-                    <InputTextOneLine
-                        label="Cantidad"
-                        name="recetaCantidad"
-                        labelWidth={ANCHO_ETIQUETA}
-                        value={form.recetaCantidad}
-                        onChange={onChangeCantidad}
-                        required
-                        error={errores.cantidad}
-                    />
-                    {pideMasDeLoDisponible && (
-                        <p className="text-sm text-amber-700">
-                            Supera el stock disponible ({medicamento.stockDisponible}): al guardar, el sistema rechaza la receta por stock insuficiente.
+                    {form.recetaNueva && (
+                        <p className="p-2 rounded border border-blue-300 bg-blue-50 text-blue-800 text-sm">
+                            Está armando una receta nueva para este ticket: las anteriores no cambian. Se registra al guardar la Historia Clínica.
                         </p>
                     )}
 
-                    <InputTextOneLine
-                        label="Indicación"
-                        name="recetaIndicacion"
-                        labelWidth={ANCHO_ETIQUETA}
-                        value={form.recetaIndicacion}
-                        onChange={onChangeIndicacion}
-                        onKeyUp={(e) => e.key === "Enter" && handleAgregar()}
-                    />
+                    {!disabled && (
+                        <div className="space-y-3">
+                            <AvisoError mensaje={error} onRetry={recargar} className="" />
+                            {!form.pacienteId && <p className="text-sm italic text-gray-600">Busque un N° de ticket para cargar los medicamentos disponibles.</p>}
 
+                            <BuscadorMedicamentoStock
+                                id="medicamentoReceta"
+                                labelWidth={ANCHO_ETIQUETA}
+                                label="Medicamento"
+                                filas={medicamentos}
+                                texto={form.recetaMedicamentoTexto}
+                                onTextoChange={onTextoMedicamento}
+                                onSelect={onSelectMedicamento}
+                                detalleCantidad={detalleStockReceta}
+                                nextFocusId="recetaCantidad"
+                                placeholder={cargando ? "Cargando medicamentos..." : "Escriba para buscar..."}
+                                error={errores.medicamento}
+                            />
+                            {medicamento && (
+                                <div className="text-sm text-gray-600">
+                                    <p>
+                                        Disponible: <strong>{cantidadStock(medicamento.stockDisponible)}</strong> · Stock físico: {cantidadStock(medicamento.stockActual)} ·
+                                        Reservado por otras recetas: {cantidadStock(medicamento.stockReservado)}
+                                    </p>
+                                    {avisoSinDisponible(medicamento) && <p className="text-amber-700">{avisoSinDisponible(medicamento)}</p>}
+                                </div>
+                            )}
+
+                            <InputTextOneLine
+                                label="Cantidad"
+                                name="recetaCantidad"
+                                labelWidth={ANCHO_ETIQUETA}
+                                value={form.recetaCantidad}
+                                onChange={onChangeCantidad}
+                                required
+                                error={errores.cantidad}
+                            />
+                            {pideMasDeLoDisponible && (
+                                <p className="text-sm text-amber-700">
+                                    Supera el stock disponible ({medicamento.stockDisponible}): al guardar, el sistema rechaza la receta por stock insuficiente.
+                                </p>
+                            )}
+
+                            <InputTextOneLine
+                                label="Indicación"
+                                name="recetaIndicacion"
+                                labelWidth={ANCHO_ETIQUETA}
+                                value={form.recetaIndicacion}
+                                onChange={onChangeIndicacion}
+                                onKeyUp={(e) => e.key === "Enter" && handleAgregar()}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={handleAgregar}
+                                className="
+                                    bg-blue-600 hover:bg-blue-700
+                                    text-white text-base px-6 py-2 rounded
+                                    flex items-center gap-2
+                                    transition-all duration-150 ease-out
+                                    hover:shadow-lg
+                                    active:scale-95 active:shadow-inner"
+                            >
+                                <FontAwesomeIcon icon={faPlus} /> Agregar
+                            </button>
+                        </div>
+                    )}
+
+                    <TablaTemplate columns={columnas} data={items} height={180} emptyText="La receta no tiene medicamentos" />
+
+                    <p className="text-sm italic text-gray-600">
+                        Se guarda junto con la Historia Clínica y solo reserva el medicamento; farmacia lo entrega después. Una vez guardada no se puede
+                        modificar. Sin medicamentos, no se registra receta.
+                    </p>
+                </div>
+            )}
+
+            {/* Todas las recetas del ticket fueron entregadas: se puede abrir otra (p. ej. la de Odontología). */}
+            {puedeAbrirNuevaReceta(form) && !disabled && (
+                <div className="p-2 rounded border border-blue-300 bg-blue-50 text-blue-800 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
+                    <p className="flex-1">Las recetas de este ticket ya fueron entregadas. Si necesita indicar más medicamentos, abra una receta nueva.</p>
                     <button
                         type="button"
-                        onClick={handleAgregar}
+                        onClick={handleNuevaReceta}
                         className="
                             bg-blue-600 hover:bg-blue-700
-                            text-white text-base px-6 py-2 rounded
-                            flex items-center gap-2
+                            text-white text-base px-4 py-1.5 rounded
+                            flex items-center justify-center gap-2 whitespace-nowrap
                             transition-all duration-150 ease-out
                             hover:shadow-lg
                             active:scale-95 active:shadow-inner"
                     >
-                        <FontAwesomeIcon icon={faPlus} /> Agregar
+                        <FontAwesomeIcon icon={faPlus} /> Nueva receta
                     </button>
                 </div>
             )}
 
-            <TablaTemplate columns={columnas} data={items} height={180} emptyText="La receta no tiene medicamentos" />
-
-            <p className="text-sm italic text-gray-600">
-                Se guarda junto con la Historia Clínica y solo reserva el medicamento; farmacia lo entrega después. Una vez guardada no se puede modificar.
-                Sin medicamentos, no se registra receta.
-            </p>
+            {otras.map(bloque)}
         </SectionFieldset>
     );
 }

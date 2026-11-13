@@ -22,7 +22,7 @@ import { useAuthStore } from "../../../../../../store/auth";
 import { patologiasAdicionales } from "../../AntecedentesPatologicos/catalogoPatologias";
 import { ObtenerDescanso, formFromDescanso, formFromTicketInfo } from "../DescansoMedico/controllerDescansoMedico";
 import { ObtenerInformeAccidente, formFromInformeAccidente } from "../InformeAccidente/controllerInformeAccidente";
-import { ObtenerReceta, formFromReceta } from "../Receta/controllerReceta";
+import { ObtenerRecetas, formFromRecetas } from "../Receta/controllerReceta";
 import {
     ConfirmarImpresionConComplementos,
     GuardarComplementos,
@@ -273,11 +273,11 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
     // La Receta, el Descanso Médico y el Informe de Accidente son registros aparte del ticket (otros endpoints):
     // se buscan en paralelo para mostrarlos si ya se guardaron. Sin registro (o si falla) devuelven null y el
     // formulario no se altera.
-    const [res, descanso, informeAccidente, receta] = await Promise.all([
+    const [res, descanso, informeAccidente, recetas] = await Promise.all([
         getFetch(`${baseUrl}/ticket/${numeroTicket}`, token),
         ObtenerDescanso(numeroTicket, token),
         ObtenerInformeAccidente(numeroTicket, token),
-        ObtenerReceta(numeroTicket, token),
+        ObtenerRecetas(numeroTicket, token),
     ]);
     Swal.close();
 
@@ -301,7 +301,7 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
         esArena: esArenaDe(data),
         ...formFromDescanso(descanso),
         ...formFromInformeAccidente(informeAccidente),
-        ...formFromReceta(receta),
+        ...formFromRecetas(recetas),
         ...resolverMedico(data.doctorAsignado, listaEmpleados, prev),
         // Un registro NUEVO siempre abre con la fecha de hoy; la fecha guardada solo manda si ya existe.
         ...(tieneRegistro ? {} : { fecha_apertura_hcl: today }),

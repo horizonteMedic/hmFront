@@ -1,17 +1,25 @@
 import Swal from "sweetalert2";
-import { LoadingDefault } from "../../../../../utils/functionUtils";
+import { LoadingDefault, MostrarOpcionesImpresion } from "../../../../../utils/functionUtils";
+import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { obtenerCmpMedico, obtenerDigitalizacionMedico, obtenerRegistroPorTicket } from "../../../../../utils/registroAsistencialUtils";
 import { ordenarInventarios } from "../../Inventario/Catalogo/Inventarios/controllerInventarios";
-import { consultarInventario, enviarInventario, etiquetaMedicamento, inventarioUrl, limpiarTexto } from "../../Inventario/Compartido/inventarioUtils";
+import { consultarInventario, enviarInventario, escaparHtml, etiquetaMedicamento, inventarioUrl, limpiarTexto } from "../../Inventario/Compartido/inventarioUtils";
 
-// Receta (reserva de medicamentos) del ticket (RecetaAsistencialDTO). La comparten las Historias Clínicas del
+// Recetas (reserva de medicamentos) del ticket (RecetaAsistencialDTO). La comparten las Historias Clínicas del
 // módulo: solo se muestra en tickets de La Arena (esArena) y se guarda junto con la Historia Clínica (su botón
 // Guardar), no por separado (ver controllerComplementos). Solo RESERVA el stock: farmacia la entrega (o la anula)
 // desde Inventario > Entrega por Ticket. Una vez guardada se imprime desde el mensaje de éxito o desde el botón
 // IMPRIMIR N° TICKET, junto al Descanso Médico y al Informe de Accidente (ver ImprimirRecetaPorTicket).
-//   GET  /asistencial/recetas/ticket/{numeroTicket}  -> la receta del ticket (404 / id null si todavía no hay).
-//   POST /asistencial/recetas?usuario=               -> { numeroTicket, detalles: [{ medicamentoId, cantidad, indicacion }] }
-//                                                       (crea o edita y reserva el stock).
+//
+// Un ticket puede tener VARIAS recetas, una detrás de otra (p. ej. la de Medicina y la de Odontología), pero solo una
+// pendiente (ni entregada ni anulada) a la vez. El formulario trabaja con la receta ACTUAL (la pendiente o, si no hay,
+// la última entregada) y, cuando esa ya fue entregada, ofrece «Nueva receta»: el guardado envía entonces
+// `nuevaReceta: true` (sin él, el backend no abre otra receta sobre un ticket que ya tuvo una entregada).
+//   GET  /asistencial/recetas/ticket/{numeroTicket}            -> receta actual (404 / id null si todavía no hay).
+//   GET  /asistencial/recetas/ticket/{numeroTicket}/historial  -> todas las recetas del ticket (entregadas, pendientes y
+//                                                                 anuladas), de la más reciente a la más antigua.
+//   POST /asistencial/recetas?usuario=               -> { numeroTicket, inventarioId?, nuevaReceta?, detalles: [{ medicamentoId,
+//                                                       cantidad, indicacion }] } (crea o edita la pendiente y reserva el stock).
 //   GET  /asistencial/inventario/medicamentos?inventarioId=&activo=true -> medicamentos con stockDisponible.
 // El DTO NO declara el inventario como escribible (inventarioId es de solo lectura): la sección ofrece un combo con los
 // inventarios activos, el CENTRAL por defecto (sin importar la sede del ticket), y muestra el stock del elegido; el POST
@@ -40,6 +48,10 @@ export const RECETA_LINEA_VACIA = {
 
 export const RECETA_ESTADO_INICIAL = {
     recetaId: null,
+    // Todas las recetas del ticket (más reciente primero): alimentan el historial y deciden si se ofrece «Nueva receta».
+    recetaHistorial: [],
+    // true mientras se arma una receta NUEVA sobre un ticket cuya última receta ya fue entregada (el guardado envía nuevaReceta).
+    recetaNueva: false,
     // "" (sin receta), "pendiente", "entregada" o "anulada".
     recetaEstado: "",
     recetaItems: [],
@@ -108,15 +120,35 @@ export const avisoSinDisponible = (medicamento) => {
 };
 
 // ===== Lectura =====
-// Receta del ticket, o null si todavía no tiene (o el servicio falla).
+// Receta actual del ticket (la pendiente; si no hay, la última entregada), o null si todavía no tiene (o el servicio falla).
 export const ObtenerReceta = (numeroTicket, token) => obtenerRegistroPorTicket(recetasUrl, numeroTicket, token);
+
+// Todas las recetas del ticket, de la más reciente a la más antigua ([] si no tiene). Si el historial no responde se
+// cae a la receta actual, para no dejar la Historia sin receta.
+export const ObtenerRecetas = async (numeroTicket, token) => {
+    const res = await consultarInventario(`${recetasUrl}/ticket/${numeroTicket}/historial`, token, "No se pudo cargar el historial de recetas.");
+    if (res.ok && Array.isArray(res.resultado)) return res.resultado;
+
+    const actual = await ObtenerReceta(numeroTicket, token);
+    return actual ? [actual] : [];
+};
+
+// Estado de una receta: "pendiente", "entregada" o "anulada".
+export const estadoDeReceta = (receta) => (receta.anulada ? "anulada" : receta.entregado ? "entregada" : "pendiente");
+
+// La receta con la que trabaja el formulario: la pendiente o, si no hay, la última entregada. Las anuladas no cuentan.
+export const recetaActualDe = (historial = []) =>
+    historial.find((receta) => estadoDeReceta(receta) === "pendiente") ?? historial.find((receta) => estadoDeReceta(receta) === "entregada") ?? null;
+
+// N° de orden de una receta dentro del ticket (1 = la más antigua): el historial viene de la más reciente a la más antigua.
+export const numeroDeReceta = (historial, receta) => historial.length - historial.findIndex((r) => r.id === receta.id);
 
 // RecetaAsistencialDTO -> campos del formulario. Una receta ANULADA ya no reserva nada: se avisa en pantalla pero se
 // parte de una lista vacía (se puede armar otra). Una PENDIENTE o ENTREGADA queda de solo lectura (ver recetaBloqueada).
 export const formFromReceta = (receta) => {
     if (!receta) return { ...RECETA_ESTADO_INICIAL };
 
-    const estado = receta.anulada ? "anulada" : receta.entregado ? "entregada" : "pendiente";
+    const estado = estadoDeReceta(receta);
     return {
         ...RECETA_ESTADO_INICIAL,
         recetaId: receta.id ?? null,
@@ -143,6 +175,22 @@ export const formFromReceta = (receta) => {
         recetaMotivoAnulacion: receta.motivoAnulacion ?? "",
     };
 };
+
+// Recetas del ticket (ver ObtenerRecetas) -> campos del formulario: la receta actual más el historial completo.
+export const formFromRecetas = (historial) => {
+    const lista = Array.isArray(historial) ? historial : [];
+    return { ...formFromReceta(recetaActualDe(lista)), recetaHistorial: lista };
+};
+
+// ===== Nueva receta =====
+// ¿Se puede abrir otra receta? Solo cuando la actual ya fue entregada: mientras haya una pendiente solo puede haber esa.
+export const puedeAbrirNuevaReceta = (form) => form.recetaEstado === "entregada" && !form.recetaNueva;
+
+// Campos para empezar una receta nueva: lista y línea en blanco; el historial se conserva para seguir viendo lo entregado.
+export const formNuevaReceta = (form) => ({ ...RECETA_ESTADO_INICIAL, recetaHistorial: form.recetaHistorial ?? [], recetaNueva: true });
+
+// Descarta lo armado (una receta nueva o lo escrito sin guardar) y vuelve a lo que tiene el ticket.
+export const formSinCambiosReceta = (form) => formFromRecetas(form.recetaHistorial);
 
 // ===== Armado de la lista =====
 // Una receta ya registrada no se vuelve a editar: la pendiente tiene el stock reservado y la entregada ya lo descontó.
@@ -213,6 +261,8 @@ export const GuardarReceta = async (form, token, userlogued) => {
     const body = {
         numeroTicket: Number(form.n_hcl),
         ...(inventarioId ? { inventarioId } : {}),
+        // Obligatorio cuando el ticket ya tuvo una receta entregada: sin esto el backend no abre otra.
+        ...(form.recetaNueva ? { nuevaReceta: true } : {}),
         detalles: form.recetaItems.map((item) => ({
             medicamentoId: Number(item.medicamentoId),
             cantidad: item.cantidad,
@@ -233,37 +283,25 @@ export const GuardarReceta = async (form, token, userlogued) => {
 };
 
 // ===== Impresión =====
-// Imprime la Receta GUARDADA de un ticket. Los datos del paciente, del ticket y de la Historia Clínica (edad, sexo,
+// Imprime las Recetas GUARDADAS de un ticket. Los datos del paciente, del ticket y de la Historia Clínica (edad, sexo,
 // empresa, diagnóstico, médico asignado) los entrega cada Historia con `obtenerDatosHC(numeroTicket, token)`, que
 // devuelve un objeto con los nombres de campo del formulario (n_hcl, numeroHistoriaClinica, nombres, dni, edad, sexo,
 // diagnostico, nombre_medico, ticket*...) o null si el ticket no existe. A diferencia del Informe de Accidente no
 // exige Historia Clínica guardada: la receta se imprime con lo que haya (el diagnóstico sale en blanco si no hay).
-// Una receta anulada ya no reserva nada, así que no se imprime.
-export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, obtenerDatosHC) => {
+// Una receta anulada ya no reserva nada, así que no se imprime. Con más de una receta imprimible el ticket pregunta
+// cuál (cada una sale en su propio formato, p. ej. la de Medicina y la de Odontología).
+
+// Texto corto de los medicamentos de una receta para reconocerla en la lista (recortado si es largo).
+const resumenMedicamentos = (receta) => {
+    const texto = (receta.detalles ?? []).map((detalle) => detalle.medicamentoNombre).filter(Boolean).join(", ");
+    return texto.length > 70 ? `${texto.slice(0, 67)}...` : texto;
+};
+
+// Formato de impresión de UNA receta ya cargada.
+const imprimirReceta = async (receta, hc, token, datosFooter) => {
     LoadingDefault("Cargando Formato a Imprimir");
 
     try {
-        const [hc, receta] = await Promise.all([obtenerDatosHC(numeroTicket, token), ObtenerReceta(numeroTicket, token)]);
-
-        if (!hc) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
-            return;
-        }
-        if (!receta) {
-            await Swal.fire("Sin receta", `El ticket N° ${numeroTicket} todavía no tiene una receta registrada.`, "warning");
-            return;
-        }
-        if (receta.anulada) {
-            const motivo = receta.motivoAnulacion ? ` (motivo: ${receta.motivoAnulacion})` : "";
-            await Swal.fire("Receta anulada", `La receta del ticket N° ${numeroTicket} fue anulada${motivo}: no se puede imprimir.`, "warning");
-            return;
-        }
-        const detalles = receta.detalles ?? [];
-        if (!detalles.length) {
-            await Swal.fire("Receta vacía", `La receta del ticket N° ${numeroTicket} no tiene medicamentos.`, "warning");
-            return;
-        }
-
         const modulo = await jasperModules[rutaJasper]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasper} no exporta una función por defecto`);
@@ -292,7 +330,7 @@ export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, 
             diagnostico: hc.diagnostico,
             medico: hc.nombre_medico,
             cmp,
-            medicamentos: detalles.map((detalle) => ({
+            medicamentos: (receta.detalles ?? []).map((detalle) => ({
                 nombre: detalle.medicamentoNombre,
                 presentacion: detalle.presentacion,
                 cantidad: detalle.cantidad,
@@ -302,6 +340,60 @@ export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, 
             ...datosFooter,
         });
         Swal.close();
+    } catch (e) {
+        console.error("Error al generar el reporte:", e);
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+    }
+};
+
+export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, obtenerDatosHC) => {
+    LoadingDefault("Cargando Formato a Imprimir");
+
+    try {
+        const [hc, historial] = await Promise.all([obtenerDatosHC(numeroTicket, token), ObtenerRecetas(numeroTicket, token)]);
+        Swal.close();
+
+        if (!hc) {
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            return;
+        }
+        if (!historial.length) {
+            await Swal.fire("Sin receta", `El ticket N° ${numeroTicket} todavía no tiene una receta registrada.`, "warning");
+            return;
+        }
+
+        const vigentes = historial.filter((receta) => !receta.anulada);
+        if (!vigentes.length) {
+            const motivo = historial[0].motivoAnulacion ? ` (motivo: ${historial[0].motivoAnulacion})` : "";
+            const texto = historial.length > 1 ? "Todas las recetas" : "La receta";
+            await Swal.fire("Receta anulada", `${texto} del ticket N° ${numeroTicket} fue anulada${motivo}: no se puede imprimir.`, "warning");
+            return;
+        }
+
+        const conMedicamentos = vigentes.filter((receta) => (receta.detalles ?? []).length > 0);
+        if (!conMedicamentos.length) {
+            await Swal.fire("Receta vacía", `La receta del ticket N° ${numeroTicket} no tiene medicamentos.`, "warning");
+            return;
+        }
+
+        // Una sola receta: se imprime directo, como siempre.
+        if (conMedicamentos.length === 1) {
+            await imprimirReceta(conMedicamentos[0], hc, token, datosFooter);
+            return;
+        }
+
+        const opciones = conMedicamentos.map((receta) => {
+            const estado = estadoDeReceta(receta) === "entregada" ? "Entregada" : "Pendiente";
+            const fecha = receta.fechaRegistro ? ` · ${formatearFechaHora(receta.fechaRegistro)}` : "";
+            return {
+                etiqueta: `Receta ${numeroDeReceta(historial, receta)}${fecha} · ${estado}<br><small>${escaparHtml(resumenMedicamentos(receta))}</small>`,
+                accion: () => imprimirReceta(receta, hc, token, datosFooter),
+            };
+        });
+        await MostrarOpcionesImpresion(`<b>Ticket N° ${numeroTicket}</b><br>Tiene ${conMedicamentos.length} recetas.`, opciones, {
+            titulo: "Recetas del ticket",
+            icono: "question",
+        });
     } catch (e) {
         console.error("Error al generar el reporte:", e);
         await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");

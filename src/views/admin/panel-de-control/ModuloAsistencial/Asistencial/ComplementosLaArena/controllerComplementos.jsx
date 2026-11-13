@@ -5,7 +5,7 @@ import { GuardarInformeAccidente, ImprimirInformeAccidentePorTicket, hayInformeA
 import {
     GuardarReceta,
     ImprimirRecetaPorTicket,
-    RECETA_ESTADO_INICIAL,
+    formSinCambiosReceta,
     hayLineaSinAgregar,
     hayReceta,
     validarReceta,
@@ -59,7 +59,7 @@ export const complementosPorGuardar = (form) => ({
 // tras pulsar «Generar», salvo estas: se muestran siempre para que nada escrito (p. ej. un medicamento sin agregar,
 // que bloquearía el guardado) ni nada ya registrado quede oculto.
 export const complementosConContenido = (form) => ({
-    receta: Boolean(form.recetaEstado) || (form.recetaItems ?? []).length > 0 || hayLineaSinAgregar(form),
+    receta: Boolean(form.recetaEstado) || Boolean(form.recetaNueva) || (form.recetaItems ?? []).length > 0 || hayLineaSinAgregar(form),
     descanso: Boolean(form.descansoRegistrado) || hayDatosDescanso(form),
     accidente: Boolean(form.accidenteRegistrado) || hayInformeAccidente(form),
 });
@@ -72,8 +72,10 @@ export const complementosRegistrados = (form) => ({
 });
 
 // Campos del formulario de cada complemento en blanco: lo que se restablece al quitar uno que todavía no se registró.
+// Reciben el formulario actual: la receta vuelve a lo que ya tiene el ticket (p. ej. al descartar una receta nueva
+// queda la entregada y el historial), no a cero.
 export const camposVaciosComplemento = {
-    receta: () => ({ ...RECETA_ESTADO_INICIAL }),
+    receta: formSinCambiosReceta,
     descanso: descansoVacio,
     accidente: () => ({ accidenteCircunstancias: "" }),
 };

@@ -65,7 +65,7 @@ export default function ComplementosDesplegables({ form, setForm, onChange, toke
       });
       if (!isConfirmed) return;
     }
-    setForm((f) => ({ ...f, ...camposVaciosComplemento[clave]() }));
+    setForm((f) => ({ ...f, ...camposVaciosComplemento[clave](f) }));
     setGenerados((g) => ({ ...g, [clave]: false }));
   };
 
