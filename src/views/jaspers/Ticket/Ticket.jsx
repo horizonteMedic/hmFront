@@ -45,6 +45,7 @@ export default async function Ticket({
     const altoBase = 115;
     const altoDoc = altoBase + altoParentesco + filas * altoCelda - 80;
 
+
     const doc = new jsPDF({
         orientation: "portrait",
         unit: "mm",
