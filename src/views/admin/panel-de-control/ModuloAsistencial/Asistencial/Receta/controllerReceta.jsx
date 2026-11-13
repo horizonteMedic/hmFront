@@ -52,6 +52,8 @@ export const RECETA_ESTADO_INICIAL = {
     recetaHistorial: [],
     // true mientras se arma una receta NUEVA sobre un ticket cuya última receta ya fue entregada (el guardado envía nuevaReceta).
     recetaNueva: false,
+    // true mientras se corrige la receta PENDIENTE del ticket (el guardado la edita; no se envía nuevaReceta).
+    recetaEditando: false,
     // "" (sin receta), "pendiente", "entregada" o "anulada".
     recetaEstado: "",
     recetaItems: [],
@@ -189,13 +191,28 @@ export const puedeAbrirNuevaReceta = (form) => form.recetaEstado === "entregada"
 // Campos para empezar una receta nueva: lista y línea en blanco; el historial se conserva para seguir viendo lo entregado.
 export const formNuevaReceta = (form) => ({ ...RECETA_ESTADO_INICIAL, recetaHistorial: form.recetaHistorial ?? [], recetaNueva: true });
 
-// Descarta lo armado (una receta nueva o lo escrito sin guardar) y vuelve a lo que tiene el ticket.
+// Descarta lo armado (una receta nueva, una edición o lo escrito sin guardar) y vuelve a lo que tiene el ticket.
 export const formSinCambiosReceta = (form) => formFromRecetas(form.recetaHistorial);
 
+// ===== Editar la receta pendiente =====
+// El backend deja corregir la pendiente (POST de nuevo: la edita, no crea otra) mientras ninguna de sus líneas se haya
+// entregado (entrega parcial). Se pide con un botón explícito para no reenviarla ni re-reservar stock en cada Guardar.
+export const puedeEditarPendiente = (receta) =>
+    estadoDeReceta(receta) === "pendiente" && !receta.entregaParcial && !(receta.detalles ?? []).some((detalle) => detalle.entregado);
+
+// Campos para empezar a editar la pendiente: sus medicamentos pasan a la lista editable y el inventario queda en el que
+// la reservó. No lleva `recetaNueva`: al editar una pendiente no se envía nuevaReceta.
+export const formEditarPendiente = (form) => ({
+    recetaEditando: true,
+    recetaItems: (form.recetaItems ?? []).map((item) => ({ ...item, registrado: false })),
+    recetaInventarioId: String(recetaActualDe(form.recetaHistorial)?.inventarioId ?? form.recetaInventarioId ?? ""),
+});
+
 // ===== Armado de la lista =====
-// Una receta ya registrada no se vuelve a editar: la pendiente tiene el stock reservado y la entregada ya lo descontó.
-// Solo la anulada (ya no reserva nada) deja armar una nueva.
-export const recetaBloqueada = (form) => form.recetaEstado === "pendiente" || form.recetaEstado === "entregada";
+// Una receta ya registrada no se vuelve a editar por sí sola: la pendiente tiene el stock reservado y la entregada ya
+// lo descontó. Solo la anulada (ya no reserva nada) deja armar una nueva, y la pendiente se abre con «Editar receta»
+// (`recetaEditando`).
+export const recetaBloqueada = (form) => (form.recetaEstado === "pendiente" && !form.recetaEditando) || form.recetaEstado === "entregada";
 
 // ¿Queda algo escrito en la línea que todavía no se agregó a la receta?
 export const hayLineaSinAgregar = (form) =>
@@ -247,10 +264,15 @@ export const hayReceta = (form) => !recetaBloqueada(form) && (form.recetaItems ?
 
 // Mensaje del primer problema de la receta (o null): un medicamento escrito pero sin agregar se avisaría solo al
 // perderse, así que se pide agregarlo o borrarlo antes de guardar nada.
-export const validarReceta = (form) =>
-    !recetaBloqueada(form) && hayLineaSinAgregar(form)
-        ? "Hay un medicamento de la receta sin agregar. Presione «Agregar» o borre lo escrito antes de guardar."
-        : null;
+export const validarReceta = (form) => {
+    if (recetaBloqueada(form)) return null;
+    if (hayLineaSinAgregar(form)) return "Hay un medicamento de la receta sin agregar. Presione «Agregar» o borre lo escrito antes de guardar.";
+    // Una pendiente sin medicamentos no se guardaría (no hay nada que enviar) y quedaría igual: se avisa en vez de ignorarlo.
+    if (form.recetaEditando && !(form.recetaItems ?? []).length) {
+        return "La receta pendiente quedaría sin medicamentos. Agregue al menos uno o cancele la edición (para anularla use Inventario > Entrega por Ticket).";
+    }
+    return null;
+};
 
 // Registra (crea o edita) la receta del ticket y reserva el stock: POST. true si quedó guardada; si no, muestra el
 // motivo que da el backend (p. ej. medicamento inactivo) y devuelve false (la Historia Clínica no se guarda).
