@@ -2,6 +2,9 @@ import { jsPDF } from "jspdf";
 
 const TITULO_DEFAULT = "Campaña de Salud Integral - Caseríos José Carlos Mariátegui, Llaray, El Hospital, Las Pajillas y Quiruvilca";
 
+const TAM_FUENTE_PARENTESCO = 6.5;
+const INTERLINEADO_PARENTESCO = 3;
+
 async function fetchImageBase64(url) {
     try {
         const res = await fetch(url);
@@ -41,8 +44,12 @@ export default async function Ticket({
     // Altura dinámica: base + parentescos + filas de especialidades
     const filas = Math.ceil(especialidades.length / 2);
     const altoCelda = 27;
-    const altoParentesco = parentescos.length > 0 ? 6 + parentescos.length * 5 : 0;
-    const altoBase = 115;
+    // Se miden los parentescos antes de crear el doc para que la altura contemple los saltos de línea
+    const bloquesParentesco = medirParentescos(parentescos, ancho, margen);
+    const altoParentesco = bloquesParentesco.length > 0
+        ? 7.5 + bloquesParentesco.reduce((acc, b) => acc + b.alto, 0)
+        : 0;
+    const altoBase = 155;
     const altoDoc = altoBase + altoParentesco + filas * altoCelda - 80;
 
     const doc = new jsPDF({
@@ -103,19 +110,13 @@ export default async function Ticket({
         doc.text("Parentesco:", margen, y);
         y += 4.5;
 
-        doc.setFontSize(7);
-        parentescos.forEach((p) => {
-            const relacion = p.tipoRelacion ?? "";
-            const nombreRel = p.nombreRelacionado ?? "";
-            const dniRel = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
-            const prefijo = `Es ${relacion} de:`;
+        doc.setFontSize(TAM_FUENTE_PARENTESCO);
+        bloquesParentesco.forEach((b) => {
             doc.setFont("helvetica", "bold");
-            doc.text(prefijo, margen + 2, y);
-            const anchoLabel = doc.getTextWidth(prefijo) + 2;
+            doc.text(b.prefijo, margen + 2, y);
             doc.setFont("helvetica", "normal");
-            const textoNombre = doc.splitTextToSize(`${nombreRel}${dniRel}`, ancho - margen - anchoLabel - 2);
-            doc.text(textoNombre, margen + 2 + anchoLabel, y);
-            y += Math.max(textoNombre.length * 3.5, 4) + 1;
+            doc.text(b.lineas, b.xTexto, y);
+            y += b.alto;
         });
         y += 1;
     }
@@ -183,6 +184,33 @@ export default async function Ticket({
     doc.setTextColor(0, 0, 0);
 
     imprimir(doc);
+}
+
+// Calcula, para cada parentesco, el prefijo, las líneas del nombre (con salto de línea
+// respetando el margen derecho) y el alto que ocupa.
+function medirParentescos(parentescos, ancho, margen) {
+    if (!parentescos.length) return [];
+    const medidor = new jsPDF({ unit: "mm", format: [ancho, 100] });
+    medidor.setFontSize(TAM_FUENTE_PARENTESCO);
+
+    return parentescos.map((p) => {
+        const prefijo = `Es ${p.tipoRelacion ?? ""} de:`;
+        const dniRel = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
+
+        medidor.setFont("helvetica", "bold");
+        const xTexto = margen + 2 + medidor.getTextWidth(prefijo) + 1.5;
+
+        medidor.setFont("helvetica", "normal");
+        const anchoDisponible = ancho - margen - xTexto; // respeta el margen derecho
+        const lineas = medidor.splitTextToSize(`${p.nombreRelacionado ?? ""}${dniRel}`, anchoDisponible);
+
+        return {
+            prefijo,
+            xTexto,
+            lineas,
+            alto: Math.max(lineas.length * INTERLINEADO_PARENTESCO, 4) + 1,
+        };
+    });
 }
 
 function calcularEdad(fechaNacimiento) {
