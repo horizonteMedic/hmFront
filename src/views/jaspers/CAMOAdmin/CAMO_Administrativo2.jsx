@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign, getSignCompressed } from "../../utils/helpers.js";
+import { getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
@@ -14,13 +14,13 @@ export default async function CAMO_Administrativo2(data = {}, docExistente = nul
   const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A." || String(data.empresa) === EMPRESA_NUEVA_BOROO;
   const Recomendaciones = esBoro && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
-  const limpiarTexto = (txt) =>
-    txt
-      .replace(/≥/g, ">=")
-      .replace(/≤/g, "<=")
-      .replace(/\n/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+  // const limpiarTexto = (txt) =>
+  //   txt
+  //     .replace(/≥/g, ">=")
+  //     .replace(/≤/g, "<=")
+  //     .replace(/\n/g, " ")
+  //     .replace(/\s+/g, " ")
+  //     .trim();
 
   const datosFinales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON

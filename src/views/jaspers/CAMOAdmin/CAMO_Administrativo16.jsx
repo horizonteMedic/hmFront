@@ -323,11 +323,12 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila3); // Línea derecha
   yPos += alturaFila3;
 
-  // Cuarta fila (DNI, GÉNERO, EDAD, GRUPO SANGUÍNEO) - 4 columnas
+  // Cuarta fila (DNI, GÉNERO, EDAD, GRUPO SANGUÍNEO) - 4 columnas; MARSA: 3 columnas (sin grupo sanguíneo)
+  const anchoColFila4 = esMARSA ? tablaAncho / 3 : 45;
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila4); // Línea izquierda
-  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + alturaFila4); // Primera división
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + alturaFila4); // Segunda división
-  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaFila4); // Tercera división
+  doc.line(tablaInicioX + anchoColFila4, yPos, tablaInicioX + anchoColFila4, yPos + alturaFila4); // Primera división
+  doc.line(tablaInicioX + anchoColFila4 * 2, yPos, tablaInicioX + anchoColFila4 * 2, yPos + alturaFila4); // Segunda división
+  if (!esMARSA) doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaFila4); // Tercera división
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila4); // Línea derecha
   yPos += alturaFila4;
 
@@ -386,35 +387,38 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("GENERO :", tablaInicioX + 47, yTexto + 4);
+  doc.text("GENERO :", tablaInicioX + anchoColFila4 + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.genero, tablaInicioX + 65, yTexto + 4);
+  doc.text(datosFinales.genero, tablaInicioX + anchoColFila4 + 20, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EDAD :", tablaInicioX + 92, yTexto + 4);
+  doc.text("EDAD :", tablaInicioX + anchoColFila4 * 2 + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad, tablaInicioX + 105, yTexto + 4);
+  doc.text(datosFinales.edad, tablaInicioX + anchoColFila4 * 2 + 15, yTexto + 4);
 
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  // Calcular posición del valor después del label para evitar superposición
-  const anchoLabelGrupo = doc.getTextWidth("GRUPO SANGUÍNEO :");
-  doc.text("GRUPO SANGUÍNEO :", tablaInicioX + 137, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  // Calcular posición X del valor, asegurándose de que quepa dentro de la columna
-  const xValorGrupo = tablaInicioX + 137 + anchoLabelGrupo + 2;
-  const anchoDisponibleGrupo = (tablaInicioX + tablaAncho) - xValorGrupo - 2; // Margen de 2mm del borde
-  // Si el valor es muy largo, usar splitTextToSize para que se ajuste
-  const grupoSanguineoTexto = datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.trim()
-    ? datosFinales.grupoSanguineo
-    : "(No Aplica)";
-  // Si es "(No Aplica)", usar fuente más pequeña para que quepa en una línea
-  if (grupoSanguineoTexto === "(No Aplica)") {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(grupoSanguineoTexto, xValorGrupo, yTexto + 4);
-  } else {
+  if (!esMARSA) {
+    // MARSA: no se muestra grupo ni factor sanguíneo
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    // Calcular posición del valor después del label para evitar superposición
+    const anchoLabelGrupo = doc.getTextWidth("GRUPO SANGUÍNEO :");
+    doc.text("GRUPO SANGUÍNEO :", tablaInicioX + 137, yTexto + 4);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    const lineasGrupo = doc.splitTextToSize(grupoSanguineoTexto, anchoDisponibleGrupo);
-    doc.text(lineasGrupo, xValorGrupo, yTexto + 4);
+    // Calcular posición X del valor, asegurándose de que quepa dentro de la columna
+    const xValorGrupo = tablaInicioX + 137 + anchoLabelGrupo + 2;
+    const anchoDisponibleGrupo = (tablaInicioX + tablaAncho) - xValorGrupo - 2; // Margen de 2mm del borde
+    // Si el valor es muy largo, usar splitTextToSize para que se ajuste
+    const grupoSanguineoTexto = datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.trim()
+      ? datosFinales.grupoSanguineo
+      : "(No Aplica)";
+    // Si es "(No Aplica)", usar fuente más pequeña para que quepa en una línea
+    if (grupoSanguineoTexto === "(No Aplica)") {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(grupoSanguineoTexto, xValorGrupo, yTexto + 4);
+    } else {
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      const lineasGrupo = doc.splitTextToSize(grupoSanguineoTexto, anchoDisponibleGrupo);
+      doc.text(lineasGrupo, xValorGrupo, yTexto + 4);
+    }
   }
   yTexto += alturaFila4;
 
