@@ -18,6 +18,8 @@ import { BuscarPacientes, ListarServicios, CrearServicio, BuscarPorDni, BuscarPo
 import TicketVenta from "../../../../../jaspers/TicketAsistencial/TicketVenta";
 import TicketAsistencialA4 from "../../../../../jaspers/TicketAsistencial/TicketAsistencialA4";
 import HistorialTickets from "./HistorialTickets";
+import ListadoTickets from "./ListadoTickets";
+import { useListadoTickets } from "./useListadoTickets";
 import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
 
 const METODOS_PAGO = [
@@ -446,6 +448,9 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
     const [errors, setErrors] = useState({});
 
+    // Últimos tickets de la sede (tabla al final del formulario)
+    const listadoTickets = useListadoTickets(selectedSede, token);
+
     // Error inline del input "N° Ticket" de la sección IMPRIMIR (reimpresión manual).
     const [errorImprimirTicket, setErrorImprimirTicket] = useState("");
 
@@ -820,6 +825,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         setForm((f) => ({ ...f, nroTicket: numeroTicketCreado }));
         // El ticket recién creado ya forma parte del historial del paciente.
         cargarHistorial(form.dni ?? form.documentoIdentidad);
+        listadoTickets.refrescar();
 
         Swal.fire({
             title: "Ticket registrado",
@@ -1324,6 +1330,12 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     <FontAwesomeIcon icon={faCalendarDay} /> Imprimir Fecha
                 </button> */}
             </BotonesForm>
+
+            <ListadoTickets
+                listado={listadoTickets}
+                onSinResultado={() => Swal.fire("Sin Resultado", "No se encontraron tickets con ese número", "warning")}
+                onImprimir={imprimirTicket}
+            />
 
             <ModalNuevoServicio
                 open={modalServicioOpen}
