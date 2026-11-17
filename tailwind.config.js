@@ -17,8 +17,9 @@ export default {
         sans: ['Poppins', 'sans-serif'],
       },
       colors: {
-        primario: "#233245",
-        primarioClaro: "#e9ebec",
+        // Variables CSS definidas en index.css; el módulo asistencial las redefine (.tema-asistencial).
+        primario: "rgb(var(--color-primario) / <alpha-value>)",
+        primarioClaro: "rgb(var(--color-primario-claro) / <alpha-value>)",
       },
     },
   },

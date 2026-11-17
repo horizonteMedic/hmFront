@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --color-primario: 35 50 69;
+  --color-primario-claro: 233 235 236;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -173,7 +175,7 @@ body {
 .swal2-popup:has(.swal2-icon.swal2-warning) .swal2-title { color: #b45309 !important; }
 .swal2-popup:has(.swal2-icon.swal2-warning) .swal2-confirm { background-color: #f59e0b; }
 
-/* ---------- SUCCESS (verde) ---------- */
+/* ---------- SUCCESS (morado) ---------- */
 .swal2-popup:has(.swal2-icon.swal2-success) {
   border-top-color: #16a34a;
   box-shadow: 0 0 0 1px rgba(22, 163, 74, .18),
@@ -205,3 +207,48 @@ body {
   100% { transform: scale(1); }
 }
 
+
+
+/* ==========================================================================
+   Tema SISTEMA ASISTENCIAL (morado). Se activa con la clase .tema-asistencial
+   en <html> mientras ModuloAsistencial está montado (también cubre modales/portales).
+   Reemplaza el azul marino (#233245) y el azul de botones del sistema ocupacional
+   por variantes de morado, sin tocar los componentes compartidos.
+   El Navbar queda fuera (:not(nav *)): conserva su estilo original.
+   ========================================================================== */
+html.tema-asistencial {
+  --color-primario: 154 120 184;         /* #9a78b8  barras de sección, botones principales */
+  --color-primario-claro: 250 246 253;  /* #faf6fd  fondo de fieldset */
+  --asis-oscuro: #9a78b8;
+  --asis-oscuro-hover: #84629f;
+  --asis-acento: #b79bd0;
+  --asis-acento-hover: #a07fc0;
+  --asis-suave: #f1eaf7;
+  --asis-borde: #e2d3ee;
+  --asis-texto: #5b3f78;
+}
+/* fondos oscuros (barras/legend/botones) */
+html.tema-asistencial :is([class~="bg-[#233245]"], [class~="bg-[#2f435b]"], .azul-btn, .azuloscurobackground, .bg-blue-600, .bg-blue-700):not(nav, nav *) { background-color: var(--asis-oscuro); }
+html.tema-asistencial :is([class*="hover:bg-[#233245]"], [class*="hover:bg-[#1a2535]"], [class*="hover:bg-[#2f435b]"], .hover\:bg-blue-600, .hover\:bg-blue-700, .hover\:bg-blue-800):hover:not(nav, nav *) { background-color: var(--asis-oscuro-hover); }
+/* acentos naranja originales -> morado más claro, distinguible de las barras */
+html.tema-asistencial :is([class~="bg-[#fc6b03]"], .naranja-btn, .naranjabackgroud):not(nav, nav *) { background-color: var(--asis-acento); }
+html.tema-asistencial :is([class*="hover:bg-[#fc6b03]"], [class*="hover:bg-[#e35f00]"]):hover:not(nav, nav *) { background-color: var(--asis-acento-hover); }
+html.tema-asistencial :is([class~="text-[#fc6b03]"], .color-naranja):not(nav, nav *) { color: var(--asis-acento-hover); }
+html.tema-asistencial [class~="border-[#fc6b03]"]:not(nav, nav *) { border-color: var(--asis-acento); }
+html.tema-asistencial [class~="before:bg-[#fc6b03]"]:not(nav, nav *)::before { background-color: var(--asis-acento); }
+/* textos y bordes que eran azul marino */
+html.tema-asistencial :is([class~="text-[#233245]"], [class~="text-[#1a2536]"], .color-azul, .text-blue-700, .text-blue-800):not(nav, nav *) { color: var(--asis-texto); }
+html.tema-asistencial .text-blue-500:not(nav, nav *) { color: var(--asis-acento-hover); }
+html.tema-asistencial [class~="border-[#233245]"]:not(nav, nav *) { border-color: var(--asis-oscuro); }
+html.tema-asistencial :is([class~="ring-[#233245]"], [class~="focus:ring-[#233245]"]):not(nav, nav *) { --tw-ring-color: var(--asis-acento); }
+html.tema-asistencial [class*="focus:border-[#084788]"]:focus:not(nav, nav *) { border-color: var(--asis-acento); }
+/* fondos claros azulados / tarjetas */
+html.tema-asistencial :is(.bg-blue-50, .bg-blue-100, [class~="bg-[#edeff2]"], [class~="bg-[#f0f6ff]"]):not(nav, nav *) { background-color: var(--asis-suave); }
+html.tema-asistencial fieldset { border-color: var(--asis-borde); }
+html.tema-asistencial :is([class~="border-[#e2e8f0]"], [class~="border-[#d7dde5]"]):not(nav, nav *) { border-color: var(--asis-borde); }
+html.tema-asistencial :is(input, select, textarea):focus:not(nav *) { border-color: var(--asis-acento); outline-color: var(--asis-acento); }
+html.tema-asistencial :is(input[type="checkbox"], input[type="radio"]):not(nav *) { accent-color: var(--asis-acento-hover); }
+html.tema-asistencial .scrollbar-tabs::-webkit-scrollbar-thumb { background-color: rgba(160, 127, 192, 0.55); }
+/* utilidades con !important (paginador) */
+html.tema-asistencial [class~="!bg-[#233245]"]:not(nav, nav *) { background-color: var(--asis-oscuro) !important; }
+html.tema-asistencial [class~="!bg-[#fc6b03]"]:not(nav, nav *) { background-color: var(--asis-acento) !important; }
