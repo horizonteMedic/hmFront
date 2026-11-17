@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { SubmitData } from "../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
@@ -93,20 +94,20 @@ export const ImprimirInformeAccidentePorTicket = async (numeroTicket, token, dat
         const [hc, informe] = await Promise.all([obtenerDatosHC(numeroTicket, token), ObtenerInformeAccidente(numeroTicket, token)]);
 
         if (!hc) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
         // El informe usa los datos de la Historia Clínica: sin ella no hay diagnóstico ni tratamiento que imprimir.
         if (!hc.tieneRegistro) {
             await Swal.fire(
                 "Sin Historia Clínica",
-                `El ticket N° ${numeroTicket} todavía no tiene una Historia Clínica guardada: el informe de accidente usa sus datos (diagnóstico y tratamiento).`,
+                `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene una Historia Clínica guardada: el informe de accidente usa sus datos (diagnóstico y tratamiento).`,
                 "warning"
             );
             return;
         }
         if (!informe) {
-            await Swal.fire("Sin informe de accidente", `El ticket N° ${numeroTicket} todavía no tiene un informe de accidente registrado.`, "warning");
+            await Swal.fire("Sin informe de accidente", `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene un informe de accidente registrado.`, "warning");
             return;
         }
 

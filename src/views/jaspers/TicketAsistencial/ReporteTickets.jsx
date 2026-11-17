@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../utils/ticketAsistencial";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { compressImage } from "../../utils/helpers.js";
@@ -113,7 +114,7 @@ function drawTicketHeaderBar(doc, t, marginX, contentWidth, y) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
     doc.setTextColor(...NAVY);
-    doc.text(`Ticket N° ${t.numeroTicket ?? "-"}`, marginX + 6, y + 5);
+    doc.text(`Ticket N° ${formatearTicketAsistencial(t.numeroTicket, "-")}`, marginX + 6, y + 5);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);

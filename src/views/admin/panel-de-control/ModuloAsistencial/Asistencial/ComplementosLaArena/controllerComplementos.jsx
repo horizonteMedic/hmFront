@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { MostrarOpcionesImpresion } from "../../../../../utils/functionUtils";
 import { GuardarDescanso, ImprimirDescansoPorTicket, descansoVacio, hayDatosDescanso, validarDescanso } from "../DescansoMedico/controllerDescansoMedico";
@@ -143,7 +144,7 @@ export const ConfirmarImpresionConComplementos = async ({ numeroTicket, ...impre
     }
 
     await MostrarOpcionesImpresion(
-        `<b style="color:#5b6ef5;">N° Ticket: ${numeroTicket}</b>`,
+        `<b style="color:#5b6ef5;">N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b>`,
         opcionesImpresion(IMPRIMIBLES, { numeroTicket, ...impresion }),
         { titulo: "¿Desea Imprimir Reporte?", icono: "question" }
     );

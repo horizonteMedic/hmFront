@@ -328,7 +328,7 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3 mb-6">
               <div className="flex gap-x-3 w-full">
                 <InputTextOneLine
-                  label="N° Ticket"
+                  label="N° Ticket" prefijo="A-"
                   name="numeroTicket"
                   value={form.numeroTicket || ""}
                   onChange={handleChangeNumber}

@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../utils/functionUtils";
@@ -83,7 +84,7 @@ const OpenModalAntecedentesPrevios = async (pacienteId, token, set, enfermedades
         const key = String(item.id ?? index);
         const fechaLabel = formatearFechaCorta(item.fecha ?? "") || item.fecha || "Sin fecha";
         const ticketLabel = item.numeroTicket ?? item.nticket;
-        acc[key] = ticketLabel ? `${fechaLabel} - Ticket N° ${ticketLabel}` : fechaLabel;
+        acc[key] = ticketLabel ? `${fechaLabel} - Ticket N° ${formatearTicketAsistencial(ticketLabel)}` : fechaLabel;
         return acc;
     }, {});
 

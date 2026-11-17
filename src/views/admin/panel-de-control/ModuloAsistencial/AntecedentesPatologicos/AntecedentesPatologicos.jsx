@@ -284,7 +284,7 @@ export default function AntecedentesPatologicos() {
 
             <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputTextOneLine
-                    label="N° Ticket"
+                    label="N° Ticket" prefijo="A-"
                     name="norden"
                     value={form.norden}
                     onChange={handleChangeNumber}

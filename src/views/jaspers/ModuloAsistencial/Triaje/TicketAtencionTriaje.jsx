@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../utils/ticketAsistencial";
 import { jsPDF } from "jspdf";
 
 // Ticket de atención del Triaje asistencial (ticketera 80 mm). Mismo diseño que el ticket de venta
@@ -123,7 +124,7 @@ const dibujar = (doc, d) => {
     doc.text("N° de Ticket", ANCHO / 2, y, { align: "center" });
     y += 10;
     doc.setFontSize(32);
-    doc.text(texto(d.numeroTicket) || "-", ANCHO / 2, y, { align: "center" });
+    doc.text(formatearTicketAsistencial(texto(d.numeroTicket), "-"), ANCHO / 2, y, { align: "center" });
     y += 6;
     separador(doc, y);
     y += 5;

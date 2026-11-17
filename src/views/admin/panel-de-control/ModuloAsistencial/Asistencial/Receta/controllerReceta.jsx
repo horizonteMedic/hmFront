@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { LoadingDefault, MostrarOpcionesImpresion } from "../../../../../utils/functionUtils";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
@@ -376,11 +377,11 @@ export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, 
         Swal.close();
 
         if (!hc) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
         if (!historial.length) {
-            await Swal.fire("Sin receta", `El ticket N° ${numeroTicket} todavía no tiene una receta registrada.`, "warning");
+            await Swal.fire("Sin receta", `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene una receta registrada.`, "warning");
             return;
         }
 
@@ -388,13 +389,13 @@ export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, 
         if (!vigentes.length) {
             const motivo = historial[0].motivoAnulacion ? ` (motivo: ${historial[0].motivoAnulacion})` : "";
             const texto = historial.length > 1 ? "Todas las recetas" : "La receta";
-            await Swal.fire("Receta anulada", `${texto} del ticket N° ${numeroTicket} fue anulada${motivo}: no se puede imprimir.`, "warning");
+            await Swal.fire("Receta anulada", `${texto} del ticket N° ${formatearTicketAsistencial(numeroTicket)} fue anulada${motivo}: no se puede imprimir.`, "warning");
             return;
         }
 
         const conMedicamentos = vigentes.filter((receta) => (receta.detalles ?? []).length > 0);
         if (!conMedicamentos.length) {
-            await Swal.fire("Receta vacía", `La receta del ticket N° ${numeroTicket} no tiene medicamentos.`, "warning");
+            await Swal.fire("Receta vacía", `La receta del ticket N° ${formatearTicketAsistencial(numeroTicket)} no tiene medicamentos.`, "warning");
             return;
         }
 
@@ -412,7 +413,7 @@ export const ImprimirRecetaPorTicket = async (numeroTicket, token, datosFooter, 
                 accion: () => imprimirReceta(receta, hc, token, datosFooter),
             };
         });
-        await MostrarOpcionesImpresion(`<b>Ticket N° ${numeroTicket}</b><br>Tiene ${conMedicamentos.length} recetas.`, opciones, {
+        await MostrarOpcionesImpresion(`<b>Ticket N° ${formatearTicketAsistencial(numeroTicket)}</b><br>Tiene ${conMedicamentos.length} recetas.`, opciones, {
             titulo: "Recetas del ticket",
             icono: "question",
         });

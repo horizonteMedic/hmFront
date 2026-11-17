@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import { faCheck, faClockRotateLeft, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
@@ -62,7 +63,7 @@ export default function ListadoTickets({ listado, onSinResultado, onImprimir }) 
                     autocomplete="off"
                 />
                 <InputTextOneLine
-                    label="Buscar por N° ticket"
+                    label="Buscar por N° ticket" prefijo="A-"
                     name="buscarTicketNumero"
                     value={busqueda.numero}
                     onChange={(e) => /^\d{0,9}$/.test(e.target.value) && listado.cambiarNumero(e.target.value)}
@@ -106,7 +107,7 @@ export default function ListadoTickets({ listado, onSinResultado, onImprimir }) 
                                 }}
                                 className={`cursor-pointer transition-colors ${COLOR_ESTADO[t.estado] ?? COLOR_ESTADO_DEFECTO}`}
                             >
-                                <td className={`${CELDA} font-semibold`}>{t.numeroTicket}</td>
+                                <td className={`${CELDA} font-semibold`}>{formatearTicketAsistencial(t.numeroTicket)}</td>
                                 <td className={`${CELDA} whitespace-nowrap`}>{t.fechaTicket}</td>
                                 <td className={`${CELDA} text-left`}>{t.paciente}</td>
                                 <td className={`${CELDA} text-left`}>{t.medico}</td>

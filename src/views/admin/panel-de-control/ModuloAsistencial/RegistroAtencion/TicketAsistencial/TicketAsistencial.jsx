@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial, soloNumerosTicket } from "../../../../../utils/ticketAsistencial";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { faBroom, faCalendarDay, faCircleExclamation, faPlus, faPrint, faTrash, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -834,7 +835,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                 <p style="margin:0 0 10px;">Ticket registrado correctamente.</p>
                 <p style="margin:0; font-size:1.2em; font-weight:600;">N° de Ticket</p>
                 <p style="margin:0; font-size:1.8em; font-weight:800; color:#16a34a;">
-                    ${numeroTicketCreado ?? ""}
+                    ${formatearTicketAsistencial(numeroTicketCreado)}
                 </p>
             `,
             showCancelButton: true,
@@ -1019,7 +1020,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     onKeyUp={handleSearch}
                 />
                 <InputTextOneLine
-                    label="N° Ticket"
+                    label="N° Ticket" prefijo="A-"
                     name="nroTicket"
                     value={form?.nroTicket}
                     disabled
@@ -1293,16 +1294,20 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     <div className="flex flex-col items-end">
                         <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
                         <div className="flex items-center gap-2">
-                            <input
-                                name="nroTicket"
-                                value={form.nroTicket}
-                                onChange={(e) => {
-                                    setErrorImprimirTicket("");
-                                    handleChangeNumberDecimals(e);
-                                }}
-                                onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket()}
-                                className={`border rounded px-2 py-1 text-base w-24 ${errorImprimirTicket ? "border-red-500 bg-red-50" : ""}`}
-                            />
+                            <div className="relative">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-base font-semibold text-gray-500 pointer-events-none select-none">A-</span>
+                                <input
+                                    name="nroTicket"
+                                    value={form.nroTicket}
+                                    onChange={(e) => {
+                                        setErrorImprimirTicket("");
+                                        e.target.value = soloNumerosTicket(e.target.value);
+                                        handleChangeNumberDecimals(e);
+                                    }}
+                                    onKeyUp={(e) => e.key === "Enter" && handleImprimirTicket()}
+                                    className={`border rounded !pl-[18px] pr-2 py-1 text-base w-28 ${errorImprimirTicket ? "border-red-500 bg-red-50" : ""}`}
+                                />
+                            </div>
                             {/* El formato lo define el esArena del ticket: La Arena, A4; el resto, 80mm. */}
                             <button
                                 type="button"

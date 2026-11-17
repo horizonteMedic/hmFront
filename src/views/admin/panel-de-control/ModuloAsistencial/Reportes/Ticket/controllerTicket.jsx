@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
@@ -185,7 +186,7 @@ export const GenerarExcelTickets = async (desde, hasta, token) => {
 
         const values = {
             item: rowIdx + 1,
-            numeroTicket: t.numeroTicket ?? "",
+            numeroTicket: formatearTicketAsistencial(t.numeroTicket),
             serieTicket: t.serieTicket ?? "",
             fecha: formatFechaLegible(t.fechaTicket),
             hora: formatHora(t.horaTicket),

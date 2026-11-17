@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "./ticketAsistencial";
 import Swal from "sweetalert2";
 import { getFetch } from "./apiHelpers";
 import {
@@ -249,7 +250,7 @@ export const verificarRegistroTicket = async ({
     Swal.fire({
       icon: "warning",
       title: '<i class="fa-solid fa-magnifying-glass"></i>Ticket no encontrado',
-      html: `No existe un ticket registrado con el N° ${numeroTicket}.`,
+      html: `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`,
     });
     return;
   }
@@ -408,7 +409,7 @@ export const confirmarImpresionTicket = async (numeroTicket, imprimir) => {
 
   const { isConfirmed } = await Swal.fire({
     title: "¿Desea Imprimir Reporte?",
-    html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b></div>`,
+    html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b></div>`,
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "Sí, Imprimir",
@@ -636,7 +637,7 @@ export const imprimirReporteTicket = async ({
 }) => {
   const paciente = await buscarPacientePorTicket(numeroTicket, token);
   if (!paciente) {
-    Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+    Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
     return;
   }
 
@@ -647,7 +648,7 @@ export const imprimirReporteTicket = async ({
     if (!registro) {
       Swal.fire(
         "Sin registro",
-        `El ticket N° ${numeroTicket} todavía no tiene este examen registrado.`,
+        `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene este examen registrado.`,
         "warning"
       );
       return;

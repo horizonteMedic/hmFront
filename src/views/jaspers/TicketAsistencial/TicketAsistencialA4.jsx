@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../utils/ticketAsistencial";
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
 
@@ -133,7 +134,7 @@ export default async function TicketAsistencialA4({
 
     doc.setFont("helvetica", "bold").setFontSize(80);
     doc.setTextColor(...NAVY);
-    doc.text(String(numeroTicket || "-"), centro, y, { align: "center" });
+    doc.text(formatearTicketAsistencial(numeroTicket, "-"), centro, y, { align: "center" });
     doc.setTextColor(0, 0, 0);
     y += 11;
 

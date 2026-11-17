@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { SubmitData } from "../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
@@ -185,11 +186,11 @@ export const ImprimirDescansoPorTicket = async (numeroTicket, token, datosFooter
         const [hc, descanso] = await Promise.all([obtenerDatosHC(numeroTicket, token), ObtenerDescanso(numeroTicket, token)]);
 
         if (!hc) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
         if (!descanso) {
-            await Swal.fire("Sin descanso médico", `El ticket N° ${numeroTicket} todavía no tiene un descanso médico registrado.`, "warning");
+            await Swal.fire("Sin descanso médico", `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene un descanso médico registrado.`, "warning");
             return;
         }
 

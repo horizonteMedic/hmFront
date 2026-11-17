@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../utils/ticketAsistencial";
 import jsPDF from "jspdf";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
@@ -19,7 +20,7 @@ const drawHeader = async (doc, datos = {}) => {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("N° Ticket: ", pageW - 80, 15);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(String(datos.numeroTicket ?? datos.norden ?? ""), pageW - 50, 16);
+  doc.text(formatearTicketAsistencial(datos.numeroTicket ?? datos.norden), pageW - 50, 16);
 
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);

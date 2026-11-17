@@ -1,6 +1,7 @@
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RevertButton from "./RevertButton";
+import { soloNumerosTicket } from "../../utils/ticketAsistencial";
 
 export default function InputTextOneLine({
   label = "",
@@ -27,6 +28,9 @@ export default function InputTextOneLine({
   placeholder,
   maxLength,
   inputMode,
+  // Texto fijo dentro del input (solo visual, no forma parte del valor): p. ej. "A-" en el N° de ticket asistencial.
+  // Al escribir o pegar se descarta todo lo que no sea número, así "A-23" y "23" buscan lo mismo.
+  prefijo = "",
 }) {
   const showRevert = edited && typeof onRevert === "function";
   const hasError = Boolean(error);
@@ -68,16 +72,22 @@ export default function InputTextOneLine({
             para que React no lo desmonte/remonte -y pierda el foco- cuando `showRevert`
             cambia de valor mientras el usuario escribe. */}
         <div className="w-full flex items-center gap-1.5">
+          <div className="relative w-full">
+          {prefijo && (
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 font-semibold text-gray-500 pointer-events-none select-none">
+              {prefijo}
+            </span>
+          )}
           <input
             type={type}
             max={max}
-            className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
+            className={`border rounded px-2 py-1 w-full ${prefijo ? "!pl-[18px]" : ""} ${disabled ? "bg-gray-300" : ""
               } ${stateClasses} ${inputClassName}`}
             id={name}
             name={name}
             value={value ?? ""}
             onKeyUp={onKeyUp}
-            onChange={onChange}
+            onChange={prefijo && onChange ? (e) => { e.target.value = soloNumerosTicket(e.target.value); onChange(e); } : onChange}
             onBlur={onBlur}
             disabled={disabled}
             aria-invalid={hasError}
@@ -87,6 +97,7 @@ export default function InputTextOneLine({
             maxLength={maxLength}
             inputMode={inputMode}
           />
+          </div>
           {showRevert && <RevertButton onClick={onRevert} />}
         </div>
       </div>
