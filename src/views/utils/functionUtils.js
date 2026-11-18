@@ -179,7 +179,9 @@ export const RegistrarServicioAsistencialDefault = async (
 };
 
 
-export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
+// `complementarDatos` (opcional): async (reporte) => objeto con datos extra que el jasper necesita y que no vienen en el
+// reporte principal (p. ej. de otro endpoint); se mezclan en los datos del jasper. Si falla, se imprime sin ellos.
+export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta, complementarDatos = null) => {
 
     LoadingDefault("Cargando Formato a Imprimir");
 
@@ -287,7 +289,15 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
 
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
-                    modulo.default({ ...res, ...datosFooter }, null);
+                    let datosExtra = {};
+                    if (complementarDatos) {
+                        try {
+                            datosExtra = (await complementarDatos(res)) ?? {};
+                        } catch (error) {
+                            console.error("No se pudieron cargar los datos complementarios del reporte:", error);
+                        }
+                    }
+                    modulo.default({ ...res, ...datosExtra, ...datosFooter }, null);
                 } else {
                     console.error(`El módulo no exporta una función por defecto`);
                     Swal.fire("Error", `El formato de impresión ${nombre}.jsx no es válido`, "error");
