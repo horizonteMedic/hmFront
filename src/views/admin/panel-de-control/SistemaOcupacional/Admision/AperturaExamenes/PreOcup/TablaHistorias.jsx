@@ -13,9 +13,9 @@ const CELDA = 'px-2 py-[6px] text-slate-800';
 
 // Click izquierdo carga la historia en el formulario; click derecho imprime su hoja de ruta.
 // Está memorizada: escribir en el formulario no la vuelve a dibujar.
-const TablaHistorias = memo(function TablaHistorias({ registros, cargando, seleccionado, onEditar, onImprimir }) {
+const TablaHistorias = memo(function TablaHistorias({ registros, cargando, seleccionado, onEditar, onImprimir, className = '' }) {
   return (
-    <div className="max-h-[calc(100vh-360px)] min-h-[240px] overflow-y-auto rounded-md border-[1px] border-slate-200">
+    <div className={`max-h-[calc(100vh-360px)] min-h-[240px] overflow-y-auto rounded-md border-[1px] border-slate-200 ${className}`}>
       <table className="w-full text-center text-base">
         <thead>
           <tr>

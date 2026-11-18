@@ -333,7 +333,7 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
         )}
       </AccionesRegistroHeader>
 
-      <div className="grid grid-cols-1 items-start gap-x-3 gap-y-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <div className="grid grid-cols-1 items-stretch gap-x-3 gap-y-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         {/* ───────── Formulario ───────── */}
         <div className="min-w-0 space-y-3">
           <SectionFieldset
@@ -696,9 +696,13 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
         </div>
 
         {/* ───────── Listado ───────── */}
+        {/* En pantallas grandes mide lo mismo que la columna del formulario (no la estira) y la tabla scrollea por dentro */}
+        <div className="relative min-w-0">
+        <div className="lg:absolute lg:inset-0">
         <SectionFieldset
           legend="Últimos agregados y hojas de ruta"
-          className="space-y-3"
+          fieldsetClassName="lg:flex lg:h-full lg:flex-col"
+          className="space-y-3 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
           actions={<span className="font-bold">{listado.registros.length} registros</span>}
         >
           <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-[3fr_2fr]">
@@ -758,8 +762,11 @@ const AperturaExamenesPreOcup = ({ listas, DNIG, selectedSede, token, userlogued
             seleccionado={datos.tieneRegistro ? datos.n_orden : null}
             onEditar={cargarHistoria}
             onImprimir={imprimirHistoria}
+            className="lg:max-h-none lg:min-h-0 lg:flex-1"
           />
         </SectionFieldset>
+        </div>
+        </div>
       </div>
 
       {modal === 'empresa' && (
