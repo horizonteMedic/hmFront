@@ -56,7 +56,7 @@ const enfocar = (id) => document.getElementById(id)?.focus();
 
 // Apertura de exámenes ocupacionales exclusiva de LA ARENA S.A.
 const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued, ChangeDNI }) => {
-  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExplotacionMulti, MineralMulti, AlturaMulti } = listas;
+  const { EmpresasMulti, ContrataMulti, MedicosMulti, CargosMulti, AreaMulti, ExamenMulti, ExplotacionMulti, MineralMulti, AlturaMulti } = listas;
 
   // Empresa tal como viene en la lista del backend (nombre exacto y RUC)
   const empresa = useMemo(() => {
@@ -286,7 +286,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
     const envio = {
       ...datos,
       ...(tipoOperacion === 1 && VALORES_OCULTOS),
-      nomExamen: tipoOperacion === 1 ? EXAMEN_ANUAL : datos.nomExamen || EXAMEN_ANUAL,
+      nomExamen: datos.nomExamen || EXAMEN_ANUAL,
       razonEmpresa: tipoOperacion === 1 ? razonEmpresa : datos.razonEmpresa || razonEmpresa,
     };
     if (errorDocumento) {
@@ -512,12 +512,28 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
               onSelect={(o) => setCampo('areaO', o.mensaje)}
               options={AreaMulti}
               placeholder="Escribe para buscar área..."
-              nextFocusId="nomEx"
+              nextFocusId="nomExamen"
               disabled={camposDeshabilitados}
               labelWidth={LABEL}
               {...revertible('areaO')}
             />
-            <InputTextOneLine label="Examen médico" name="nomExamen" value={datos.nomExamen} disabled labelWidth={LABEL} />
+            <InputAutocomplete
+              label="Examen médico"
+              name="nomExamen"
+              value={datos.nomExamen}
+              onChange={(v) => setCampo('nomExamen', v)}
+              onSelect={(o) => setCampo('nomExamen', o.mensaje)}
+              options={ExamenMulti}
+              placeholder="Click para ver la lista o escribe para buscar..."
+              mostrarTodo
+              soloSeleccion
+              estricto
+              onSinCoincidencia={() => setCampo('nomExamen', '')}
+              nextFocusId="nomEx"
+              disabled={camposDeshabilitados}
+              labelWidth={LABEL}
+              {...revertible('nomExamen')}
+            />
             <SelectField
               inline
               label="Explotación en"
