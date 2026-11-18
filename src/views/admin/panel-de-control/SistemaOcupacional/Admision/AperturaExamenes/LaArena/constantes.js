@@ -68,6 +68,7 @@ export const CAMPOS_EDITABLES = [
   'protocolo',
   'cargoDe',
   'areaO',
+  'nomExamen',
   'nomEx',
   'mineralPo',
   'alturaPo',
