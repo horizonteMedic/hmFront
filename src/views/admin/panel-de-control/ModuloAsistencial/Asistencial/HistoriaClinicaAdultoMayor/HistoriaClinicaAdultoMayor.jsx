@@ -489,7 +489,7 @@ export default function HistoriaClinicaAdultoMayor() {
       <SectionFieldset legend="Datos del registro" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
         <div className="flex gap-x-3 w-full">
           <InputTextOneLine
-            label="N° Ticket"
+            label="N° Ticket" prefijo="A-"
             name="n_hcl"
             value={form.n_hcl}
             onChange={handleChangeNumberDecimals}

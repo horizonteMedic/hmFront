@@ -47,6 +47,13 @@ const ModuloAsistencial = () => {
         setSelectedSede(sedeTNP?.cod_sede || sedesUsuario[0].cod_sede);
     }, [sedesUsuario, selectedSede, setSelectedSede]);
 
+    // Tema naranja del sistema asistencial (ver .tema-asistencial en index.css). Va en <html> para
+    // que también alcance modales y portales; se retira al salir del módulo.
+    useEffect(() => {
+        document.documentElement.classList.add("tema-asistencial");
+        return () => document.documentElement.classList.remove("tema-asistencial");
+    }, []);
+
     const tieneVista = (nombreVista) => {
         return Vista.some((item) => item === nombreVista);
     };

@@ -8,6 +8,7 @@ const buscarReniecUrl = "/api/pacientes-asistencial/reniec";
 const buscarDocumentoUrl = "/api/pacientes-asistencial/documento";
 const ticketsUrl = "/api/tickets";
 const historialUrl = "/api/tickets/historial";
+const reporteFiltrosUrl = "/api/tickets/reporte/filtros";
 const pacientesUrl = "/api/pacientes-asistencial";
 
 
@@ -88,6 +89,28 @@ export const ListarHistorialTickets = async (documento, token) => {
         `${b.fechaTicket ?? ""} ${b.horaTicket ?? ""}`.localeCompare(`${a.fechaTicket ?? ""} ${a.horaTicket ?? ""}`) ||
         (b.id ?? 0) - (a.id ?? 0)
     );
+  } catch {
+    return [];
+  }
+};
+
+// Listado de tickets de una sede (POST /api/tickets/reporte/filtros): `opcion` es el opcion_id_p
+// (1 = los más recientes, 2 = por N° de ticket, 3 = por apellidos/nombres del paciente).
+// Devuelve [] si no hay resultados o si la consulta falla; la tabla solo muestra "Sin registros".
+export const ListarTicketsFiltros = async ({ opcion, numeroTicket = null, nombres = null }, sede, token) => {
+  const body = {
+    opcion_id_p: opcion,
+    numero_ticket_p: numeroTicket,
+    nombres_apellidos_p: nombres,
+    cod_sede_p: sede,
+  };
+
+  try {
+    const res = await SubmitData(body, reporteFiltrosUrl, token);
+
+    // El backend puede devolver la lista directa o envuelta en { resultado }.
+    const lista = res?.resultado ?? res;
+    return Array.isArray(lista) ? lista : [];
   } catch {
     return [];
   }

@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta, formatearFechaHora } from "../../../../../utils/formatDateUtils";
@@ -185,7 +186,7 @@ export const GenerarExcelEntregas = async ({ inventarioId, inventarioNombre, des
             ...celdasMonto(item, lotesPorId),
             lote: item.numeroLote,
             vencimiento: formatearFechaCorta(item.fechaVencimiento),
-            numeroTicket: item.numeroTicket,
+            numeroTicket: formatearTicketAsistencial(item.numeroTicket),
             referencia: item.referencia,
             motivo: item.motivo,
             usuario: item.usuario,

@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../utils/apiHelpers";
 import {
@@ -189,7 +190,7 @@ export const BuscarPorNroTicket = async (numeroTicket, token, setForm) => {
 
     if (!resultado) {
         Swal.close();
-        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
         return;
     }
 
@@ -221,7 +222,7 @@ export const BuscarPorTicket = async (numeroTicket, token, setForm) => {
 
     if (!resultado) {
         Swal.close();
-        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
         return;
     }
 
@@ -440,7 +441,7 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
         if (!resTriaje || resTriaje.error || !triaje) {
             await Swal.fire(
                 "Sin Triaje",
-                `El ticket N° ${numeroTicket} todavía no tiene un Triaje registrado.`,
+                `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene un Triaje registrado.`,
                 "warning"
             );
             return;
@@ -450,7 +451,7 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
         const ticket = resTicket?.resultado;
 
         if (!ticket) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
 
@@ -486,7 +487,7 @@ export const PrintTicketAtencion = async (numeroTicket, token) => {
         if (!resTriaje || resTriaje.error || !triaje) {
             await Swal.fire(
                 "Sin Triaje",
-                `El ticket N° ${numeroTicket} todavía no tiene un Triaje registrado.`,
+                `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene un Triaje registrado.`,
                 "warning"
             );
             return;
@@ -494,7 +495,7 @@ export const PrintTicketAtencion = async (numeroTicket, token) => {
 
         const ticket = await ObtenerTicketPorNumero(numeroTicket, token);
         if (!ticket) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
 
@@ -534,7 +535,7 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     }
 
     await MostrarOpcionesImpresion(
-        `<b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b>`,
+        `<b style='color:#5b6ef5;'>N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b>`,
         opcionesImpresion(numeroTicket, token, datosFooter),
         { titulo: "Imprimir", icono: "question" }
     );

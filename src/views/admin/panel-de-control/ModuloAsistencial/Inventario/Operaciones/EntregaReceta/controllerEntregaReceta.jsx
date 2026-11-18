@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { LoadingDefault } from "../../../../../../utils/functionUtils";
 import { consultarInventario, enviarInventario, escaparHtml, etiquetaMedicamento, hoyISO, limpiarTexto } from "../../Compartido/inventarioUtils";
@@ -17,7 +18,7 @@ export const ValidarNumeroTicket = (valor) => {
 // Receta del ticket. Que el ticket no tenga receta no es un fallo del servidor: se avisa con un mensaje claro,
 // tanto si el backend responde 404 como si responde vacío.
 export const ObtenerRecetaPorTicket = async (numeroTicket, token) => {
-    const sinReceta = { ok: false, status: 404, mensaje: `No se encontró una receta para el ticket N° ${numeroTicket}.` };
+    const sinReceta = { ok: false, status: 404, mensaje: `No se encontró una receta para el ticket N° ${formatearTicketAsistencial(numeroTicket)}.` };
 
     const res = await consultarInventario(`${recetasUrl}/ticket/${numeroTicket}`, token, "No se pudo consultar la receta del ticket.");
     if (!res.ok) return res.status === 404 ? sinReceta : res;
@@ -126,7 +127,7 @@ export const EntregarReceta = async (receta, token, usuario) => {
     const faltante = receta.conFaltante ? " Atención: la receta tiene medicamentos con faltante de stock." : "";
     const { isConfirmed } = await Swal.fire({
         title: "Entregar receta",
-        text: `Se entregarán ${receta.detalles?.length ?? 0} medicamento(s) del ticket N° ${receta.numeroTicket} a ${paciente} y se descontarán del stock.${faltante} ¿Desea continuar?`,
+        text: `Se entregarán ${receta.detalles?.length ?? 0} medicamento(s) del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} a ${paciente} y se descontarán del stock.${faltante} ¿Desea continuar?`,
         icon: receta.conFaltante ? "warning" : "question",
         showCancelButton: true,
         confirmButtonText: "Sí, entregar",
@@ -139,7 +140,7 @@ export const EntregarReceta = async (receta, token, usuario) => {
             url: urlAccionTicket(receta, "entregar", { parcial: false, usuario: usuario ?? "" }),
             titulo: "Entregando Receta",
             mensajeError: "Ocurrió un error al entregar la receta.",
-            mensajeExito: `Receta del ticket N° ${receta.numeroTicket} entregada correctamente.`,
+            mensajeExito: `Receta del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} entregada correctamente.`,
         },
         token
     );
@@ -167,7 +168,7 @@ export const EntregarRecetaParcial = async (receta, token, usuario) => {
         title: "Entrega parcial",
         icon: "question",
         html:
-            `<p>Se entregarán solo los medicamentos disponibles del ticket N° ${receta.numeroTicket} a ${paciente} y se descontarán del stock.</p>` +
+            `<p>Se entregarán solo los medicamentos disponibles del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} a ${paciente} y se descontarán del stock.</p>` +
             `<p style="margin-top:8px"><strong>Se entregan (${disponibles.length}):</strong></p>${listaMedicamentos(disponibles)}` +
             (conProblema.length > 0
                 ? `<p><strong>Quedan pendientes (${conProblema.length}):</strong></p>${listaMedicamentos(conProblema)}`
@@ -190,7 +191,7 @@ export const EntregarRecetaParcial = async (receta, token, usuario) => {
                     texto:
                         quedan > 0
                             ? `Entrega parcial registrada. Quedan ${quedan} medicamento(s) pendientes en la receta: use «Re-reservar» para reservarles stock vigente.`
-                            : `Receta del ticket N° ${receta.numeroTicket} entregada correctamente.`,
+                            : `Receta del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} entregada correctamente.`,
                     icono: "success",
                 };
             },
@@ -206,7 +207,7 @@ export const ReReservarReceta = async (receta, token, usuario) => {
 
     const { isConfirmed } = await Swal.fire({
         title: "Re-reservar receta",
-        text: `Se soltarán los lotes vencidos reservados para el ticket N° ${receta.numeroTicket} y se reservará stock nuevo solo de lo que falta. ¿Desea continuar?`,
+        text: `Se soltarán los lotes vencidos reservados para el ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} y se reservará stock nuevo solo de lo que falta. ¿Desea continuar?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, re-reservar",
@@ -223,7 +224,7 @@ export const ReReservarReceta = async (receta, token, usuario) => {
             mensajeExito: (resultado) =>
                 resultado?.conFaltante
                     ? { texto: "Se soltaron los lotes vencidos, pero no hay stock vigente suficiente: la receta sigue con faltante. Puede entregarla parcialmente.", icono: "warning" }
-                    : { texto: `Receta del ticket N° ${receta.numeroTicket} re-reservada. Ya se puede entregar.`, icono: "success" },
+                    : { texto: `Receta del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} re-reservada. Ya se puede entregar.`, icono: "success" },
         },
         token
     );
@@ -236,7 +237,7 @@ export const AnularReceta = async (receta, token, usuario) => {
 
     const { isConfirmed, value } = await Swal.fire({
         title: "Anular receta",
-        text: `Se anulará la receta del ticket N° ${receta.numeroTicket} y se liberará la reserva de sus medicamentos. Indique el motivo de la anulación.`,
+        text: `Se anulará la receta del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} y se liberará la reserva de sus medicamentos. Indique el motivo de la anulación.`,
         icon: "warning",
         input: "textarea",
         inputPlaceholder: "Motivo de la anulación",
@@ -254,7 +255,7 @@ export const AnularReceta = async (receta, token, usuario) => {
             url: `${recetasUrl}/${receta.id}/anular?${query}`,
             titulo: "Anulando Receta",
             mensajeError: "Ocurrió un error al anular la receta.",
-            mensajeExito: `Receta del ticket N° ${receta.numeroTicket} anulada. Se liberó la reserva de sus medicamentos.`,
+            mensajeExito: `Receta del ticket N° ${formatearTicketAsistencial(receta.numeroTicket)} anulada. Se liberó la reserva de sus medicamentos.`,
         },
         token
     );

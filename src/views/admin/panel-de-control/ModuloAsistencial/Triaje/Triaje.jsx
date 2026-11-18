@@ -286,7 +286,7 @@ export default function TriajeAsistencial() {
 
             <SectionFieldset legend="Datos de Registro" className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 <InputTextOneLine
-                    label="N° Ticket"
+                    label="N° Ticket" prefijo="A-"
                     name="numeroTicket"
                     value={form.numeroTicket}
                     onChange={handleChangeNumber}

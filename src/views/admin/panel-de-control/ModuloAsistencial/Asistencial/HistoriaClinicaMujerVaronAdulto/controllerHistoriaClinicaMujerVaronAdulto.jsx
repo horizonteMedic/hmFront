@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../../utils/functionUtils";
@@ -240,7 +241,7 @@ export const VerifyTR = async (numeroTicket, token, set, today, listaEmpleados) 
     const paciente = pacienteDe(data);
 
     if (res?.error || !data || !paciente) {
-        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
         return;
     }
 
@@ -302,7 +303,7 @@ const OpenModalHistorialPrevio = async (numeroTicket, token, set, today, listaEm
         const key = String(item.id ?? index);
         const fechaLabel = formatearFechaCorta(item.fechaApertura ?? "") || item.fechaApertura || "Sin fecha";
         const ticketLabel = item.numeroTicket;
-        acc[key] = ticketLabel ? `${fechaLabel} - Ticket N° ${ticketLabel}` : fechaLabel;
+        acc[key] = ticketLabel ? `${fechaLabel} - Ticket N° ${formatearTicketAsistencial(ticketLabel)}` : fechaLabel;
         return acc;
     }, {});
 
@@ -511,13 +512,13 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const data = unwrap(res);
 
         if (res?.error || !data || !pacienteDe(data)) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
         if (!tieneHistoria(data)) {
             await Swal.fire(
                 "Sin Historia Clínica",
-                `El ticket N° ${numeroTicket} todavía no tiene una Historia Clínica registrada.`,
+                `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene una Historia Clínica registrada.`,
                 "warning"
             );
             return;
@@ -567,7 +568,7 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, esAre
 
     const { isConfirmed } = await Swal.fire({
         title: "¿Desea Imprimir Reporte?",
-        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b></div>`,
+        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b></div>`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, Imprimir",
@@ -673,7 +674,7 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         // Los avisos se esperan (await): también se llama desde el mensaje de opciones de impresión, que se
         // reabre al terminar esta función y taparía el aviso.
         if (res?.error || !data || !pacienteDe(data)) {
-            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
 

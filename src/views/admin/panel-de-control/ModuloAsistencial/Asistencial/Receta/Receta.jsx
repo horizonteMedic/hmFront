@@ -15,9 +15,12 @@ import {
     detalleStockReceta,
     estadoDeReceta,
     estadoItemReceta,
+    formEditarPendiente,
     formNuevaReceta,
+    formSinCambiosReceta,
     numeroDeReceta,
     puedeAbrirNuevaReceta,
+    puedeEditarPendiente,
     recetaBloqueada,
     validarLineaReceta,
 } from "./controllerReceta";
@@ -79,7 +82,9 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
     // La pendiente (si hay) va destacada arriba; el resto de las recetas guardadas, debajo, de la más reciente a la más antigua.
     const pendiente = historial.find((receta) => estadoDeReceta(receta) === "pendiente") ?? null;
     const otras = historial.filter((receta) => receta !== pendiente);
-    const bloque = (receta) => <RecetaGuardada key={receta.id} receta={receta} numero={numeroDeReceta(historial, receta)} />;
+    const bloque = (receta, onEditar = null) => (
+        <RecetaGuardada key={receta.id} receta={receta} numero={numeroDeReceta(historial, receta)} onEditar={onEditar} />
+    );
     const medicamento = medicamentos.find((m) => String(m.id) === form.recetaMedicamentoId) ?? null;
     // Sin el dato de stock (el backend no lo trajo) no se puede afirmar que supere lo disponible.
     const pideMasDeLoDisponible =
@@ -134,6 +139,18 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
     };
 
     // Abre una receta nueva: lista y línea en blanco (lo entregado sigue a la vista en el historial).
+    // Abre la receta pendiente para corregirla: sus medicamentos pasan a la lista editable (se re-reserva al guardar).
+    const handleEditarPendiente = () => {
+        setErrores({});
+        setForm((f) => ({ ...f, ...formEditarPendiente(f) }));
+    };
+
+    // Descarta la edición (o lo escrito) y vuelve a lo que tiene el ticket.
+    const handleCancelarEdicion = () => {
+        setErrores({});
+        setForm((f) => ({ ...f, ...formSinCambiosReceta(f) }));
+    };
+
     const handleNuevaReceta = () => {
         setErrores({});
         setForm((f) => ({ ...f, ...formNuevaReceta(f) }));
@@ -189,7 +206,7 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
     return (
         <SectionFieldset legend="Receta (Reserva de Medicamentos)" className="space-y-3" actions={acciones}>
             {/* La receta pendiente va primero y destacada: es la que todavía falta entregar. */}
-            {pendiente && bloque(pendiente)}
+            {pendiente && !form.recetaEditando && bloque(pendiente, !disabled && puedeEditarPendiente(pendiente) ? handleEditarPendiente : null)}
 
             {/* Armado de una receta: solo cuando se puede crear (el ticket no tiene ninguna, o se abrió una nueva). */}
             {!registrada && (
@@ -199,11 +216,11 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
                         <InputTextOneLine
                             label="Fecha y hora de creación"
                             name="recetaFechaRegistro"
-                            value="Se asigna al guardar"
+                            value={form.recetaEditando && form.recetaFechaRegistro ? formatearFechaHora(form.recetaFechaRegistro) : "Se asigna al guardar"}
                             disabled
                             labelWidth={ANCHO_ETIQUETA}
                         />
-                        {disabled ? (
+                        {disabled || form.recetaEditando ? (
                             <InputTextOneLine
                                 label="Inventario"
                                 name="recetaInventario"
@@ -230,6 +247,25 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
                             La receta anterior de este ticket fue anulada{form.recetaMotivoAnulacion ? ` (motivo: ${form.recetaMotivoAnulacion})` : ""}: ya no
                             reserva medicamentos. Puede armar una nueva.
                         </p>
+                    )}
+                    {form.recetaEditando && (
+                        <div className="p-2 rounded border border-amber-400 bg-amber-50 text-amber-900 text-sm flex flex-col sm:flex-row sm:items-center gap-2">
+                            <p className="flex-1">
+                                Está editando la receta pendiente: al guardar la Historia Clínica se reemplazan sus medicamentos y se vuelve a reservar el stock.
+                                Agregue, quite o cambie lo que necesite.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={handleCancelarEdicion}
+                                className="
+                                    bg-gray-600 hover:bg-gray-700
+                                    text-white text-base px-4 py-1.5 rounded whitespace-nowrap
+                                    transition-all duration-150 ease-out
+                                    active:scale-95"
+                            >
+                                Cancelar edición
+                            </button>
+                        </div>
                     )}
                     {form.recetaNueva && (
                         <p className="p-2 rounded border border-blue-300 bg-blue-50 text-blue-800 text-sm">
@@ -308,8 +344,8 @@ export default function Receta({ form, setForm, token, usuario, disabled = false
                     <TablaTemplate columns={columnas} data={items} height={180} emptyText="La receta no tiene medicamentos" />
 
                     <p className="text-sm italic text-gray-600">
-                        Se guarda junto con la Historia Clínica y solo reserva el medicamento; farmacia lo entrega después. Una vez guardada no se puede
-                        modificar. Sin medicamentos, no se registra receta.
+                        Se guarda junto con la Historia Clínica y solo reserva el medicamento; farmacia lo entrega después. Mientras siga pendiente se puede
+                        corregir con «Editar receta»; una vez entregada no se modifica. Sin medicamentos, no se registra receta.
                     </p>
                 </div>
             )}

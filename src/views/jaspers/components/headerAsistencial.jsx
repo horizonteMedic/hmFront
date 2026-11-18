@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../utils/ticketAsistencial";
 import CabeceraLogo from "./CabeceraLogo.jsx";
 import drawColorBox from "./ColorBox.jsx";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
@@ -27,7 +28,7 @@ const HeaderAsistencial = async (
   doc.text(etiquetaTicket, x, 15);
   const xTicket = x + doc.getTextWidth(etiquetaTicket) + 2;
   doc.setFontSize(18);
-  doc.text(texto(datos.numeroTicket), xTicket, 16);
+  doc.text(formatearTicketAsistencial(texto(datos.numeroTicket)), xTicket, 16);
 
   doc.setFontSize(8);
   doc.text(`N° Historia Clínica: ${texto(datos.numeroHistoriaClinica)}`, x, 20);

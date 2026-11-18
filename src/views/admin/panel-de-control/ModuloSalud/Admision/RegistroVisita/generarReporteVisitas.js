@@ -30,6 +30,7 @@ const calcularEdad = (fechaNacimiento) => {
 
 const textoSexo = (sexo) => (sexo === "M" ? "MASCULINO" : sexo === "F" ? "FEMENINO" : sexo ?? "");
 
+
 // Una fila del reporte (visita + paciente + parentescos) -> fila plana de la hoja
 const aplanarFila = (item) => {
     const paciente = item.paciente ?? {};

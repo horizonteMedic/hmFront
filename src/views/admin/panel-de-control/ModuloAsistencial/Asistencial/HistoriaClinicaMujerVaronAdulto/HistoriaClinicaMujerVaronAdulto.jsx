@@ -335,7 +335,7 @@ export default function HistoriaClinicaMujerVaronAdulto() {
 
       <SectionFieldset legend="Datos del registro" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputTextOneLine
-          label="N° Ticket"
+          label="N° Ticket" prefijo="A-"
           name="n_hcl"
           value={form.n_hcl}
           onChange={handleChangeNumber}

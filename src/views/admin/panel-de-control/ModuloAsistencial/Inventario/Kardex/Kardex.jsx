@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -104,7 +105,7 @@ const crearColumnas = (valorDe, precioDe) => [
         valorOrden: (row) => [row.motivo, row.referencia].filter(Boolean).join(" · "),
         render: (row) => [row.motivo, row.referencia].filter(Boolean).join(" · ") || "—",
     },
-    { id: "ticket", label: "Ticket", width: "6%", valorOrden: (row) => row.numeroTicket, render: (row) => row.numeroTicket ?? "—" },
+    { id: "ticket", label: "Ticket", width: "6%", valorOrden: (row) => row.numeroTicket, render: (row) => formatearTicketAsistencial(row.numeroTicket, "—") },
     { id: "usuario", label: "Usuario", accessor: "usuario", width: "8%" },
 ];
 

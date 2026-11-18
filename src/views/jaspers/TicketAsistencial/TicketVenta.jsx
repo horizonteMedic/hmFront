@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../utils/ticketAsistencial";
 import { jsPDF } from "jspdf";
 
 // Logo horizontal (POLICLÍNICO HORIZONTE MEDIC / Cuidamos tu Salud!), 3517x1260px.
@@ -229,7 +230,7 @@ export default async function TicketVenta({
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(36);
-    doc.text(String(numeroTicket || "-"), ancho / 2, y, { align: "center" });
+    doc.text(formatearTicketAsistencial(numeroTicket, "-"), ancho / 2, y, { align: "center" });
     y += 9;
 
     // ── Línea separadora ──────────────────────────────────────────────────────

@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../utils/ticketAsistencial";
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../utils/functionUtils";
@@ -156,7 +157,7 @@ export const VerifyTR = async (numeroTicket, token, set, catalogos, listaEmplead
 
     const data = unwrap(res);
     if (res?.error || !data || (!texto(data.pacienteNombres) && !texto(data.pacienteApellidos))) {
-        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+        await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
         return;
     }
 
@@ -333,13 +334,13 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
         const data = unwrap(res);
 
         if (res?.error || !data) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${formatearTicketAsistencial(numeroTicket)}.`, "error");
             return;
         }
         if (!tieneReferencia(data)) {
             Swal.fire(
                 "Sin Hoja de Referencia",
-                `El ticket N° ${numeroTicket} todavía no tiene una Hoja de Referencia registrada.`,
+                `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene una Hoja de Referencia registrada.`,
                 "warning"
             );
             return;
@@ -372,7 +373,7 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
 
     const { isConfirmed } = await Swal.fire({
         title: "¿Desea Imprimir Reporte?",
-        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${numeroTicket}</b></div>`,
+        html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b></div>`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, Imprimir",

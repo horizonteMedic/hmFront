@@ -158,7 +158,7 @@ export default function BKKOH() {
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-2 gap-3 lg:gap-4">
         <div className="flex gap-x-3 w-full">
           <InputTextOneLine
-            label="N° Ticket"
+            label="N° Ticket" prefijo="A-"
             name="numeroTicket"
             value={form.numeroTicket}
             onChange={handleChangeNumber}

@@ -225,7 +225,7 @@ export default function HojaReferencia() {
       <SectionFieldset legend="Datos Generales" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
         <div className="flex gap-x-3 w-full">
           <InputTextOneLine
-            label="N° Ticket"
+            label="N° Ticket" prefijo="A-"
             name="numeroTicket"
             value={form.numeroTicket}
             onChange={handleChangeNumberDecimals}

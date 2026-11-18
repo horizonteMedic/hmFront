@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../../utils/ticketAsistencial";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -118,7 +119,7 @@ const crearColumnasDetalle = (resaltar, valorDe) => [
 // `idsConFaltante`: ids de las recetas que el backend lista como "con faltante" (lote vencido). `valorDe(receta)` da el
 // valor referencial de lo reservado o entregado de la receta (de `ValorDeReceta`).
 const crearColumnasPendientes = (idsConFaltante, valorDe) => [
-    { label: "N° Ticket", accessor: "numeroTicket", width: "9%" },
+    { label: "N° Ticket", width: "9%", render: (row) => formatearTicketAsistencial(row.numeroTicket) },
     { label: "Paciente", width: "21%", render: (row) => NombrePaciente(row) || "—" },
     { label: "Documento", width: "11%", render: (row) => row.pacienteDocumento || "—" },
     { label: "Medicamentos", width: "11%", render: (row) => row.detalles?.length ?? "—" },
@@ -303,7 +304,7 @@ export default function EntregaReceta() {
                 <SectionFieldset legend="Buscar Receta por Ticket" fieldsetClassName="min-w-0">
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
                         <InputTextOneLine
-                            label="N° Ticket"
+                            label="N° Ticket" prefijo="A-"
                             name="numeroTicket"
                             labelWidth="110px"
                             className="w-full md:flex-1"
@@ -332,7 +333,7 @@ export default function EntregaReceta() {
                 </SectionFieldset>
 
                 {(cargandoReceta || errorReceta || receta) && (
-                    <SectionFieldset legend={receta ? `Receta del Ticket N° ${receta.numeroTicket}` : "Receta"} fieldsetClassName="min-w-0">
+                    <SectionFieldset legend={receta ? `Receta del Ticket N° ${formatearTicketAsistencial(receta.numeroTicket)}` : "Receta"} fieldsetClassName="min-w-0">
                         {cargandoReceta && <p className="text-gray-500">Buscando receta...</p>}
                         <AvisoError mensaje={errorReceta} onRetry={() => buscarReceta()} />
 

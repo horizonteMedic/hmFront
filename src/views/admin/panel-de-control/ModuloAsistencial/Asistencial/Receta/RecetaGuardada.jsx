@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { estadoDeReceta } from "./controllerReceta";
 
@@ -26,9 +28,10 @@ const ESTILOS = {
 /**
  * Una receta YA GUARDADA del ticket (solo lectura), completa: cabecera con su N°, estado, fecha, usuario e inventario, y
  * la lista de medicamentos con el estado de cada uno. La receta pendiente (falta que farmacia la entregue) se destaca
- * con color ámbar para que se note de inmediato. `numero` es su orden dentro del ticket (1 = la más antigua).
+ * con color ámbar para que se note de inmediato y, con `onEditar`, ofrece «Editar receta». `numero` es su orden dentro
+ * del ticket (1 = la más antigua).
  */
-export default function RecetaGuardada({ receta, numero }) {
+export default function RecetaGuardada({ receta, numero, onEditar = null }) {
     const estado = estadoDeReceta(receta);
     const { texto, clases } = ESTADOS_RECETA[estado];
     const detalles = receta.detalles ?? [];
@@ -49,10 +52,27 @@ export default function RecetaGuardada({ receta, numero }) {
             </header>
 
             {estado === "pendiente" && (
-                <p className="px-3 py-2 text-sm text-amber-800 font-medium">
-                    Falta que farmacia entregue esta receta (Inventario &gt; Entrega por Ticket). Mientras tanto no se puede modificar ni abrir otra receta.
-                    {receta.conFaltante && " Tiene faltante de stock en algún medicamento."}
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 px-3 py-2">
+                    <p className="flex-1 text-sm text-amber-800 font-medium">
+                        Falta que farmacia entregue esta receta (Inventario &gt; Entrega por Ticket). Mientras siga pendiente no se puede abrir otra receta.
+                        {receta.conFaltante && " Tiene faltante de stock en algún medicamento."}
+                    </p>
+                    {onEditar && (
+                        <button
+                            type="button"
+                            onClick={onEditar}
+                            className="
+                                bg-amber-600 hover:bg-amber-700
+                                text-white text-base px-4 py-1.5 rounded
+                                flex items-center justify-center gap-2 whitespace-nowrap
+                                transition-all duration-150 ease-out
+                                hover:shadow-lg
+                                active:scale-95 active:shadow-inner"
+                        >
+                            <FontAwesomeIcon icon={faPen} /> Editar receta
+                        </button>
+                    )}
+                </div>
             )}
             {estado === "anulada" && (
                 <p className="px-3 py-2 text-sm text-red-700">

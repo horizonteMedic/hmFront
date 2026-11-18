@@ -158,7 +158,7 @@ export default function Boro() {
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex gap-x-3 w-full">
           <InputTextOneLine
-            label="N° Ticket"
+            label="N° Ticket" prefijo="A-"
             name="numeroTicket"
             value={form.numeroTicket}
             onChange={handleChangeNumber}

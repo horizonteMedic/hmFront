@@ -1,3 +1,4 @@
+import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistencial";
 import { faCheck, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -62,7 +63,7 @@ export default function HistorialTickets({ tickets, seleccionadoId, contextoActu
                                 <span className="flex items-baseline justify-between gap-2">
                                     <span className="flex items-center gap-1 text-xl font-bold text-gray-800">
                                         {activo && <FontAwesomeIcon icon={faCheck} className="text-green-600" />}
-                                        Ticket N° {t.numeroTicket}
+                                        Ticket N° {formatearTicketAsistencial(t.numeroTicket)}
                                     </span>
                                     <span className="text-lg text-gray-500">{formatearFecha(t.fechaTicket)}</span>
                                 </span>
