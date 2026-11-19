@@ -43,8 +43,21 @@ const COMPLEMENTOS = {
  * Siguen sin botón propio: se guardan con el Guardar de la Historia Clínica (ver controllerComplementos) y se
  * imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET. `onChange` es el manejador de
  * texto del formulario (en mayúsculas) y `disabled` bloquea la creación en un registro sin «Habilitar edición».
+ *
+ * `claves` limita cuáles se ofrecen (por defecto los tres): Odontología solo usa ["receta"], con su propio `titulo` y
+ * `descripcion` de encabezado.
  */
-export default function ComplementosDesplegables({ form, setForm, onChange, token, usuario, disabled = false }) {
+export default function ComplementosDesplegables({
+  form,
+  setForm,
+  onChange,
+  token,
+  usuario,
+  disabled = false,
+  claves = Object.keys(COMPLEMENTOS),
+  titulo = "Complementos de La Arena",
+  descripcion = "Documentos opcionales de este ticket: genere solo los que necesite. Se guardan junto con la Historia Clínica.",
+}) {
   const [generados, setGenerados] = useState({ descanso: false, accidente: false, receta: false });
 
   const conContenido = complementosConContenido(form);
@@ -85,13 +98,11 @@ export default function ComplementosDesplegables({ form, setForm, onChange, toke
   return (
     <section className="space-y-3">
       <div>
-        <p className="font-semibold text-primario">Complementos de La Arena</p>
-        <p className="text-gray-600">
-          Documentos opcionales de este ticket: genere solo los que necesite. Se guardan junto con la Historia Clínica.
-        </p>
+        <p className="font-semibold text-primario">{titulo}</p>
+        <p className="text-gray-600">{descripcion}</p>
       </div>
 
-      {Object.entries(COMPLEMENTOS).map(([clave, datos]) => (
+      {Object.entries(COMPLEMENTOS).filter(([clave]) => claves.includes(clave)).map(([clave, datos]) => (
         <ComplementoDesplegable
           key={clave}
           {...datos}

@@ -22,6 +22,7 @@ import Swal from "sweetalert2";
 import { useForm } from "../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../hooks/useSessionData";
+import { useEsSedeLaArena, useFormLaArena } from "../../../../hooks/useLaArena";
 import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
 import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
@@ -31,6 +32,8 @@ import InputTextOneLine from "../../../../components/reusableComponents/InputTex
 import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import BotonesForm from "../../../../components/templates/BotonesForm";
+import ComplementosDesplegables from "../Asistencial/ComplementosLaArena/ComplementosDesplegables";
+import { RECETA_ESTADO_INICIAL } from "../Asistencial/Receta/controllerReceta";
 import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
 import { CONTADORES_INICIALES } from "./estadosOdontograma";
 
@@ -107,6 +110,13 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
     observaciones: "",
     observacionesCie10: "",
     noPasoExamen: false,
+
+    // Receta de La Arena (la misma de las Historias Clínicas): n_hcl es el N° de ticket que usa la receta; esArena lo
+    // carga la búsqueda del ticket (ver useFormLaArena) y los `receta*` son su estado (RECETA_ESTADO_INICIAL).
+    n_hcl: "",
+    esArena: false,
+    pacienteId: null,
+    ...RECETA_ESTADO_INICIAL,
 
     nombres_search: "",
     codigo_search: "",
@@ -186,6 +196,12 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
     handleClear,
   } = useForm(initialFormState);
 
+  // Receta de La Arena: con la sede La Arena seleccionada, o con un ticket ya registrado como La Arena (form.esArena), se
+  // ofrece desde que se abre el formulario. Incrustado (Auditoría de Protocolos, por orden) no lleva receta.
+  const formArena = useFormLaArena(form);
+  const esArenaSede = useEsSedeLaArena();
+  const conReceta = !embebido && formArena.esArena;
+
   const {
     edicionHabilitada,
     habilitarEdicion,
@@ -226,14 +242,15 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
   };
 
   const handlePrint = () => {
-    ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
+    ConfirmarImpresion(form.ticketImprimir, token, datosFooter, esArenaSede);
   };
 
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
   const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, alRegistrar, datosFooter);
+    // formArena: lleva esArena resuelto con la sede (la receta solo se valida y guarda en La Arena y no incrustado).
+    SubmitDataService({ ...formArena, esArena: conReceta }, token, userlogued, alRegistrar, datosFooter);
   };
 
   // ===== Búsqueda con botón =====
@@ -459,6 +476,27 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
                       onRevert={revertMedico}
                     />
                   </SectionFieldset>
+
+                  {/* ===== SECCIÓN: RECETA (La Arena) =====
+                      Misma receta de las Historias Clínicas: aparece al pulsar «Generar Receta», se guarda con el Guardar
+                      del odontograma y se imprime desde el mensaje de éxito o el botón IMPRIMIR N° TICKET. */}
+                  {conReceta && (
+                    <div className="mt-3">
+                      <ComplementosDesplegables
+                        // La clave reinicia qué se «generó» al buscar otro ticket o limpiar.
+                        key={form.pacienteId ?? "sin-ticket"}
+                        form={formArena}
+                        setForm={setForm}
+                        onChange={handleChange}
+                        token={token}
+                        usuario={userlogued}
+                        disabled={camposDeshabilitados}
+                        claves={["receta"]}
+                        titulo="Receta"
+                        descripcion="Opcional: genere la receta de este ticket si el paciente necesita medicamentos. Se guarda junto con el Odontograma."
+                      />
+                    </div>
+                  )}
 
                   {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
                   {hayRegistroCargado && (
