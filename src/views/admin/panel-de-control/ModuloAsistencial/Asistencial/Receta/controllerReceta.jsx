@@ -277,7 +277,7 @@ export const validarReceta = (form) => {
 
 // Registra (crea o edita) la receta del ticket y reserva el stock: POST. true si quedó guardada; si no, muestra el
 // motivo que da el backend (p. ej. medicamento inactivo) y devuelve false (la Historia Clínica no se guarda).
-export const GuardarReceta = async (form, token, userlogued) => {
+export const GuardarReceta = async (form, token, userlogued, registro = "la Historia Clínica") => {
     // inventarioId figura de solo lectura en el DTO: se envía el elegido en el combo por si el backend lo toma; el
     // inventario que realmente registra se ve al volver a cargar la receta (campo Inventario).
     const inventarioId = Number(form.recetaInventarioId);
@@ -299,7 +299,7 @@ export const GuardarReceta = async (form, token, userlogued) => {
     Swal.close();
 
     if (!res.ok) {
-        await Swal.fire("Error", `No se pudo registrar la receta, por eso no se guardó la Historia Clínica: ${res.mensaje}`, "error");
+        await Swal.fire("Error", `No se pudo registrar la receta, por eso no se guardó ${registro}: ${res.mensaje}`, "error");
         return false;
     }
     return true;

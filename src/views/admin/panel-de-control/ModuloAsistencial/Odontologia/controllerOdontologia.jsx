@@ -6,9 +6,12 @@ import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
 import { actualizarRegistro, validarSede } from "../../../../utils/registroOcupacionalUtils";
 import { contadoresParaRegistrar, labelParaLeer, valorParaRegistrar } from "./estadosOdontograma";
 import { getFetch as getFetchAsistencial } from "../../../../utils/apiHelpers";
-import { LoadingDefault, RegistrarServicioAsistencialDefault } from "../../../../utils/functionUtils";
+import { LoadingDefault, MostrarOpcionesImpresion, RegistrarServicioAsistencialDefault } from "../../../../utils/functionUtils";
 import { obtenerDigitalizacionMedico, obtenerDigitalizacionPaciente } from "../../../../utils/registroAsistencialUtils";
 import { convertirGenero } from "../../../../utils/helpers";
+import { esArenaDe } from "../Asistencial/ComplementosLaArena/controllerComplementos";
+import { formFromTicketInfo } from "../Asistencial/DescansoMedico/controllerDescansoMedico";
+import { GuardarReceta, ImprimirRecetaPorTicket, ObtenerRecetas, formFromRecetas, hayReceta, validarReceta } from "../Asistencial/Receta/controllerReceta";
 
 //===============Zona Modificación===============
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
@@ -196,6 +199,9 @@ const formFromOdontograma = (resultado, prev) => {
   const base = {
     pacienteId: paciente.id ?? ticket.pacienteId ?? null,
     numeroTicket: String(resultado.numeroTicket ?? ticket.numeroTicket ?? ""),
+    // La Receta (compartida con las Historias Clínicas) trabaja con n_hcl como N° de ticket y solo se ofrece en tickets de La Arena.
+    n_hcl: String(resultado.numeroTicket ?? ticket.numeroTicket ?? ""),
+    esArena: esArenaDe(resultado),
     nombres: `${paciente.nombres ?? ticket.pacienteNombres ?? ""} ${paciente.apellidos ?? ticket.pacienteApellidos ?? ""}`.trim(),
     sexo: convertirGenero(paciente.sexo) ?? "",
     edad: edad ? `${edad} años` : "",
@@ -234,7 +240,11 @@ export const BuscarPorTicket = async (numeroTicket, token, setForm) => {
   }
 
   LoadingDefault("Buscando Ticket");
-  const res = await getFetchAsistencial(`${odontogramaTicketUrl}/${numeroTicket}`, token);
+  // Las recetas del ticket son registros aparte (otro endpoint): se buscan en paralelo para mostrarlas si ya existen.
+  const [res, recetas] = await Promise.all([
+    getFetchAsistencial(`${odontogramaTicketUrl}/${numeroTicket}`, token),
+    ObtenerRecetas(numeroTicket, token),
+  ]);
   Swal.close();
 
   const resultado = res?.resultado;
@@ -243,7 +253,7 @@ export const BuscarPorTicket = async (numeroTicket, token, setForm) => {
     return;
   }
 
-  setForm((prev) => ({ ...prev, ...formFromOdontograma(resultado, prev) }));
+  setForm((prev) => ({ ...prev, ...formFromOdontograma(resultado, prev), ...formFromRecetas(recetas) }));
 
   if (resultado.id) {
     Swal.fire("Alerta", "Este ticket ya cuenta con un Odontograma registrado.", "warning");
@@ -280,15 +290,29 @@ export const SubmitDataService = async (form, token, user, limpiar, datosFooter)
     return;
   }
 
+  // Receta (La Arena): un medicamento escrito sin agregar se avisa antes de guardar nada, y si hay receta se guarda
+  // ANTES que el odontograma: es lo que más puede rechazar el backend (stock, medicamentos inactivos) y así, si falla,
+  // el odontograma no se guarda y se puede reintentar sin duplicar nada.
+  const errorReceta = form.esArena ? validarReceta(form) : null;
+  if (errorReceta) {
+    await Swal.fire("Datos incompletos", errorReceta, "warning");
+    return;
+  }
+  const recetaPorGuardar = Boolean(form.esArena) && hayReceta(form);
+  if (recetaPorGuardar && !(await GuardarReceta(form, token, user, "el Odontograma"))) return;
+
   const numeroTicket = form.numeroTicket; // el formulario se limpia al terminar de guardar
   const url = `${registrarAsistencialUrl}?usuario=${encodeURIComponent(user ?? "")}`;
+  const mensaje = form.id ? "Odontograma actualizado correctamente." : "Odontograma registrado correctamente.";
   await RegistrarServicioAsistencialDefault(
     token,
     construirBodyAsistencial(form),
     url,
     limpiar,
-    form.id ? "Odontograma actualizado correctamente." : "Odontograma registrado correctamente.",
-    () => PrintOdontogramaAsistencial(numeroTicket, token, datosFooter)
+    recetaPorGuardar ? `${mensaje}\nReceta registrada (medicamentos reservados).` : mensaje,
+    () => PrintOdontogramaAsistencial(numeroTicket, token, datosFooter),
+    // En un ticket de La Arena el mensaje de éxito ofrece imprimir el Odontograma y la Receta.
+    form.esArena ? opcionesImpresion(numeroTicket, token, datosFooter) : null
   );
 };
 
@@ -352,10 +376,55 @@ export const PrintOdontogramaAsistencial = async (numeroTicket, token, datosFoot
   }
 };
 
-// Botón IMPRIMIR: pide confirmación y luego imprime el ticket indicado.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+// Datos del paciente y del ticket que imprime la Receta, con los nombres de campo del formulario que lee
+// ImprimirRecetaPorTicket (n_hcl, numeroHistoriaClinica, nombres, dni, edad, sexo, diagnostico, nombre_medico, ticket*).
+// Salen del odontograma del ticket (que responde siempre con el paciente y el ticket, haya o no odontograma). El
+// diagnóstico de la receta son las Observaciones CIE10 del odontograma. null si el ticket no existe.
+export const ObtenerDatosRecetaOdontologia = async (numeroTicket, token) => {
+  const res = await getFetchAsistencial(`${odontogramaTicketUrl}/${numeroTicket}`, token);
+  const resultado = res?.resultado;
+  if (!res || res.error || !resultado) return null;
+
+  const paciente = resultado.paciente ?? {};
+  const ticket = resultado.infoTicket ?? {};
+  return {
+    ...formFromTicketInfo(ticket),
+    n_hcl: String(numeroTicket),
+    numeroHistoriaClinica: paciente.numeroHistoriaClinica ?? "",
+    nombres: `${paciente.nombres ?? ticket.pacienteNombres ?? ""} ${paciente.apellidos ?? ticket.pacienteApellidos ?? ""}`.trim(),
+    dni: paciente.numeroDocumento ?? ticket.pacienteDni ?? "",
+    edad: paciente.edad ?? ticket.pacienteEdad ?? resultado.edadOd ?? "",
+    sexo: convertirGenero(paciente.sexo) ?? "",
+    diagnostico: resultado.observacionesCie10 ?? "",
+    nombre_medico: resultado.doctorAsignado ?? "",
+    esArena: esArenaDe(resultado),
+  };
+};
+
+// Botones de impresión de un ticket de La Arena: el Odontograma y la Receta (con varias recetas, ésta pregunta cuál).
+const opcionesImpresion = (numeroTicket, token, datosFooter) => [
+  { etiqueta: "Imprimir Odontograma", accion: () => PrintOdontogramaAsistencial(numeroTicket, token, datosFooter) },
+  { etiqueta: "Imprimir Receta", accion: () => ImprimirRecetaPorTicket(numeroTicket, token, datosFooter, ObtenerDatosRecetaOdontologia) },
+];
+
+// Botón IMPRIMIR: pide confirmación y luego imprime el ticket indicado. Si el ticket es de La Arena (o la sede
+// seleccionada lo es: `esArenaSede`) el mensaje ofrece además imprimir la Receta del ticket.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, esArenaSede = false) => {
   if (!numeroTicket) {
     await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
+    return;
+  }
+
+  LoadingDefault("Consultando ticket");
+  const datos = await ObtenerDatosRecetaOdontologia(numeroTicket, token);
+  Swal.close();
+
+  if (datos && (datos.esArena || esArenaSede)) {
+    await MostrarOpcionesImpresion(
+      `<b style="color:#5b6ef5;">N° Ticket: ${formatearTicketAsistencial(numeroTicket)}</b>`,
+      opcionesImpresion(numeroTicket, token, datosFooter),
+      { titulo: "¿Desea Imprimir Reporte?", icono: "question" }
+    );
     return;
   }
 
