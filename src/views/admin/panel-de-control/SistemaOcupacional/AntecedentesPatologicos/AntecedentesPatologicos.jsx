@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faStethoscope, faFileMedical } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faStethoscope, faFileMedical, faFileSignature } from "@fortawesome/free-solid-svg-icons";
 import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/AntecedentesPatologicosTab"
 import IndicarEnfermedades from "./IndicarEnfermedades/IndicarEnfermedades"
 import Antecedentes from "./Antecedentes/Antecedentes";
+import DeclaracionJurada from "./DeclaracionJurada/DeclaracionJurada";
+import {
+  CAMPOS_DECLARACION_JURADA,
+  DECLARACION_JURADA_INICIAL,
+} from "../../../../utils/declaracionJuradaSaludUtils";
 import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
@@ -24,6 +29,7 @@ import {
   UpdateDataService,
   VerifyTR,
 } from "./controllerAntecedentesPatologicos";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = TABLA_ANTECEDENTES_PATOLOGICOS;
 
@@ -65,7 +71,9 @@ const CAMPOS_EDITABLES = [
   "especifiqueMedicamentos",
   "actividadFisica",
   "especifiqueActividadFisica",
-  // Pestaña 3
+  // Pestaña 3 (Declaración Jurada: 51 respuestas SI/NO + detalle)
+  ...CAMPOS_DECLARACION_JURADA,
+  // Pestaña 4 (Antecedentes)
   "antecedentes",
   "antecedentesEliminados",
   "hijosVivos",
@@ -109,6 +117,16 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
     sexo: "",
     edad: "",
     boroo: false,
+    empresa: "", // empresa del N° de orden: decide si la Declaración Jurada se guarda siempre (MARSA)
+    // Datos personales / laborales del N° de orden (solo lectura, los muestra DatosPersonalesLaborales).
+    // Los pide el controller: mapDatosPacienteForm (reporte) y cargarDatosPersonalesComplementarios (los 3 que el reporte no trae).
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
 
     covid19: false,
     fechaCovid: today,
@@ -332,7 +350,10 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
     actividadFisica: false,
     especifiqueActividadFisica: "",
 
-    //TERCERA TAB==========================================================================
+    //TERCERA TAB (Declaración Jurada)=====================================================
+    ...DECLARACION_JURADA_INICIAL,
+
+    //CUARTA TAB (Antecedentes)===========================================================
     fechaAntecedente: "",
     hospital: "",
     operacion: "",
@@ -407,6 +428,8 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
   const [activeTab, setActiveTab] = useState(0);
   const [errors, setErrors] = useState({});
 
+  // `id` = posición en la lista. Antecedentes va al final porque cierra el registro: Guardar / Imprimir son botones
+  // únicos de la pantalla (no hay uno por pestaña) y guardan todo junto, incluida la Declaración Jurada (solo MARSA).
   const tabs = [
     {
       id: 0,
@@ -422,12 +445,18 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
     },
     {
       id: 2,
+      name: "Declaración Jurada",
+      icon: faFileSignature,
+      component: DeclaracionJurada,
+    },
+    {
+      id: 3,
       name: "Antecedentes",
       icon: faFileMedical,
       component: Antecedentes,
     },
     /*{
-      id: 3,
+      id: 4,
       name: "Mineros del Norte",
       icon: faN,
       component: MinerosdelNorte,
@@ -561,13 +590,8 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
         />
       </SectionFieldset>
 
-      {/* ===== SECCIÓN: DATOS DEL PACIENTE ===== */}
-      <SectionFieldset legend="Datos del Paciente" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-        <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="120px" />
-        <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="120px" />
-        <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="120px" />
-        <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="120px" />
-      </SectionFieldset>
+      {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+      <DatosPersonalesLaborales form={form} />
 
       <div className="flex flex-col lg:flex-row gap-3 items-start">
         {/* ===== COLUMNA PRINCIPAL: PESTAÑAS ===== */}

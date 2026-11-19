@@ -6,12 +6,20 @@ import {
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
 import {
     guardarRegistro,
     actualizarRegistro,
     validarSede,
 } from "../../../../utils/registroOcupacionalUtils";
+import {
+    datosDeclaracionJuradaParaReporte,
+    debeGuardarDeclaracionJurada,
+    declaracionJuradaAForm,
+    guardarDeclaracionJuradaSalud,
+    obtenerDeclaracionJuradaSalud,
+} from "../../../../utils/declaracionJuradaSaludUtils";
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_ANTECEDENTES_PATOLOGICOS = "antecedentes_patologicos";
@@ -22,6 +30,7 @@ const obtenerReporteUrl =
 const registrarUrl =
     "/api/v01/ct/antecedentesPatologicos/registrarActualizarAntecedentesPatologicos";
 const obtenerListaNordenUrl = "/api/v01/ct/antecedentesPatologicos/historial";
+const infoPersonalUrl = "/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros";
 
 const OpenModalNorden = async (
     norden,
@@ -224,6 +233,25 @@ const fetchAntecedentesHuamachuco = async (dni, token) => {
     }
 };
 
+// Datos personales y laborales del paciente que muestra la sección DatosPersonalesLaborales, tomados del reporte de un
+// N° de orden (`AntecedentesPatologicosReporteDTO`). Es el único lugar donde se mapean: al editar se usa con el reporte
+// del registro y al copiar un N° anterior se vuelve a aplicar con el reporte del N° ACTUAL (estos datos nunca salen
+// del anterior). Claves del reporte: `fechanacimientopaciente_…` va todo en minúsculas y `area_area_o` (área de
+// trabajo) alimenta "Ocupación", igual que `areaO` en los demás formularios. El reporte NO trae lugar de nacimiento,
+// estado civil ni nivel de estudios: ver `cargarDatosPersonalesComplementarios`.
+const mapDatosPacienteForm = (res) => ({
+    nombres: [res?.nombres_nombres_pa, res?.apellidos_apellidos_pa].filter(Boolean).join(" "),
+    dni: res?.dni_cod_pa ?? "",
+    sexo: res?.sexo_sexo_pa == "M" ? "MASCULINO" : res?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
+    edad: res?.edad_edad ? `${res.edad_edad} AÑOS` : "",
+    fechaNacimiento: formatearFechaCorta(res?.fechanacimientopaciente_fecha_nacimiento_pa ?? ""),
+    boroo: res?.esBoro ?? false,
+    empresa: res?.empresa_razon_empresa ?? "",
+    contrata: res?.contrata_razon_contrata ?? "",
+    ocupacion: res?.area_area_o ?? "",
+    cargoDesempenar: res?.cargo_cargo_de ?? "",
+});
+
 // Arma el objeto de campos del formulario a partir de la respuesta del backend.
 // Se usa tanto para editar un registro existente como para "copiar" datos de
 // un N° de orden anterior hacia un registro nuevo (ver GetInfoServicioParaNuevoRegistro).
@@ -232,11 +260,8 @@ const mapAntecedentesPatologicosForm = (res, antecedentesData, prev) => ({
     norden: res.n_orden,
     codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
     fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
-    nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
-    dni: res.dni_cod_pa ?? "",
-    sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-    edad: res.edad_edad + " AÑOS",
-    boroo: res.esBoro ?? false,
+    // Datos personales y laborales del paciente (los muestra DatosPersonalesLaborales).
+    ...mapDatosPacienteForm(res),
 
     covid19: res.covid_chkcovid,
     fechaCovid: res.fechaCovid_fechacovid,
@@ -492,6 +517,9 @@ export const GetInfoServicioEditar = async (
     token,
     onFinish = () => { }
 ) => {
+    // La Declaración Jurada es otro endpoint: se pide en paralelo y se carga junto con los antecedentes
+    // (así el snapshot del registro editable ya la incluye).
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nro, token);
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -500,6 +528,7 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
         // Check if we need to fetch from Huamachuco
         let antecedentesData = [];
         if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
@@ -520,12 +549,16 @@ export const GetInfoServicioEditar = async (
         set((prev) => ({
             ...prev,
             ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
-            // Auditoría REAL. El reporte solo trae el usuario que registró (`userRegistro_user_registro`):
-            // no tiene fecha-hora de registro ni datos de edición. Se conserva para reenviarlo al editar.
-            userRegistro: res.userRegistro_user_registro ?? "",
-            fechaRegistro: "",
-            usuarioActualizacion: "",
-            fechaActualizacion: "",
+            ...declaracionJurada,
+            // Auditoría REAL. Desde 2026-11-18 el reporte (AntecedentesPatologicosReporteDTO) y el body de guardado
+            // (AntecedentesPatologicosDTO) tienen los 4 campos: `userRegistro`, `fechaRegistro`, `usuarioActualizacion`
+            // y `fechaActualizacion`. Antes el creador venía como `userRegistro_user_registro` (y no había fechas ni datos
+            // de edición): el nombre viejo queda de respaldo para backends sin actualizar (main). Todo se reenvía al
+            // editar con sellarAuditoria: si `userRegistro` llegara vacío se mandaría null y el backend perdería al creador.
+            userRegistro: res.userRegistro ?? res.userRegistro_user_registro ?? "",
+            fechaRegistro: res.fechaRegistro ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
             tieneRegistro: true,
         }));
     }
@@ -540,6 +573,8 @@ export const GetInfoServicioParaNuevoRegistro = async (
     token,
     onFinish = () => { }
 ) => {
+    // La Declaración Jurada es del N° de orden ACTUAL (no se copia la del anterior: es una declaración nueva).
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nordenActual, token);
     const res = await GetInfoServicioDefault(
         nordenBuscar,
         tabla,
@@ -568,6 +603,8 @@ export const GetInfoServicioParaNuevoRegistro = async (
         const hoy = new Date();
         const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
+        const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
+
         // El Examen Ocular (Oftalmología) y el Laboratorio pertenecen al N°
         // de orden ACTUAL, así que se traen por separado en lugar de usar
         // los del norden anterior seleccionado en el modal.
@@ -579,6 +616,7 @@ export const GetInfoServicioParaNuevoRegistro = async (
         set((prev) => ({
             ...prev,
             ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+            ...declaracionJurada,
             norden: nordenActual,
             fechaExam: fechaActual,
             fechaCovid: fechaActual,
@@ -594,18 +632,6 @@ export const GetInfoServicioParaNuevoRegistro = async (
         }));
     }
 };
-
-// Datos básicos del paciente (nombre, sexo, edad) según el reporte del N°
-// de orden ACTUAL, independientes del norden anterior que se haya elegido.
-const mapDatosPacienteForm = (resActual) => ({
-    nombres: resActual?.nombres_nombres_pa
-        ? `${resActual.nombres_nombres_pa} ${resActual.apellidos_apellidos_pa ?? ""}`.trim()
-        : "",
-    dni: resActual?.dni_cod_pa ?? "",
-    sexo: resActual?.sexo_sexo_pa == "M" ? "MASCULINO" : resActual?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
-    edad: resActual?.edad_edad ? `${resActual.edad_edad} AÑOS` : "",
-    boroo: resActual?.esBoro ?? false,
-});
 
 // Examen Ocular (Oftalmología) y Laboratorio (cocaína/marihuana) del N° de
 // orden ACTUAL: nunca se pisan con los del norden anterior seleccionado.
@@ -654,6 +680,7 @@ const mapValidacionesActuales = (resActual) => {
 // Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL,
 // Antecedentes Quirúrgicos del N° de orden mas reciente(fecha_registro_antecedente)
 export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token, list = []) => {
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nordenActual, token);
     const resActual = await getFetch(
         `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
         token
@@ -691,6 +718,8 @@ export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token,
     const hoy = new Date();
     const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
+    const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
+
     set((prev) => ({
         ...prev,
         norden: nordenActual,
@@ -700,6 +729,7 @@ export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token,
         ...mapDatosPacienteForm(resActual),
         ...mapExamenesActualesForm(resActual),
         ...mapValidacionesActuales(resActual),
+        ...declaracionJurada,
         antecedentes: antecedentesData,
     }));
 };
@@ -930,8 +960,8 @@ const construirBase = (form) => ({
 });
 
 // Body completo (creación / actualización). El usuario que registra se llama `userRegistro` en el POST
-// (default de sellarAuditoria) y `userRegistro_user_registro` en el GET; el DTO no tiene fecha-hora de
-// registro ni datos de edición, así que esos campos del sellado el backend los ignora.
+// (default de sellarAuditoria) y, desde 2026-11-18, también en el GET (antes `userRegistro_user_registro`). El DTO
+// de guardado recibe los 4 campos de auditoría que sella sellarAuditoria (fechas en `yyyy-MM-ddTHH:mm:ss`).
 const construirBody = (form, user, esActualizacion) =>
     sellarAuditoria(construirBase(form), {
         user,
@@ -950,13 +980,44 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/AntecedentesPatologicos"
+        "../../../../jaspers/AntecedentesPatologicos",
+        // Solo MARSA: el reporte lleva una página más con la Declaración Jurada de Salud
+        (reporte) => datosDeclaracionJuradaParaReporte(reporte, nro, token)
     );
 };
 
+// ===== Declaración Jurada de Salud =====
+// Texto de la respuesta del backend que se muestra dentro del `html` de un Swal: se escapa.
+const escaparHtml = (texto) =>
+    String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+// Es otro registro (otro endpoint) pero se guarda con el mismo botón, y solo si la empresa del N° de orden es MARSA
+// (ver debeGuardarDeclaracionJurada). Va ANTES que los antecedentes porque el reporte, que se imprime al terminar,
+// la lee del backend. Si no se pudo guardar se pregunta si seguir solo con los antecedentes (mostrando el mensaje del
+// backend): devuelve false si el usuario cancela.
+const guardarDeclaracionJurada = async (form, token, user) => {
+    if (!debeGuardarDeclaracionJurada(form)) return true;
+    LoadingDefault("Guardando Declaración Jurada");
+    const { ok, status, mensaje } = await guardarDeclaracionJuradaSalud({ form, token, user });
+    if (ok) return true;
+    const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-file-signature"></i>Declaración Jurada no guardada',
+        html: `No se pudo guardar la Declaración Jurada${status ? ` (error ${status})` : ""}.${mensaje ? `<br><small>${escaparHtml(mensaje)}</small>` : ""}<br>¿Desea guardar solo los antecedentes patológicos?`,
+        showCancelButton: true,
+        confirmButtonText: "Guardar antecedentes",
+        cancelButtonText: "Cancelar",
+    });
+    return isConfirmed;
+};
+
 // ===== Guardar (registro nuevo) =====
-export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
-    guardarRegistro({
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await guardarDeclaracionJurada(form, token, user))) return;
+    return guardarRegistro({
         form,
         token,
         user,
@@ -966,10 +1027,12 @@ export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter
         buildBody: construirBody,
         onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
+};
 
 // ===== Editar (registro existente) =====
-export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
-    actualizarRegistro({
+export const UpdateDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await guardarDeclaracionJurada(form, token, user))) return;
+    return actualizarRegistro({
         form,
         token,
         user,
@@ -979,6 +1042,31 @@ export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter
         buildBody: construirBody,
         onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
+};
+
+// ===== Datos personales complementarios =====
+// El reporte de Antecedentes Patológicos no trae lugar de nacimiento, estado civil ni nivel de estudios, que sí muestra
+// la sección Datos Personales: se piden al endpoint general de datos del paciente (`InformacionPersonalDTO`, el mismo
+// que usan los demás formularios al abrir un N° de orden). Es un complemento: si falla o no responde esos 3 campos
+// quedan vacíos sin avisar. Se mezcla aparte de los 3 flujos de carga (ninguno toca estas claves, así no importa cuál
+// termine primero) y solo si el formulario sigue en el mismo N° de orden (no pisa uno ya limpiado o cambiado de orden).
+const mismoNorden = (a, b) => Number(a) === Number(b);
+
+const cargarDatosPersonalesComplementarios = async (nro, sede, token, set) => {
+    if (!sede) return;
+    try {
+        const res = await getFetch(`${infoPersonalUrl}?nOrden=${nro}&nomSede=${sede}`, token);
+        if (!res || res.error) return;
+        const datos = {
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            estadoCivil: res.estadoCivil ?? "",
+            nivelEstudios: res.nivelEstudios ?? "",
+        };
+        set((prev) => (mismoNorden(prev.norden, nro) ? { ...prev, ...datos } : prev));
+    } catch (error) {
+        console.error("No se pudieron cargar los datos personales complementarios:", error);
+    }
+};
 
 // ===== Búsqueda / verificación por N° Orden =====
 // Tiene 3 estados (existenciaExamenes): sin registro -> se ofrece copiar un N° de orden anterior,
@@ -1016,6 +1104,9 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
             return;
         }
     }
+
+    // Lugar de nacimiento / estado civil / nivel de estudios (no vienen en el reporte): en paralelo a la carga.
+    cargarDatosPersonalesComplementarios(nro, sede, token, set);
 
     VerifyTRPerzonalizadoDefault(
         nro,
