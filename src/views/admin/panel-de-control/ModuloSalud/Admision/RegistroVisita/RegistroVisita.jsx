@@ -78,7 +78,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     const imprimirTicket = async (visitaId) => {
         try {
             const datos = await getVisitaById(visitaId, token);
-            await Ticket({ datos, titulo: campania.nombre, logoUrl: campania.fotoUrl });
+            await Ticket({ datos });
         } catch (error) {
             console.error(error);
             Swal.fire("Error", "No se pudo generar el ticket de la visita", "error");
@@ -100,8 +100,8 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     // ── Registro ──────────────────────────────────────────────────────────────
     // Crea la visita del paciente en la campaña activa con todas sus especialidades activas.
     // Devuelve true si se creó. Se usa desde el modal y desde el alta de paciente (auto-registro).
-    // `imprimir` indica si se imprime el ticket al terminar (el auto-registro tras crear al paciente no lo imprime).
-    const registrarVisita = async (paciente, { imprimir = true } = {}) => {
+    // Al terminar se pregunta si se imprime el ticket.
+    const registrarVisita = async (paciente) => {
         if (!campania) {
             avisarCampaniaRequerida(paciente, onIrACampanias);
             return false;
@@ -123,8 +123,15 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
                 token
             );
             recargar();
-            Swal.fire("Éxito", `Visita N° ${visita.norden} registrada en "${campania.nombre}"`, "success").then(() => {
-                if (imprimir) imprimirTicket(visita.id);
+            Swal.fire({
+                icon: "success",
+                title: `Visita N° ${visita.norden} registrada`,
+                text: `Campaña "${campania.nombre}". ¿Deseas imprimir el ticket?`,
+                showCancelButton: true,
+                confirmButtonText: "Sí, imprimir",
+                cancelButtonText: "No",
+            }).then(({ isConfirmed }) => {
+                if (isConfirmed) imprimirTicket(visita.id);
             });
             return true;
         } catch (error) {
@@ -144,7 +151,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     useRegistroAutomatico(
         pacienteActivo,
         !campania || !especialidades.cargando,
-        (paciente) => registrarVisita(paciente, { imprimir: false }),
+        registrarVisita,
         onAutoRegistrado
     );
 
