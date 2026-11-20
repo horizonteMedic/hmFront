@@ -28,7 +28,13 @@ const calcularEdad = (fechaNacimiento) => {
     return edad;
 };
 
-const textoSexo = (sexo) => (sexo === "M" ? "MASCULINO" : sexo === "F" ? "FEMENINO" : sexo ?? "");
+// "2005-02-14" -> "14/02/2005" (por texto, sin pasar por Date para no desfasar el día por zona horaria)
+const formatearFecha = (fecha) => {
+    const [anio, mes, dia] = String(fecha ?? "").slice(0, 10).split("-");
+    return anio && mes && dia ? `${dia}/${mes}/${anio}` : "";
+};
+
+const textoSexo =(sexo) => (sexo === "M" ? "MASCULINO" : sexo === "F" ? "FEMENINO" : sexo ?? "");
 
 // Una fila del reporte (visita + paciente + parentescos) -> fila plana de la hoja
 const aplanarFila = (item) => {
@@ -43,7 +49,7 @@ const aplanarFila = (item) => {
         dni: paciente.numeroDocumento ?? "",
         tipoDocumento: paciente.tipoDocumentoNombre ?? "",
         edad: calcularEdad(paciente.fechaNacimiento),
-        fechaNacimiento: paciente.fechaNacimiento ?? "",
+        fechaNacimiento: formatearFecha(paciente.fechaNacimiento),
         sexo: textoSexo(paciente.sexo),
         caserio: paciente.caserio ?? "",
         parentesco: parentescos

@@ -1,245 +1,190 @@
-import { jsPDF } from "jspdf";
+// Sticker de la ticketera Advance ADV-9026N (driver 4Barcode 3B-300B): rollo de 80 x 50 mm.
+//
+//   ┌──────────────────────────────────────────────┐
+//   │ PACIENTE                  ┊      N° ORDEN    │
+//   │ NOMBRES COMPLETOS         ┊                  │
+//   │ DNI    70543209           ┊        24        │
+//   │ EDAD   27 años            ┊                  │
+//   │                           ┊    19/11/2026    │
+//   └──────────────────────────────────────────────┘
+//   Filas a la izquierda (nombre, DNI, edad); a la derecha, separado por una línea vertical,
+//   el N° de orden grande y la fecha pequeña.
+//
+// Se imprime como página HTML con `@page { size }` (y no como PDF): así el navegador le pide al driver
+// exactamente 80 x 50 mm en vez de adaptar la hoja al papel «USER» que tenga configurado el driver
+// (que giraba el ticket y gastaba varios stickers).
 
-const TITULO_DEFAULT = "Campaña de Salud Integral - Caseríos José Carlos Mariátegui, Llaray, El Hospital, Las Pajillas y Quiruvilca";
+const ANCHO = 80;
+const ALTO = 50;
 
-const TAM_FUENTE_PARENTESCO = 6.5;
-const INTERLINEADO_PARENTESCO = 3;
+// Giro del contenido, en grados horarios: 0, 90, 180 o 270.
+// Si el sticker sale girado, se corrige solo con este valor:
+//   0   = el sticker se alimenta con el lado de 80 mm horizontal (lo normal).
+//   90 / 270 = el driver alimenta el lado de 80 mm en vertical: la página pasa a ser de 50 x 80 mm.
+//   180 = igual que 0 pero de cabeza.
+const GIRO = 0;
 
-async function fetchImageBase64(url) {
-    try {
-        const res = await fetch(url);
-        if (!res.ok) return null;
-        const blob = await res.blob();
-        const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsDataURL(blob);
-        });
-        return { data: base64, format: blob.type.includes("png") ? "PNG" : "JPEG" };
-    } catch {
-        return null;
-    }
-}
+// Márgenes del sticker (mm). La impresora no imprime hasta el borde derecho, por eso ese margen es mayor.
+// Si algo sigue cortándose, se sube el margen del lado afectado.
+const MARGEN = { arriba: 3, derecho: 7, abajo: 3, izquierdo: 4 };
 
-export default async function Ticket({
-    datos = null,
-    titulo = TITULO_DEFAULT,
-    logoUrl = null,
-}) {
-    const logoImg = logoUrl ? await fetchImageBase64(logoUrl) : null;
-    // ── Desestructurar datos de la API ────────────────────────────────────────
+// Ancho (mm) de la columna izquierda (filas de datos) y de las etiquetas «DNI» / «EDAD» dentro de ella.
+// El resto del ancho es para el N° de orden.
+const COL_IZQUIERDA = 42;
+const COL_ETIQUETA = 11;
+
+// Tamaños de letra (pt), del más grande al más pequeño. Se usa el primero que cabe.
+const FUENTES_NOMBRE = [10, 9, 8, 7];
+const FUENTES_DATO = [19, 17, 15, 13, 11, 9]; // DNI y edad
+const FUENTES_ORDEN = [52, 46, 40, 34, 30, 26];
+const INTERLINEADO_NOMBRE = 1.15;
+
+export default async function Ticket({ datos = null }) {
     const visita = datos?.visita ?? {};
     const paciente = datos?.paciente ?? {};
-    const fichas = datos?.fichas ?? [];
-
-    const norden = String(visita.norden ?? "");
-    const nombres = `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`.trim();
-    const dni = paciente.dni ?? "";
     const edad = calcularEdad(paciente.fechaNacimiento);
-    const especialidades = fichas.map((f) => ({ nombre: f.especialidad?.nombre ?? "" }));
-    const parentescos = Array.isArray(paciente.parentescos) ? paciente.parentescos : [];
-    const ancho = 80;
-    const margen = 5;
+    const norden = String(visita.norden ?? "");
 
-    // Altura dinámica: base + parentescos + filas de especialidades
-    const filas = Math.ceil(especialidades.length / 2);
-    const altoCelda = 27;
-    // Se miden los parentescos antes de crear el doc para que la altura contemple los saltos de línea
-    const bloquesParentesco = medirParentescos(parentescos, ancho, margen);
-    const altoParentesco = bloquesParentesco.length > 0
-        ? 7.5 + bloquesParentesco.reduce((acc, b) => acc + b.alto, 0)
-        : 0;
-    const altoBase = 155;
-    const altoDoc = altoBase + altoParentesco + filas * altoCelda - 80;
-
-    const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: [ancho, altoDoc],
-    });
-
-    let y = margen;
-
-    // ── Logo ──────────────────────────────────────────────────────────────────
-    try {
-        const logoAncho = 38;
-        const logoAlto = 18;
-        if (logoImg) {
-            doc.addImage(logoImg.data, logoImg.format, (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
-        } else {
-            doc.addImage("/img/Ticket/Logo.png", "PNG", (ancho - logoAncho) / 2, y, logoAncho, logoAlto);
-        }
-        y += logoAlto + 3;
-    } catch {
-        y += 3;
-    }
-
-    // ── Título ────────────────────────────────────────────────────────────────
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
-    const tituloLineas = doc.splitTextToSize(titulo, ancho - margen * 2);
-    doc.text(tituloLineas, ancho / 2, y, { align: "center" });
-    y += tituloLineas.length * 3.2 + 4;
-
-    // ── Datos del paciente ────────────────────────────────────────────────────
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("Paciente:", margen, y);
-    doc.setFont("helvetica", "normal");
-    const nombreLineas = doc.splitTextToSize(nombres, ancho - margen * 2 - 24);
-    doc.text(nombreLineas, margen + 24, y);
-    y += Math.max(nombreLineas.length * 4.2, 5) + 2;
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("DNI:", margen, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(dni, margen + 12, y);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("Edad:", margen + 37, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${edad} años`, margen + 51, y);
-    y += 7;
-
-    // ── Parentesco (solo si existe) ───────────────────────────────────────────
-    if (parentescos.length > 0) {
-        y += 2;
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
-        doc.text("Parentesco:", margen, y);
-        y += 4.5;
-
-        doc.setFontSize(TAM_FUENTE_PARENTESCO);
-        bloquesParentesco.forEach((b) => {
-            doc.setFont("helvetica", "bold");
-            doc.text(b.prefijo, margen + 2, y);
-            doc.setFont("helvetica", "normal");
-            doc.text(b.lineas, b.xTexto, y);
-            y += b.alto;
-        });
-        y += 1;
-    }
-
-    // ── Línea separadora ──────────────────────────────────────────────────────
-    separador(doc, margen, ancho, y);
-    y += 6;
-
-    // ── Fecha ─────────────────────────────────────────────────────────────────
-    const fechaStr = new Date().toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text(fechaStr, ancho / 2, y, { align: "center" });
-    y += 5;
-
-    // ── Label N° de Orden ─────────────────────────────────────────────────────
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("N° de Orden", ancho / 2, y, { align: "center" });
-    y += 11;
-
-    // ── Norden grande ─────────────────────────────────────────────────────────
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(36);
-    doc.text(String(norden), ancho / 2, y, { align: "center" });
-    y += 9;
-
-    // ── Línea separadora ──────────────────────────────────────────────────────
-    separador(doc, margen, ancho, y);
-    y += 6;
-
-    // ── Especialidades en 2 columnas ──────────────────────────────────────────
-    /*const colAncho = (ancho - margen * 2 - 3) / 2;   // ancho de cada celda
-    const padding = 2.5;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-
-    const esImparSolitario = especialidades.length % 2 !== 0;
-
-    especialidades.forEach((esp, i) => {
-        const esUltimoSolitario = esImparSolitario && i === especialidades.length - 1;
-        const fila = Math.floor(i / 2);
-        const x = esUltimoSolitario
-            ? margen + (ancho - margen * 2 - colAncho) / 2
-            : margen + (i % 2) * (colAncho + 3);
-        const yCell = y + fila * altoCelda;
-
-        // Borde del cuadro
-        doc.setDrawColor(100, 100, 100);
-        doc.rect(x, yCell, colAncho, altoCelda);
-
-        // Texto centrado verticalmente con padding
-        const lineas = doc.splitTextToSize(esp.nombre.toUpperCase(), colAncho - padding * 2);
-        const altoTexto = lineas.length * 3.5;
-        const yTexto = yCell + (altoCelda - altoTexto) / 2 + 3;
-        doc.text(lineas, x + colAncho / 2, yTexto, { align: "center" });
-    });*/
-
-    // ── Footer ────────────────────────────────────────────────────────────────
-    const yFooter = altoDoc - 5;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(6);
-    doc.setTextColor(120, 120, 120);
-    doc.text("Horizonte Medic — cuidamos tu salud\nJr. Leoncio Prado N°786 - Huamachuco", ancho / 2, yFooter, { align: "center" });
-    doc.setTextColor(0, 0, 0);
-
-    imprimir(doc);
+    imprimir(
+        construirHtml({
+            nombres: `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`.trim().toUpperCase(),
+            edad: edad ? `${edad} años` : "-",
+            dni: paciente.dni || "S/D",
+            fecha: formatearFecha(visita.fechaVisita) || formatearFecha(new Date().toISOString()),
+            norden,
+        })
+    );
 }
 
-// Calcula, para cada parentesco, el prefijo, las líneas del nombre (con salto de línea
-// respetando el margen derecho) y el alto que ocupa.
-function medirParentescos(parentescos, ancho, margen) {
-    if (!parentescos.length) return [];
-    const medidor = new jsPDF({ unit: "mm", format: [ancho, 100] });
-    medidor.setFontSize(TAM_FUENTE_PARENTESCO);
+const escapar = (texto) =>
+    String(texto).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-    return parentescos.map((p) => {
-        const prefijo = `Es ${p.tipoRelacion ?? ""} de:`;
-        const dniRel = p.dniRelacionado ? ` (DNI: ${p.dniRelacionado})` : "";
+// Transformación que gira el sticker (diseñado en 80 x 50) dentro de la página, según GIRO
+const transformacion = () =>
+    ({
+        0: "none",
+        90: `translate(${ALTO}mm, 0) rotate(90deg)`,
+        180: `translate(${ANCHO}mm, ${ALTO}mm) rotate(180deg)`,
+        270: `translate(0, ${ANCHO}mm) rotate(-90deg)`,
+    })[GIRO] ?? "none";
 
-        medidor.setFont("helvetica", "bold");
-        const xTexto = margen + 2 + medidor.getTextWidth(prefijo) + 1.5;
+function construirHtml({ nombres, edad, dni, fecha, norden }) {
+    const vertical = GIRO === 90 || GIRO === 270;
+    const paginaAncho = vertical ? ALTO : ANCHO;
+    const paginaAlto = vertical ? ANCHO : ALTO;
 
-        medidor.setFont("helvetica", "normal");
-        const anchoDisponible = ancho - margen - xTexto; // respeta el margen derecho
-        const lineas = medidor.splitTextToSize(`${p.nombreRelacionado ?? ""}${dniRel}`, anchoDisponible);
+    return `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ticket N° ${escapar(norden)}</title>
+<style>
+  @page { size: ${paginaAncho}mm ${paginaAlto}mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: ${paginaAncho}mm; height: ${paginaAlto}mm; overflow: hidden; background: #fff; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pagina { position: relative; width: ${paginaAncho}mm; height: ${paginaAlto}mm; overflow: hidden; }
+  .sticker { position: absolute; top: 0; left: 0; width: ${ANCHO}mm; height: ${ALTO}mm;
+             padding: ${MARGEN.arriba}mm ${MARGEN.derecho}mm ${MARGEN.abajo}mm ${MARGEN.izquierdo}mm;
+             transform-origin: top left; transform: ${transformacion()}; display: flex; flex-direction: column; }
+  .etiqueta { font-size: 6pt; color: #6e6e6e; letter-spacing: .02em; }
+  .cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: ${COL_IZQUIERDA}mm minmax(0, 1fr); }
+  .izquierda { display: flex; flex-direction: column; justify-content: center; gap: 3mm; padding-right: 2mm; }
+  .nombre { font-size: 10pt; font-weight: 700; line-height: ${INTERLINEADO_NOMBRE}; margin-top: 0.8mm; word-break: break-word; }
+  .fila { display: grid; grid-template-columns: ${COL_ETIQUETA}mm minmax(0, 1fr); align-items: baseline; }
+  .dato { font-size: ${FUENTES_DATO[0]}pt; font-weight: 700; line-height: 1.05; white-space: nowrap; }
+  .derecha { border-left: 0.3mm dashed #6e6e6e; padding-left: 2mm; display: flex; flex-direction: column; text-align: center; }
+  .centro { flex: 1; display: flex; align-items: center; }
+  .norden { width: 100%; font-size: ${FUENTES_ORDEN[0]}pt; font-weight: 700; line-height: 1; white-space: nowrap; }
+  .fecha { font-size: 8pt; color: #333; }
+</style>
+</head>
+<body>
+<div class="pagina"><div class="sticker"><div class="cuerpo">
+  <div class="izquierda">
+    <div>
+      <div class="etiqueta">PACIENTE</div>
+      <div class="nombre" id="nombre">${escapar(nombres)}</div>
+    </div>
+    <div class="fila"><div class="etiqueta">DNI</div><div class="dato" id="dni">${escapar(dni)}</div></div>
+    <div class="fila"><div class="etiqueta">EDAD</div><div class="dato" id="edad">${escapar(edad)}</div></div>
+  </div>
+  <div class="derecha">
+    <div class="etiqueta">N° ORDEN</div>
+    <div class="centro"><div class="norden" id="norden">${escapar(norden)}</div></div>
+    <div class="fecha">${escapar(fecha)}</div>
+  </div>
+</div></div></div>
+</body>
+</html>`;
+}
 
-        return {
-            prefijo,
-            xTexto,
-            lineas,
-            alto: Math.max(lineas.length * INTERLINEADO_PARENTESCO, 4) + 1,
-        };
-    });
+// Letra más grande con la que el nombre cabe en 2 líneas; si no cabe, en 3
+function ajustarNombre(doc) {
+    const el = doc.getElementById("nombre");
+    if (!el) return;
+    const lineasConTamano = (pt) => {
+        el.style.fontSize = `${pt}pt`;
+        const altoLinea = ((pt * 96) / 72) * INTERLINEADO_NOMBRE;
+        return Math.round(el.scrollHeight / altoLinea);
+    };
+    for (const maxLineas of [2, 3]) {
+        const pt = FUENTES_NOMBRE.find((tam) => lineasConTamano(tam) <= maxLineas);
+        if (pt) {
+            el.style.fontSize = `${pt}pt`;
+            return;
+        }
+    }
+    el.style.fontSize = `${FUENTES_NOMBRE[FUENTES_NOMBRE.length - 1]}pt`;
+}
+
+// Letra más grande, de `fuentes`, con la que el texto de todos los elementos cabe en su ancho. Todos los
+// elementos del grupo comparten el mismo tamaño (el del que menos cabe), para que las filas se vean parejas.
+// (un DNI/pasaporte largo o un N° de orden de varios dígitos no deben salirse del ticket)
+function ajustarAncho(doc, ids, fuentes) {
+    const elementos = ids.map((id) => doc.getElementById(id)).filter(Boolean);
+    const caben = (tam) =>
+        elementos.every((el) => {
+            el.style.fontSize = `${tam}pt`;
+            return el.scrollWidth <= el.clientWidth;
+        });
+    const pt = fuentes.find(caben) ?? fuentes[fuentes.length - 1];
+    elementos.forEach((el) => (el.style.fontSize = `${pt}pt`));
+}
+
+// "2026-11-19" (o con hora) -> "19/11/2026", por texto para no desfasar el día por zona horaria
+function formatearFecha(fecha) {
+    const [anio, mes, dia] = String(fecha ?? "").slice(0, 10).split("-");
+    return anio && mes && dia ? `${dia}/${mes}/${anio}` : "";
 }
 
 function calcularEdad(fechaNacimiento) {
-    if (!fechaNacimiento) return "";
-    const fecha = new Date(fechaNacimiento);
-    if (isNaN(fecha)) return "";
+    const [anio, mes, dia] = String(fechaNacimiento ?? "").slice(0, 10).split("-").map(Number);
+    if (!anio || !mes || !dia) return "";
     const hoy = new Date();
-    let edad = hoy.getFullYear() - fecha.getFullYear();
-    const cumple = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
-    if (hoy < cumple) edad--;
+    let edad = hoy.getFullYear() - anio;
+    if (hoy.getMonth() + 1 < mes || (hoy.getMonth() + 1 === mes && hoy.getDate() < dia)) edad--;
     return String(edad);
 }
 
-function separador(doc, margen, ancho, y) {
-    doc.setLineDashPattern([1, 1], 0);
-    doc.line(margen, y, ancho - margen, y);
-    doc.setLineDashPattern([], 0);
-}
+// Escribe el ticket en un iframe oculto y abre el diálogo de impresión del navegador
+function imprimir(html) {
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+    document.body.appendChild(iframe);
 
-function imprimir(doc) {
-    doc.autoPrint();
-    const url = URL.createObjectURL(doc.output("blob"));
-    const a = window.open(url, "_blank");
-    if (!a) {
-        // fallback si el navegador bloquea la pestaña
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "ticket.pdf";
-        link.click();
-    }
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    const quitar = () => iframe.isConnected && iframe.remove();
+    const doc = iframe.contentDocument;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    ajustarNombre(doc);
+    ajustarAncho(doc, ["dni", "edad"], FUENTES_DATO);
+    ajustarAncho(doc, ["norden"], FUENTES_ORDEN);
+    iframe.contentWindow.addEventListener("afterprint", quitar);
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(quitar, 60000);
 }
