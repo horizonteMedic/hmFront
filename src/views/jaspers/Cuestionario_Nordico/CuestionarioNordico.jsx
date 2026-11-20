@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header_Cuestionario from "./Header_CuestionarioN";
 import { compressImage, getSign, getSignCompressed } from "../../utils/helpers";
+import { esEmpresaMarsa } from "../../utils/declaracionJuradaSaludUtils.js";
 
 export default async function CuestionarioNordico(datos = {}, docExistente = null) {
 
@@ -50,6 +51,10 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
   const pageW = doc.internal.pageSize.getWidth();
   let y = 26;
 
+  // Solo MARSA: se muestran además año de nacimiento, peso y talla (los trae el backend en el reporte).
+  const esMARSA = esEmpresaMarsa(datos.empresa);
+  const anioNacimiento = String(datos.fechaNacimientoPaciente ?? "").match(/\d{4}/)?.[0] ?? "";
+
   // 2) Encabezado (logo, campos, título)
 
   // 2) Encabezado (logo, campos, título)
@@ -96,7 +101,7 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
       [
         {
           content: "",
-          styles: { valign: "top", cellWidth: 150, minCellHeight: 38 },
+          styles: { valign: "top", cellWidth: 150, minCellHeight: esMARSA ? 43 : 38 }, // MARSA: +5 mm por el renglón de año de nacimiento/peso/talla
         },
         {
           content: " ", // Aquí va la imagen
@@ -128,6 +133,7 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
         const boxSize = 4;
         const textX = data.cell.x + 2; // margen interno izquierdo
         const textY = data.cell.y + 4; // margen superior
+        const dY = esMARSA ? 5 : 0; // MARSA: el renglón extra debajo de Género baja 5 mm lo que sigue
         doc.setFontSize(9);
         doc.text(`Nombre: ${datos.nombres}`, textX, textY);
         doc.text(`Edad en años cumplidos: ${datos.edad} AÑOS`, textX, textY + 5);
@@ -136,17 +142,24 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
         doc.text(`Género:`, textX, textY + 10);
         doc.text(`Masculino:                        Femenino:`, textX + 30, textY + 10);
 
-        doc.text(`Cuantos años y meses ha estado Ud. haciendo el presente tipo de trabajo:`, textX, textY + 15);
-        doc.text(`Años:                                Meses:`, textX + 32, textY + 20);
+        // Solo MARSA: año de nacimiento, peso y talla en un renglón debajo de Género (columnas alineadas con los cuadros)
+        if (esMARSA) {
+          doc.text(`Año de nacimiento: ${anioNacimiento}`, textX, textY + 15);
+          doc.text(`Peso: ${datos.peso ? `${datos.peso} Kg.` : ""}`, textX + 48, textY + 15);
+          doc.text(`Talla: ${datos.talla ? `${datos.talla} mts.` : ""}`, textX + 85, textY + 15);
+        }
 
-        doc.text(`En promedio cuántas horas a la semana trabaja?`, textX, textY + 25);
+        doc.text(`Cuantos años y meses ha estado Ud. haciendo el presente tipo de trabajo:`, textX, textY + 15 + dY);
+        doc.text(`Años:                                Meses:`, textX + 32, textY + 20 + dY);
+
+        doc.text(`En promedio cuántas horas a la semana trabaja?`, textX, textY + 25 + dY);
         if (datos.horasTrabajadas) {
           doc.setFontSize(11)
-          doc.text(`${datos.horasTrabajadas} hrs`, textX + 75, textY + 25);
+          doc.text(`${datos.horasTrabajadas} hrs`, textX + 75, textY + 25 + dY);
           doc.setFontSize(9)
         }
-        doc.text(`Es Ud: `, textX, textY + 30);
-        doc.text(`Diestro:                              Zurdo:`, textX + 31, textY + 30);
+        doc.text(`Es Ud: `, textX, textY + 30 + dY);
+        doc.text(`Diestro:                              Zurdo:`, textX + 31, textY + 30 + dY);
         //GENERO Mascuilo - Femenino
         doc.setDrawColor(0); // Negro
         doc.setLineWidth(0.5);
@@ -160,28 +173,28 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
         }
 
         //Años y Meses
-        doc.rect(textX + 48, textY + 17, 6, 5); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 17 + dY, 6, 5); // Cuadro pequeño
         if (datos.anios) {
           doc.setFontSize(11)
           const centerX = textX + 48 + 6 / 2;   // centro en X
-          const centerY = textY + 17 + 5 / 2;   // centro en Y
+          const centerY = textY + 17 + dY + 5 / 2;   // centro en Y
           doc.text(`${datos.anios}`, centerX, centerY + 1.5, { align: "center" });
         }
-        doc.rect(textX + 85, textY + 17, 6, 5); // Cuadro pequeño
+        doc.rect(textX + 85, textY + 17 + dY, 6, 5); // Cuadro pequeño
         if (datos.meses) {
           doc.setFontSize(11)
           const centerX = textX + 85 + 6 / 2;
-          const centerY = textY + 17 + 5 / 2;
+          const centerY = textY + 17 + dY + 5 / 2;
           doc.text(`${datos.meses}`, centerX, centerY + 1.5, { align: "center" });
         }
         //Diestro o Zurdo
-        doc.rect(textX + 48, textY + 27, 6, 5); // Cuadro pequeño
-        doc.rect(textX + 85, textY + 27, 6, 5); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 27 + dY, 6, 5); // Cuadro pequeño
+        doc.rect(textX + 85, textY + 27 + dY, 6, 5); // Cuadro pequeño
         //X
         if (datos.esDiestro === true) {
-          drawXInBox(doc, textX + 48, textY + 27, 6, 5); // Cuadro Masculino
+          drawXInBox(doc, textX + 48, textY + 27 + dY, 6, 5); // Cuadro Masculino
         } else if (datos.esZurdo === true) {
-          drawXInBox(doc, textX + 85, textY + 27, 6, 5); // Cuadro Femenino
+          drawXInBox(doc, textX + 85, textY + 27 + dY, 6, 5); // Cuadro Femenino
         }
       }
     },
@@ -613,7 +626,8 @@ export default async function CuestionarioNordico(datos = {}, docExistente = nul
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY,
     theme: "grid",
-    margin: { left: margin, right: margin },
+    // MARSA: el renglón extra de datos personales baja esta tabla 5 mm; con el margen inferior por defecto ya no cabría en la página 1
+    margin: { left: margin, right: margin, ...(esMARSA && { bottom: 5 }) },
     styles: { fontSize: 9, textColor: [0, 0, 0] },
     headStyles: { lineWidth: 0.5, lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],

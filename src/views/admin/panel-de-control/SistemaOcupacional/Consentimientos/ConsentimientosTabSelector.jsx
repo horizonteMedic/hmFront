@@ -8,6 +8,7 @@ import RecepcionExamenMedico from "./RecepcionExamenMedico/RecepcionExamenMedico
 import SintomaticoRespiratorio from "./SintomaticoRespiratorio/SintomaticoRespiratorio";
 import SuficienciaBrigadista from "./SuficienciaBrigadista/SuficienciaBrigadista";
 import ConformidadEMO from "./ConformidadEMO/ConformidadEMO";
+import RegistroEntregaInformeEMO from "./RegistroEntregaInformeEMO/RegistroEntregaInformeEMO";
 
 export default function ConsentimientosTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -64,6 +65,12 @@ export default function ConsentimientosTabSelector({ tieneVista }) {
             permission: "Conformidad EMO",
             label: "Conformidad EMO",
             component: ConformidadEMO
+        },
+        {
+            id: 9,
+            permission: "Registro Entrega Informe EMO",
+            label: "Registro Entrega Informe EMO",
+            component: RegistroEntregaInformeEMO
         },
     ];
     return (

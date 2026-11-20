@@ -10,6 +10,7 @@ export const TABLA_FECHA_MAP = {
     "CONSENT_INFORMADO_MEDICA": { fechaField: "fechaRegistro", vencimientoField: null }, // CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA
     "CONSENT_SINTOMATICO": { fechaField: "fechaRegistro", vencimientoField: null }, // DECLARACION DE SINTOMATICO RESPIRATORIO
     "DECLA_INFO_APTITUD_MO": { fechaField: "fechaRegistro", vencimientoField: null }, // DECLARACIÓN JURADA DE INFORMACION APTITUD MEDICO OCUPACIONAL
+    "registro_entrega_resultados_emo": { fechaField: "fechaRegistro", vencimientoField: null }, // REGISTRO DE ENTREGA E INFORME DE RESULTADOS DEL EMO
     "DECLA_JURA_ANTECE_PERSON_FAM": { fechaField: "fechaRegistro", vencimientoField: null, extraFechaFields: ["fechaFirma"] }, // DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
     "ac_bioquimica2022": { fechaField: "fecha", vencimientoField: null }, // ACIDO URICO
     "ac_coprocultivo": { fechaField: "fecha", vencimientoField: null }, // MANIPULADORES COPROCULTIVO
