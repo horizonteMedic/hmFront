@@ -5,7 +5,7 @@ import {
     InputsBooleanRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function ExamenFisico({ form, handleChange, handleRadioButtonBoolean }) {
+export default function ExamenFisico({ form, handleChange, handleRadioButtonBoolean, disabled = false, isFieldEdited = () => false, revertField = () => { } }) {
     return (
         <div className="p-4 space-y-4">
             {/* Medidas Antropométricas y Signos Vitales */}
@@ -118,6 +118,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="limitacionFuerzaExtremidades"
                                 value={form?.limitacionFuerzaExtremidades}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("limitacionFuerzaExtremidades")}
+                                onRevert={() => revertField("limitacionFuerzaExtremidades")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -126,6 +129,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="alteracionEquilibrio"
                                 value={form?.alteracionEquilibrio}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alteracionEquilibrio")}
+                                onRevert={() => revertField("alteracionEquilibrio")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -134,6 +140,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadMarcha"
                                 value={form?.anormalidadMarcha}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadMarcha")}
+                                onRevert={() => revertField("anormalidadMarcha")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -142,6 +151,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="alteracionCoordinacionDedoNariz"
                                 value={form?.alteracionCoordinacionDedoNariz}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("alteracionCoordinacionDedoNariz")}
+                                onRevert={() => revertField("alteracionCoordinacionDedoNariz")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -150,6 +162,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="asimetriaFacial"
                                 value={form?.asimetriaFacial}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("asimetriaFacial")}
+                                onRevert={() => revertField("asimetriaFacial")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -158,6 +173,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="sustentacionPie1"
                                 value={form?.sustentacionPie1}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("sustentacionPie1")}
+                                onRevert={() => revertField("sustentacionPie1")}
                             />
                         </div>
                     </div>
@@ -169,6 +187,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="presenciaNistagmus"
                                 value={form?.presenciaNistagmus}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("presenciaNistagmus")}
+                                onRevert={() => revertField("presenciaNistagmus")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -177,6 +198,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadMovimientosOculares"
                                 value={form?.anormalidadMovimientosOculares}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadMovimientosOculares")}
+                                onRevert={() => revertField("anormalidadMovimientosOculares")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -185,6 +209,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="pupilasNoCirla"
                                 value={form?.pupilasNoCirla}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("pupilasNoCirla")}
+                                onRevert={() => revertField("pupilasNoCirla")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -193,6 +220,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="anormalidadLenguaje"
                                 value={form?.anormalidadLenguaje}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("anormalidadLenguaje")}
+                                onRevert={() => revertField("anormalidadLenguaje")}
                             />
                         </div>
                         <div className="flex items-center justify-between">
@@ -201,6 +231,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                                 name="movimientosInvoluntarios"
                                 value={form?.movimientosInvoluntarios}
                                 onChange={handleRadioButtonBoolean}
+                                disabled={disabled}
+                                edited={isFieldEdited("movimientosInvoluntarios")}
+                                onRevert={() => revertField("movimientosInvoluntarios")}
                             />
                         </div>
                     </div>
@@ -212,6 +245,9 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                         name="detalleInformacionExamenFisico"
                         value={form?.detalleInformacionExamenFisico}
                         onChange={handleChange}
+                        disabled={disabled}
+                        edited={isFieldEdited("detalleInformacionExamenFisico")}
+                        onRevert={() => revertField("detalleInformacionExamenFisico")}
                         rows={4}
                     />
                 </div>
@@ -224,4 +260,7 @@ ExamenFisico.propTypes = {
     form: PropTypes.object.isRequired,
     handleChange: PropTypes.func.isRequired,
     handleRadioButtonBoolean: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
+    isFieldEdited: PropTypes.func,
+    revertField: PropTypes.func,
 };

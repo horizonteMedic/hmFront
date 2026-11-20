@@ -1,23 +1,19 @@
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import "./OdontogramaAdultos.css";
-import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import CIE10 from "../Anexo16/CIE10/CIE10";
 import CIE10List from "../../../../components/reusableComponents/CIE10List";
+import RevertButton from "../../../../components/reusableComponents/RevertButton";
+import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
 
 export default function OdontogramaAdultos({
   form,
   setForm,
   token,
   handleChange,
-  handleChangeSimple,
   handleCheckBoxChange,
-  handleClear,
-  handleSave,
-  handlePrint,
-  embebido = false,
+  // Registro existente sin habilitar edición: el odontograma y las observaciones quedan solo de lectura.
+  disabled = false,
+  isFieldEdited = () => false,
+  revertFields = () => {},
 }) {
   const dientesSuperioresArray = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -63,6 +59,7 @@ export default function OdontogramaAdultos({
   }, [contextMenu]);
 
   const handleContextMenu = (event, diente) => {
+    if (disabled) return;
     event.preventDefault();
     event.stopPropagation();
 
@@ -206,7 +203,7 @@ export default function OdontogramaAdultos({
 
   const renderDiente = (diente, imgUrl, rotate = false) => (
     <div
-      className="diente-item"
+      className={`diente-item ${isFieldEdited(`d${diente}`) ? "ring-2 ring-orange-500 rounded" : ""}`}
       onContextMenu={(e) => handleContextMenu(e, diente)}
     >
       <img
@@ -300,9 +297,17 @@ export default function OdontogramaAdultos({
 
   return (
     <div className="odontograma-container">
-      <h2 className="text-blue-700 mx-auto font-bold text-center text-2xl">
-        Odontograma Adultos
-      </h2>
+      <div className="flex items-center justify-center gap-3">
+        <h2 className="text-blue-700 font-bold text-center text-2xl">
+          Odontograma Adultos
+        </h2>
+        {CAMPOS_DIENTES.some(isFieldEdited) && (
+          <RevertButton
+            onClick={() => revertFields(CAMPOS_DIENTES)}
+            title="Revertir los cambios del odontograma"
+          />
+        )}
+      </div>
       {/*DIENTES IMAGENES*/}
       <div className="seccion-titulo">Dientes Superiores</div>
       <div className="dientes-grid">
@@ -398,14 +403,23 @@ export default function OdontogramaAdultos({
       {/*OBSERVACIONES & NO PASO EXAMEN*/}
       <div className="mt-4 px-6 text-[11px]">
         <div className="observaciones-section"> 
-          <label className="observaciones-label text-[11px]">
-            Observaciones:
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="observaciones-label text-[11px]">
+              Observaciones:
+            </label>
+            {CAMPOS_OBSERVACIONES.some(isFieldEdited) && (
+              <RevertButton
+                onClick={() => revertFields(CAMPOS_OBSERVACIONES)}
+                title="Revertir observaciones"
+              />
+            )}
+          </div>
           <textarea
             name="observaciones"
             value={form.observaciones || ""}
             onChange={handleChange}
-            className="resize-none w-full border text-[11px] rounded px-2 py-1 "
+            disabled={disabled}
+            className={`resize-none w-full border text-[11px] rounded px-2 py-1 ${disabled ? "bg-gray-300" : isFieldEdited("observaciones") ? "border-orange-600 bg-orange-100" : ""}`}
             rows="3"
           />
 
@@ -416,6 +430,7 @@ export default function OdontogramaAdultos({
               label="Observaciones CIE10"
               token={token}
               setForm={setForm}
+              disabled={disabled}
             />
           </div>
         </div>
@@ -426,6 +441,7 @@ export default function OdontogramaAdultos({
               type="checkbox"
               name="noPasoExamen"
               checked={form.observaciones.includes("NO PASO EXAMEN ODONTOLOGICO")}
+              disabled={disabled}
               onChange={(e) => {
                 setForm((prev) => ({
                   ...prev,
@@ -436,57 +452,6 @@ export default function OdontogramaAdultos({
             />
             No pasó examen odontológico
           </label>
-        </div>
-        <SectionFieldset legend="Asignación de Médico">
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            label="Especialista"
-            form={form}
-            onChange={handleChangeSimple}
-          />
-        </SectionFieldset>
-        {/*BOTONES ACCIONES*/}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 ">
-          <div className=" flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            {!embebido && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            )}
-          </div>
-
-          {!embebido && (
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

@@ -3,12 +3,13 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { inferirDuracionFA2 } from "./FA2FormDefaults";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import { guardarRegistro, actualizarRegistro, validarSede } from "../../../../../utils/registroOcupacionalUtils";
+import { inferirDuracionFA2, inferirRestriccionesFA2 } from "./FA2FormDefaults";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2";
@@ -107,62 +108,82 @@ export const GetInfoServicioEditar = async (
             restricciones: res.restriccionesDescripcion,
 
             // Checkboxes de recomendaciones - mapeados basados en restriccionesDescripcion
-            corregirAgudezaVisualTotal: res.restriccionesDescripcion?.includes("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            corregirAgudezaVisual: res.restriccionesDescripcion?.includes("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            dietaHipocalorica: res.restriccionesDescripcion?.includes("DIETA HIPOCALÓRICA Y EJERCICIOS") || false,
-            evitarMovimientosDisergonomicos: res.restriccionesDescripcion?.includes("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS") || false,
-            noHacerTrabajoAltoRiesgo: res.restriccionesDescripcion?.includes("NO HACER TRABAJO DE ALTO RIESGO") || false,
-            noHacerTrabajoSobre18: res.restriccionesDescripcion?.includes("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            usoEppAuditivo: res.restriccionesDescripcion?.includes("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB") || false,
-            usoLentesConducir: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS") || false,
-            usoLentesTrabajo: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO.") || false,
-            usoLentesTrabajoSobre18: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
+            ...inferirRestriccionesFA2(res.restriccionesDescripcion),
             ninguno: res.restriccionesDescripcion?.includes("NINGUNO") || res.restriccionesDescripcion === "NINGUNO." || false,
-            noConducirVehiculos: res.restriccionesDescripcion?.includes("NO CONDUCIR VEHÍCULOS") || false,
 
             // Médico que Certifica
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+            // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+            // FichaAnexo2ReporteDTO aún no devuelve estos campos: mientras tanto quedan vacíos.
+            fechaRegistro: res.fechaRegistro ?? "",
+            userRegistro: res.userRegistro ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
 
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
-    const body = {
-        norden: form.norden,
-        dni: form.dni,
-        fecha: form.fechaValido,
-        nombreMedico: form.nombre_medico,
-        apto: form.apto === "APTO",
-        aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
-        noApto: form.apto === "NO APTO",
-        conObservacion: form.apto === "CON OBSERVACION",
-        evaluado: form.apto === "EVALUADO",
-        restriccionesDescripcion: form.restricciones,
-        horaSalida: getHoraActual(),
-        fechaHasta: form.fechaVencimiento,
-        recomendaciones: form.recomendaciones,
-        conclusiones: form.conclusiones,
-        usuarioRegistro: user,
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => ({
+    norden: form.norden,
+    dni: form.dni,
+    fecha: form.fechaValido,
+    nombreMedico: form.nombre_medico,
+    apto: form.apto === "APTO",
+    aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
+    noApto: form.apto === "NO APTO",
+    conObservacion: form.apto === "CON OBSERVACION",
+    evaluado: form.apto === "EVALUADO",
+    restriccionesDescripcion: form.restricciones,
+    horaSalida: getHoraActual(),
+    fechaHasta: form.fechaVencimiento,
+    recomendaciones: form.recomendaciones,
+    conclusiones: form.conclusiones,
 
-        usuarioFirma: form.user_medicoFirma,
-    };
+    usuarioFirma: form.user_medicoFirma,
+});
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). AptitudMedicoOcupacionalAgroDTO usa `usuarioRegistro` para el
+// usuario que registra. El reporte (GET) aún no devuelve quién registró, así que al editar, si no se conoce el
+// creador, se manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro || user,
+        fechaRegistro: form.fechaRegistro,
+        campoUserRegistro: "usuarioRegistro",
     });
-};
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
 
 export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     GetInfoServicio(nro, tabla, set, token, () => {
@@ -206,6 +227,38 @@ export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
 // };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    Loading("Validando datos");
+
+    // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
     VerifyTRPerzonalizado(
         nro,
         tabla,

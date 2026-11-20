@@ -5,10 +5,14 @@ import {
   GetInfoServicioDefault,
   LoadingDefault,
   PrintHojaRDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  validarSede,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_AUDIOMETRIA = "audiometria_2023";
@@ -33,8 +37,8 @@ const verificarBloqueoAudiometriaOhla = async (nro, tabla, token) => {
   return { bloqueado: !existePropia && existeOhla, existePropia, existeOhla };
 };
 
-// ================= GET INFO SERVICIO =================
-export const GetInfoServicio = async (
+// ================= GET INFO SERVICIO (edición) =================
+export const GetInfoServicioEditar = async (
   nro,
   tabla,
   set,
@@ -190,19 +194,165 @@ export const GetInfoServicio = async (
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
+
+      // Auditoría. AudiometriaReporteDTO no devuelve quién registró ni fechas de registro/edición:
+      // quedan vacías (el backend tendría que agregarlas al reporte).
+      userRegistro: "",
+      fechaRegistro: "",
+      usuarioActualizacion: "",
+      fechaActualizacion: "",
+      tieneRegistro: true,
     }));
   }
 };
 
-// ================= SUBMIT =================
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
+// ================= BODY =================
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => ({
+  codAu: form.codAu,
+  norden: form.norden,
+  fechaAu: form.fecha,
+
+  rbsasorderaSi: form.sordera,
+  rbsasorderaNo: !form.sordera,
+  rbsaacufenosSi: form.acufenos,
+  rbsaacufenosNo: !form.acufenos,
+  rbsavertigoSi: form.vertigo,
+  rbsavertigoNo: !form.vertigo,
+  rbsaotalgiaSi: form.otalgia,
+  rbsaotalgiaNo: !form.otalgia,
+  rbsasecrecionSi: form.secrecion_otica,
+  rbsasecrecionNo: !form.secrecion_otica,
+  txtsaotrossintomas: form.otros_sintomas_orl,
+
+  rbamrenitisSi: form.rinitis,
+  rbamrenitisNo: !form.rinitis,
+  rbamsinusitisSi: form.sinusitis,
+  rbamsinusitisNo: !form.sinusitis,
+  rbamotitisSi: form.otitis_media_cronica,
+  rbamotitisNo: !form.otitis_media_cronica,
+  rbamototoxicosSi: form.medicamentos_ototoxicos,
+  rbamototoxicosNo: !form.medicamentos_ototoxicos,
+  rbammeningitisSi: form.meningitis,
+  rbammeningitisNo: !form.meningitis,
+  rbamtecSi: form.tec,
+  rbamtecNo: !form.tec,
+  rbamsorderaSi: form.sordera_am,
+  rbamsorderaNo: !form.sordera_am,
+  rbamparotiditisSi: form.parotiditis,
+  rbamparotiditisNo: !form.parotiditis,
+  rbamsarampionSi: form.sarampion,
+  rbamsarampionNo: !form.sarampion,
+  rbamtbcSi: form.tbc,
+  rbamtbcNo: !form.tbc,
+  txtamcuales: form.cuales_antecedentes,
+
+  rbeoexposicionSi: form.exposicion_ruido,
+  rbeoexposicionNo: !form.exposicion_ruido,
+  rbeoprotectoresSi: form.protectores_auditivos,
+  rbeoprotectoresNo: !form.protectores_auditivos,
+  rbeosustanciasSi: form.exposicion_quimicos,
+  rbeosustanciasNo: !form.exposicion_quimicos,
+
+  rbte0a2: form.promedio_horas == "0-2",
+  rbte2a4: form.promedio_horas == "2-4",
+  rbte4a6: form.promedio_horas == "4-6",
+  rbte6a8: form.promedio_horas == "6-8",
+  rbte8a10: form.promedio_horas == "8-10",
+  rbte10a12: form.promedio_horas == "10-12",
+  rbtem12: form.promedio_horas == ">12",
+  rbteeventual: form.promedio_horas == "EVENTUAL",
+  txtanios: form.anios_exposicion,
+  txtmeses: form.meses_exposicion,
+
+  chktapones: form.tapones,
+  chkorejeras: form.orejeras,
+  txthplomo: form.plomo_hrs,
+  txthmercurio: form.mercurio_hrs,
+  txthtolueno: form.tolueno_hrs,
+  txthxileno: form.xileno_hrs,
+  txthplaguic: form.plaguicidas_hrs,
+  txthorganofos: form.organofosforados_hrs,
+
+  txttplomo: form.plomo_anios,
+  txttmercurio: form.mercurio_anios,
+  txtttolueno: form.tolueno_anios,
+  txttxileno: form.xileno_anios,
+  txttplaguic: form.plaguicidas_anios,
+  txttorganofos: form.organofosforados_anios,
+  txteootros: form.otros_quimicos,
+
+  rbaepraticaSi: form.practica_tiro,
+  rbaepraticaNo: !form.practica_tiro,
+  rbaeusoSi: form.uso_walkman,
+  rbaeusoNo: !form.uso_walkman,
+  rbaeotrosSi: form.otros_antecedentes,
+  rbaeotrosNo: !form.otros_antecedentes,
+  txtaecuales: form.cuales_antecedentes_extralaborales,
+  txtood: form.otoscopia_odiocho,
+  txtooi: form.otoscopia_odilzquierdo,
+
+  od500: form.od_500,
+  od1000: form.od_1000,
+  od2000: form.od_2000,
+  od3000: form.od_3000,
+  od4000: form.od_4000,
+  od6000: form.od_6000,
+  od8000: form.od_8000,
+
+  oi500: form.oi_500,
+  oi1000: form.oi_1000,
+  oi2000: form.oi_2000,
+  oi3000: form.oi_3000,
+  oi4000: form.oi_4000,
+  oi6000: form.oi_6000,
+  oi8000: form.oi_8000,
+
+  txtdiagOd: form.diagnostico_od,
+  txtdiagOi: form.diagnostico_oi,
+  txtcomentarios: form.comentarios_audiometria,
+  chkrpasimple: form.proteccion_simpleODoble == "SIMPLE",
+  chkrpadoble: form.proteccion_simpleODoble == "DOBLE",
+  chkcasemestral: form.control_semestralOAnual == "SEMESTRAL",
+  chkcaanual: form.control_semestralOAnual == "ANUAL",
+  txtotrasrecomendaciones: form.recomendaciones_otras,
+
+  od1500: form.od_o_500,
+  od11000: form.od_o_1000,
+  od12000: form.od_o_2000,
+  od13000: form.od_o_3000,
+  od14000: form.od_o_4000,
+  od16000: form.od_o_6000,
+  od18000: form.od_o_8000,
+
+  oi1500: form.oi_o_500,
+  oi11000: form.oi_o_1000,
+  oi12000: form.oi_o_2000,
+  oi13000: form.oi_o_3000,
+  oi14000: form.oi_o_4000,
+  oi16000: form.oi_o_6000,
+  oi18000: form.oi_o_8000,
+
+  userMedicoOcup: "",
+  formato: "",
+  conclusionesCie10: form.conclusionesCie10,
+  usuarioFirma: form.user_medicoFirma,
+  doctorAsignado: form.user_doctorAsignado,
+});
+
+// Body completo (creación / actualización). El reporte (GET) no devuelve quién registró, así que al editar,
+// si no se conoce el creador, se manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro || user,
+    fechaRegistro: form.fechaRegistro,
+  });
+
+// ================= GUARDAR / EDITAR =================
+// Antes de guardar se aplica el bloqueo por Audiometría OHLA (ver verificarBloqueoAudiometriaOhla).
+const guardarConBloqueo = async (accion, form, token, user, limpiar, tabla, datosFooter) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos incompletos", "error");
     return;
@@ -214,149 +364,23 @@ export const SubmitDataService = async (
     return;
   }
 
-  const body = {
-    codAu: form.codAu,
-    norden: form.norden,
-    fechaAu: form.fecha,
-
-    rbsasorderaSi: form.sordera,
-    rbsasorderaNo: !form.sordera,
-    rbsaacufenosSi: form.acufenos,
-    rbsaacufenosNo: !form.acufenos,
-    rbsavertigoSi: form.vertigo,
-    rbsavertigoNo: !form.vertigo,
-    rbsaotalgiaSi: form.otalgia,
-    rbsaotalgiaNo: !form.otalgia,
-    rbsasecrecionSi: form.secrecion_otica,
-    rbsasecrecionNo: !form.secrecion_otica,
-    txtsaotrossintomas: form.otros_sintomas_orl,
-
-    rbamrenitisSi: form.rinitis,
-    rbamrenitisNo: !form.rinitis,
-    rbamsinusitisSi: form.sinusitis,
-    rbamsinusitisNo: !form.sinusitis,
-    rbamotitisSi: form.otitis_media_cronica,
-    rbamotitisNo: !form.otitis_media_cronica,
-    rbamototoxicosSi: form.medicamentos_ototoxicos,
-    rbamototoxicosNo: !form.medicamentos_ototoxicos,
-    rbammeningitisSi: form.meningitis,
-    rbammeningitisNo: !form.meningitis,
-    rbamtecSi: form.tec,
-    rbamtecNo: !form.tec,
-    rbamsorderaSi: form.sordera_am,
-    rbamsorderaNo: !form.sordera_am,
-    rbamparotiditisSi: form.parotiditis,
-    rbamparotiditisNo: !form.parotiditis,
-    rbamsarampionSi: form.sarampion,
-    rbamsarampionNo: !form.sarampion,
-    rbamtbcSi: form.tbc,
-    rbamtbcNo: !form.tbc,
-    txtamcuales: form.cuales_antecedentes,
-
-    rbeoexposicionSi: form.exposicion_ruido,
-    rbeoexposicionNo: !form.exposicion_ruido,
-    rbeoprotectoresSi: form.protectores_auditivos,
-    rbeoprotectoresNo: !form.protectores_auditivos,
-    rbeosustanciasSi: form.exposicion_quimicos,
-    rbeosustanciasNo: !form.exposicion_quimicos,
-
-    rbte0a2: form.promedio_horas == "0-2",
-    rbte2a4: form.promedio_horas == "2-4",
-    rbte4a6: form.promedio_horas == "4-6",
-    rbte6a8: form.promedio_horas == "6-8",
-    rbte8a10: form.promedio_horas == "8-10",
-    rbte10a12: form.promedio_horas == "10-12",
-    rbtem12: form.promedio_horas == ">12",
-    rbteeventual: form.promedio_horas == "EVENTUAL",
-    txtanios: form.anios_exposicion,
-    txtmeses: form.meses_exposicion,
-
-    chktapones: form.tapones,
-    chkorejeras: form.orejeras,
-    txthplomo: form.plomo_hrs,
-    txthmercurio: form.mercurio_hrs,
-    txthtolueno: form.tolueno_hrs,
-    txthxileno: form.xileno_hrs,
-    txthplaguic: form.plaguicidas_hrs,
-    txthorganofos: form.organofosforados_hrs,
-
-    txttplomo: form.plomo_anios,
-    txttmercurio: form.mercurio_anios,
-    txtttolueno: form.tolueno_anios,
-    txttxileno: form.xileno_anios,
-    txttplaguic: form.plaguicidas_anios,
-    txttorganofos: form.organofosforados_anios,
-    txteootros: form.otros_quimicos,
-
-    rbaepraticaSi: form.practica_tiro,
-    rbaepraticaNo: !form.practica_tiro,
-    rbaeusoSi: form.uso_walkman,
-    rbaeusoNo: !form.uso_walkman,
-    rbaeotrosSi: form.otros_antecedentes,
-    rbaeotrosNo: !form.otros_antecedentes,
-    txtaecuales: form.cuales_antecedentes_extralaborales,
-    txtood: form.otoscopia_odiocho,
-    txtooi: form.otoscopia_odilzquierdo,
-
-    od500: form.od_500,
-    od1000: form.od_1000,
-    od2000: form.od_2000,
-    od3000: form.od_3000,
-    od4000: form.od_4000,
-    od6000: form.od_6000,
-    od8000: form.od_8000,
-
-    oi500: form.oi_500,
-    oi1000: form.oi_1000,
-    oi2000: form.oi_2000,
-    oi3000: form.oi_3000,
-    oi4000: form.oi_4000,
-    oi6000: form.oi_6000,
-    oi8000: form.oi_8000,
-
-    txtdiagOd: form.diagnostico_od,
-    txtdiagOi: form.diagnostico_oi,
-    txtcomentarios: form.comentarios_audiometria,
-    chkrpasimple: form.proteccion_simpleODoble == "SIMPLE",
-    chkrpadoble: form.proteccion_simpleODoble == "DOBLE",
-    chkcasemestral: form.control_semestralOAnual == "SEMESTRAL",
-    chkcaanual: form.control_semestralOAnual == "ANUAL",
-    txtotrasrecomendaciones: form.recomendaciones_otras,
-
-    od1500: form.od_o_500,
-    od11000: form.od_o_1000,
-    od12000: form.od_o_2000,
-    od13000: form.od_o_3000,
-    od14000: form.od_o_4000,
-    od16000: form.od_o_6000,
-    od18000: form.od_o_8000,
-
-    oi1500: form.oi_o_500,
-    oi11000: form.oi_o_1000,
-    oi12000: form.oi_o_2000,
-    oi13000: form.oi_o_3000,
-    oi14000: form.oi_o_4000,
-    oi16000: form.oi_o_6000,
-    oi18000: form.oi_o_8000,
-
-    userRegistro: user,
-    userMedicoOcup: "",
-    formato: "",
-    conclusionesCie10: form.conclusionesCie10,
-    usuarioFirma: form.user_medicoFirma,
-    doctorAsignado: form.user_doctorAsignado,
-  };
-
-  await SubmitDataServiceDefault(
+  await accion({
+    form,
     token,
+    user,
+    tabla,
     limpiar,
-    body,
     registrarUrl,
-    () => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
-    }
-  );
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
 };
+
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarConBloqueo(guardarRegistro, form, token, user, limpiar, tabla, datosFooter);
+
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarConBloqueo(actualizarRegistro, form, token, user, limpiar, tabla, datosFooter);
 
 // ================= PRINT =================
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
@@ -376,26 +400,44 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 };
 
 // ================= VERIFY =================
+// Además del nuevo/existente, aplica el bloqueo por Audiometría OHLA y valida que el N° Orden pertenezca a la sede.
 // `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
 // "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
 export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
   if (!nro) {
-    await Swal.fire(
-      "Error",
-      "Debe Introducir un Nro de Historia Clinica válido",
-      "error"
-    );
+    await Swal.fire({
+      icon: "error",
+      title: '<i class="fa-solid fa-keyboard"></i>Error',
+      html: "Debe Introducir un N° Orden válido",
+    });
     return;
   }
-  Loading("Validando datos");
 
-  let existePropia, existeOhla, bloqueado;
+  LoadingDefault("Validando datos");
+
+  if (sede) {
+    const { estado, descripcionSede } = await validarSede(nro, sede, token);
+    if (estado === "otraSede") {
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+        html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+      });
+      return;
+    }
+    if (estado !== "ok") {
+      Swal.fire({
+        icon: "error",
+        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+      });
+      return;
+    }
+  }
+
+  let existePropia, bloqueado;
   try {
-    ({ existePropia, existeOhla, bloqueado } = await verificarBloqueoAudiometriaOhla(
-      nro,
-      tabla,
-      token
-    ));
+    ({ existePropia, bloqueado } = await verificarBloqueoAudiometriaOhla(nro, tabla, token));
   } catch (error) {
     Swal.close();
     await Swal.fire("Error", "Ocurrió un error al validar el Nro de Orden.", "error");
@@ -405,32 +447,29 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
 
   if (bloqueado) {
     await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA, "error");
-    console.log("Bloqueado: OHLA existe, audiometria aún no. No se cargan datos.");
-    return; // no se llama a GetInfoPac
+    return; // no se cargan datos
   }
 
   if (existePropia) {
-    GetInfoServicio(nro, tabla, set, token, () => {
+    GetInfoServicioEditar(nro, tabla, set, token, () => {
       if (silencioso) {
         Swal.close();
         return;
       }
-      Swal.fire(
-        "Alerta",
-        "Este paciente ya cuenta con registros de Audiometría.",
-        "warning"
-      );
-      console.log(existeOhla ? "Caso legado: ambas existen" : "Solo Normal existe");
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+        html: "Este paciente ya cuenta con registros de Audiometría.",
+      });
     });
     return;
   }
 
-  await GetInfoPac(nro, set, token, sede);
-  console.log("Ninguna existe, registro nuevo");
+  await GetInfoServicio(nro, set, token, sede);
 };
 
-// ================= GET INFO PAC =================
-const GetInfoPac = async (nro, set, token, sede) => {
+// ================= GET INFO SERVICIO (registro nuevo) =================
+export const GetInfoServicio = async (nro, set, token, sede) => {
   const res = await GetInfoPacDefault(nro, token, sede);
 
   if (!res || res.error || !res.nombresApellidos) {
@@ -453,10 +492,6 @@ const GetInfoPac = async (nro, set, token, sede) => {
     cargoDesempenar: res.cargo ?? "",
     lugarNacimiento: res.lugarNacimiento ?? "",
     sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+    tieneRegistro: false,
   }));
-};
-
-// ================= LOADING =================
-export const Loading = (mensaje) => {
-  LoadingDefault(mensaje);
 };

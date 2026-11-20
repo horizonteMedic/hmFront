@@ -1,6 +1,8 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../getFetch/getFetch";
 import { SubmitData } from "./model";
+import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import { guardarRegistro, actualizarRegistro, validarSede } from "../../../../utils/registroOcupacionalUtils";
 
 //===============Zona Modificación===============
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
@@ -112,6 +114,14 @@ export const GetInfoServicio = (
             "NO PASO EXAMEN ODONTOLOGICO"
           ),
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+          // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
+          // OdontogramaReporteDTO aún no devuelve estos campos: mientras tanto quedan vacíos.
+          fechaRegistro: res.fechaRegistro ?? "",
+          userRegistro: res.userRegistro ?? "",
+          fechaActualizacion: res.fechaActualizacion ?? "",
+          usuarioActualizacion: res.usuarioActualizacion ?? "",
+          tieneRegistro: true,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -127,20 +137,9 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-  Loading("Registrando Datos");
-  const body = {
+// ===== Mapeo: Body base =====
+// Campos propios del examen (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => ({
     codOd: form.codOd,
     norden: form.norden,
     fechaOd: form.fechaExam,
@@ -195,31 +194,51 @@ export const SubmitDataService = async (
     txtCoronas: form.corona,
     txtObservaciones: form.observaciones,
     observacionesCie10: form.observacionesCie10,
-    userRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,
-  };
-  SubmitData(body, registrarUrl, token).then((res) => {
-    console.log(res);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla, datosFooter);
-        }
-      });
-    } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
-    }
+});
+
+// Body completo (creación / actualización). OdontogramaDTO usa `userRegistro` para el usuario que registra.
+// El reporte (GET) aún no devuelve la fecha de registro, así que al editar, si no se conoce el creador, se
+// manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro || user,
+    fechaRegistro: form.fechaRegistro,
   });
-};
+
+// Este endpoint responde id 1 al registrar y 0 al actualizar.
+const idsExito = [0, 1];
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    idsExito,
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    idsExito,
+  });
 
 export const SubmitDataServiceLO = async (
   form,
@@ -363,6 +382,28 @@ export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = fals
     return;
   }
   Loading("Validando datos");
+
+  // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+  if (sede) {
+    const { estado, descripcionSede } = await validarSede(nro, sede, token);
+    if (estado === "otraSede") {
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+        html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+      });
+      return;
+    }
+    if (estado !== "ok") {
+      Swal.fire({
+        icon: "error",
+        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+      });
+      return;
+    }
+  }
+
   getFetch(
     `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
     token

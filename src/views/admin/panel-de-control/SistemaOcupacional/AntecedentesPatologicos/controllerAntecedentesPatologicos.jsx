@@ -3,27 +3,34 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    SubmitDataServiceDefault,
+    VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    validarSede,
+} from "../../../../utils/registroOcupacionalUtils";
+import {
+    datosDeclaracionJuradaParaReporte,
+    debeGuardarDeclaracionJurada,
+    declaracionJuradaAForm,
+    guardarDeclaracionJuradaSalud,
+    obtenerDeclaracionJuradaSalud,
+} from "../../../../utils/declaracionJuradaSaludUtils";
 
-const listaNordenFecha = [
-    {
-        norden: "1",
-        fecha: "2023-01-01",
-    },
-    {
-        norden: "2",
-        fecha: "2023-01-02",
-    }
-];
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_ANTECEDENTES_PATOLOGICOS = "antecedentes_patologicos";
 
-
+// ===== Configuración =====
 const obtenerReporteUrl =
     "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos";
 const registrarUrl =
     "/api/v01/ct/antecedentesPatologicos/registrarActualizarAntecedentesPatologicos";
 const obtenerListaNordenUrl = "/api/v01/ct/antecedentesPatologicos/historial";
+const infoPersonalUrl = "/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros";
 
 const OpenModalNorden = async (
     norden,
@@ -31,7 +38,8 @@ const OpenModalNorden = async (
     set,
     token,
 ) => {
-    const list = await getFetch(`${obtenerListaNordenUrl}?nOrden=${norden}`, token);
+    const resHistorial = await getFetch(`${obtenerListaNordenUrl}?nOrden=${norden}`, token);
+    const list = Array.isArray(resHistorial) ? resHistorial : [];
     if (list.length === 0) {
         GetInfoBasicoNordenActual(norden, tabla, set, token, list);
         Swal.fire({
@@ -207,7 +215,7 @@ const fetchAntecedentesHuamachuco = async (dni, token) => {
         Swal.close();
 
         if (res && res.operaciones) {
-            return res.operaciones.map((op, index) => ({
+            return res.operaciones.map((op) => ({
                 codAntecedentesPatologicosQuirurgicos: null,
                 quirurjicosId: null,
                 fecha: op.fechaOperacion || null,
@@ -225,89 +233,24 @@ const fetchAntecedentesHuamachuco = async (dni, token) => {
     }
 };
 
-export const GetInfoServicio = async (
-    nro,
-    tabla,
-    set,
-    token,
-    selectedSede,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        let presion_sistolica = parseFloat(res.sistolica);
-        let presion_diastolica = parseFloat(res.diastolica);
-        let hipertension = false;
-        if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
-            (presion_sistolica >= 140 || presion_diastolica >= 90)) {
-            // concatenacionObservacion += "HTA NO CONTROLADA.\n";
-            hipertension = true;
-        }
-
-        const medicamentosAnexo16A = res.medicamentosAnexo16A ?? "";
-
-        // Check if we need to fetch from Huamachuco
-        let antecedentesData = [];
-        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
-            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
-                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
-                quirurjicosId: item.quirurjicosId,
-                fecha: item.fecha,
-                hospitalOperacion: item.hospitalOperacion,
-                operacion: item.operacion,
-                diasHospitalizado: item.diasHospitalizado,
-                complicaciones: item.complicaciones,
-            }));
-        } else if (res.dni_cod_pa) {
-            const dni = res.dni_cod_pa;
-            console.log({ selectedSede });
-            if (selectedSede == "HMAC") {
-                antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
-            }
-        }
-
-        set((prev) => ({
-            ...prev,
-            norden: res.n_orden,
-            codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
-            nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
-            sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-            edad: res.edad_edad + " AÑOS",
-            boroo: res.esBoro ?? false,
-
-            hipertensionArterial: hipertension,
-
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
-            enfOculares: (res.enfermedadesocularesoftalmo_e_oculares || "") != "" && !(res.enfermedadesocularesoftalmo_e_oculares || "").includes("NINGUNA"),
-            vcOD: res.visioncercasincorregirod_v_cerca_s_od,
-            vcOI: res.visioncercasincorregiroi_v_cerca_s_oi,
-            vcCorregidaOD: res.oftalodccmologia_odcc,
-            vcCorregidaOI: res.oiccoftalmologia_oicc,
-            vlOD: res.visionlejossincorregirod_v_lejos_s_od,
-            vlOI: res.visionlejossincorregiroi_v_lejos_s_oi,
-            vlCorregidaOD: res.odlcoftalmologia_odlc,
-            vlCorregidaOI: res.oilcoftalmologia_oilc,
-            vclrs: res.vcoftalmologia_vc,
-            vb: res.vboftalmologia_vb,
-            rp: res.rpoftalmologia_rp,
-            cocaina: res.cocainaLaboratorioClinico_txtcocaina,
-            cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
-            marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
-            marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
-
-            medicamentos: medicamentosAnexo16A != "",
-            especifiqueMedicamentos: medicamentosAnexo16A,
-
-            antecedentes: antecedentesData,
-        }));
-    }
-};
+// Datos personales y laborales del paciente que muestra la sección DatosPersonalesLaborales, tomados del reporte de un
+// N° de orden (`AntecedentesPatologicosReporteDTO`). Es el único lugar donde se mapean: al editar se usa con el reporte
+// del registro y al copiar un N° anterior se vuelve a aplicar con el reporte del N° ACTUAL (estos datos nunca salen
+// del anterior). Claves del reporte: `fechanacimientopaciente_…` va todo en minúsculas y `area_area_o` (área de
+// trabajo) alimenta "Ocupación", igual que `areaO` en los demás formularios. El reporte NO trae lugar de nacimiento,
+// estado civil ni nivel de estudios: ver `cargarDatosPersonalesComplementarios`.
+const mapDatosPacienteForm = (res) => ({
+    nombres: [res?.nombres_nombres_pa, res?.apellidos_apellidos_pa].filter(Boolean).join(" "),
+    dni: res?.dni_cod_pa ?? "",
+    sexo: res?.sexo_sexo_pa == "M" ? "MASCULINO" : res?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
+    edad: res?.edad_edad ? `${res.edad_edad} AÑOS` : "",
+    fechaNacimiento: formatearFechaCorta(res?.fechanacimientopaciente_fecha_nacimiento_pa ?? ""),
+    boroo: res?.esBoro ?? false,
+    empresa: res?.empresa_razon_empresa ?? "",
+    contrata: res?.contrata_razon_contrata ?? "",
+    ocupacion: res?.area_area_o ?? "",
+    cargoDesempenar: res?.cargo_cargo_de ?? "",
+});
 
 // Arma el objeto de campos del formulario a partir de la respuesta del backend.
 // Se usa tanto para editar un registro existente como para "copiar" datos de
@@ -317,10 +260,8 @@ const mapAntecedentesPatologicosForm = (res, antecedentesData, prev) => ({
     norden: res.n_orden,
     codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
     fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
-    nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
-    sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-    edad: res.edad_edad + " AÑOS",
-    boroo: res.esBoro ?? false,
+    // Datos personales y laborales del paciente (los muestra DatosPersonalesLaborales).
+    ...mapDatosPacienteForm(res),
 
     covid19: res.covid_chkcovid,
     fechaCovid: res.fechaCovid_fechacovid,
@@ -576,6 +517,9 @@ export const GetInfoServicioEditar = async (
     token,
     onFinish = () => { }
 ) => {
+    // La Declaración Jurada es otro endpoint: se pide en paralelo y se carga junto con los antecedentes
+    // (así el snapshot del registro editable ya la incluye).
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nro, token);
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -584,6 +528,7 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
         // Check if we need to fetch from Huamachuco
         let antecedentesData = [];
         if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
@@ -604,6 +549,17 @@ export const GetInfoServicioEditar = async (
         set((prev) => ({
             ...prev,
             ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+            ...declaracionJurada,
+            // Auditoría REAL. Desde 2026-11-18 el reporte (AntecedentesPatologicosReporteDTO) y el body de guardado
+            // (AntecedentesPatologicosDTO) tienen los 4 campos: `userRegistro`, `fechaRegistro`, `usuarioActualizacion`
+            // y `fechaActualizacion`. Antes el creador venía como `userRegistro_user_registro` (y no había fechas ni datos
+            // de edición): el nombre viejo queda de respaldo para backends sin actualizar (main). Todo se reenvía al
+            // editar con sellarAuditoria: si `userRegistro` llegara vacío se mandaría null y el backend perdería al creador.
+            userRegistro: res.userRegistro ?? res.userRegistro_user_registro ?? "",
+            fechaRegistro: res.fechaRegistro ?? "",
+            usuarioActualizacion: res.usuarioActualizacion ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
+            tieneRegistro: true,
         }));
     }
 };
@@ -617,6 +573,8 @@ export const GetInfoServicioParaNuevoRegistro = async (
     token,
     onFinish = () => { }
 ) => {
+    // La Declaración Jurada es del N° de orden ACTUAL (no se copia la del anterior: es una declaración nueva).
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nordenActual, token);
     const res = await GetInfoServicioDefault(
         nordenBuscar,
         tabla,
@@ -645,6 +603,8 @@ export const GetInfoServicioParaNuevoRegistro = async (
         const hoy = new Date();
         const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
+        const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
+
         // El Examen Ocular (Oftalmología) y el Laboratorio pertenecen al N°
         // de orden ACTUAL, así que se traen por separado en lugar de usar
         // los del norden anterior seleccionado en el modal.
@@ -656,10 +616,12 @@ export const GetInfoServicioParaNuevoRegistro = async (
         set((prev) => ({
             ...prev,
             ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+            ...declaracionJurada,
             norden: nordenActual,
             fechaExam: fechaActual,
             fechaCovid: fechaActual,
             codigoAntecedentesPatologicos_cod_ap: null,
+            tieneRegistro: false,
             ...mapDatosPacienteForm(resActual),
             ...mapExamenesActualesForm(resActual),
             // Va después del spread del norden anterior a propósito: para las
@@ -670,17 +632,6 @@ export const GetInfoServicioParaNuevoRegistro = async (
         }));
     }
 };
-
-// Datos básicos del paciente (nombre, sexo, edad) según el reporte del N°
-// de orden ACTUAL, independientes del norden anterior que se haya elegido.
-const mapDatosPacienteForm = (resActual) => ({
-    nombres: resActual?.nombres_nombres_pa
-        ? `${resActual.nombres_nombres_pa} ${resActual.apellidos_apellidos_pa ?? ""}`.trim()
-        : "",
-    sexo: resActual?.sexo_sexo_pa == "M" ? "MASCULINO" : resActual?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
-    edad: resActual?.edad_edad ? `${resActual.edad_edad} AÑOS` : "",
-    boroo: resActual?.esBoro ?? false,
-});
 
 // Examen Ocular (Oftalmología) y Laboratorio (cocaína/marihuana) del N° de
 // orden ACTUAL: nunca se pisan con los del norden anterior seleccionado.
@@ -729,6 +680,7 @@ const mapValidacionesActuales = (resActual) => {
 // Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL,
 // Antecedentes Quirúrgicos del N° de orden mas reciente(fecha_registro_antecedente)
 export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token, list = []) => {
+    const pedidoDeclaracion = obtenerDeclaracionJuradaSalud(nordenActual, token);
     const resActual = await getFetch(
         `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
         token
@@ -766,260 +718,257 @@ export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token,
     const hoy = new Date();
     const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
+    const declaracionJurada = declaracionJuradaAForm(await pedidoDeclaracion);
+
     set((prev) => ({
         ...prev,
         norden: nordenActual,
         fechaExam: fechaActual,
         fechaCovid: fechaActual,
+        tieneRegistro: false,
         ...mapDatosPacienteForm(resActual),
         ...mapExamenesActualesForm(resActual),
         ...mapValidacionesActuales(resActual),
+        ...declaracionJurada,
         antecedentes: antecedentesData,
     }));
 };
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
-    console.log({ ff: form.antecedentesEliminados })
-    const body = {
-        norden: form.norden,
-        codigoAntecedentesPatologicos: form.codigoAntecedentesPatologicos_cod_ap,
-        edad: form.edad.replace(" AÑOS", ""),
-        fechaAntecedentesPatologicos: form.fechaExam,
-        dniUsuario: form.dniUsuario,
-        alergias: form.alergias,
-        amigdalitisCronica: form.amigdalitisCronica,
-        arritmiasCardiacas: form.arritmiasCardiacas,
-        asma: form.asma,
-        bocio: form.bocio,
-        bronconeumonia: form.bronconeumonia,
-        bronquitisARepeticion: form.bronquitisRepeticion,
-        cariesOGingivitis: form.cariesGingivitis,
-        colecistitis: form.colecistitis,
-        dermatitis: form.dermatitis,
-        diabetes: form.diabetes,
-        disenteria: form.disenteria,
-        enfermedadesCorazon: form.enfCorazon,
-        enfermedadesOculares: form.enfOculares,
-        epilsepsiaOConvulsiones: form.epilepsiaConvulsiones,
-        faringitisCronica: form.faringitisCronica,
-        fiebreMalta: form.fiebreMalta,
-        fiebreTifoidea: form.fiebreTifoidea,
-        fiebreReumatica: form.fiebreReumatica,
-        foruncolois: form.forunculosis,
-        gastritisCronica: form.gastritisCronica,
-        gonorrea: form.gonorrea,
-        gota: form.gota,
-        hemorroides: form.hemorroides,
-        hepatitis: form.hepatitis,
-        hernias: form.hernias,
-        hipertencionArterial: form.hipertensionArterial,
-        urinariasRepetidas: form.infUrinariasRepetidas,
-        intoxicaciones: form.intoxicaciones,
-        insuficienciaCardiaca: form.insuficienciaCardiaca,
-        insuficienciaCoronariaCronica: form.insuficienciaCoronariaCronica,
-        insuficienciaRenalCronica: form.insuficienciaRenalCronica,
-        litiasisUrinaria: form.litiasisUrinaria,
-        meningitis: form.meningitis,
-        neuritis: form.neuritisRepeticion,
-        otitisMedia: form.otitisMedia,
-        presionAltaOBaja: form.presionAltaBaja,
-        paludismoOMalaria: form.paludismoMalaria,
-        parasitosisIntestinal: form.parasitosisIntestinal,
-        paratiditis: form.parotiditis,
-        pleuresia: form.pleuresia,
-        plumbismo: form.plumbismo,
-        poliomielitis: form.poliomielitis,
-        portadorMarcapasos: form.portadorMarcapaso,
-        protesisCardiacasValvulares: form.protesisCardiacasValvulares,
-        resfriosFrecuentes: form.resfriosFrecuentes,
-        reumatismo: form.reumatismoRepeticion,
-        sarampion: form.sarampion,
-        sifilis: form.sifilis,
-        silicosis: form.silicosis,
-        sinusitisCronica: form.sinusitisCronica,
-        tosConvulsiva: form.tosConvulsiva,
-        transtornosNerviosos: form.trastornosNerviosos,
-        traumatismoEncefalocraneano: form.traumatismoEncefalocraneano,
-        tuberculosis: form.tuberculosis,
-        tumoresQuistes: form.tumoresQuistes,
-        ulceraPeptica: form.ulceraPeptica,
-        varicela: form.varicela,
-        varices: form.varices,
-        varicocele: form.varicocele,
-        perdidaMemoria: form.perdidaMemoria,
-        preocupacionesAngustia: form.preocupacionesAngustia,
-        doloresArticulares: form.doloresArticulares,
-        aumentoDisminucionPeso: form.aumentoDisminucionPeso,
-        dolorCabeza: form.dolorCabeza,
-        diarrea: form.diarrea,
-        agitacionEjercicio: form.agitacionEjercicios,
-        dolorOcular: form.dolorOcular,
-        dolorOpresivoTorax: form.dolorOpresivoTorax,
-        hinchazonPiesOManos: form.hinchazonPiesManos,
-        estrenimiento: form.estrenimiento,
-        vomitosConSangre: form.vomitosSangre,
-        sangradoPorOrina: form.sangradoOrina,
-        tosConSangre: form.tosSangre,
-        coloracionAmarillaPiel: false,//enviar false
-        indigestionFrecuente: form.indigestionFrecuente,
-        coloracionAmarrillaPiel: form.coloracionAmarilla,
-        insomnio: form.insomnio,
-        lumbalgiaODolorCintura: form.lumbalgias,
-        mareos: form.mareosDesmayos,
-        hecesNegras: form.hecesNegras,
-        orinaConDolor: form.orinaDolorArdor,
-        orinaInvoluntaria: form.orinaInvoluntaria,
-        dolorOido: form.dolorOido,
-        secrecionesOido: form.secrecionesOido,
-        palpitaciones: form.palpitaciones,
-        adormecimientos: form.adormecimientos,
-        pesadillasFrecuentes: form.pesadillasFrecuentes,
-        doloresMusculares: form.doloresMusculares,
-        tosCronica: form.tosCronica,
-        sangradoEncias: form.sangradoEncias,
-        drogasNo: !form.drogas,
-        drogasSi: form.drogas,
-        licorNo: !form.licor,
-        licorSi: form.licor,
-        fumarNo: !form.fumar,
-        fumarSi: form.fumar,
-        drogasFrecuencia: form.frecuenciaDrogas,
-        drogasTipo: form.tipoDrogas,
-        licorFrecuencia: form.frecuenciaLicor,
-        licorTipoFrecuente: form.tipoLicor,
-        numeroCigarrillos: form.numeroCigarrillos,
-        precisarCausasVarones: form.causasAbortos,
-        hijosVivosVarones: form.hijosVivos,
-        hijosFallecidosVarones: form.hijosFallecidos,
-        abortosParejasVarones: form.abortosParejas,
-        inicioMestruacionDamas: form.inicioMenstruacion,
-        inicioVidaSexualDamas: form.inicioVidaSexual,
-        numeroParejasSexActualidadDamas: form.parejasSexuales,
-        hijosVivosDamas: form.hijosVivosDamas,
-        hijosFallecidosDamas: form.hijosFallecidosDamas,
-        numerosDeAbortosDamas: form.abortosDamas,
-        precisarCausasDamas: form.causasAbortosDamas,
-        otrosDescripcionAntecedentesPatologicos: form.otrasPatologias,
-        otrosDescripcionIndicarEnfermedades: form.otrasEnfermedades,
-        covid: form.covid19,
-        fechaCovid: form.fechaCovid,
-        covidLevel: form.severidadCovid === "LEVE",
-        covidModerado: form.severidadCovid === "MODERADA",
-        covidSevero: form.severidadCovid === "SEVERA",
-        dosisVacunas: form.dosisVacunas,
-        otrosTipoIndicarEnfermedades: form.tipoOtros,
-        otrosFrecuenciaIndicarEnfermedades: form.frecuenciaOtros,
-        otrosSiIndicarEnfermedades: form.otros,
-        otrosNoIndicarEnfermedades: !form.otros,
-        imaBoro: form.ima,
-        acvBoro: form.acv,
-        tbcBoro: form.tbc,
-        vihBoro: form.vih,
-        fobiasBoro: form.fobias,
-        vertigosBoro: form.vertigos,
-        tifoideaBoro: form.tifoidea,
-        neoplasiasBoro: form.neoplasias,
-        quemadurasBoro: form.quemaduras,
-        discopatiasBoro: form.discopatias,
-        columnaBoro: form.columna,
-        enfermedadesPsiquiatricasBoro: form.enfPsiquiatricas,
-        enfermedadesReumaticasBoro: form.enfReumatica,
-        enfermedadesPulmonaresBoro: form.enfPulmonares,
-        enfermedadesPielBoro: form.enfPiel,
-        tendinitisBoro: form.tendinitis,
-        onicomicosisBoro: form.onicomicosis,
-        fracturasBoro: form.fracturas,
-        anemiaBoro: form.anemia,
-        obesidadBoro: form.obesidad,
-        dislipidemiaBoro: form.dislipidemia,
-        intoxicacionesBoro: form.intoxicaciones,
-        amputacionBoro: form.amputacion,
-        sorderaBoro: form.sordera,
-        especifiqueDetallesOTratamientoBoro: form.detallesTratamiento,
-        alergiasMedicamentosAlimentosBoro: form.alergiasMedicamentos,
-        alergiasMedicamentosAlimentosEspecifiqueBoro: form.especifiqueAlergias,
-        accidenteTrabajoBoro: form.accidenteTrabajo,
-        accidenteTrabajoFechaBoro: form.fechaAccidente,
-        descansoMedicoBoro: form.tiempoPerdido,
-        descansoMedicoEspecifiqueBoro: form.especifiqueTiempoPerdido,
-        enfermedadesProfesionalesBoro: form.enfermedadProfesional,
-        enfermedadesProfesionalesFechaBoro: form.fechaCalificacion,
-        enfermedadesLaboralesCalificacionBoro: form.evaluadoCalificacion,
-        enfermedadesLaboralesCalificacionEspecifiqueBoro: form.especifiqueCalificacion,
-        antitetanicaBoro: form.antitetanica,
-        fiebreAmarillaBoro: form.fiebreAmarilla,
-        influenzaBoro: form.influenza,
-        hepatitisABoro: form.hepatitisA,
-        hepatitisBBoro: form.hepatitisB,
-        gripeInfluenzaBoro: form.gripeInfluenza,
-        neumococoBoro: form.neumococo,
-        rabiaBoro: form.rabia,
-        papilomaHumanoBoro: form.papilomaHumano,
-        covidAntecedentePatologico: form.covidAntecedentePatologico,
-        cantidosisBoro: false, //enviar false
-        medicamentoBoro: form.medicamentos,
-        medicamentoEspecifiqueBoro: form.especifiqueMedicamentos,
-        actividadFisicaBoro: form.actividadFisica,
-        actividadFisicaEspecifiqueBoro: form.especifiqueActividadFisica,
-        padreEspecifiqueBoro: form.padre,
-        madreEspecifiqueBoro: form.madre,
-        hermanosEspecifiqueBoro: form.hermanos,
-        hijosEspecifiqueBoro: form.hijos,
-        esposConyEspecifiqueBoro: form.esposaConyuge,
-        conadisEspecifiqueBoro: form.carnetConadis,
-        etsBoro: form.ets,
-        migranaBoro: form.migrana,
-        tiempoIncapacidadBoro: form.tipoIncapacidad,
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => ({
+    norden: form.norden,
+    codigoAntecedentesPatologicos: form.codigoAntecedentesPatologicos_cod_ap,
+    edad: form.edad.replace(" AÑOS", ""),
+    fechaAntecedentesPatologicos: form.fechaExam,
+    dniUsuario: form.dniUsuario,
+    alergias: form.alergias,
+    amigdalitisCronica: form.amigdalitisCronica,
+    arritmiasCardiacas: form.arritmiasCardiacas,
+    asma: form.asma,
+    bocio: form.bocio,
+    bronconeumonia: form.bronconeumonia,
+    bronquitisARepeticion: form.bronquitisRepeticion,
+    cariesOGingivitis: form.cariesGingivitis,
+    colecistitis: form.colecistitis,
+    dermatitis: form.dermatitis,
+    diabetes: form.diabetes,
+    disenteria: form.disenteria,
+    enfermedadesCorazon: form.enfCorazon,
+    enfermedadesOculares: form.enfOculares,
+    epilsepsiaOConvulsiones: form.epilepsiaConvulsiones,
+    faringitisCronica: form.faringitisCronica,
+    fiebreMalta: form.fiebreMalta,
+    fiebreTifoidea: form.fiebreTifoidea,
+    fiebreReumatica: form.fiebreReumatica,
+    foruncolois: form.forunculosis,
+    gastritisCronica: form.gastritisCronica,
+    gonorrea: form.gonorrea,
+    gota: form.gota,
+    hemorroides: form.hemorroides,
+    hepatitis: form.hepatitis,
+    hernias: form.hernias,
+    hipertencionArterial: form.hipertensionArterial,
+    urinariasRepetidas: form.infUrinariasRepetidas,
+    intoxicaciones: form.intoxicaciones,
+    insuficienciaCardiaca: form.insuficienciaCardiaca,
+    insuficienciaCoronariaCronica: form.insuficienciaCoronariaCronica,
+    insuficienciaRenalCronica: form.insuficienciaRenalCronica,
+    litiasisUrinaria: form.litiasisUrinaria,
+    meningitis: form.meningitis,
+    neuritis: form.neuritisRepeticion,
+    otitisMedia: form.otitisMedia,
+    presionAltaOBaja: form.presionAltaBaja,
+    paludismoOMalaria: form.paludismoMalaria,
+    parasitosisIntestinal: form.parasitosisIntestinal,
+    paratiditis: form.parotiditis,
+    pleuresia: form.pleuresia,
+    plumbismo: form.plumbismo,
+    poliomielitis: form.poliomielitis,
+    portadorMarcapasos: form.portadorMarcapaso,
+    protesisCardiacasValvulares: form.protesisCardiacasValvulares,
+    resfriosFrecuentes: form.resfriosFrecuentes,
+    reumatismo: form.reumatismoRepeticion,
+    sarampion: form.sarampion,
+    sifilis: form.sifilis,
+    silicosis: form.silicosis,
+    sinusitisCronica: form.sinusitisCronica,
+    tosConvulsiva: form.tosConvulsiva,
+    transtornosNerviosos: form.trastornosNerviosos,
+    traumatismoEncefalocraneano: form.traumatismoEncefalocraneano,
+    tuberculosis: form.tuberculosis,
+    tumoresQuistes: form.tumoresQuistes,
+    ulceraPeptica: form.ulceraPeptica,
+    varicela: form.varicela,
+    varices: form.varices,
+    varicocele: form.varicocele,
+    perdidaMemoria: form.perdidaMemoria,
+    preocupacionesAngustia: form.preocupacionesAngustia,
+    doloresArticulares: form.doloresArticulares,
+    aumentoDisminucionPeso: form.aumentoDisminucionPeso,
+    dolorCabeza: form.dolorCabeza,
+    diarrea: form.diarrea,
+    agitacionEjercicio: form.agitacionEjercicios,
+    dolorOcular: form.dolorOcular,
+    dolorOpresivoTorax: form.dolorOpresivoTorax,
+    hinchazonPiesOManos: form.hinchazonPiesManos,
+    estrenimiento: form.estrenimiento,
+    vomitosConSangre: form.vomitosSangre,
+    sangradoPorOrina: form.sangradoOrina,
+    tosConSangre: form.tosSangre,
+    coloracionAmarillaPiel: false,//enviar false
+    indigestionFrecuente: form.indigestionFrecuente,
+    coloracionAmarrillaPiel: form.coloracionAmarilla,
+    insomnio: form.insomnio,
+    lumbalgiaODolorCintura: form.lumbalgias,
+    mareos: form.mareosDesmayos,
+    hecesNegras: form.hecesNegras,
+    orinaConDolor: form.orinaDolorArdor,
+    orinaInvoluntaria: form.orinaInvoluntaria,
+    dolorOido: form.dolorOido,
+    secrecionesOido: form.secrecionesOido,
+    palpitaciones: form.palpitaciones,
+    adormecimientos: form.adormecimientos,
+    pesadillasFrecuentes: form.pesadillasFrecuentes,
+    doloresMusculares: form.doloresMusculares,
+    tosCronica: form.tosCronica,
+    sangradoEncias: form.sangradoEncias,
+    drogasNo: !form.drogas,
+    drogasSi: form.drogas,
+    licorNo: !form.licor,
+    licorSi: form.licor,
+    fumarNo: !form.fumar,
+    fumarSi: form.fumar,
+    drogasFrecuencia: form.frecuenciaDrogas,
+    drogasTipo: form.tipoDrogas,
+    licorFrecuencia: form.frecuenciaLicor,
+    licorTipoFrecuente: form.tipoLicor,
+    numeroCigarrillos: form.numeroCigarrillos,
+    precisarCausasVarones: form.causasAbortos,
+    hijosVivosVarones: form.hijosVivos,
+    hijosFallecidosVarones: form.hijosFallecidos,
+    abortosParejasVarones: form.abortosParejas,
+    inicioMestruacionDamas: form.inicioMenstruacion,
+    inicioVidaSexualDamas: form.inicioVidaSexual,
+    numeroParejasSexActualidadDamas: form.parejasSexuales,
+    hijosVivosDamas: form.hijosVivosDamas,
+    hijosFallecidosDamas: form.hijosFallecidosDamas,
+    numerosDeAbortosDamas: form.abortosDamas,
+    precisarCausasDamas: form.causasAbortosDamas,
+    otrosDescripcionAntecedentesPatologicos: form.otrasPatologias,
+    otrosDescripcionIndicarEnfermedades: form.otrasEnfermedades,
+    covid: form.covid19,
+    fechaCovid: form.fechaCovid,
+    covidLevel: form.severidadCovid === "LEVE",
+    covidModerado: form.severidadCovid === "MODERADA",
+    covidSevero: form.severidadCovid === "SEVERA",
+    dosisVacunas: form.dosisVacunas,
+    otrosTipoIndicarEnfermedades: form.tipoOtros,
+    otrosFrecuenciaIndicarEnfermedades: form.frecuenciaOtros,
+    otrosSiIndicarEnfermedades: form.otros,
+    otrosNoIndicarEnfermedades: !form.otros,
+    imaBoro: form.ima,
+    acvBoro: form.acv,
+    tbcBoro: form.tbc,
+    vihBoro: form.vih,
+    fobiasBoro: form.fobias,
+    vertigosBoro: form.vertigos,
+    tifoideaBoro: form.tifoidea,
+    neoplasiasBoro: form.neoplasias,
+    quemadurasBoro: form.quemaduras,
+    discopatiasBoro: form.discopatias,
+    columnaBoro: form.columna,
+    enfermedadesPsiquiatricasBoro: form.enfPsiquiatricas,
+    enfermedadesReumaticasBoro: form.enfReumatica,
+    enfermedadesPulmonaresBoro: form.enfPulmonares,
+    enfermedadesPielBoro: form.enfPiel,
+    tendinitisBoro: form.tendinitis,
+    onicomicosisBoro: form.onicomicosis,
+    fracturasBoro: form.fracturas,
+    anemiaBoro: form.anemia,
+    obesidadBoro: form.obesidad,
+    dislipidemiaBoro: form.dislipidemia,
+    intoxicacionesBoro: form.intoxicaciones,
+    amputacionBoro: form.amputacion,
+    sorderaBoro: form.sordera,
+    especifiqueDetallesOTratamientoBoro: form.detallesTratamiento,
+    alergiasMedicamentosAlimentosBoro: form.alergiasMedicamentos,
+    alergiasMedicamentosAlimentosEspecifiqueBoro: form.especifiqueAlergias,
+    accidenteTrabajoBoro: form.accidenteTrabajo,
+    accidenteTrabajoFechaBoro: form.fechaAccidente,
+    descansoMedicoBoro: form.tiempoPerdido,
+    descansoMedicoEspecifiqueBoro: form.especifiqueTiempoPerdido,
+    enfermedadesProfesionalesBoro: form.enfermedadProfesional,
+    enfermedadesProfesionalesFechaBoro: form.fechaCalificacion,
+    enfermedadesLaboralesCalificacionBoro: form.evaluadoCalificacion,
+    enfermedadesLaboralesCalificacionEspecifiqueBoro: form.especifiqueCalificacion,
+    antitetanicaBoro: form.antitetanica,
+    fiebreAmarillaBoro: form.fiebreAmarilla,
+    influenzaBoro: form.influenza,
+    hepatitisABoro: form.hepatitisA,
+    hepatitisBBoro: form.hepatitisB,
+    gripeInfluenzaBoro: form.gripeInfluenza,
+    neumococoBoro: form.neumococo,
+    rabiaBoro: form.rabia,
+    papilomaHumanoBoro: form.papilomaHumano,
+    covidAntecedentePatologico: form.covidAntecedentePatologico,
+    cantidosisBoro: false, //enviar false
+    medicamentoBoro: form.medicamentos,
+    medicamentoEspecifiqueBoro: form.especifiqueMedicamentos,
+    actividadFisicaBoro: form.actividadFisica,
+    actividadFisicaEspecifiqueBoro: form.especifiqueActividadFisica,
+    padreEspecifiqueBoro: form.padre,
+    madreEspecifiqueBoro: form.madre,
+    hermanosEspecifiqueBoro: form.hermanos,
+    hijosEspecifiqueBoro: form.hijos,
+    esposConyEspecifiqueBoro: form.esposaConyuge,
+    conadisEspecifiqueBoro: form.carnetConadis,
+    etsBoro: form.ets,
+    migranaBoro: form.migrana,
+    tiempoIncapacidadBoro: form.tipoIncapacidad,
 
-        ruido: form.ruido,
-        polvo: form.polvo,
-        vidSegmentario: form.vidSegmentario,
-        vidTotal: form.vidTotal,
-        alturaEstructura: form.alturaEstruct,
-        vibraciones: form.vibraciones,
-        cancerigenos: form.cancerigenos,
-        mutagenicos: form.mutagenicos,
-        solventes: form.solventes,
-        metales: form.metales,
-        alturaGeografica: form.alturaGeograf,
-        temperatura: form.temperaturaAgente,
-        biologicos: form.biologicos,
-        posturas: form.posturas,
-        turnos: form.turnos,
-        quimicos: form.quimicos,
-        cargas: form.cargas,
-        movRepet: form.movRepet,
-        pvd: form.pvd,
-        electricos: form.electricos,
-        otros: form.otrosAgentes,
+    ruido: form.ruido,
+    polvo: form.polvo,
+    vidSegmentario: form.vidSegmentario,
+    vidTotal: form.vidTotal,
+    alturaEstructura: form.alturaEstruct,
+    vibraciones: form.vibraciones,
+    cancerigenos: form.cancerigenos,
+    mutagenicos: form.mutagenicos,
+    solventes: form.solventes,
+    metales: form.metales,
+    alturaGeografica: form.alturaGeograf,
+    temperatura: form.temperaturaAgente,
+    biologicos: form.biologicos,
+    posturas: form.posturas,
+    turnos: form.turnos,
+    quimicos: form.quimicos,
+    cargas: form.cargas,
+    movRepet: form.movRepet,
+    pvd: form.pvd,
+    electricos: form.electricos,
+    otros: form.otrosAgentes,
 
-        antecedentesPatologicosQuirurgicos: form.antecedentes.map(reg => ({
-            ...reg,
-            quirurjicosId: form.codigoAntecedentesPatologicos_cod_ap ? reg.quirurjicosId : null,
-        })),//form.antecedentes || null,
-        eliminarPatologicosQuirurgicos:
-            form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
-        userRegistro: user,
+    antecedentesPatologicosQuirurgicos: form.antecedentes.map(reg => ({
+        ...reg,
+        quirurjicosId: form.codigoAntecedentesPatologicos_cod_ap ? reg.quirurjicosId : null,
+    })),//form.antecedentes || null,
+    eliminarPatologicosQuirurgicos:
+        form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
 
-        usuarioFirma: form.user_medicoFirma,
-    };
-    console.log(body)
+    usuarioFirma: form.user_medicoFirma,
+});
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). El usuario que registra se llama `userRegistro` en el POST
+// (default de sellarAuditoria) y, desde 2026-11-18, también en el GET (antes `userRegistro_user_registro`). El DTO
+// de guardado recibe los 4 campos de auditoría que sella sellarAuditoria (fechas en `yyyy-MM-ddTHH:mm:ss`).
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro,
+        fechaRegistro: form.fechaRegistro,
     });
-};
 
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
@@ -1031,36 +980,135 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/AntecedentesPatologicos"
+        "../../../../jaspers/AntecedentesPatologicos",
+        // Solo MARSA: el reporte lleva una página más con la Declaración Jurada de Salud
+        (reporte) => datosDeclaracionJuradaParaReporte(reporte, nro, token)
     );
 };
 
-// export const VerifyTR = async (nro, tabla, token, set, sede) => {
-//     VerifyTRDefault(
-//         nro,
-//         tabla,
-//         token,
-//         set,
-//         sede,
-//         () => {
-//             //NO Tiene registro
-//             GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
-//         },
-//         () => {
-//             //Tiene registro
-//             GetInfoServicioEditar(nro, tabla, set, token, () => {
-//                 Swal.fire(
-//                     "Alerta",
-//                     "Este paciente ya cuenta con registros de Antecedentes Patológicos.",
-//                     "warning"
-//                 );
-//             });
-//         }
-//     );
-// };
+// ===== Declaración Jurada de Salud =====
+// Texto de la respuesta del backend que se muestra dentro del `html` de un Swal: se escapa.
+const escaparHtml = (texto) =>
+    String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRPerzonalizado(
+// Es otro registro (otro endpoint) pero se guarda con el mismo botón, y solo si la empresa del N° de orden es MARSA
+// (ver debeGuardarDeclaracionJurada). Va ANTES que los antecedentes porque el reporte, que se imprime al terminar,
+// la lee del backend. Si no se pudo guardar se pregunta si seguir solo con los antecedentes (mostrando el mensaje del
+// backend): devuelve false si el usuario cancela.
+const guardarDeclaracionJurada = async (form, token, user) => {
+    if (!debeGuardarDeclaracionJurada(form)) return true;
+    LoadingDefault("Guardando Declaración Jurada");
+    const { ok, status, mensaje } = await guardarDeclaracionJuradaSalud({ form, token, user });
+    if (ok) return true;
+    const { isConfirmed } = await Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-file-signature"></i>Declaración Jurada no guardada',
+        html: `No se pudo guardar la Declaración Jurada${status ? ` (error ${status})` : ""}.${mensaje ? `<br><small>${escaparHtml(mensaje)}</small>` : ""}<br>¿Desea guardar solo los antecedentes patológicos?`,
+        showCancelButton: true,
+        confirmButtonText: "Guardar antecedentes",
+        cancelButtonText: "Cancelar",
+    });
+    return isConfirmed;
+};
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await guardarDeclaracionJurada(form, token, user))) return;
+    return guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await guardarDeclaracionJurada(form, token, user))) return;
+    return actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Datos personales complementarios =====
+// El reporte de Antecedentes Patológicos no trae lugar de nacimiento, estado civil ni nivel de estudios, que sí muestra
+// la sección Datos Personales: se piden al endpoint general de datos del paciente (`InformacionPersonalDTO`, el mismo
+// que usan los demás formularios al abrir un N° de orden). Es un complemento: si falla o no responde esos 3 campos
+// quedan vacíos sin avisar. Se mezcla aparte de los 3 flujos de carga (ninguno toca estas claves, así no importa cuál
+// termine primero) y solo si el formulario sigue en el mismo N° de orden (no pisa uno ya limpiado o cambiado de orden).
+const mismoNorden = (a, b) => Number(a) === Number(b);
+
+const cargarDatosPersonalesComplementarios = async (nro, sede, token, set) => {
+    if (!sede) return;
+    try {
+        const res = await getFetch(`${infoPersonalUrl}?nOrden=${nro}&nomSede=${sede}`, token);
+        if (!res || res.error) return;
+        const datos = {
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            estadoCivil: res.estadoCivil ?? "",
+            nivelEstudios: res.nivelEstudios ?? "",
+        };
+        set((prev) => (mismoNorden(prev.norden, nro) ? { ...prev, ...datos } : prev));
+    } catch (error) {
+        console.error("No se pudieron cargar los datos personales complementarios:", error);
+    }
+};
+
+// ===== Búsqueda / verificación por N° Orden =====
+// Tiene 3 estados (existenciaExamenes): sin registro -> se ofrece copiar un N° de orden anterior,
+// con registro -> edición, y "necesita Agudeza visual" (id === 2).
+// `silencioso`: al encontrar un registro existente no avisa "ya cuenta con registros" (formulario incrustado,
+// donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    LoadingDefault("Validando datos");
+
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
+    // Lugar de nacimiento / estado civil / nivel de estudios (no vienen en el reporte): en paralelo a la carga.
+    cargarDatosPersonalesComplementarios(nro, sede, token, set);
+
+    VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
         token,
@@ -1068,57 +1116,29 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            // GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
             OpenModalNorden(nro, tabla, set, token);
         },
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Antecedentes Patológicos.",
-                    "warning"
-                );
+                if (silencioso) {
+                    Swal.close();
+                    return;
+                }
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de Antecedentes Patológicos.",
+                });
             });
         },
         () => {
-            //Necesita Agudeza visual 
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Agudeza visual para poder registrarse.",
-                "warning"
-            );
+            //Necesita Agudeza visual
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-eye"></i>Alerta',
+                html: "El paciente necesita pasar por Agudeza visual para poder registrarse.",
+            });
         }
     );
-};
-
-export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
-    if (!nro) {
-        await Swal.fire(
-            "Error",
-            "Debe Introducir un Nro de Historia Clínica válido",
-            "error"
-        );
-        return;
-    }
-    Loading("Validando datos");
-    getFetch(
-        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-        token
-    ).then((res) => {
-        console.log(res);
-        if (res.id === 0) {
-            //No tiene registro previo 
-            noTieneRegistro();//datos paciente
-        } else if (res.id === 2) {
-            necesitaExamen();//datos paciente
-        } else {
-            tieneRegistro();//obtener data servicio
-        }
-    });
-};
-
-
-export const Loading = (mensaje) => {
-    LoadingDefault(mensaje);
 };

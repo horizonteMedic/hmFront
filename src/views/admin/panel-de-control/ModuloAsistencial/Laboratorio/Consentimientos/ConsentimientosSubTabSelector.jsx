@@ -13,7 +13,7 @@ const tabsConfig = [
     icon: config.icon,
     component: () => <ConsentimientoLaboratorio config={config} />,
   })),
-  { permission: "Consentimiento BORO", label: "BORO", icon: faFlask, component: Boro },
+  { permission: "Consentimiento BORO Asistencial", label: "BORO", icon: faFlask, component: Boro },
 ].map((tab, id) => ({ ...tab, id }));
 
 export default function ConsentimientosSubTabSelector({ tieneVista }) {

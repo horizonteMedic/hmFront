@@ -110,7 +110,7 @@ export default function ModalRegistroCampania({ token, usuario, onClose, onGuard
                 <div className="sm:col-span-2">
                     <ImageUploadField
                         label="Foto de la campaña (opcional)"
-                        hint="Logo que se mostrará en la campaña y en el ticket de la visita."
+                        hint="Logo que se mostrará en la campaña."
                         file={archivo}
                         onChange={setArchivo}
                     />

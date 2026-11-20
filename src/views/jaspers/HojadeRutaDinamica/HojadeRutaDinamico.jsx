@@ -245,7 +245,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
     // ==========================================
     const doc = new jsPDF();
 
-    await headerHR(doc, datos);
+    await headerHR(doc, datos, { fechaEnFilaSede: true, tamanoTipoEx: 7.5 });
 
     const startY = 62;
 

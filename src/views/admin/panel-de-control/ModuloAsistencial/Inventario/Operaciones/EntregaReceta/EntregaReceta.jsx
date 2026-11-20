@@ -140,12 +140,8 @@ const crearColumnasPendientes = (idsConFaltante, valorDe) => [
     { label: "Registrada", width: "20%", render: (row) => formatearFechaHora(row.fechaRegistro) },
 ];
 
-// Anular es más delicado que entregar (libera la reserva de un paciente), por eso tiene permiso propio.
-const PERMISO_ANULAR = "Anular Receta Asistencial";
-
-export default function EntregaReceta({ tieneVista }) {
+export default function EntregaReceta() {
     const { token, userlogued } = useSessionData();
-    const puedeAnular = Boolean(tieneVista?.(PERMISO_ANULAR));
     const { inventarios, inventarioId, setInventarioId, errorInventarios, cargarInventarios } = useInventarios(token);
     const pendientes = useConsultaInventario();
     // Recetas con lote vencido ("con faltante" en el backend): se piden aparte para resaltarlas en la lista y bloquear su entrega completa.
@@ -430,7 +426,7 @@ export default function EntregaReceta({ tieneVista }) {
                                         </>
                                     )}
 
-                                    {puedeAnular && PuedeEntregarse(receta) && (
+                                    {PuedeEntregarse(receta) && (
                                         <button type="button" onClick={handleAnular} className={`bg-red-600 hover:bg-red-700 ${CLASES_BOTON}`}>
                                             <FontAwesomeIcon icon={faBan} /> Anular Receta
                                         </button>

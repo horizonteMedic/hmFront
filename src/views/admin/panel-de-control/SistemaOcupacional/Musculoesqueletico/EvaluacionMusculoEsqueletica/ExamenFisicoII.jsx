@@ -1,8 +1,9 @@
-import React from "react";
+import { useCampoEdicion } from "../EdicionContext";
 
 const RadioGroup = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[120px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -33,13 +34,15 @@ const RadioGroup = ({ label, name, value, onChange }) => {
           M
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
 const RadioGroupSiNo = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[120px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -61,11 +64,12 @@ const RadioGroupSiNo = ({ label, name, value, onChange }) => {
           NO
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
-export default function ExamenFisicoII({ form, handleRadioButton, handleChange }) {
+export default function ExamenFisicoII({ form, handleRadioButton }) {
   return (
     <div className="space-y-6">
       {/* Grid de 2x2 para Examen Físico II */}

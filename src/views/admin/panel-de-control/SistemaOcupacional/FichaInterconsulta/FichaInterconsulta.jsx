@@ -1,25 +1,46 @@
-import { faSave, faBroom, faPrint, faUpload, faDownload } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
-import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
-import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import useRealTime from "../../../../hooks/useRealTime";
-import { useForm } from "../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterconsulta";
-import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday, comprimirPdfAzureSiSuperaLimite, uint8ToBase64 } from "../../../../utils/helpers";
-import Swal from "sweetalert2";
-import { SubirInterconsulta, ReadArchivos } from "./model";
-import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
-import { SubmitData } from "../../../../utils/apiHelpers";
+import { faUpload, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Swal from "sweetalert2";
+import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
+import InputTextAreaUpper from "../../../../components/reusableComponents/InputTextAreaUpper";
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import { SelectField } from "../../../../components/reusableComponents/InputSelect";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import CIE10List from "../../../../components/reusableComponents/CIE10List";
-import InputTextAreaUpper from "../../../../components/reusableComponents/InputTextAreaUpper";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import { useForm } from "../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { getToday, getFechaHoraActual, comprimirPdfAzureSiSuperaLimite, uint8ToBase64 } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { LoadingDefault } from "../../../../utils/functionUtils";
+import { SubmitData } from "../../../../utils/apiHelpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterconsulta";
+import { SubirInterconsulta, ReadArchivos } from "./model";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+    "fechaExamen",
+    "especialidad",
+    "motivo",
+    "hallazgo",
+    "diagnostico",
+    "tratamiento",
+    "conclusionesCie10",
+    "fechaReevaluacion",
+    "user_medicoFirma",
+    "nombre_medico",
+];
 
 const Especialidades = [
     "Neurología del Sueño",
@@ -62,10 +83,14 @@ const Especialidades = [
     "Espirometria"
 ]
 
+// Opciones del selector, ordenadas alfabéticamente respetando tildes (el valor guardado va en mayúsculas).
+const OPCIONES_ESPECIALIDAD = [...Especialidades]
+    .sort((a, b) => a.localeCompare(b))
+    .map((option) => ({ value: option.toUpperCase(), label: option }));
 
 export default function FichaInterconsulta() {
 
-    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName, hora } =
         useSessionData();
     const [visualerOpen, setVisualerOpen] = useState(null)
     const Initialform = {
@@ -73,6 +98,7 @@ export default function FichaInterconsulta() {
         fechaExamen: today,
         nombreExamen: "",
         especialidad: "",
+        areaPaciente: "",
         cargoPaciente: "",
         conclusionesCie10: "",
         //Datos Usuario
@@ -81,6 +107,9 @@ export default function FichaInterconsulta() {
         nombres: "",
         sexo: "",
         fechaNacimientoPaciente: "",
+        lugarNacimientoPaciente: "",
+        estadoCivilPaciente: "",
+        nivelEstudioPaciente: "",
         edadPaciente: "",
         //Funciones Vitales
         frecuenciaCardiaca: "",
@@ -110,42 +139,83 @@ export default function FichaInterconsulta() {
         nomenclatura: "",
         orden: "",
         fechaReevaluacion: "",
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     }
 
-    const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
+    const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
 
-    const handleClearnotOandEspecialidad = () => {
-        setForm((prev) => ({ ...Initialform, norden: prev.norden }));
-        if (typeof window !== "undefined" && "ficha_interconsultas_form") {
-            try {
-                localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden }));
-            } catch (err) {
-                console.warn("useForm: error guardando localStorage en clearnotO", err);
-            }
-        }
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+    // Props comunes de un campo de texto.
+    const campo = (name, onChange = handleChange) => ({
+        name,
+        value: form[name],
+        onChange,
+        disabled: camposDeshabilitados,
+        edited: isFieldEdited(name),
+        onRevert: () => revertField(name),
+    });
+
+    // ===== Búsqueda =====
+    // Una orden puede tener varias interconsultas (una por especialidad): si ya tiene registros se elige cuál abrir
+    // (o crear una nueva); si no tiene ninguno se carga el paciente con la especialidad elegida en el selector.
+    const executeSearch = () => {
+        const especialidad = form.especialidad;
+        handleClearnotO();
+        VerifyTR(form.norden, especialidad, tabla, token, setForm, selectedSede);
     };
 
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotOandEspecialidad();
-            VerifyTR(form.norden, form.especialidad, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
-    const handlePrint = () => {
-        if (!form.norden) {
-            Swal.fire("Error", "Debe colocar un Numero de Orden", 'error')
-            return
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dniPaciente || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...Initialform, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
         }
+    };
+
+    // ===== Impresión =====
+    const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
+    // ===== Guardar =====
+    // Un solo endpoint hace de alta y de edición (se distingue por `codigoFichaInterconsulta`): no se puede validar con
+    // "ya existe un registro para la orden" porque una orden tiene una interconsulta por especialidad.
     const handleSave = () => {
-        if (!form.especialidad) return Swal.fire("Error", "Debe solucionar al menos una especialidad", "error")
+        if (!form.especialidad) return Swal.fire("Error", "Debe seleccionar al menos una especialidad", "error")
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-        console.log("Guardando datos:", form);
     };
 
     const handleSubirArchivo = async () => {
@@ -191,13 +261,11 @@ export default function FichaInterconsulta() {
                         "codigoFichaInterconsulta": form.codigoFichaInterconsulta,
                         "nomenclatura": form.nomenclatura
                     }
-                    const response = await SubmitData(body, '/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta', token)
-                    console.log(response)
+                    await SubmitData(body, '/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta', token)
                     Swal.fire("Exito", "Archivo Subido con exto", "success")
                 } else {
                     Swal.fire("Error", "No se pudo subir", "error")
                 }
-                console.log(response)
             };
             reader.readAsDataURL(file);
         }
@@ -220,414 +288,298 @@ export default function FichaInterconsulta() {
             })
     }
 
+    // Fecha de reevaluación a partir de la fecha del examen
+    const sumarMeses = (meses) => {
+        const d = new Date(form.fechaExamen + "T00:00:00");
+        d.setMonth(d.getMonth() + meses);
+        setForm(prev => ({ ...prev, fechaReevaluacion: d.toISOString().split('T')[0] }));
+    };
+
+    const hayRegistroCargado = Boolean(form.nombres || form.dniPaciente);
+
+    // Adaptador: DatosPersonalesLaborales espera sus propios nombres de campo.
+    const datosPaciente = {
+        nombres: form.nombres,
+        edad: form.edadPaciente,
+        sexo: form.sexo,
+        dni: form.dniPaciente,
+        fechaNacimiento: formatearFechaCorta(form.fechaNacimientoPaciente ?? ""),
+        lugarNacimiento: form.lugarNacimientoPaciente,
+        estadoCivil: form.estadoCivilPaciente,
+        nivelEstudios: form.nivelEstudioPaciente,
+        empresa: form.empresa,
+        contrata: form.contrata,
+        ocupacion: form.areaPaciente,
+        cargoDesempenar: form.cargoPaciente,
+    };
+
+    // La especialidad cargada puede no estar en la lista fija: se agrega para no perderla en el selector.
+    const opcionesEspecialidad =
+        form.especialidad && !OPCIONES_ESPECIALIDAD.some((o) => o.value === form.especialidad)
+            ? [...OPCIONES_ESPECIALIDAD, { value: form.especialidad, label: form.especialidad }]
+            : OPCIONES_ESPECIALIDAD;
+
+    // Registro existente: el reporte solo trae el usuario y la fecha (sin hora) de registro, y esa fecha no puede
+    // pasar por formatearFechaHora (la tomaría como UTC y mostraría el día anterior). Nuevo: creación en vivo.
+    const auditoria = form.tieneRegistro
+        ? {
+            fechaCreacion: formatearFechaCorta(form.fechaRegistro ?? ""),
+            usuarioRegistro: form.userRegistro,
+        }
+        : buildAuditoria(form, { usuarioActual: userlogued, fechaHoraActual: getFechaHoraActual() });
+
     return (
-        <>
-            <div className="space-y-6 max-w-[95%] mx-auto">
-                {/* Header */}
-                <section className="bg-white border border-gray-200 rounded-lg p-4 w-full">
-                    {/* Fila de inputs */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        <InputTextOneLine label="N° Orden" value={form.norden} name="norden" onKeyUp={handleSearch} onChange={handleChangeNumber} />
-                        <InputTextOneLine label="Fecha de Examen" value={form.fechaExamen} onChange={handleChangeSimple} type="date" name="fechaExamen" />
-                        <div className="flex items-center gap-4 w-full">
-                            <label htmlFor="">Especialidades</label>
-                            <select value={form.especialidad} name="especialidad" onChange={handleChangeSimple} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
-                                <option value="">Selecione una Especialidad...</option>
-                                {Especialidades?.sort((a, b) => a.localeCompare(b)) // ordena alfabéticamente respetando tildes
-                                    .map((option, index) => (
-                                        <option key={index} value={option.toUpperCase()}>
-                                            {option}
-                                        </option>
-                                    ))}
-                            </select>
-                        </div>
-                        {/*<InputTextOneLine label="Especialidad" value={form.especialidad} onChange={handleChange} name="especialidad" />*/}
-                        <InputTextOneLine label="Nombre Examen" value={form.nombreExamen} disabled name="nombreExamen" />
-                    </div>
+        <div className="space-y-3 px-4 max-w-[95%] mx-auto pb-6">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
 
-                    {/* Hora en tiempo real */}
-                    <div className="flex justify-end mt-3">
-                        <h1 className="text-lg font-bold">{useRealTime()}</h1>
-                    </div>
-
-                    {form.SubirDoc && <div className="flex justify-center items-center gap-3">
-                        <button onClick={handleSubirArchivo} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
-                            <FontAwesomeIcon icon={faUpload} />
-                            Subir Archivo
+            {/* ===== SECCIÓN: INFORMACIÓN DEL EXAMEN ===== */}
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-3">
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumber}
+                        disabled={hayRegistroCargado}
+                        labelWidth="110px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
+                <InputTextOneLine
+                    label="Fecha de Examen"
+                    type="date"
+                    labelWidth="110px"
+                    {...campo("fechaExamen", handleChangeSimple)}
+                />
+                <SelectField
+                    label="Especialidad"
+                    inline
+                    labelWidth="110px"
+                    name="especialidad"
+                    value={form.especialidad}
+                    onChange={handleChangeSimple}
+                    options={opcionesEspecialidad}
+                    placeholder="Seleccione una Especialidad..."
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("especialidad")}
+                    onRevert={() => revertField("especialidad")}
+                />
+                <InputTextOneLine
+                    label="Nombre Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                    labelWidth="110px"
+                />
+                <InputTextOneLine
+                    label="Hora"
+                    name="hora"
+                    value={hora}
+                    disabled
+                    labelWidth="110px"
+                />
+                {/* Una orden tiene una interconsulta por especialidad: con una cargada se vuelve a la lista. */}
+                {hayRegistroCargado && form.norden && (
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            onClick={executeSearch}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-1.5 rounded"
+                        >
+                            Cambiar de especialidad
                         </button>
-                        <button onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
-                            <FontAwesomeIcon icon={faDownload} />
-                            Ver Archivo
-                        </button>
-                    </div>}
-
-
-
-                    <div className="grid gap-4 mt-4 pt-4 border-t-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-center">
-                        {/* DNI */}
-                        <InputTextOneLine
-                            label="DNI:"
-                            labelWidth="40px"
-                            value={form.dniPaciente}
-                            disabled
-                            name="dniPaciente"
-                        />
-
-                        {/* Nombres (debe expandirse más) */}
-                        <InputTextOneLine
-                            label="Nombres:"
-                            labelWidth="70px"
-                            value={form.nombres}
-                            name="nombres"
-                            disabled
-                            className="lg:col-span-2"
-                        />
-
-                        {/* Sexo (campo pequeño) */}
-                        <InputTextOneLine
-                            label="Sexo:"
-                            labelWidth="40px"
-                            value={form.sexo}
-                            name="sexo"
-                            disabled
-                            className="max-w-[120px]"
-                            inputClassName="!w-[80px] text-center"
-                        />
-
-                        {/* Fecha de nacimiento */}
-                        <InputTextOneLine
-                            label="Fecha de Nacimiento"
-                            value={form.fechaNacimientoPaciente}
-                            disabled
-                            name="fechaNacimientoPaciente"
-                        />
-
-                        {/* Edad (campo pequeño) */}
-                        <InputTextOneLine
-                            label="Edad:"
-                            labelWidth="40px"
-                            value={form.edadPaciente}
-                            disabled
-                            name="edadPaciente"
-                            className="max-w-[100px]"
-                            inputClassName="!w-[70px] text-center"
-                        />
-
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                        <InputTextOneLine label="Emp. Contratista" value={form.contrata} disabled name="contrata" />
-                        <InputTextOneLine label="Empresa" value={form.empresa} disabled name="empresa" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                        <InputTextOneLine label="Area de Trabajo" value={form.areaPaciente} disabled name="contrata" />
-                        <InputTextOneLine label="Puesto de Trabajo" value={form.cargoPaciente} disabled name="empresa" />
-                    </div>
-
-                </section>
-                <h1 className="text-blue-600 font-semibold ">Funciones Vitales</h1>
-                <section className="bg-white border border-gray-200 rounded-lg mt-0 p-4 w-full">
-                    {/* Checkboxes en grid responsivo */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 mt-4 items-center">
-                        {/* F.C */}
-                        <div className="flex items-center gap-1">
-                            <InputTextOneLine
-                                label="F.C"
-                                labelWidth="30px"
-                                disabled
-                                value={form.frecuenciaCardiaca}
-                                className="min-w-[90px] w-full !gap-1"
-                                name="fc"
-                            />
-                            <span className="text-sm text-gray-600">x min</span>
-                        </div>
-
-                        {/* P.A */}
-                        <div className="flex items-center gap-1">
-                            <InputTextOneLine
-                                label="P.A"
-                                labelWidth="30px"
-                                value={form.PA}
-                                disabled
-                                className="min-w-[90px] w-full !gap-1"
-                                name="pa"
-                            />
-                            <span className="text-sm text-gray-600">mmHg</span>
-                        </div>
-
-                        {/* F.R */}
-                        <div className="flex items-center gap-1">
-                            <InputTextOneLine
-                                label="F.R"
-                                labelWidth="30px"
-                                disabled
-                                value={form.frecuenciaRespiratoriaTriaje}
-                                className="min-w-[90px] w-full !gap-1"
-                                name="fr"
-                            />
-                            <span className="text-sm text-gray-600">x min</span>
-                        </div>
-
-                        {/* IMC */}
-                        <InputTextOneLine
-                            label="IMC"
-                            labelWidth="30px"
-                            value={form.imcTriaje}
-                            disabled
-                            className="min-w-[90px] w-full !gap-1"
-                            name="imc"
-                        />
-
-                        {/* Sat. O2 */}
-                        <InputTextOneLine
-                            label="Sat. O°"
-                            labelWidth="45px"
-                            value={form.saturacionOxigenoTriaje}
-                            disabled
-                            className="min-w-[90px] w-full !gap-1"
-                            name="sat"
-                        />
-
-                        {/* T° */}
-                        <InputTextOneLine
-                            label="T°"
-                            value={form.temperatura}
-                            disabled
-                            labelWidth="25px"
-                            className="min-w-[90px] w-full !gap-1"
-                            name="temperatura"
-                        />
-
-                        {/* Peso */}
-                        <div className="flex items-center gap-1">
-                            <InputTextOneLine
-                                label="Peso"
-                                value={form.peso}
-                                disabled
-                                labelWidth="40px"
-                                className="min-w-[90px] w-full !gap-1"
-                                name="peso"
-                            />
-                            <span className="text-sm text-gray-600">Kg</span>
-                        </div>
-
-                        {/* Talla */}
-                        <div className="flex items-center gap-1">
-                            <InputTextOneLine
-                                label="Talla"
-                                value={form.tallaTriaje}
-                                disabled
-                                labelWidth="45px"
-                                className="min-w-[90px] w-full !gap-1"
-                                name="talla"
-                            />
-                            <span className="text-sm text-gray-600">m</span>
-                        </div>
-                    </div>
-                </section>
-
-                <h1 className="text-blue-600 font-semibold ">Doctor</h1>
-                <section className="bg-white border border-gray-200 rounded-lg mt-0 p-4 w-full">
-                    {/* Checkboxes en grid responsivo */}
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
-                        {/* Nombre Completo (más grande, ocupa 2 columnas en pantallas medianas o grandes) */}
-                        <div className="sm:col-span-2">
-                            <EmpleadoComboBox
-                                value={form.nombre_medico}
-                                label="Doctor Asignado"
-                                form={form}
-                                onChange={handleChangeSimple}
-                            />
-                        </div>
-
-                        {/* CMP (pequeño) */}
-                        {/* <div className="sm:col-span-1">
-                            <InputTextOneLine label="CMP" value={form.cmpUsuario} disabled name="cmp" />
-                        </div> */}
-
-                    </div>
-                </section>
-
-
-                <section className="bg-white rounded-lg  my-4 w-full">
-                    <div className="w-full flex justify-around items-center gap-4">
-                        <InputTextArea
-                            label="Motivo de Interconsulta"
-                            rows={6}
-                            value={form.motivo}
-                            onChange={handleChange}
-                            classNameLabel="text-blue-600"
-                            name="motivo"
-                        />
-
-                        <InputTextArea
-                            label="Hallazgos Relevantes"
-                            value={form.hallazgo}
-                            onChange={handleChange}
-                            classNameLabel="text-blue-600"
-                            rows={6}
-                            classNameArea="bg-[#99FFFF]"
-                            name="hallazgo"
-                        />
-                    </div>
-                </section>
-                <section className="bg-white rounded-lg my-2 w-full">
-                    <div className="w-full flex justify-around items-start gap-4">
-                        <div className="flex flex-col items-start w-full">
-                            {/*<InputTextArea
-                                label="Diagnostico"
-                                value={form.diagnostico}
-                                onChange={handleChange}
-                                rows={6}
-                                classNameLabel="text-blue-600"
-                                name="diagnostico"
-                                classNameArea="bg-[#99FFFF]"
-                            />*/}
-                            <InputTextAreaUpper
-                                label="Diagnóstico"
-                                name="diagnostico"
-                                classNameLabel="text-blue-600"
-                                classNameArea="bg-[#99FFFF]"
-                                value={form.diagnostico}
-                                rows={6}
-                                onChange={(upper) => {
-                                    const cie10Lines = upper
-                                        .split("\n")
-                                        .filter(l => /^CIE 10:/i.test(l.trim()));
-                                    const nuevoCie10 = cie10Lines.join("\n");
-                                    setForm((d) => ({
-                                        ...d,
-                                        diagnostico: upper,
-                                        ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
-                                    }));
-                                }}
-                            />
-                            <div className="bg-green-200 p-3 rounded-xl col-span-3 w-full">
-                                <CIE10List
-                                    value={form.conclusionesCie10}
-                                    fieldName="conclusionesCie10"
-                                    label="Conclusiones CIE10"
-                                    token={token}
-                                    setForm={setForm}
-                                    setAdditionalForm={setForm}
-                                    additionalFieldName="diagnostico"
-                                    additionalDelimiter={"\n"}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col w-full">
-                            <InputTextArea
-                                label="Tratamiento"
-                                value={form.tratamiento}
-                                onChange={handleChange}
-                                classNameLabel="text-blue-600"
-                                rows={6}
-                                name="tratamiento"
-                                classNameArea="bg-[#99FFFF]"
-                            />
-
-                            {/* Fecha Reevaluación */}
-                            <div className="flex flex-col gap-2 mt-4 p-3 border rounded-lg">
-                                <label className="text-blue-600 font-semibold text-sm">Fecha Reevaluación</label>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <InputTextOneLine
-                                        type="date"
-                                        name="fechaReevaluacion"
-                                        value={form.fechaReevaluacion}
-                                        onChange={handleChangeSimple}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const d = new Date(form.fechaExamen + "T00:00:00");
-                                            d.setMonth(d.getMonth() + 1);
-                                            setForm(prev => ({ ...prev, fechaReevaluacion: d.toISOString().split('T')[0] }));
-                                        }}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded"
-                                    >
-                                        + 1 mes
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const d = new Date(form.fechaExamen + "T00:00:00");
-                                            d.setMonth(d.getMonth() + 3);
-                                            setForm(prev => ({ ...prev, fechaReevaluacion: d.toISOString().split('T')[0] }));
-                                        }}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded"
-                                    >
-                                        + 3 meses
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setForm(prev => ({ ...prev, fechaReevaluacion: "" }))}
-                                        className="bg-gray-400 hover:bg-gray-500 text-white text-xs px-3 py-1 rounded"
-                                    >
-                                        Limpiar
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="flex  p-3 mt-4 text-lg items-center font-bold rounded-lg justify-between">
-                                <div className="flex justify-between gap-1 p-2 border">
-                                    <button
-                                        type="button"
-                                        onClick={handleSave}
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleClear}
-                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                    >
-                                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                                    </button>
-                                </div>
-                                <div className="flex justify-center gap-1 text-center p-2 border items-center">
-                                    <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            name="norden"
-                                            value={form.norden}
-                                            onChange={handleChangeNumber}
-                                            className="border rounded px-2 py-1 text-base w-24"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={handlePrint}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                        >
-                                            <FontAwesomeIcon icon={faPrint} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-                {visualerOpen && (
-                    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-                        <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-                            <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                                <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-                            </div>
-                            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-                            </div>
-                            <div className="flex justify-center">
-                                <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                                </a>
-                            </div>
-                        </div>
                     </div>
                 )}
-            </div>
-        </>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: DATOS PERSONALES Y LABORALES ===== */}
+            <DatosPersonalesLaborales form={datosPaciente} />
+
+            {/* ===== SECCIÓN: DOCUMENTO (solo con registro existente) ===== */}
+            {form.SubirDoc && (
+                <SectionFieldset legend="Documento de Interconsulta" className="flex flex-wrap justify-center items-center gap-3">
+                    <button type="button" onClick={handleSubirArchivo} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                        <FontAwesomeIcon icon={faUpload} />
+                        Subir Archivo
+                    </button>
+                    <button type="button" onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                        <FontAwesomeIcon icon={faDownload} />
+                        Ver Archivo
+                    </button>
+                </SectionFieldset>
+            )}
+
+            {/* ===== SECCIÓN: FUNCIONES VITALES (solo lectura: datos de Triaje) ===== */}
+            <SectionFieldset legend="Funciones Vitales" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-8 gap-3 items-center">
+                <div className="flex items-center gap-1">
+                    <InputTextOneLine label="F.C" labelWidth="30px" disabled value={form.frecuenciaCardiaca} className="min-w-[90px] w-full !gap-1" name="fc" />
+                    <span className="text-sm text-gray-600">x min</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <InputTextOneLine label="P.A" labelWidth="30px" disabled value={form.PA} className="min-w-[90px] w-full !gap-1" name="pa" />
+                    <span className="text-sm text-gray-600">mmHg</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <InputTextOneLine label="F.R" labelWidth="30px" disabled value={form.frecuenciaRespiratoriaTriaje} className="min-w-[90px] w-full !gap-1" name="fr" />
+                    <span className="text-sm text-gray-600">x min</span>
+                </div>
+                <InputTextOneLine label="IMC" labelWidth="30px" disabled value={form.imcTriaje} className="min-w-[90px] w-full !gap-1" name="imc" />
+                <InputTextOneLine label="Sat. O°" labelWidth="45px" disabled value={form.saturacionOxigenoTriaje} className="min-w-[90px] w-full !gap-1" name="sat" />
+                <InputTextOneLine label="T°" labelWidth="25px" disabled value={form.temperatura} className="min-w-[90px] w-full !gap-1" name="temperatura" />
+                <div className="flex items-center gap-1">
+                    <InputTextOneLine label="Peso" labelWidth="40px" disabled value={form.peso} className="min-w-[90px] w-full !gap-1" name="peso" />
+                    <span className="text-sm text-gray-600">Kg</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <InputTextOneLine label="Talla" labelWidth="45px" disabled value={form.tallaTriaje} className="min-w-[90px] w-full !gap-1" name="talla" />
+                    <span className="text-sm text-gray-600">m</span>
+                </div>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: DOCTOR ===== */}
+            <SectionFieldset legend="Doctor">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    <EmpleadoComboBox
+                        value={form.nombre_medico}
+                        label="Doctor Asignado"
+                        form={form}
+                        onChange={handleChangeSimple}
+                        disabled={camposDeshabilitados}
+                        edited={isMedicoEdited}
+                        onRevert={revertMedico}
+                    />
+                </div>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: INTERCONSULTA ===== */}
+            <SectionFieldset legend="Interconsulta" className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                <div className="space-y-4">
+                    <InputTextArea label="Motivo de Interconsulta" rows={6} {...campo("motivo")} />
+                    <InputTextAreaUpper
+                        label="Diagnóstico"
+                        name="diagnostico"
+                        value={form.diagnostico}
+                        rows={6}
+                        disabled={camposDeshabilitados}
+                        edited={isFieldEdited("diagnostico")}
+                        onRevert={() => revertFields(["diagnostico", "conclusionesCie10"])}
+                        onChange={(upper) => {
+                            const cie10Lines = upper
+                                .split("\n")
+                                .filter(l => /^CIE 10:/i.test(l.trim()));
+                            const nuevoCie10 = cie10Lines.join("\n");
+                            setForm((d) => ({
+                                ...d,
+                                diagnostico: upper,
+                                ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                            }));
+                        }}
+                    />
+                    <div className="bg-green-200 p-3 rounded-xl w-full">
+                        <CIE10List
+                            value={form.conclusionesCie10}
+                            fieldName="conclusionesCie10"
+                            label="Conclusiones CIE10"
+                            token={token}
+                            setForm={setForm}
+                            setAdditionalForm={setForm}
+                            additionalFieldName="diagnostico"
+                            additionalDelimiter={"\n"}
+                            disabled={camposDeshabilitados}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <InputTextArea label="Hallazgos Relevantes" rows={6} {...campo("hallazgo")} />
+                    <InputTextArea label="Tratamiento" rows={6} {...campo("tratamiento")} />
+
+                    {/* Fecha Reevaluación */}
+                    <div className="flex flex-col gap-2 p-3 border rounded-lg">
+                        <span className="font-semibold">Fecha Reevaluación</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <InputTextOneLine
+                                type="date"
+                                {...campo("fechaReevaluacion", handleChangeSimple)}
+                                className="w-auto"
+                            />
+                            <button
+                                type="button"
+                                disabled={camposDeshabilitados}
+                                onClick={() => sumarMeses(1)}
+                                className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs px-3 py-1 rounded"
+                            >
+                                + 1 mes
+                            </button>
+                            <button
+                                type="button"
+                                disabled={camposDeshabilitados}
+                                onClick={() => sumarMeses(3)}
+                                className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs px-3 py-1 rounded"
+                            >
+                                + 3 meses
+                            </button>
+                            <button
+                                type="button"
+                                disabled={camposDeshabilitados}
+                                onClick={() => setForm(prev => ({ ...prev, fechaReevaluacion: "" }))}
+                                className="bg-gray-400 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs px-3 py-1 rounded"
+                            >
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={false}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
+                form={form}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
+            />
+
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }

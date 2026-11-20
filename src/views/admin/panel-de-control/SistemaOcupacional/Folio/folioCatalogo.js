@@ -664,6 +664,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    CONSENT_REG_ENTREGA_RESULTADOS_EMO: {
+        nombre: "REGISTRO DE ENTREGA E INFORME DE RESULTADOS DEL EMO",
+        tabla: "registro_entrega_resultados_emo",
+        url: "/api/v01/ct/ocupacional/registro-entrega-resultados/obtenerReporte",
+        esJasper: true
+    },
+
     CONSENT_DROGAS_BOROO: {
         nombre: "CONSENTIMIENTO DROGAS BOROO",
         tabla: "consent_Boro",

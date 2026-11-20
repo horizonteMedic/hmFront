@@ -13,7 +13,9 @@ import {
   SectionFieldset,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getTodayPlusOneYear, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import LugarDeTrabajo from "./TabsUsoRespiradores/LugarDeTrabajo";
 import PersonalEmpleadoI from "./TabsUsoRespiradores/PersonalEmpleadoI";
@@ -21,12 +23,73 @@ import PersonalEmpleadoII from "./TabsUsoRespiradores/PersonalEmpleadoII";
 import PersonalEmpleadoIII from "./TabsUsoRespiradores/PersonalEmpleadoIII";
 import PersonalEmpleadoIV from "./TabsUsoRespiradores/PersonalEmpleadoIV";
 import FinalAutorizacion from "./TabsUsoRespiradores/FinalAutorizacion";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerUsoRespiradores";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerUsoRespiradores";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
-import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "b_uso_respiradores";
+
+// Campos que NO edita el usuario (vienen del paciente, de otros exámenes o son control de la interfaz): todo lo
+// demás del formulario se puede resaltar/revertir.
+const CAMPOS_FIJOS = [
+  "norden",
+  "codigoRespiradores",
+  "tipoExamen",
+  "dni",
+  "nombres",
+  "fechaNacimiento",
+  "lugarNacimiento",
+  "edad",
+  "sexo",
+  "estadoCivil",
+  "nivelEstudios",
+  "empresa",
+  "contrata",
+  "ocupacion",
+  "cargoDesempenar",
+  "dniUsuario",
+  "vcOD",
+  "vlOD",
+  "vcOI",
+  "vlOI",
+  "vcCorregidaOD",
+  "vlCorregidaOD",
+  "vcCorregidaOI",
+  "vlCorregidaOI",
+  "vclrs",
+  "vb",
+  "rp",
+  "enfermedadesOculares",
+  "tieneRegistro",
+  "userRegistro",
+  "fechaRegistro",
+  "usuarioActualizacion",
+  "fechaActualizacion",
+];
+
+// Respuestas que limpian otro campo al cambiar ("Otros" en NO borra su descripción; cambiar la clase borra la
+// opción de la Clase II): al revertir cualquiera de los dos se revierten juntos, o se perdería lo escrito.
+const GRUPOS_DEPENDIENTES = [
+  ["probPulmonOtros", "probPulmonOtrosDescripcion"],
+  ["sintOtros", "sintOtrosDescripcion"],
+  ["cardioOtros", "cardioOtrosDescripcion"],
+  ["sintCardioOtros", "sintCardioOtrosDescripcion"],
+  ["respOtros", "respOtrosDescripcion"],
+  ["visionOtros", "visionOtrosDescripcion"],
+  ["audicionOtros", "audicionOtrosDescripcion"],
+  ["probGenOtros", "probGenOtrosDescripcion"],
+  ["alturaOtros", "alturaOtrosDescripcion"],
+  ["probPulmonIndustrialesOtros", "probPulmonIndustrialesOtrosDescripcion"],
+  ["otrosCondicionesTrabajo", "otrosCondicionesTrabajoDescripcion"],
+  ["claseAutorizacion", "claseIIOpcion"],
+];
+const GRUPO_POR_CAMPO = Object.fromEntries(
+  GRUPOS_DEPENDIENTES.flatMap((grupo) => grupo.map((campo) => [campo, grupo]))
+);
 
 export default function UsoRespiradores() {
   const [activeTab, setActiveTab] = useState(0);
@@ -251,6 +314,15 @@ export default function UsoRespiradores() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -266,7 +338,25 @@ export default function UsoRespiradores() {
     handleClearnotO,
     handleChangeNumberDecimals,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "usoRespiradores" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertFields,
+  } = useRegistroEditable(form, setForm, {
+    tieneRegistro: form.tieneRegistro,
+    camposEditables: Object.keys(initialFormState).filter((campo) => !CAMPOS_FIJOS.includes(campo)),
+  });
+
+  // Revierte un campo (y, si limpia a otro al cambiar, también ese otro).
+  const revertCampo = (campo) => revertFields(GRUPO_POR_CAMPO[campo] ?? [campo]);
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se revierten ambos.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
   const tabs = [
     { id: 0, name: "Lugar de Trabajo", icon: faIndustry, component: LugarDeTrabajo },
@@ -281,10 +371,32 @@ export default function UsoRespiradores() {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
+    }
+  };
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
     }
   };
 
@@ -294,184 +406,230 @@ export default function UsoRespiradores() {
     });
   };
 
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const nordenDisabled = hayRegistroCargado;
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
   return (
-    <div className="grid 2xl:grid-cols-8 mx-auto gap-x-4 px-2 gap-y-3">
-      {/* Contenido principal - 80% */}
-      <div className="2xl:col-span-6 space-y-3">
-        {/* Datos del trabajador */}
-        <SectionFieldset legend="Información del Examen">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
-            <InputTextOneLine
-              label="N° Orden"
-              name="norden"
-              value={form.norden}
-              onChange={handleChangeNumberDecimals}
-              onKeyUp={handleSearch}
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Fecha"
-              name="fechaExam"
-              type="date"
-              value={form.fechaExam}
-              onChange={handleChangeSimple}
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Nombre del Examen"
-              name="tipoExamen"
-              value={form.tipoExamen}
-              disabled
-              labelWidth="120px"
+    <div className="space-y-3 px-2">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
+      <div className="grid 2xl:grid-cols-8 mx-auto gap-x-4 gap-y-3">
+        {/* Contenido principal - 80% */}
+        <div className="2xl:col-span-6 space-y-3 min-w-0">
+          {/* Datos del trabajador */}
+          <SectionFieldset legend="Información del Examen">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+              <div className="flex gap-x-3 w-full">
+                <InputTextOneLine
+                  label="N° Orden"
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChangeNumberDecimals}
+                  onKeyUp={handleSearch}
+                  disabled={nordenDisabled}
+                  labelWidth="120px"
+                  className="w-full"
+                />
+                <SearchButton onClick={executeSearch} className="lg:hidden" />
+              </div>
+              <InputTextOneLine
+                label="Fecha"
+                name="fechaExam"
+                type="date"
+                value={form.fechaExam}
+                onChange={handleChangeSimple}
+                disabled={camposDeshabilitados}
+                edited={isFieldEdited("fechaExam")}
+                onRevert={() => revertCampo("fechaExam")}
+                labelWidth="120px"
+              />
+              <InputTextOneLine
+                label="Nombre del Examen"
+                name="tipoExamen"
+                value={form.tipoExamen}
+                disabled
+                labelWidth="120px"
+              />
+            </div>
+          </SectionFieldset>
+
+          <DatosPersonalesLaborales form={form} />
+
+          {/* Navegación de pestañas */}
+          <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20 overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`flex-1 whitespace-nowrap px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                  ? "border-[#233245] text-[#233245] font-semibold"
+                  : "border-transparent"
+                  }`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+
+          {/* Contenido de la pestaña activa */}
+          <div className="px-4 pt-4 ">
+            <ActiveComponent
+              form={form}
+              setForm={setForm}
+              handleChange={handleChange}
+              handleChangeNumber={handleChangeNumber}
+              handleCheckBoxChange={handleCheckBoxChange}
+              handleRadioButtonBoolean={handleRadioButtonBoolean}
+              handleRadioButton={handleRadioButton}
+              handleChangeSimple={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              isFieldEdited={isFieldEdited}
+              revertField={revertCampo}
             />
           </div>
-        </SectionFieldset>
+          <SectionFieldset legend="Autorización Final" fieldsetClassName="mx-4 mt-4">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              edited={isMedicoEdited}
+              onRevert={revertMedico}
+            />
+          </SectionFieldset>
 
-        <DatosPersonalesLaborales form={form} />
+          {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+          {hayRegistroCargado && (
+            <AuditoriaRegistro
+              mostrarEdicion={form.tieneRegistro}
+              fechaCreacion={auditoria.fechaCreacion}
+              fechaEdicion={auditoria.fechaActualizacion}
+              usuarioRegistro={auditoria.usuarioRegistro}
+              usuarioEdicion={auditoria.usuarioActualizacion}
+            />
+          )}
 
-        {/* Navegación de pestañas */}
-        <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                ? "border-[#233245] text-[#233245] font-semibold"
-                : "border-transparent"
-                }`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-              {tab.name}
-            </button>
-          ))}
-        </nav>
-
-        {/* Contenido de la pestaña activa */}
-        <div className="px-4 pt-4 ">
-          <ActiveComponent
+          {/* ===== BOTONES DE ACCIÓN ===== */}
+          <BotonesForm
             form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
-            handleCheckBoxChange={handleCheckBoxChange}
-            handleRadioButtonBoolean={handleRadioButtonBoolean}
+            handleChangeNumberDecimals={handleChangeNumberDecimals}
+            onNordenChange={handlePrintNordenChange}
+            handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+            saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+            handleEdit={habilitarEdicion}
             handleClear={handleClear}
-            handleSave={handleSave}
             handlePrint={handlePrint}
-            handleRadioButton={handleRadioButton}
-            handleChangeSimple={handleChangeSimple}
+            hideSave={form.tieneRegistro && !edicionHabilitada}
+            hideEdit={!form.tieneRegistro || edicionHabilitada}
           />
         </div>
-        <SectionFieldset legend="Autorización Final" fieldsetClassName="mx-4 mt-4">
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            form={form}
-            onChange={handleChangeSimple}
-          />
-        </SectionFieldset>
 
-        <BotonesAccion
-          form={form}
-          handleSave={handleSave}
-          handleClear={handleClear}
-          handlePrint={handlePrint}
-          handleChangeNumberDecimals={handleChangeNumberDecimals}
-        />
-      </div>
-
-      {/* Panel lateral - 20% */}
-      <div className="2xl:col-span-2">
-        <SectionFieldset legend="Oftalmología" className="grid gap-y-3">
-          <SectionFieldset legend="Sin Corregir" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
-            <div>
-              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
-              <div className="space-y-3">
-                <InputTextOneLine label="Visión Cerca" name="vcOD" value={form?.vcOD} disabled labelWidth="70px" />
-                <InputTextOneLine label="Visión Lejos" name="vlOD" value={form?.vlOD} disabled labelWidth="70px" />
+        {/* Panel lateral - 20% */}
+        <div className="2xl:col-span-2">
+          <SectionFieldset legend="Oftalmología" className="grid gap-y-3">
+            <SectionFieldset legend="Sin Corregir" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+              <div>
+                <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+                <div className="space-y-3">
+                  <InputTextOneLine label="Visión Cerca" name="vcOD" value={form?.vcOD} disabled labelWidth="70px" />
+                  <InputTextOneLine label="Visión Lejos" name="vlOD" value={form?.vlOD} disabled labelWidth="70px" />
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
-              <div className="space-y-3">
-                <InputTextOneLine label="Visión Cerca" name="vcOI" value={form?.vcOI} disabled labelWidth="70px" />
-                <InputTextOneLine label="Visión Lejos" name="vlOI" value={form?.vlOI} disabled labelWidth="70px" />
+              <div>
+                <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
+                <div className="space-y-3">
+                  <InputTextOneLine label="Visión Cerca" name="vcOI" value={form?.vcOI} disabled labelWidth="70px" />
+                  <InputTextOneLine label="Visión Lejos" name="vlOI" value={form?.vlOI} disabled labelWidth="70px" />
+                </div>
               </div>
-            </div>
-          </SectionFieldset>
+            </SectionFieldset>
 
-          {/* Corregida */}
-          <SectionFieldset legend="Corregida" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
-            <div className="space-y-3">
-              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+            {/* Corregida */}
+            <SectionFieldset legend="Corregida" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+              <div className="space-y-3">
+                <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+                <InputTextOneLine
+                  label="Visión Cerca"
+                  name="vcCorregidaOD"
+                  value={form?.vcCorregidaOD}
+                  disabled
+                  labelWidth="70px"
+                />
+                <InputTextOneLine
+                  label="Visión Lejos"
+                  name="vlCorregidaOD"
+                  value={form?.vlCorregidaOD}
+                  disabled
+                  labelWidth="70px"
+                />
+              </div>
+              <div className="space-y-3">
+                <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
+                <InputTextOneLine
+                  label="Visión Cerca"
+                  name="vcCorregidaOI"
+                  value={form?.vcCorregidaOI}
+                  disabled
+                  labelWidth="70px"
+                />
+                <InputTextOneLine
+                  label="Visión Lejos"
+                  name="vlCorregidaOI"
+                  value={form?.vlCorregidaOI}
+                  disabled
+                  labelWidth="70px"
+                />
+              </div>
+            </SectionFieldset>
+            {/* Fila extra (ancho completo) */}
+            <SectionFieldset legend="Valoración Oftalmológica" className="grid gap-y-3">
               <InputTextOneLine
-                label="Visión Cerca"
-                name="vcCorregidaOD"
-                value={form?.vcCorregidaOD}
+                label="Visión Colores"
+                name="vclrs"
+                value={form?.vclrs}
                 disabled
-                labelWidth="70px"
+                labelWidth="100px"
               />
               <InputTextOneLine
-                label="Visión Lejos"
-                name="vlCorregidaOD"
-                value={form?.vlCorregidaOD}
+                label="Visión Binocular"
+                name="vb"
+                value={form?.vb}
                 disabled
-                labelWidth="70px"
-              />
-            </div>
-            <div className="space-y-3">
-              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
-              <InputTextOneLine
-                label="Visión Cerca"
-                name="vcCorregidaOI"
-                value={form?.vcCorregidaOI}
-                disabled
-                labelWidth="70px"
+                labelWidth="100px"
               />
               <InputTextOneLine
-                label="Visión Lejos"
-                name="vlCorregidaOI"
-                value={form?.vlCorregidaOI}
+                label="Reflejos Pupilares"
+                name="rp"
+                value={form?.rp}
                 disabled
-                labelWidth="70px"
+                labelWidth="100px"
               />
-            </div>
-          </SectionFieldset>
-          {/* Fila extra (ancho completo) */}
-          <SectionFieldset legend="Valoración Oftalmológica" className="grid gap-y-3">
-            <InputTextOneLine
-              label="Visión Colores"
-              name="vclrs"
-              value={form?.vclrs}
-              disabled
-              labelWidth="100px"
-            />
-            <InputTextOneLine
-              label="Visión Binocular"
-              name="vb"
-              value={form?.vb}
-              disabled
-              labelWidth="100px"
-            />
-            <InputTextOneLine
-              label="Reflejos Pupilares"
-              name="rp"
-              value={form?.rp}
-              disabled
-              labelWidth="100px"
-            />
-            <InputTextArea
-              label="Enfermedades Oculares"
-              rows={7}
-              name="enfermedadesOculares"
-              value={form?.enfermedadesOculares}
-              onChange={handleChange}
-              disabled
-            />
-          </SectionFieldset>
+              <InputTextArea
+                label="Enfermedades Oculares"
+                rows={7}
+                name="enfermedadesOculares"
+                value={form?.enfermedadesOculares}
+                onChange={handleChange}
+                disabled
+              />
+            </SectionFieldset>
 
-        </SectionFieldset>
+          </SectionFieldset>
+        </div>
       </div>
     </div>
   );

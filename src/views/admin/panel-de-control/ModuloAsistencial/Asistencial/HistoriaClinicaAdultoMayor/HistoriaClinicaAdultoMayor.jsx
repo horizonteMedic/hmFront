@@ -1,5 +1,4 @@
 import {
-  InputCheckbox,
   InputTextOneLine,
   InputTextArea,
   SectionFieldset,
@@ -15,6 +14,7 @@ import { DatosPersonalesLaborales } from "../../../../../components/templates/Te
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
 import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { useEsSedeLaArena, useFormLaArena } from "../../../../../hooks/useLaArena";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
 import {
   RANGO_EDAD_HC,
@@ -169,8 +169,9 @@ export default function HistoriaClinicaAdultoMayor() {
     ticketImprimir: "",
     numeroHistoriaClinica: "",
     fecha_apertura_hcl: today,
-    // Cliente La Arena: lo define el ticket (esArena, se marca en Ticket Asistencial) y se carga al buscarlo. Habilita
-    // Receta, Descanso Médico, Informe de Accidente y Resumen Asistencial (solo UI, no se envía a la Historia Clínica).
+    // Cliente La Arena: lo define la sede seleccionada (LARE, desde que se abre el formulario) o el ticket buscado
+    // (esArena, se carga al buscarlo); `form.esArena` ya viene resuelto con ambos (useFormLaArena). Habilita Receta,
+    // Descanso Médico, Informe de Accidente y Resumen Asistencial (solo UI, no se envía a la Historia Clínica).
     esArena: false,
 
     // Datos Personales (solo lectura: vienen del paciente)
@@ -309,7 +310,7 @@ export default function HistoriaClinicaAdultoMayor() {
   };
 
   const {
-    form,
+    form: formBase,
     setForm,
     handleChange,
     handleChangeSimple,
@@ -317,6 +318,10 @@ export default function HistoriaClinicaAdultoMayor() {
     handleRadioButton,
     handleClear,
   } = useForm(initialFormState, { storageKey: "hc_adulto_mayor_ticket" });
+
+  // Con la sede La Arena seleccionada el formulario nace como La Arena (sin esperar a buscar un ticket).
+  const esArenaSede = useEsSedeLaArena();
+  const form = useFormLaArena(formBase);
 
   const {
     edicionHabilitada,
@@ -354,10 +359,11 @@ export default function HistoriaClinicaAdultoMayor() {
     SubmitDataService(form, token, userlogued, handleClear, datosFooter);
   };
 
-  // Si el ticket impreso es de La Arena (esArena), el mensaje de impresión ofrece también la Receta, el Descanso
-  // Médico y el Informe de Accidente. El N° puede ser de otro ticket que el cargado, así que se consulta al imprimir.
+  // Si el ticket impreso es de La Arena (esArena) o la sede seleccionada es La Arena, el mensaje de impresión ofrece
+  // también la Receta, el Descanso Médico y el Informe de Accidente. El N° puede ser de otro ticket que el cargado,
+  // así que se consulta al imprimir.
   const handlePrint = () => {
-    ConfirmarImpresion(form.ticketImprimir, token, datosFooter);
+    ConfirmarImpresion(form.ticketImprimir, token, datosFooter, esArenaSede);
   };
 
   // Imprime la hoja de Historia Clínica del ticket buscado (aunque todavía no esté guardada). Solo en tickets de La Arena.
@@ -502,8 +508,6 @@ export default function HistoriaClinicaAdultoMayor() {
           disabled
           labelWidth="120px"
         />
-        {/* Solo informativo: viene del ticket (esArena), no se edita aquí. */}
-        <InputCheckbox label="La Arena" name="esArena" checked={form.esArena} disabled className="font-semibold w-fit" />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} laborales={false} />
@@ -779,6 +783,8 @@ export default function HistoriaClinicaAdultoMayor() {
           Guardar de la Historia Clínica y se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET. */}
       {form.esArena && (
         <ComplementosDesplegables
+          // Con la sede La Arena el bloque ya no se desmonta al buscar/limpiar: la clave reinicia qué se «generó».
+          key={form.pacienteId ?? "sin-ticket"}
           form={form}
           setForm={setForm}
           onChange={handleChange}

@@ -1,16 +1,28 @@
 import { InputsBooleanRadioGroup, InputTextArea, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
 import { useForm } from "../../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import {
   PrintHojaR,
   SubmitDataService,
+  UpdateDataService,
   VerifyTR,
 } from "./controllerDeclaracionJuradaAntecedentesPersonales";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 
 const tabla = "DECLA_JURA_ANTECE_PERSON_FAM";
+
+// Al cambiar "existen antecedentes" se limpia el detalle: se revierten en conjunto.
+const CAMPOS_ANTECEDENTES = ["existenAntecedentes", "detalleAntecedentes"];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = ["fecha", ...CAMPOS_ANTECEDENTES];
 
 const textoFinalConsentimiento = "(De marcar SI, detallar que antecedentes existen, considerar los antecedentes de la madre, padre, abuelo y abuela)";
 const textoFinalConsentimiento2 = "Se suscribe la presente declaración jurada en conformidad de lo antes expuesto.";
@@ -29,6 +41,15 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
     ocupacion: "",
     existenAntecedentes: false,
     detalleAntecedentes: "",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -37,21 +58,54 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
     handleChange,
     handleChangeSimple,
     handleRadioButtonBoolean,
-    handleChangeNumberDecimals,
+    handleChangeNumber,
     handleClear,
     handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState, { storageKey: "DeclaracionJuradaAntecedentesPersonales" });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
 
+  const hayRegistroCargado = Boolean(form.nombres);
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleUpdate = () => {
+    UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
   };
 
   const handlePrint = () => {
@@ -60,22 +114,43 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
     });
   };
 
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+      />
+
       <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
-        <InputTextOneLine
-          label="N° Orden"
-          name="norden"
-          value={form.norden}
-          onKeyUp={handleSearch}
-          onChange={handleChangeNumberDecimals}
-        />
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onKeyUp={handleSearch}
+            onChange={handleChangeNumber}
+            disabled={hayRegistroCargado}
+            className="w-full"
+          />
+          <SearchButton onClick={executeSearch} className="lg:hidden" />
+        </div>
         <InputTextOneLine
           label="Fecha"
           type="date"
           name="fecha"
           value={form.fecha}
           onChange={handleChangeSimple}
+          disabled={camposDeshabilitados}
+          edited={isFieldEdited("fecha")}
+          onRevert={() => revertField("fecha")}
         />
         <InputTextOneLine
           label="Hora"
@@ -136,6 +211,9 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
                 }));
               }}
               labelOnTop
+              disabled={camposDeshabilitados}
+              edited={isFieldEdited("existenAntecedentes")}
+              onRevert={() => revertFields(CAMPOS_ANTECEDENTES)}
             />
             <p className=" text-gray-500">
               {textoFinalConsentimiento}
@@ -145,7 +223,9 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
               name="detalleAntecedentes"
               value={form.detalleAntecedentes}
               onChange={handleChange}
-              disabled={!form.existenAntecedentes}
+              disabled={camposDeshabilitados || !form.existenAntecedentes}
+              edited={isFieldEdited("detalleAntecedentes")}
+              onRevert={() => revertField("detalleAntecedentes")}
               rows={8}
             />
             <p className="text-justify">
@@ -155,12 +235,28 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
         </div>
       </SectionFieldset>
 
-      <BotonesAccion
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
         form={form}
-        handleSave={handleSave}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleUpdate : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
         handleClear={handleClear}
         handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
       />
     </div>
   );

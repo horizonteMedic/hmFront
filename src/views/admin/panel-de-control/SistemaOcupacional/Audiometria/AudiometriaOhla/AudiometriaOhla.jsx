@@ -749,7 +749,7 @@ export default function AudiometriaOhla({
   };
 
   return (
-    <div className="w-full max-w-[90vw]  mx-auto bg-white rounded shadow p-6 space-y-6">
+    <div className="w-full max-w-[95%] xl:max-w-[90%]  mx-auto bg-white rounded shadow p-6 space-y-6">
       <h2 className="text-2xl font-bold text-center mb-6">AUDIOMETRIA OHLA</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[2.5fr_3fr] gap-6">
         {/* Lado izquierdo */}

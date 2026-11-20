@@ -1,6 +1,12 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
-import { SubmitData } from "../model";
+import { GetInfoPacDefault, LoadingDefault } from "../../../../../utils/functionUtils";
+import { sellarAuditoria } from "../../../../../utils/auditoriaUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 //===============Zona Modificación===============
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
@@ -11,11 +17,11 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/audiometria/registrarActualizarCuestionarioAudiometria";
 
-export const GetInfoServicio = (nro, tabla, set, token) => {
+// ===== Mapeo Edición =====
+export const GetInfoServicioEditar = (nro, tabla, set, token, onFinish = () => { }) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
-        console.log(res.usuarioFirma);
         set((prev) => ({
           ...prev,
           ...res,
@@ -78,7 +84,14 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           p16_servicio_tiempo: res.txtmilitar16,
           p16_boxeo: res.chkboxeo16,
           p16_boxeo_tiempo: res.txtboxeo16,
-          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma ? res.usuarioFirma : prev.user_medicoFirma,
+
+          // Auditoría. CuestionarioAudiometriaReporteDTO no devuelve quién registró ni fechas de
+          // registro/edición: quedan vacías (el backend tendría que agregarlas al reporte).
+          userRegistro: "",
+          fechaRegistro: "",
+          usuarioActualizacion: "",
+          fechaActualizacion: "",
+          tieneRegistro: true,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -86,116 +99,131 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
     })
     .finally(() => {
       Swal.close();
+      onFinish();
     });
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-  Loading("Registrando Datos");
-  const body = {
-    codCuestionario: form.codCuestionario,
-    norden: form.norden,
-    edad: form.edad,
-    fechaCuestionario: form.fecha,
-    chksi1: form.p1 === "SI",
-    chkno1: form.p1 === "NO",
-    txtrcual1: form.p1_cual,
-    txtrcuando1: form.p1_cuando,
-    txtrque1: form.p1_quehizo,
-    chksi2: form.p2 === "SI",
-    chkno2: form.p2 === "NO",
-    chksi3: form.p3 === "SI",
-    chkno3: form.p3 === "NO",
-    chksi4: form.p4 === "SI",
-    chkno4: form.p4 === "NO",
-    chksi5: form.p5 === "SI",
-    chkno5: form.p5 === "NO",
-    chksi6: form.p6 === "SI",
-    chkno6: form.p6 === "NO",
-    chksi7: form.p7 === "SI",
-    chkno7: form.p7 === "NO",
-    chksi8: form.p8 === "SI",
-    chkno8: form.p8 === "NO",
-    chksi9: form.p9 === "SI",
-    chkno9: form.p9 === "NO",
-    txtrcual9: form.p9_cual,
-    txtrdonde9: form.p9_donde,
-    txtrque9: form.p9_quehizo,
-    chksi10: form.p10 === "SI",
-    chkno10: form.p10 === "NO",
-    txtrcual10: form.p10_cual,
-    txtrdonde10: form.p10_donde,
-    txtrque10: form.p10_quehizo,
-    chksi11: form.p11 === "SI",
-    chkno11: form.p11 === "NO",
-    txtrcual11: form.p11_cual,
-    txtrcuanto11: form.p11_tiempo,
-    chksi12: form.p12 === "SI",
-    chkno12: form.p12 === "NO",
-    txtrcual12: form.p12_cual,
-    txtrcuanto12: form.p12_tiempo,
-    chksi13: form.p13 === "SI",
-    chkno13: form.p13 === "NO",
-    txtrcuanto13: form.p13_tiempo,
-    txtrcuando13: form.p13_cuando,
-    txtrdonde13: form.p13_donde,
-    chksi14: form.p14 === "SI",
-    chkno14: form.p14 === "NO",
-    txtrcual14: form.p14_cual,
-    txtrdonde14: form.p14_donde,
-    txtrque14: form.p14_quehizo,
-    chksi15: form.p15 === "SI",
-    chkno15: form.p15 === "NO",
-    txtrcuantos15: form.p15_cuantos,
-    chkcaza16: form.p16_caza,
-    txtcaza16: form.p16_caza_tiempo,
-    chktiro16: form.p16_tiro,
-    txttiro16: form.p16_tiro_tiempo,
-    chkdiscoteca16: form.p16_discoteca,
-    txtdiscoteca16: form.p16_discoteca_tiempo,
-    chkauriculares16: form.p16_auriculares,
-    txtauriculares16: form.p16_auriculares_tiempo,
-    chkmilitar16: form.p16_servicio,
-    txtmilitar16: form.p16_servicio_tiempo,
-    chkboxeo16: form.p16_boxeo,
-    txtboxeo16: form.p16_boxeo_tiempo,
-    userRegistro: user,
-    usuarioFirma: form.user_medicoFirma,
-  };
-  SubmitData(body, registrarUrl, token).then((res) => {
-    console.log(res);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
-        }
-      });
-    } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
-    }
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+// `usuarioFirma` no existe en CuestionarioAudiometriaDTO: se envía igual pero el backend lo ignora, por lo que
+// el médico elegido en el formulario no se guarda.
+const construirBase = (form) => ({
+  codCuestionario: form.codCuestionario,
+  norden: form.norden,
+  edad: form.edad,
+  fechaCuestionario: form.fecha,
+  chksi1: form.p1 === "SI",
+  chkno1: form.p1 === "NO",
+  txtrcual1: form.p1_cual,
+  txtrcuando1: form.p1_cuando,
+  txtrque1: form.p1_quehizo,
+  chksi2: form.p2 === "SI",
+  chkno2: form.p2 === "NO",
+  chksi3: form.p3 === "SI",
+  chkno3: form.p3 === "NO",
+  chksi4: form.p4 === "SI",
+  chkno4: form.p4 === "NO",
+  chksi5: form.p5 === "SI",
+  chkno5: form.p5 === "NO",
+  chksi6: form.p6 === "SI",
+  chkno6: form.p6 === "NO",
+  chksi7: form.p7 === "SI",
+  chkno7: form.p7 === "NO",
+  chksi8: form.p8 === "SI",
+  chkno8: form.p8 === "NO",
+  chksi9: form.p9 === "SI",
+  chkno9: form.p9 === "NO",
+  txtrcual9: form.p9_cual,
+  txtrdonde9: form.p9_donde,
+  txtrque9: form.p9_quehizo,
+  chksi10: form.p10 === "SI",
+  chkno10: form.p10 === "NO",
+  txtrcual10: form.p10_cual,
+  txtrdonde10: form.p10_donde,
+  txtrque10: form.p10_quehizo,
+  chksi11: form.p11 === "SI",
+  chkno11: form.p11 === "NO",
+  txtrcual11: form.p11_cual,
+  txtrcuanto11: form.p11_tiempo,
+  chksi12: form.p12 === "SI",
+  chkno12: form.p12 === "NO",
+  txtrcual12: form.p12_cual,
+  txtrcuanto12: form.p12_tiempo,
+  chksi13: form.p13 === "SI",
+  chkno13: form.p13 === "NO",
+  txtrcuanto13: form.p13_tiempo,
+  txtrcuando13: form.p13_cuando,
+  txtrdonde13: form.p13_donde,
+  chksi14: form.p14 === "SI",
+  chkno14: form.p14 === "NO",
+  txtrcual14: form.p14_cual,
+  txtrdonde14: form.p14_donde,
+  txtrque14: form.p14_quehizo,
+  chksi15: form.p15 === "SI",
+  chkno15: form.p15 === "NO",
+  txtrcuantos15: form.p15_cuantos,
+  chkcaza16: form.p16_caza,
+  txtcaza16: form.p16_caza_tiempo,
+  chktiro16: form.p16_tiro,
+  txttiro16: form.p16_tiro_tiempo,
+  chkdiscoteca16: form.p16_discoteca,
+  txtdiscoteca16: form.p16_discoteca_tiempo,
+  chkauriculares16: form.p16_auriculares,
+  txtauriculares16: form.p16_auriculares_tiempo,
+  chkmilitar16: form.p16_servicio,
+  txtmilitar16: form.p16_servicio_tiempo,
+  chkboxeo16: form.p16_boxeo,
+  txtboxeo16: form.p16_boxeo_tiempo,
+  usuarioFirma: form.user_medicoFirma,
+});
+
+// Body completo (creación / actualización). El reporte (GET) no devuelve quién registró, así que al editar,
+// si no se conoce el creador, se manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+  sellarAuditoria(construirBase(form), {
+    user,
+    esActualizacion,
+    userRegistro: form.userRegistro || user,
+    fechaRegistro: form.fechaRegistro,
   });
-};
+
+// El backend de este examen responde id 1 al registrar y 0 al actualizar (ambos son éxito).
+const IDS_EXITO = [0, 1];
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+    idsExito: IDS_EXITO,
+  });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla),
+    idsExito: IDS_EXITO,
+  });
 
 export const PrintHojaR = (nro, token, tabla) => {
-  Loading("Cargando Formato a Imprimir");
+  LoadingDefault("Cargando Formato a Imprimir");
 
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
-        console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
         const jasperModules = import.meta.glob(
           `../../../../../jaspers/Audiometria/**/*.jsx`
         );
@@ -218,81 +246,49 @@ export const PrintHojaR = (nro, token, tabla) => {
 };
 
 //===============Fin Zona Modificación===============
-export const Loading = (text) => {
-  Swal.fire({
-    title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-    html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
-    icon: "info",
-    background: "#f0f6ff",
-    color: "#22223b",
-    showConfirmButton: false,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showCancelButton: true,
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
-    customClass: {
-      popup: "swal2-border-radius",
-      title: "swal2-title-custom",
-      htmlContainer: "swal2-html-custom",
-    },
-    showClass: {
-      popup: "animate__animated animate__fadeInDown",
-    },
-    hideClass: {
-      popup: "animate__animated animate__fadeOutUp",
-    },
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
-};
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  if (!nro) {
-    await Swal.fire(
-      "Error",
-      "Debe Introducir un Nro de Historia Clinica válido",
-      "error"
-    );
+// ===== Búsqueda / verificación por N° Orden =====
+// verificarRegistro valida la sede y decide nuevo / existente. `silencioso`: al encontrar un registro existente solo
+// cierra el "Validando datos", sin el aviso de "ya cuenta con registros" (formulario incrustado, donde el estado
+// del registro ya se ve en pantalla).
+export const VerifyTR = (nro, tabla, token, set, sede, { silencioso = false } = {}) =>
+  verificarRegistro({
+    nro,
+    tabla,
+    token,
+    sede,
+    onNuevo: () => GetInfoServicio(nro, set, token, sede),
+    onExistente: () =>
+      GetInfoServicioEditar(nro, tabla, set, token, () => {
+        if (silencioso) {
+          Swal.close();
+          return;
+        }
+        Swal.fire({
+          icon: "warning",
+          title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+          html: "Este paciente ya cuenta con registros del Cuestionario de Audiometría.",
+        });
+      }),
+  });
+
+// ===== Mapeo Registro nuevo =====
+export const GetInfoServicio = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  // Norden inexistente / paciente no encontrado / error del backend.
+  if (!res || res.error || !res.nombresApellidos) {
+    Swal.fire({
+      icon: "warning",
+      title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+      html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+    });
     return;
   }
-  Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
-    console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
-    } else {
-      GetInfoServicio(nro, tabla, set, token);
-    }
-  });
-};
-
-function convertirFecha(fecha) {
-  if (fecha === "") return "";
-  const [dia, mes, anio] = fecha.split("-");
-  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-}
-
-export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
-    `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-    token
-  )
-    .then((res) => {
-      console.log("pros", res);
-      set((prev) => ({
-        ...prev,
-        ...res,
-        nombres: res.nombresApellidos,
-        genero: res.genero === "M" ? "Masculino" : "Femenino",
-      }));
-    })
-    .finally(() => {
-      Swal.close();
-    });
+  set((prev) => ({
+    ...prev,
+    ...res,
+    nombres: res.nombresApellidos,
+    genero: res.genero === "M" ? "Masculino" : "Femenino",
+    tieneRegistro: false,
+  }));
 };

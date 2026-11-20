@@ -484,15 +484,19 @@ export const SubmitDataService = async (form, token, userlogued, limpiar, datosF
     // Se captura antes de limpiar: el formulario se vacía al terminar de guardar.
     const numeroTicket = form.n_hcl;
     const imprimirHistoria = () => PrintHojaR(numeroTicket, token, datosFooter);
-    // Con complementos guardados, el mensaje de éxito ofrece imprimir cada documento (si no, el "¿Desea imprimir?" de siempre).
+    const imprimirResumen = () => PrintResumenAsistencial(numeroTicket, token, datosFooter);
+    // En un ticket de La Arena (o con complementos guardados), el mensaje de éxito ofrece imprimir cada documento
+    // (Historia, Resumen Asistencial, Receta, Descanso, Informe); si no, el "¿Desea imprimir?" de siempre.
     const { mensaje, opciones } = armarResultadoGuardado({
         mensaje: "Historia Clínica del Adulto Mayor registrada correctamente.",
         guardados,
+        esArena: form.esArena,
         numeroTicket,
         token,
         datosFooter,
         obtenerDatosHC: ObtenerDatosComplementos,
         imprimirHistoria,
+        imprimirResumen,
     });
 
     await RegistrarServicioAsistencialDefault(
@@ -728,8 +732,10 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         const res = await getFetch(`${baseUrl}/ticket/${numeroTicket}`, token);
         const data = unwrap(res);
 
+        // Los avisos se esperan (await): también se llama desde el mensaje de opciones de impresión, que se
+        // reabre al terminar esta función y taparía el aviso.
         if (res?.error || !data || !pacienteDe(data)) {
-            Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
+            await Swal.fire("No encontrado", `No existe un ticket registrado con el N° ${numeroTicket}.`, "error");
             return;
         }
 
@@ -739,7 +745,7 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         const modulo = await jasperModules[rutaJasperResumen]();
         if (typeof modulo.default !== "function") {
             console.error(`El módulo ${rutaJasperResumen} no exporta una función por defecto`);
-            Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
+            await Swal.fire("Error", "No se pudo cargar el formato de impresión.", "error");
             return;
         }
 
@@ -747,15 +753,16 @@ export const PrintResumenAsistencial = async (numeroTicket, token, datosFooter) 
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);
-        Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+        await Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
     }
 };
 
 // Botón IMPRIMIR: pide confirmación (como handlePrintDefault, pero por N° de Ticket) y luego imprime. Si el ticket es
 // de La Arena el mensaje ofrece además imprimir la Receta, el Descanso Médico y el Informe de Accidente del ticket.
 // El N° escrito en el bloque IMPRIMIR puede ser de otro ticket que el cargado en pantalla, así que "La Arena" se
-// consulta (esArena) en el ticket que se va a imprimir y no en el formulario.
-export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
+// consulta (esArena) en el ticket que se va a imprimir y no en el formulario. Con la sede La Arena seleccionada
+// (`esArenaSede`) también se ofrecen los complementos, sea cual sea el ticket.
+export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, esArenaSede = false) => {
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
         return;
@@ -765,13 +772,14 @@ export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     const historia = await ObtenerDatosComplementos(numeroTicket, token);
     Swal.close();
 
-    if (historia?.esArena) {
+    if (historia && (historia.esArena || esArenaSede)) {
         await ConfirmarImpresionConComplementos({
             numeroTicket,
             token,
             datosFooter,
             obtenerDatosHC: ObtenerDatosComplementos,
             imprimirHistoria: () => PrintHojaR(numeroTicket, token, datosFooter),
+            imprimirResumen: () => PrintResumenAsistencial(numeroTicket, token, datosFooter),
         });
         return;
     }

@@ -2,15 +2,20 @@ import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
     handleSubidaMasiva,
-    handleSubirArchivoDefault,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
     ReadArchivosFormDefault,
-    SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    validarSede,
+} from "../../../../utils/registroOcupacionalUtils";
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_FICHA_CERTIFICADO_ALTURA = "b_certificado_altura";
@@ -137,7 +142,13 @@ export const GetInfoServicio = async (
             dni: res.dniPaciente ?? "",
             edad: String((res.edadPaciente ?? "") + " AÑOS"),
             sexo: res.sexoPaciente ?? "",
-            areaTrabajo: res.areaPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            // "Área de Trabajo" del legacy; el cargo sale de `cargoPaciente`.
+            ocupacion: res.areaPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             //==========================TAB LATERAL===========================
@@ -181,6 +192,13 @@ export const GetInfoServicio = async (
             medicinasTomando: res.medicamentosAnexo16A ?? "",
 
             razonVisita: (res.nombreExamen ?? "") == "ANUAL" ? "REVALIDACION" : "PRIMERA ACTITUD",
+
+            // Registro nuevo: sin auditoría real todavía (la sección muestra la creación en vivo).
+            userRegistro: "",
+            fechaRegistro: "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: false,
         }));
     }
 };
@@ -281,7 +299,13 @@ export const GetInfoServicioEditar = async (
             edad: String((res.edadPaciente ?? "") + " AÑOS"),
             sexo: res.sexoPaciente ?? "",
             experienciaAnios: res.tiempoExperiencia_t_experiencia ?? "",
-            areaTrabajo: res.areaPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            // "Área de Trabajo" del legacy; el cargo sale de `cargoPaciente`.
+            ocupacion: res.areaPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             //==========================TAB LATERAL===========================
@@ -337,6 +361,7 @@ export const GetInfoServicioEditar = async (
             talla: res.tallaTriaje ?? "",
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
+            imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
             perimetroCintura: res.cinturaTriaje ?? "",
             perimetroCadera: res.caderaTriaje ?? "",
@@ -379,6 +404,14 @@ export const GetInfoServicioEditar = async (
 
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
+
+            // Auditoría. CertificadoTrabajoAlturaReporteDTO no devuelve quién registró ni fechas de
+            // registro/edición: quedan vacías (el backend tendría que agregarlas al reporte).
+            userRegistro: "",
+            fechaRegistro: "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: true,
             // nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
             // dniUsuario: userCompleto?.datos?.dni_user,
 
@@ -388,27 +421,26 @@ export const GetInfoServicioEditar = async (
     }
 };
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
+// Validaciones previas a guardar o editar (devuelve false si falta algo, tras avisar).
+const validarFormulario = async (form) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
+        return false;
     }
     if (!form.conclusion) {
         await Swal.fire("Error", "Ingrese la Conclusión", "error");
-        return;
+        return false;
     }
     if (!form.experienciaAnios || form.experienciaAnios === "") {
         await Swal.fire("Error", "Ingrese el Tiempo de Experiencia", "error");
-        return;
+        return false;
     }
-     
+    return true;
+};
+
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+const construirBase = (form) => {
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado,
@@ -490,11 +522,49 @@ export const SubmitDataService = async (
 
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
-        usuarioRegistro: user,
     };
+    return body;
+};
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). CertificadoTrabajoAlturaDTO usa `usuarioRegistro` para el usuario
+// que registra. El reporte (GET) no devuelve quién registró, así que al editar, si no se conoce el creador, se
+// manda el usuario en sesión (como siempre) en vez de null para no borrarlo.
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro || user,
+        fechaRegistro: form.fechaRegistro,
+        campoUserRegistro: "usuarioRegistro",
+    });
+
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await validarFormulario(form))) return;
+    await guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+    if (!(await validarFormulario(form))) return;
+    await actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
 };
 
@@ -520,6 +590,38 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 // `silencioso`: al encontrar un registro existente solo cierra el "Validando datos", sin el aviso de
 // "ya cuenta con registros" (formulario incrustado, donde el estado del registro ya se ve en pantalla).
 export const VerifyTR = async (nro, tabla, token, set, sede, { silencioso = false } = {}) => {
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    Loading("Validando datos");
+
+    // Como el resto de formularios de la plantilla: el N° Orden debe pertenecer a la sede actual.
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
     VerifyTRPerzonalizado(
         nro,
         tabla,

@@ -19,6 +19,12 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
   const [dd, mm, yyyy] = data.fechaAperturaPo.split('/');
   const fechaFormateada = `${yyyy}/${mm}/${dd}`;
 
+  // Campos del DTO que el formulario no muestra. Al registrar (1) van con su valor inicial de siempre; al
+  // actualizar (2) se reenvía el que trajo la historia (GET busquedaHistoriaOcupNOrden), para que editar un dato
+  // no devuelva la historia a "EN PROCESO" ni borre su grupo sanguíneo, clínica, N° de operación, etc.
+  const actualizando = operacion === 2;
+  const conservado = (valor, inicial) => (actualizando && valor !== undefined && valor !== null && valor !== '' ? valor : inicial);
+
   const body = {
 
     tipoOperacion: operacion,
@@ -31,7 +37,7 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     mineralPo: data.mineralPo,
     fechaAperturaPo: fechaFormateada,
     precioPo: data.precioPo,
-    estadoEx: "EN PROCESO",
+    estadoEx: conservado(data.estadoEx, "EN PROCESO"),
     nomExamen: data.nomExamen,
     cargoDe: data.cargoDe,
     areaO: data.areaO,
@@ -41,25 +47,25 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     n_fisttest: data.n_fisttest, //1
     n_psicosen: data.n_psicosen, //2
     n_testaltura: data.n_testaltura, //3
-    color: 30,
-    grupoSan: null,
-    grupoFactorSan: null,
-    codClinica: "4353-H",
+    color: conservado(data.color, 30),
+    grupoSan: conservado(data.grupoSan, null),
+    grupoFactorSan: conservado(data.grupoFactorSan, null),
+    codClinica: conservado(data.codClinica, "4353-H"),
     visualCompl: data.visualCompl,//6
     trabCalientes: data.trabCalientes, //4
-    chk_covid1: false,
-    chk_covid2: false,
+    chk_covid1: conservado(data.chk_covid1, false),
+    chk_covid2: conservado(data.chk_covid2, false),
     manipAlimentos: data.manipAlimentos, //7
     textObserv1: data.textObserv1,
     textObserv2: data.textObserv2,
     codSede: sede,
-    tipoPruebaCovid: "RA",
-    tipoPrueba: "N/A",
-    nombreHotel: "N/A",
+    tipoPruebaCovid: conservado(data.tipoPruebaCovid, "RA"),
+    tipoPrueba: conservado(data.tipoPrueba, "N/A"),
+    nombreHotel: conservado(data.nombreHotel, "N/A"),
     protocolo: data.protocolo,
     precioAdic: `${precioAdic ? 'S/.' + precioAdic : 'S/.0'}`,
     autoriza: data.autoriza,
-    n_operacion: null,
+    n_operacion: conservado(data.n_operacion, null),
     herraManuales: data.herraManuales, //8
     rxcDorsoLumbar: data.rxcDorsoLumbar, //9
     rxcKLumbar: data.rxcKLumbar, //10

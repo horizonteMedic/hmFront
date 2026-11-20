@@ -102,32 +102,38 @@ export const GuardarComplementos = async (form, token, userlogued) => {
     return porGuardar;
 };
 
-// Opciones de impresión: la Historia Clínica y los complementos indicados (un botón por cada uno).
-const opcionesImpresion = (claves, { numeroTicket, token, datosFooter, obtenerDatosHC, imprimirHistoria }) => [
+// Opciones de impresión: la Historia Clínica, el Resumen Asistencial (`imprimirResumen`, el extra de La Arena que
+// aporta cada Historia) y los complementos indicados (un botón por cada uno).
+const opcionesImpresion = (
+    claves,
+    { numeroTicket, token, datosFooter, obtenerDatosHC, imprimirHistoria, imprimirResumen }
+) => [
     { etiqueta: "Imprimir Historia Clínica", accion: imprimirHistoria },
+    ...(imprimirResumen ? [{ etiqueta: "Imprimir Resumen Asistencial", accion: imprimirResumen }] : []),
     ...claves.map((clave) => ({
         etiqueta: `Imprimir ${COMPLEMENTOS[clave].etiqueta}`,
         accion: () => COMPLEMENTOS[clave].imprimir(numeroTicket, token, datosFooter, obtenerDatosHC),
     })),
 ];
 
-// Mensaje de éxito y opciones de impresión tras guardar. Sin complementos guardados `opciones` es null y el
-// guardado conserva su "¿Desea imprimir?" de siempre; con complementos que tienen reporte, un botón por cada
-// documento guardado.
-export const armarResultadoGuardado = ({ mensaje, guardados, ...impresion }) => {
+// Mensaje de éxito y opciones de impresión tras guardar. En un ticket de La Arena (`esArena`) siempre hay opciones:
+// la Historia Clínica, el Resumen Asistencial y un botón por cada complemento que tiene reporte y se guardó ahora.
+// Fuera de La Arena y sin complementos guardados `opciones` es null y el guardado conserva su "¿Desea imprimir?"
+// de siempre.
+export const armarResultadoGuardado = ({ mensaje, guardados, esArena, ...impresion }) => {
     const claves = Object.keys(COMPLEMENTOS).filter((clave) => guardados?.[clave]);
-    if (!claves.length) return { mensaje, opciones: null };
+    if (!claves.length && !esArena) return { mensaje, opciones: null };
 
     const imprimibles = claves.filter((clave) => IMPRIMIBLES.includes(clave));
     return {
         mensaje: [mensaje, ...claves.map((clave) => COMPLEMENTOS[clave].guardado)].join("\n"),
-        opciones: imprimibles.length ? opcionesImpresion(imprimibles, impresion) : null,
+        opciones: esArena || imprimibles.length ? opcionesImpresion(imprimibles, impresion) : null,
     };
 };
 
 // Botón IMPRIMIR N° TICKET en un ticket de La Arena: en lugar de la confirmación simple, el mensaje ofrece un
-// botón por documento (Historia Clínica, Receta, Descanso Médico e Informe de Accidente) del ticket indicado. Cada
-// complemento avisa si ese ticket todavía no lo tiene.
+// botón por documento (Historia Clínica, Resumen Asistencial, Receta, Descanso Médico e Informe de Accidente) del
+// ticket indicado. Cada complemento avisa si ese ticket todavía no lo tiene.
 export const ConfirmarImpresionConComplementos = async ({ numeroTicket, ...impresion }) => {
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");

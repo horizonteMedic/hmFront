@@ -1,7 +1,16 @@
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import { InputTextOneLine, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function FinalAutorizacion({ form, setForm, handleChange, handleRadioButton, handleChangeSimple }) {
+export default function FinalAutorizacion({
+  form,
+  setForm,
+  handleChange,
+  handleRadioButton,
+  handleChangeSimple,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => { },
+}) {
   return (
     <div className="space-y-3">
       <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3">
@@ -13,6 +22,9 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleR
           name="supervisor"
           value={form?.supervisor}
           onChange={handleChange}
+          disabled={disabled}
+          edited={isFieldEdited("supervisor")}
+          onRevert={() => revertField("supervisor")}
         />
         {/* Datos adicionales */}
         <InputTextOneLine
@@ -21,6 +33,9 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleR
           type="date"
           value={form?.fechaExpiraAutorizacion}
           onChange={handleChangeSimple}
+          disabled={disabled}
+          edited={isFieldEdited("fechaExpiraAutorizacion")}
+          onRevert={() => revertField("fechaExpiraAutorizacion")}
         />
         {/* Clasificación por clases */}
         <div>
@@ -29,6 +44,9 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleR
             name="claseAutorizacion"
             vertical
             value={form?.claseAutorizacion}
+            disabled={disabled}
+            edited={isFieldEdited("claseAutorizacion")}
+            onRevert={() => revertField("claseAutorizacion")}
             onChange={(e, value) => {
               setForm((prev) => ({
                 ...prev,
@@ -59,6 +77,9 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleR
                 vertical
                 value={form?.claseIIOpcion}
                 onChange={handleRadioButton}
+                disabled={disabled}
+                edited={isFieldEdited("claseIIOpcion")}
+                onRevert={() => revertField("claseIIOpcion")}
                 options={[
                   { label: "A ser utilizados en respuestas a emergencia o para escape solamente", value: "EMERGENCIA" },
                   { label: "Solo PAPR", value: "PAPR" },

@@ -1,6 +1,6 @@
 import { InputTextOneLine, RadioTable, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBoolean, handleChange }) {
+export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBoolean, handleChange, disabled = false, isFieldEdited = () => false, revertField = () => { } }) {
   return (
     <div className="space-y-3">
       <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3">
@@ -18,6 +18,9 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={handleRadioButtonBoolean}
           />
         </SectionFieldset>
@@ -36,6 +39,9 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={handleRadioButtonBoolean}
           />
         </SectionFieldset>
@@ -62,6 +68,9 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={(e, value) => {
               if (e.target.name === "probPulmonOtros" && !value) {
                 setForm(prev => ({ ...prev, probPulmonOtrosDescripcion: "" }));
@@ -75,8 +84,10 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
             label="Especifique"
             name="probPulmonOtrosDescripcion"
             value={form?.probPulmonOtrosDescripcion}
-            disabled={!form?.probPulmonOtros}
+            disabled={disabled || !form?.probPulmonOtros}
             onChange={handleChange}
+            edited={isFieldEdited("probPulmonOtrosDescripcion")}
+            onRevert={() => revertField("probPulmonOtrosDescripcion")}
           />
         </SectionFieldset>
 
@@ -105,6 +116,9 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={(e, value) => {
               if (e.target.name === "sintOtros" && !value) {
                 setForm(prev => ({ ...prev, sintOtrosDescripcion: "" }));
@@ -118,8 +132,10 @@ export default function PersonalEmpleadoI({ form, setForm, handleRadioButtonBool
             label="Especifique"
             name="sintOtrosDescripcion"
             value={form?.sintOtrosDescripcion}
-            disabled={!form?.sintOtros}
+            disabled={disabled || !form?.sintOtros}
             onChange={handleChange}
+            edited={isFieldEdited("sintOtrosDescripcion")}
+            onRevert={() => revertField("sintOtrosDescripcion")}
           />
         </SectionFieldset>
       </div>

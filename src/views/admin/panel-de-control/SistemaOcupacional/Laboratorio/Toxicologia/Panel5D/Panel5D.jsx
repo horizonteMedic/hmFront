@@ -157,7 +157,7 @@ export default function Panel5D() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -206,14 +206,14 @@ export default function Panel5D() {
       {/* Resultados */}
       <SectionFieldset legend="Resultados">
         <div className="grid gap-x-4 gap-y-3">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Cocaína (COC)'
               name="valueC"
               value={form.valueC}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueC")}
               onRevert={() => revertField("valueC")}
@@ -229,14 +229,14 @@ export default function Panel5D() {
               disabled={camposDeshabilitados}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Marihuana (THC)'
               name="valueM"
               value={form.valueM}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueM")}
               onRevert={() => revertField("valueM")}
@@ -252,14 +252,14 @@ export default function Panel5D() {
               disabled={camposDeshabilitados}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Anfetamina en Orina'
               name="valueAn"
               value={form.valueAn}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueAn")}
               onRevert={() => revertField("valueAn")}
@@ -275,14 +275,14 @@ export default function Panel5D() {
               disabled={camposDeshabilitados}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Metanfetaminas'
               name="valueMet"
               value={form.valueMet}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueMet")}
               onRevert={() => revertField("valueMet")}
@@ -298,14 +298,14 @@ export default function Panel5D() {
               disabled={camposDeshabilitados}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <InputTextOneLine
               label='Benzodiazepina'
               name="valueBen"
               value={form.valueBen}
               onChange={handleChange}
               labelWidth='120px'
-              className='w-full max-w-[85%]'
+              className='w-full sm:max-w-[85%]'
               disabled={camposDeshabilitados}
               edited={isFieldEdited("valueBen")}
               onRevert={() => revertField("valueBen")}

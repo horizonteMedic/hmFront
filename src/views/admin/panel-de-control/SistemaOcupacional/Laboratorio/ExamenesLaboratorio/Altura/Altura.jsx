@@ -4,7 +4,7 @@ import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-ic
 
 const Altura = ({ token, selectedSede }) => {
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-4 sm:p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">TEST ALTURA</h2>
       <form className="space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -27,7 +27,7 @@ const Altura = ({ token, selectedSede }) => {
             <input className="border rounded px-2 py-1 w-24 bg-gray-100" />
           </div>
         </div>
-        <div className="flex gap-8 mt-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 mt-6">
           <div className="flex flex-col gap-2 flex-1">
             <span className="font-bold">PRUEBAS</span>
             <label className="flex items-center gap-2">Grupo Sanguíneo :</label>

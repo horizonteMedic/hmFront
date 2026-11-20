@@ -115,7 +115,8 @@ function evaluarObservacionesObtener(res, set) {
     const vcercacoi = res.oiccOftalmologia_oicc || "";
     const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (textoEnfermedadOftalmo !== "NINGUNA") {
+    // Sin texto (null o vacío) o "NINGUNA": no hay problema oftalmológico
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
         const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "MIOPÍA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
@@ -183,7 +184,8 @@ function evaluarObservacionesEditar(res, set) {
     const vcercacoi = res.oiccOftalmologia_oicc || "";
     const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (textoEnfermedadOftalmo !== "NINGUNA") {
+    // Sin texto (null o vacío) o "NINGUNA": no hay problema oftalmológico
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
         const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "MIOPÍA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;

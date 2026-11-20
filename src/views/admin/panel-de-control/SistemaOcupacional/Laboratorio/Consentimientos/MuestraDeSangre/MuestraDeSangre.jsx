@@ -112,7 +112,7 @@ const MuestraDeSangre = () => {
   });
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full lg:max-w-[85vw] xl:max-w-[70vw] mx-auto bg-white rounded shadow p-3 sm:p-6">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -121,7 +121,7 @@ const MuestraDeSangre = () => {
         onLimpiar={handleClear}
       />
 
-      <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE</h2>
+      <h2 className="text-lg sm:text-2xl font-bold text-center mb-4 sm:mb-6">CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE</h2>
 
       <form className="space-y-6">
         <SectionFieldset legend="Datos del Paciente" className="space-y-4">
@@ -163,7 +163,7 @@ const MuestraDeSangre = () => {
               name="nombres"
               value={form.nombres || ''}
               readOnly
-              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
+              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-full sm:max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
               style={{ width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
             />
             <span>de,</span>
@@ -261,7 +261,7 @@ const MuestraDeSangre = () => {
             </button>
           </div>
 
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center md:items-end">
             <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <input

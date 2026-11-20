@@ -1,27 +1,94 @@
 import { useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import Swal from "sweetalert2";
 import ExamenFisicoI2021 from "./ExamenFisicoI2021";
 import ExamenFisicoII2021 from "./ExamenFisicoII2021";
 import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
-import { useSessionData } from "../../../../../hooks/useSessionData";
-import { useForm } from "../../../../../hooks/useForm";
 import {
   PrintHojaR,
   SubmitDataService,
+  UpdateDataService,
   TABLA_EVALUACION_2021,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica2021";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 
 const tabla = TABLA_EVALUACION_2021;
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
+
+// Campos de cada examen físico: sus inputs son crudos (radios/inputs con `name`), así que el resaltado y la
+// reversión se hacen por parte (botón en el título de la sección) y el bloqueo con un <fieldset disabled>.
+const PARTE_1 = [
+  "flexFuerzaAbdomen", "cadera", "muslo", "abdomenLateralI", "totalAptitudEspalda", "observacionesAptitudEspalda",
+  "abduccionHombro180", "dolorAbduccionHombro180", "abduccionHombro60", "dolorAbduccionHombro60",
+  "rotacionExterna90", "dolorRotacionExterna90", "rotacionExternaHombroInterna", "dolorRotacionExternaHombroInterna",
+  "totalRangosArticulares", "observacionesRangosArticulares",
+];
+const PARTE_2 = [
+  "desviacionEje", "desviacionEjeDescripcion", "testAdams", "testAdamsDescripcion", "dandy", "dandyDescripcion",
+  "lasegue", "lasegueDescripcion", "contracturaMuscular", "contracturaMuscularDescripcion",
+  "cicatrizPostOperatoria", "cicatrizPostOperatoriaDescripcion",
+  "testJobeDerecha", "testJobeIzquierda", "testPatteDerecha", "testPatteIzquierda", "testGerberDerecha", "testGerberIzquierda",
+  "palmUpTestDerecha", "palmUpTestIzquierda", "epicondilitisDerecha", "epicondilitisIzquierda",
+  "epitrocleitisDerecha", "epitrocleitisIzquierda", "phalenDerecha", "phalenIzquierda",
+  "phalenInvertidoDerecha", "phalenInvertidoIzquierda",
+];
+const PARTE_3 = [
+  "tinnelDerecha", "tinnelIzquierda", "finkelsTeinDerecha", "finkelsTeinIzquierda",
+  "abduccionCaderaDerecha", "abduccionCaderaIzquierda", "abduccionRodillaDerecha", "abduccionRodillaIzquierda",
+  "aduccionCaderaDerecha", "aduccionCaderaIzquierda", "aduccionRodillaDerecha", "aduccionRodillaIzquierda",
+  "flexionCaderaDerecha", "flexionCaderaIzquierda", "flexionRodillaDerecha", "flexionRodillaIzquierda",
+  "extensionCaderaDerecha", "extensionCaderaIzquierda", "extensionRodillaDerecha", "extensionRodillaIzquierda",
+  "rotacionExternaCaderaDerecha", "rotacionExternaCaderaIzquierda", "rotacionExternaRodillaDerecha", "rotacionExternaRodillaIzquierda",
+  "rotacionInternaCaderaDerecha", "rotacionInternaCaderaIzquierda", "rotacionInternaRodillaDerecha", "rotacionInternaRodillaIzquierda",
+  "irradiacionCaderaDerecha", "irradiacionCaderaIzquierda", "irradiacionRodillaDerecha", "irradiacionRodillaIzquierda",
+  "altMasaMuscularCaderaDerecha", "altMasaMuscularCaderaIzquierda", "altMasaMuscularRodillaDerecha", "altMasaMuscularRodillaIzquierda",
+];
+const PARTE_4 = [
+  "abduccionTobilloDerecho", "abduccionTobilloIzquierdo", "aduccionTobilloDerecho", "aduccionTobilloIzquierdo",
+  "flexionTobilloDerecho", "flexionTobilloIzquierdo", "extensionTobilloDerecho", "extensionTobilloIzquierdo",
+  "rotacionExternaTobilloDerecho", "rotacionExternaTobilloIzquierdo", "rotacionInternaTobilloDerecho", "rotacionInternaTobilloIzquierdo",
+  "irradiacionTobilloDerecho", "irradiacionTobilloIzquierdo", "altMasaMuscularTobilloDerecho", "altMasaMuscularTobilloIzquierdo",
+];
+
+// Campos que NO edita el usuario (identidad, datos del paciente, control de UI y auditoría): el resto del
+// formulario se resalta/revierte al editar un registro existente.
+const CAMPOS_NO_EDITABLES = [
+  "norden",
+  "codEvaluacion",
+  "nombres",
+  "dni",
+  "edad",
+  "sexo",
+  "fechaNacimiento",
+  "lugarNacimiento",
+  "estadoCivil",
+  "nivelEstudios",
+  "empresa",
+  "contrata",
+  "ocupacion",
+  "cargoDesempenar",
+  "nombreMedico",
+  "tieneRegistro",
+  "userRegistro",
+  "fechaRegistro",
+  "usuarioActualizacion",
+  "fechaActualizacion",
+];
 
 function fixEncodingModern(str) {
   const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
@@ -34,16 +101,23 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
   const embebido = Boolean(nOrdenInicial);
   const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
+
   const initialFormState = {
     norden: embebido ? String(nOrdenInicial) : "",
     codEvaluacion: null,
     nombres: "",
     dni: "",
-    areaTrabajo: "",
     edad: "",
     sexo: "",
     fecha: today,
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
     empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
     tiempoServicio: "AÑOS",
 
     // PARTE 1: APTITUD ESPALDA
@@ -168,7 +242,17 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
+
   const {
     form,
     setForm,
@@ -178,21 +262,52 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     handleRadioButton,
     handleClear,
     handleClearnotO,
-  } = useForm(initialFormState);
+    handlePrintDefault,
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "evaluacionMusculoEsqueletica2021" });
+
+  const camposEditables = Object.keys(initialFormState).filter((k) => !CAMPOS_NO_EDITABLES.includes(k));
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+  // el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+  // Botón de revertir en el título de un examen cuando alguno de sus campos cambió.
+  const revertirParte = (campos) =>
+    campos.some(isFieldEdited) ? (
+      <RevertButton onClick={() => revertFields(campos)} title="Revertir cambios de esta parte" />
+    ) : null;
+
+  // Props comunes de un campo de texto.
+  const campo = (name, onChange = handleChange) => ({
+    name,
+    value: form[name],
+    onChange,
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
 
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
   const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
+  const dniUsuario = userCompleto?.datos?.dni_user;
+
   const handleSave = () => {
-    SubmitDataService(
-      form,
-      token,
-      userlogued,
-      alRegistrar,
-      tabla,
-      datosFooter,
-      userCompleto?.datos?.dni_user
-    );
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter, dniUsuario);
+  };
+
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter, dniUsuario);
   };
 
   // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
@@ -201,299 +316,175 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
       VerifyTR(String(nOrdenInicial), tabla, token, setForm, selectedSede, { silencioso: true });
     }
   }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
+
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
 
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  // ===== Impresión =====
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const nordenDisabled = embebido || hayRegistroCargado;
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
+  // Props comunes de los exámenes físicos
+  const propsExamen = { form, handleRadioButton, handleChange, handleChangeNumber };
+  const examenClass = "m-0 p-0 border-0 min-w-0 text-[11px]";
+
   return (
-    <div className="w-full text-[11px]">
-      {/* Header Form */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-blue-900 mb-4 border-b-2 pb-2">
-          Datos del Paciente
-        </h2>
-        <form className="p-4 rounded w-full border">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
-            {/* Primera fila: n° orden, nombres (largo), edad */}
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">N° Orden :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="norden"
-                value={form.norden || ""}
-                onChange={handleChangeNumber}
-                onKeyDown={handleSearch}
-                disabled={embebido}
-              />
-            </div>
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Nombres :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="nombres"
-                value={form.nombres || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Edad :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="edad"
-                value={form.edad ?? ""}
-                disabled
-              />
-            </div>
+    <div className="w-full space-y-3">
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
+      />
 
-            {/* Segunda fila: dni, fecha, sexo, t. servicio */}
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">DNI :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="dni"
-                value={form.dni ?? ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Fecha :</label>
-              <input
-                type="date"
-                className="border rounded px-2 py-1 w-full"
-                name="fecha"
-                value={form.fecha || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Sexo :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="sexo"
-                value={form.sexo || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">
-                T. Servicio :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="tiempoServicio"
-                value={form.tiempoServicio || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Tercera fila: área trabajo (largo), empresa (largo) */}
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px] max-w-[65px]">
-                Área Trabajo :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="areaTrabajo"
-                value={form.areaTrabajo || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Empresa :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="empresa"
-                value={form.empresa || ""}
-                disabled
-              />
-            </div>
-          </div>
-        </form>
-      </div>
-
-      {/* PARTE 1: EXAMEN FÍSICO I */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 1: EXAMEN FÍSICO I
-        </h2>
-        <ExamenFisicoI2021
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
-          handleChangeNumber={handleChangeNumber}
-        />
-      </div>
-
-      {/* PARTE 2: EXAMEN FÍSICO II */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 2: EXAMEN FÍSICO II
-        </h2>
-        <ExamenFisicoII2021
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
-          handleChangeNumber={handleChangeNumber}
-        />
-      </div>
-
-      {/* PARTE 3: EXAMEN FÍSICO III */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 3: EXAMEN FÍSICO III
-        </h2>
-        <ExamenFisicoIII2021
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
-          handleChangeNumber={handleChangeNumber}
-        />
-      </div>
-
-      {/* PARTE 4: EXAMEN FÍSICO IV */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 4: EXAMEN FÍSICO IV
-        </h2>
-        <ExamenFisicoIV2021
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
-          handleChangeNumber={handleChangeNumber}
-        />
-      </div>
-
-      {/* CONCLUSIONES Y COMENTARIOS */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          CONCLUSIONES Y COMENTARIOS
-        </h2>
-        <div className="border rounded p-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="mb-3">
-                <label className="font-semibold block mb-1">CIE 10:</label>
-                <input
-                  className="border rounded px-3 py-1 w-full capitalize"
-                  name="cie10"
-                  value={form.cie10 || ""}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </div>
-          <div className="mb-3">
-            <label className="font-semibold block mb-1">Conclusiones:</label>
-            <textarea
-              className="border rounded px-3 py-1 w-full resize-none"
-              name="conclusiones"
-              rows={3}
-              value={form.conclusiones}
-              onChange={handleChange}
-            />
-            <label className="flex items-center text-[11px] font-semibold gap-2">
-              <input
-                type="checkbox"
-                className="text-[11px]"
-                checked={form.conclusiones == "NORMAL"}
-                onChange={(e) => {
-                  setForm((prev) => ({
-                    ...prev,
-                    conclusiones: e.target.checked ? "NORMAL" : "",
-                  }));
-                }}
-              />
-              Normal
-            </label>
-          </div>
-          <div>
-            <label className="font-semibold block mb-1">
-              Recomendaciones - Restricciones:
-            </label>
-            <textarea
-              className="border rounded px-3 py-2 w-full h-24 resize-none"
-              name="recomendaciones"
-              rows={3}
-              value={form.recomendaciones}
-              onChange={handleChange}
-            />
-          </div>
+      {/* ===== SECCIÓN: DATOS DEL PACIENTE ===== */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onKeyUp={handleSearch}
+            onChange={handleChangeNumber}
+            disabled={nordenDisabled}
+            labelWidth="100px"
+            className="w-full"
+          />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
-      </div>
-      <div className="mb-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-6">
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Agregar/Actualizar
-            </button>
-            {!embebido && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            )}
-          </div>
+        <InputTextOneLine
+          label="Fecha"
+          type="date"
+          labelWidth="100px"
+          {...campo("fecha")}
+        />
+        <InputTextOneLine
+          label="T. Servicio"
+          labelWidth="100px"
+          {...campo("tiempoServicio")}
+        />
+      </SectionFieldset>
 
-          {!embebido && (
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
-          )}
+      <DatosPersonalesLaborales form={form} />
+
+      {/* ===== SECCIÓN: EXÁMENES FÍSICOS =====
+          El bloqueo de edición va en un <fieldset disabled> por examen (deshabilita todos sus radios/inputs). */}
+      <SectionFieldset legend="Parte 1: Examen Físico I" actions={revertirParte(PARTE_1)}>
+        <fieldset disabled={camposDeshabilitados} className={examenClass}>
+          <ExamenFisicoI2021 {...propsExamen} />
+        </fieldset>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Parte 2: Examen Físico II" actions={revertirParte(PARTE_2)}>
+        <fieldset disabled={camposDeshabilitados} className={examenClass}>
+          <ExamenFisicoII2021 {...propsExamen} />
+        </fieldset>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Parte 3: Examen Físico III" actions={revertirParte(PARTE_3)}>
+        <fieldset disabled={camposDeshabilitados} className={examenClass}>
+          <ExamenFisicoIII2021 {...propsExamen} />
+        </fieldset>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Parte 4: Examen Físico IV" actions={revertirParte(PARTE_4)}>
+        <fieldset disabled={camposDeshabilitados} className={examenClass}>
+          <ExamenFisicoIV2021 {...propsExamen} />
+        </fieldset>
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: CONCLUSIONES Y COMENTARIOS ===== */}
+      <SectionFieldset legend="Conclusiones y Comentarios" className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputTextOneLine label="CIE 10" labelWidth="80px" inputClassName="capitalize" {...campo("cie10")} />
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
+          />
         </div>
-      </div>
+        <div className="space-y-2">
+          <InputTextArea label="Conclusiones" rows={3} {...campo("conclusiones")} />
+          <InputCheckbox
+            label="Normal"
+            name="conclusionesNormal"
+            checked={form.conclusiones == "NORMAL"}
+            disabled={camposDeshabilitados}
+            onChange={(e) => {
+              const marcado = e.target.checked;
+              setForm((prev) => ({
+                ...prev,
+                conclusiones: marcado ? "NORMAL" : "",
+              }));
+            }}
+          />
+        </div>
+        <InputTextArea label="Recomendaciones - Restricciones" rows={3} {...campo("recomendaciones")} />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
+      />
     </div>
   );
 };

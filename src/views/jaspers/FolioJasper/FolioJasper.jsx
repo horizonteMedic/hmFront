@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { getFetch, getFetchPdf } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
+import { datosDeclaracionJuradaParaReporte } from "../../utils/declaracionJuradaSaludUtils";
 import { PDFDocument } from "pdf-lib";
 // import * as pdfjsLib from "pdfjs-dist";
 // import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
@@ -165,6 +166,10 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
                 if (!data) return null;
                 data = aplicarFechaPersonalizada(data, examen.tabla, fechaPersonalizada, diasVencimientoPersonalizado);
+                // Antecedentes Patológicos de MARSA: el reporte lleva una página más con la Declaración Jurada de Salud
+                if (examen.tabla === "antecedentes_patologicos") {
+                    data = { ...data, ...(await datosDeclaracionJuradaParaReporte(data, nro, token, signal)) };
+                }
                 return { ...data, ...datosFooter };
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);

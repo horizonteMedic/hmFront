@@ -157,7 +157,7 @@ const Panel10D = () => {
   });
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full lg:max-w-[85vw] xl:max-w-[70vw] mx-auto bg-white rounded shadow p-3 sm:p-6">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -166,7 +166,7 @@ const Panel10D = () => {
         onLimpiar={handleClear}
       />
 
-      <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS<br />PANEL 10 D (AMP-BAR-BZO-COC-MET-MTP-PCP-THC-OPI-TCA)</h2>
+      <h2 className="text-lg sm:text-2xl font-bold text-center mb-4 sm:mb-6">CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS<br />PANEL 10 D (AMP-BAR-BZO-COC-MET-MTP-PCP-THC-OPI-TCA)</h2>
 
       <form className="space-y-6">
         <SectionFieldset legend="Datos del Paciente" className="space-y-4">
@@ -208,7 +208,7 @@ const Panel10D = () => {
               name="nombres"
               value={form.nombres || ''}
               readOnly
-              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
+              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-full sm:max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
               style={{ width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
             />
             <span>, de</span>
@@ -235,9 +235,9 @@ const Panel10D = () => {
 
         <SectionFieldset legend="ANTECEDENTES" className="space-y-4">
           {form.antecedentes.map(({ label, key, fecha, value }) => (
-            <div key={key} className="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <label className="text-base font-medium flex-1 whitespace-nowrap min-w-[300px]">{label}</label>
-              <div className="flex items-center gap-4">
+            <div key={key} className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <label className="text-base font-medium flex-1 min-w-0">{label}</label>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:w-[27rem] lg:shrink-0">
                 <InputsBooleanRadioGroup
                   name={`antecedente_${key}`}
                   value={value}
@@ -257,7 +257,7 @@ const Panel10D = () => {
                     onChange={e => handleFechaChange(key, e.target.value)}
                     disabled={camposDeshabilitados}
                     labelWidth="80px"
-                    className="w-48"
+                    className="w-full sm:w-72 max-w-full"
                   />
                 )}
               </div>
@@ -326,7 +326,7 @@ const Panel10D = () => {
             </button>
           </div>
 
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center md:items-end">
             <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <input

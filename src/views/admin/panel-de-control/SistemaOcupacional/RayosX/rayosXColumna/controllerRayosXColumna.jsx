@@ -3,16 +3,18 @@ import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
   handleImgtoPdfDefault,
-  handleSubidaMasiva,
   handleSubidaMasivaImagenesRXDinamico,
   handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
   ReadArchivosFormDefault,
-  SubmitDataServiceDefault,
-  VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import {
+  guardarRegistro,
+  actualizarRegistro,
+  verificarRegistro,
+} from "../../../../../utils/registroOcupacionalUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico";
@@ -44,12 +46,14 @@ export const GetInfoServicio = async (
       norden: res.norden ?? "",
       fechaExam: res.fechaExamen ?? "",
 
-      nombreExamen: res.tipoExamen ?? "",
+      // InformeRadiograficoReporteDTO trae `nombreExamen` y `fechaNac` (no `tipoExamen` ni
+      // `fechaNacimientoPaciente`): antes el tipo de examen y la fecha de nacimiento salían vacíos.
+      nombreExamen: res.nombreExamen ?? res.tipoExamen ?? "",
       dni: res.dni ?? "",
 
       nombres: res.nombres ?? "",
       fechaNacimiento: formatearFechaCorta(
-        res.fechaNacimientoPaciente ?? ""
+        res.fechaNac ?? res.fechaNacimientoPaciente ?? ""
       ),
       lugarNacimiento: res.lugarNacimientoPaciente ?? "",
       edad: res.edad ?? "",
@@ -72,40 +76,61 @@ export const GetInfoServicio = async (
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
       SubirDoc: true,
-      digitalizacion: res.digitalizacion
+      digitalizacion: res.digitalizacion,
+
+      // Auditoría. InformeRadiograficoReporteDTO solo devuelve la fecha de registro (`fechaRegistro`, sin hora):
+      // no trae quién registró ni datos de edición (la sección los muestra como "—"). Si el backend los agrega,
+      // se leen solos.
+      userRegistro: res.userRegistro ?? res.usuarioRegistro ?? "",
+      fechaRegistro: res.fechaRegistro ?? "",
+      usuarioActualizacion: res.usuarioActualizacion ?? "",
+      fechaActualizacion: res.fechaActualizacion ?? "",
+      tieneRegistro: true,
     }));
   }
 };
 
-export const SubmitDataService = async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos incompletos", "error");
-    return;
-  }
+// ===== Mapeo: Body =====
+// RadiografiaDTO usa `userRegistro` para el usuario que registra. Declara `fechaRegistro` como FECHA (sin hora), por
+// eso no se sella auditoría (sellarAuditoria manda fecha-hora): el backend sigue manejándola como hasta ahora. El
+// reporte (GET) no devuelve el creador: se manda el usuario en sesión, como siempre.
+const construirBody = (form, user) => ({
+  norden: form.norden,
+  fechaExamen: form.fechaExam,
+  tipoRadio: form.tipoRadiografia,
+  informacionGeneral: form.informe,
+  conclusiones: form.conclusion,
+  conclusionCie10: form.conclusionCie10,
+  userRegistro: user,
 
-  const body = {
-    norden: form.norden,
-    fechaExamen: form.fechaExam,
-    tipoRadio: form.tipoRadiografia,
-    informacionGeneral: form.informe,
-    conclusiones: form.conclusion,
-    conclusionCie10: form.conclusionCie10,
-    userRegistro: user,
+  usuarioFirma: form.user_medicoFirma,
+});
 
-    usuarioFirma: form.user_medicoFirma,
-  };
-
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  guardarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
   });
-};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+  actualizarRegistro({
+    form,
+    token,
+    user,
+    tabla,
+    limpiar,
+    registrarUrl,
+    buildBody: construirBody,
+    onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+  });
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   const jasperModules = import.meta.glob(
@@ -123,47 +148,56 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+// verificarRegistro valida la sede del N° Orden y decide nuevo / existente.
+export const VerifyTR = async (nro, tabla, token, set, sede) =>
+  verificarRegistro({
     nro,
     tabla,
     token,
-    set,
     sede,
-    () => {
-      // NO tiene registro
-      GetInfoPac(nro, set, token, sede);
-    },
-    () => {
-      // SÍ tiene registro
+    // NO tiene registro
+    onNuevo: () => GetInfoPac(nro, set, token, sede),
+    // SÍ tiene registro
+    onExistente: () =>
       GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con un informe radiográfico.",
           "warning"
         );
-      });
-    }
-  );
-};
+      }),
+  });
 
 const GetInfoPac = async (nro, set, token, sede) => {
   const res = await GetInfoPacDefault(nro, token, sede);
 
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      nombres: res.nombresApellidos ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad ?? "",
-      ocupacion: res.areaO ?? "",
-      nombreExamen: res.nomExam ?? "",
-      cargoDesempenar: res.cargo ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-    }));
+  // Norden inexistente / paciente no encontrado / error del backend.
+  if (!res || res.error || !res.nombresApellidos) {
+    Swal.fire({
+      icon: "warning",
+      title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+      html: `No se encontró ningún registro con el N° Orden ${nro}.`,
+    });
+    return;
   }
+
+  set((prev) => ({
+    ...prev,
+    ...res,
+    nombres: res.nombresApellidos ?? "",
+    fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+    edad: res.edad ?? "",
+    ocupacion: res.areaO ?? "",
+    nombreExamen: res.nomExam ?? "",
+    cargoDesempenar: res.cargo ?? "",
+    lugarNacimiento: res.lugarNacimiento ?? "",
+    sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
+    tieneRegistro: false,
+  }));
 };
 
 export const Loading = (mensaje) => {

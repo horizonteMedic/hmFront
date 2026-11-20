@@ -78,7 +78,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     const imprimirTicket = async (visitaId) => {
         try {
             const datos = await getVisitaById(visitaId, token);
-            await Ticket({ datos, titulo: campania.nombre, logoUrl: campania.fotoUrl });
+            await Ticket({ datos });
         } catch (error) {
             console.error(error);
             Swal.fire("Error", "No se pudo generar el ticket de la visita", "error");
@@ -100,6 +100,7 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     // ── Registro ──────────────────────────────────────────────────────────────
     // Crea la visita del paciente en la campaña activa con todas sus especialidades activas.
     // Devuelve true si se creó. Se usa desde el modal y desde el alta de paciente (auto-registro).
+    // Al terminar se pregunta si se imprime el ticket.
     const registrarVisita = async (paciente) => {
         if (!campania) {
             avisarCampaniaRequerida(paciente, onIrACampanias);
@@ -122,9 +123,16 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
                 token
             );
             recargar();
-            Swal.fire("Éxito", `Visita N° ${visita.norden} registrada en "${campania.nombre}"`, "success").then(() =>
-                imprimirTicket(visita.id)
-            );
+            Swal.fire({
+                icon: "success",
+                title: `Visita N° ${visita.norden} registrada`,
+                text: `Campaña "${campania.nombre}". ¿Deseas imprimir el ticket?`,
+                showCancelButton: true,
+                confirmButtonText: "Sí, imprimir",
+                cancelButtonText: "No",
+            }).then(({ isConfirmed }) => {
+                if (isConfirmed) imprimirTicket(visita.id);
+            });
             return true;
         } catch (error) {
             console.error(error);
@@ -140,7 +148,12 @@ export default function RegistroVisita({ pacienteActivo, onAutoRegistrado, onVis
     };
 
     // Paciente recién registrado: se le crea la visita en cuanto se conocen las especialidades de la campaña
-    useRegistroAutomatico(pacienteActivo, !campania || !especialidades.cargando, registrarVisita, onAutoRegistrado);
+    useRegistroAutomatico(
+        pacienteActivo,
+        !campania || !especialidades.cargando,
+        registrarVisita,
+        onAutoRegistrado
+    );
 
     if (!campania) {
         return (

@@ -148,7 +148,7 @@ export default function Gonadotropina() {
   });
 
   return (
-    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+    <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
       <AccionesRegistroHeader
         tieneRegistro={form.tieneRegistro}
         hayRegistroCargado={hayRegistroCargado}
@@ -193,7 +193,7 @@ export default function Gonadotropina() {
 
       <DatosPersonalesLaborales form={form} />
 
-      <SectionFieldset legend="Resultado" className="flex gap-4">
+      <SectionFieldset legend="Resultado" className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <InputTextOneLine
           label='Resultado'
           name="resultado"

@@ -5,6 +5,8 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSignCompressed } from "../../utils/helpers.js";
 import { dnicompletarConCeros } from "../../utils/functionUtils.js";
+import { esEmpresaMarsa } from "../../utils/declaracionJuradaSaludUtils.js";
+import DeclaracionJuradaSalud_MARSA from "../DeclaracionJuradaSalud/DeclaracionJuradaSalud_MARSA.jsx";
 
 export default async function ficha_antecedente_patologico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -1642,6 +1644,27 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
+
+  // === PÁGINA ADICIONAL MARSA: Declaración Jurada de Salud (módulo independiente) ===
+  // Solo si la empresa es MARSA y el reporte trae la declaración (la piden el botón Imprimir y Folio).
+  if (esEmpresaMarsa(datosFinales.empresa) && data.declaracionJuradaSalud) {
+    const declaracion = data.declaracionJuradaSalud;
+    await DeclaracionJuradaSalud_MARSA(
+      {
+        ...declaracion,
+        // Datos de la cabecera que el endpoint de la declaración no trae
+        numeroFicha: datosFinales.numeroFicha,
+        sede: datosFinales.sede,
+        fechaExamen: datosFinales.fechaExamen,
+        codigoColor: datosFinales.codigoColor,
+        textoColor: datosFinales.textoColor,
+        // Firma y huella son del trabajador: si la declaración no las trae se usan las del reporte
+        digitalizacion: declaracion.digitalizacion?.length ? declaracion.digitalizacion : data.digitalizacion,
+      },
+      doc,
+      numeroPagina + 1
+    );
+  }
 
   // === Imprimir ===
   if (docExistente) {

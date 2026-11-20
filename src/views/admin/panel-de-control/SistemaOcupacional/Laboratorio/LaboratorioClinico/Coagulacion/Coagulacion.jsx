@@ -149,7 +149,7 @@ const Coagulacion = () => {
     });
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+        <div className="space-y-3 px-2 sm:px-4 max-w-full sm:max-w-[90%] xl:max-w-[80%] mx-auto">
             <AccionesRegistroHeader
                 tieneRegistro={form.tieneRegistro}
                 hayRegistroCargado={hayRegistroCargado}

@@ -2,18 +2,76 @@ import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    SubmitDataServiceDefault,
+    VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    imprimirReporteJasper,
+    validarSede,
+} from "../../../../utils/registroOcupacionalUtils";
 
+// ===== Configuración =====
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
 const registrarUrl =
     "/api/v01/ct/certificadoAptitudMedicoOcupacional/registrarActualizarCertificadoAptitudMedicoOcupacional";
 const today = getToday();
 
+// Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por
+// eso se declara aquí (en el controller) y no dentro del util de impresión.
+const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+const rutaReporte = "../../../../jaspers/CertificadoMedicoOcupacional/Aptitud_medico_resumen_Digitalizado.jsx";
+
+// ===== Mapeo Registro =====
+// El mismo endpoint (obtenerReporte) arma el certificado con los datos de otros exámenes (Ficha de
+// Aptitud, Oftalmología, Laboratorio, Triaje) exista o no un registro propio, por eso nuevo y existente
+// comparten el mapeo y solo cambia lo que se setea al final (auditoría + tieneRegistro).
+//
+// CertificadoMedicoOcupacionalReporteDTO devuelve la aptitud en minúsculas pegadas (`apto`, `noapto`...)
+// y la aptitud REAL del certificado sale de la Ficha de Aptitud (`esAptoAnexo`, `noAptoAnexo`...).
+const mapReporte = (res, prev) => ({
+    ...prev,
+    ...res,
+
+    // Datos personales / laborales (nombres de campo de DatosPersonalesLaborales)
+    nombres: [res.nombrePaciente, res.apellidoPaciente].filter(Boolean).join(" "),
+    dni: res.dniPaciente ?? "",
+    edad: res.edadPaciente ?? "",
+    sexo: res.sexoPaciente === "F" ? "Femenino" : "Masculino",
+    fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+    lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+    estadoCivil: res.estadoCivilPaciente ?? "",
+    nivelEstudios: res.nivelEstudioPaciente ?? "",
+    empresa: res.empresa ?? "",
+    contrata: res.contrata ?? "",
+    ocupacion: res.ocupacionPaciente ?? "",
+    cargoDesempenar: res.cargoPaciente ?? "",
+    nombreExamen: res.nombreExamen ?? "",
+
+    // Aptitud (solo lectura: viene de la Ficha de Aptitud)
+    apto: res.esAptoAnexo
+        ? "APTO"
+        : res.aptoConRestriccionAnexo
+            ? "APTOCONRESTRICCION"
+            : res.evaluadoAnexo
+                ? "EVALUADO"
+                : res.noAptoAnexo
+                    ? "NOAPTO"
+                    : res.conObservacionAnexo
+                        ? "OBSERVACION"
+                        : "",
+
+    fechaDesde: res.fechaDesde ? res.fechaDesde : today,
+    fechahasta: res.fechahasta ? res.fechahasta : today,
+    conclusiones: res.conclusiones ?? "",
+    enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
+});
+
+// ===== Mapeo Registro nuevo =====
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -28,30 +86,20 @@ export const GetInfoServicio = async (
         obtenerReporteUrl,
         onFinish
     );
-    console.log(res)
     if (res) {
-        console.log(res)
         set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dniPaciente,
-            edadPaciente: res.edadPaciente,
-            nombreExamen: res.nombreExamen,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargoPaciente: res.cargoPaciente,
-            ocupacionPaciente: res.ocupacionPaciente,
-            apto: res.esAptoAnexo ? "APTO" : res.aptoConRestriccionAnexo ? "APTOCONRESTRICCION" : res.evaluadoAnexo ? "EVALUADO" : res.noAptoAnexo ? "NOAPTO" : res.conObservacionAnexo ? "OBSERVACION" : "",
-            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
-            fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
-            enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
+            ...mapReporte(res, prev),
+            // Registro nuevo: sin auditoría real todavía (la sección muestra la creación en vivo).
+            userRegistro: "",
+            fechaRegistro: "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: false,
         }));
     }
 };
 
+// ===== Mapeo Edición =====
 export const GetInfoServicioEditar = async (
     nro,
     tabla,
@@ -67,79 +115,124 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
-        console.log(res)
         set((prev) => ({
-            ...prev,
-            ...res,
-            // Header
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            ...mapReporte(res, prev),
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: res.edadPaciente,
-            dniUser: res.dniUsuario,
-            apto: res.esAptoAnexo ? "APTO" : res.aptoConRestriccionAnexo ? "APTOCONRESTRICCION" : res.evaluadoAnexo ? "EVALUADO" : res.noAptoAnexo ? "NOAPTO" : res.conObservacionAnexo ? "OBSERVACION" : "",
-            enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
-
+            // Auditoría. El reporte solo devuelve quién registró (`usuarioregistro`, en minúsculas):
+            // no trae fechas de registro ni datos de edición.
+            userRegistro: res.usuarioregistro ?? "",
+            fechaRegistro: "",
+            usuarioActualizacion: "",
+            fechaActualizacion: "",
+            tieneRegistro: true,
         }));
     }
 };
 
+// ===== Mapeo: Body base =====
+// Campos propios del formulario (sin auditoría): el usuario que registra lo agrega sellarAuditoria.
+// La aptitud se reenvía tal como la cargó la Ficha de Aptitud ("Con observación" no tiene casilla en el DTO).
+const construirBase = (form) => ({
+    norden: form.norden,
+    dniPaciente: form.dni,
+    fecha: form.fechaDesde,
+    nombreMedico: "",
+    apto: form.apto === "APTO",
+    aptoConRestriccion: form.apto === "APTOCONRESTRICCION",
+    noApto: form.apto === "NOAPTO",
+    evaluado: form.apto === "EVALUADO",
+    horaSalida: getHoraActual(),
+    fechaHasta: form.fechahasta,
+    conclusiones: form.conclusiones,
+    usuarioFirma: form.user_medicoFirma,
+});
 
-export const SubmitDataService = async (
-    form,
-    token,
-    user,
-    limpiar,
-    tabla,
-    datosFooter
-) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
-    const body = {
-        "norden": form.norden,
-        "dniPaciente": form.dniPaciente,
-        "fecha": form.fechaDesde,
-        "nombreMedico": "",
-        "apto": form.apto === "APTO" ? true : false,
-        "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
-        "noApto": form.apto === "NOAPTO" ? true : false,
-        "evaluado": form.apto === "EVALUADO" ? true : false,
-        "horaSalida": getHoraActual(),
-        "fechaHasta": form.fechahasta,
-        "conclusiones": form.conclusiones,
-        usuarioFirma: form.user_medicoFirma,
-        "usuarioRegistro": user
-    };
-
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// Body completo (creación / actualización). CertificadoAptitudMedicoResumenDTO espera el usuario que registra
+// en `usuarioRegistro`; en la edición se reenvía el creador original (si el reporte no lo trajo, el usuario en sesión).
+const construirBody = (form, user, esActualizacion) =>
+    sellarAuditoria(construirBase(form), {
+        user,
+        esActualizacion,
+        userRegistro: form.userRegistro || user,
+        fechaRegistro: form.fechaRegistro,
+        campoUserRegistro: "usuarioRegistro",
     });
-};
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
-    });
-};
-
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
-    PrintHojaRDefault(
+// ===== Impresión =====
+export const PrintHojaR = (nro, token, tabla, datosFooter, sede) =>
+    imprimirReporteJasper({
         nro,
         token,
         tabla,
         datosFooter,
+        sede,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoMedicoOcupacional"
-    );
-};
+        rutaModulo: rutaReporte,
+    });
 
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
+
+// ===== Búsqueda / verificación por N° Orden =====
+// VerifyTRPerzonalizadoDefault (3 estados: nuevo / existente / necesita Ficha de Aptitud), anteponiendo la
+// validación de sede como el resto de formularios de la plantilla.
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRPerzonalizado(
+    if (!nro) {
+        await Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-keyboard"></i>Error',
+            html: "Debe Introducir un N° Orden válido",
+        });
+        return;
+    }
+
+    LoadingDefault("Validando datos");
+
+    if (sede) {
+        const { estado, descripcionSede } = await validarSede(nro, sede, token);
+        if (estado === "otraSede") {
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+                html: `El N° Orden ${nro} pertenece a la sede${descripcionSede ? `: ${descripcionSede}` : ""}.`,
+            });
+            return;
+        }
+        if (estado !== "ok") {
+            Swal.fire({
+                icon: "error",
+                title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+                html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+            });
+            return;
+        }
+    }
+
+    VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
         token,
@@ -152,54 +245,25 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de C. Medico Ocupacional",
-                    "warning"
-                );
+                Swal.fire({
+                    icon: "warning",
+                    title: '<i class="fa-solid fa-clipboard-check"></i>Alerta',
+                    html: "Este paciente ya cuenta con registros de C. Medico Ocupacional.",
+                });
             });
         },
         () => {
-            //Necesita Agudeza visual 
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Ficha de Aptitud 02 o 16.",
-                "warning"
-            );
+            //Necesita Ficha de Aptitud (Anexo 2 o 16)
+            Swal.fire({
+                icon: "warning",
+                title: '<i class="fa-solid fa-file-medical"></i>Alerta',
+                html: "El paciente necesita pasar por Ficha de Aptitud 02 o 16.",
+            });
         }
     );
 };
 
-export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
-    if (!nro) {
-        await Swal.fire(
-            "Error",
-            "Debe Introducir un Nro de Historia Clínica válido",
-            "error"
-        );
-        return;
-    }
-    Loading("Validando datos");
-    getFetch(
-        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-        token
-    ).then((res) => {
-        console.log(res)
-        if (res.id === 0) {
-            //No tiene registro previo 
-            noTieneRegistro();//datos paciente
-        } else if (res.id === 2) {
-            necesitaExamen();
-        } else {
-            tieneRegistro();//obtener data servicio
-        }
-    });
-};
-
-export const Loading = (mensaje) => {
-    LoadingDefault(mensaje);
-};
-
+// Plantillas de "Exámenes" (conclusiones) que se cargan al elegir una opción en el formulario.
 export const Valores = {
     Check1: `- LABORATORIO: Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
         - APTITUD

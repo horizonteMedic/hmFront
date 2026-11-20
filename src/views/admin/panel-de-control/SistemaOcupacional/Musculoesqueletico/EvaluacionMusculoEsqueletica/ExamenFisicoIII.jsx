@@ -1,8 +1,9 @@
-import React from "react";
+import { useCampoEdicion } from "../EdicionContext";
 
 const RadioGroup = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[80px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -33,13 +34,15 @@ const RadioGroup = ({ label, name, value, onChange }) => {
           M
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
 const RadioGroupSiNo = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[80px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -61,13 +64,15 @@ const RadioGroupSiNo = ({ label, name, value, onChange }) => {
           NO
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
 const RadioGroupNormal = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[80px]">{label}:</span>
       <div className="flex gap-4">
         <label className="flex items-center gap-1">
@@ -98,13 +103,15 @@ const RadioGroupNormal = ({ label, name, value, onChange }) => {
           Concav. Izquierda
         </label>
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
 const RadioGroupNumerico = ({ label, name, value, onChange }) => {
+  const { claseEditado, botonRevertir } = useCampoEdicion(name);
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${claseEditado}`}>
       <span className="font-semibold min-w-[80px]">{label}:</span>
       <div className="flex gap-4">
         {[1, 2, 3, 4, 5].map((numero) => (
@@ -119,11 +126,12 @@ const RadioGroupNumerico = ({ label, name, value, onChange }) => {
           </label>
         ))}
       </div>
+      {botonRevertir}
     </div>
   );
 };
 
-export default function ExamenFisicoIII({ form, handleRadioButton, handleChange }) {
+export default function ExamenFisicoIII({ form, handleRadioButton }) {
   return (
     <div className="space-y-6">
       {/* Grid de 3x3 para Examen Físico III */}

@@ -4,7 +4,7 @@ import {
     InputsBooleanRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function PruebasComplementarias({ form, handleChange, handleRadioButtonBoolean }) {
+export default function PruebasComplementarias({ form, handleChange, handleRadioButtonBoolean, disabled = false, isFieldEdited = () => false, revertField = () => { } }) {
     return (
         <div className="p-4 space-y-6">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -19,6 +19,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="hipoacusiaFrecuenciasConversacionales"
                             value={form?.hipoacusiaFrecuenciasConversacionales}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("hipoacusiaFrecuenciasConversacionales")}
+                            onRevert={() => revertField("hipoacusiaFrecuenciasConversacionales")}
                         />
                     </div>
 
@@ -30,6 +33,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="alteracionAgudezaVisual"
                             value={form?.alteracionAgudezaVisual}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("alteracionAgudezaVisual")}
+                            onRevert={() => revertField("alteracionAgudezaVisual")}
                         />
                     </div>
 
@@ -41,6 +47,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="noReconocimientoColores"
                             value={form?.noReconocimientoColores}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("noReconocimientoColores")}
+                            onRevert={() => revertField("noReconocimientoColores")}
                         />
                     </div>
 
@@ -52,6 +61,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="campimetriaAnormal"
                             value={form?.campimetriaAnormal}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("campimetriaAnormal")}
+                            onRevert={() => revertField("campimetriaAnormal")}
                         />
                     </div>
 
@@ -63,6 +75,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="pruebaVisionProfundidadAlterada"
                             value={form?.pruebaVisionProfundidadAlterada}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("pruebaVisionProfundidadAlterada")}
+                            onRevert={() => revertField("pruebaVisionProfundidadAlterada")}
                         />
                     </div>
 
@@ -74,6 +89,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="testSASAnormal"
                             value={form?.testSASAnormal}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("testSASAnormal")}
+                            onRevert={() => revertField("testSASAnormal")}
                         />
                     </div>
 
@@ -85,6 +103,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                             name="evaluacionPsicosensometricaAlterada"
                             value={form?.evaluacionPsicosensometricaAlterada}
                             onChange={handleRadioButtonBoolean}
+                            disabled={disabled}
+                            edited={isFieldEdited("evaluacionPsicosensometricaAlterada")}
+                            onRevert={() => revertField("evaluacionPsicosensometricaAlterada")}
                         />
                     </div>
 
@@ -98,6 +119,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                                 name="medicinasTomando"
                                 value={form?.medicinasTomando}
                                 onChange={handleChange}
+                                disabled={disabled}
+                                edited={isFieldEdited("medicinasTomando")}
+                                onRevert={() => revertField("medicinasTomando")}
                             />
                             <InputTextArea
                                 label="Otros"
@@ -105,6 +129,9 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
                                 name="otrosDatosRelevancia"
                                 value={form?.otrosDatosRelevancia}
                                 onChange={handleChange}
+                                disabled={disabled}
+                                edited={isFieldEdited("otrosDatosRelevancia")}
+                                onRevert={() => revertField("otrosDatosRelevancia")}
                             />
                         </div>
                     </div>

@@ -431,7 +431,7 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
 
 
   return (
-    <div className={embebido ? "space-y-3" : "max-w-[95%] xl:max-w-[90%] mx-auto space-y-3"}>
+    <div className={embebido ? "space-y-3" : "max-w-full sm:max-w-[95%] xl:max-w-[90%] mx-auto space-y-3"}>
       <div className="px-4">
         <AccionesRegistroHeader
           tieneRegistro={form.tieneRegistro}

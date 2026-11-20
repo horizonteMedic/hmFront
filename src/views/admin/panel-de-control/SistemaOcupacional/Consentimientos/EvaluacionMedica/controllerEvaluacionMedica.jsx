@@ -4,11 +4,18 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
+import {
+    guardarRegistro,
+    actualizarRegistro,
+    verificarRegistro,
+} from "../../../../../utils/registroOcupacionalUtils";
+import { auditoriaDesdeReporte, sellarConsentimientoAdmision } from "../consentimientosAdmisionUtils";
+
+// Este endpoint es compartido por varios consentimientos: `tipoReporte` identifica cuál es.
+const TIPO_REPORTE = "CONSENT_INFORMADO_MEDICA";
 
 const obtenerReporteUrl = "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision";
 const registrarUrl = "/api/v01/ct/consentimientos/registrarActualizarConsentimientosAdmision";
@@ -25,37 +32,57 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             dni: res.dniPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
             empresa: res.empresa ?? "",
+
+            // Auditoría (ver consentimientosAdmisionUtils)
+            ...auditoriaDesdeReporte(res),
         }));
     }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
-        return;
-    }
+// ===== Mapeo: Body base =====
+// Campos propios del consentimiento (sin auditoría).
+const construirBase = (form) => ({
+    norden: form.norden,
+    idConsentimiento: form.idConsentimiento,
 
-    const body = {
-        norden: form.norden,
-        idConsentimiento: form.idConsentimiento,
+    tipoReporte: TIPO_REPORTE,
+    nombreReporte: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA ",
 
-        tipoReporte: tabla,
-        nombreReporte: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA ",
+    antecedentesPatologicos: false,
+    detalleAntecedentes: null,
 
-        antecedentesPatologicos: false,
-        detalleAntecedentes: null,
+    fechaFirma: form.fecha,
+    horaReporte: getHoraActual(),
+});
 
-        fechaFirma: form.fecha,
-        horaReporte: getHoraActual(),
-        usuarioRegistro: user,
-        fechaRegistro: form.fecha,
-        usuarioActualiza: user,
-    };
+const construirBody = (form, user, esActualizacion) =>
+    sellarConsentimientoAdmision(construirBase(form), form, user, esActualizacion);
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+// ===== Guardar (registro nuevo) =====
+export const SubmitDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    guardarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
     });
-};
+
+// ===== Editar (registro existente) =====
+export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter) =>
+    actualizarRegistro({
+        form,
+        token,
+        user,
+        tabla,
+        limpiar,
+        registrarUrl,
+        buildBody: construirBody,
+        onPrint: () => PrintHojaR(form.norden, token, tabla, datosFooter),
+    });
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../../jaspers/ModuloConsentimientos/ConsentAdmisEvaluaMedica/*.jsx");
@@ -70,29 +97,23 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+// ===== Búsqueda / verificación por N° Orden (valida también la sede) =====
+export const VerifyTR = (nro, tabla, token, set, sede) =>
+    verificarRegistro({
         nro,
         tabla,
         token,
-        set,
         sede,
-        () => {
-            //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            //Tiene registro
+        onNuevo: () => GetInfoPac(nro, set, token, sede),
+        onExistente: () =>
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros del Consentimiento.",
                     "warning"
                 );
-            });
-        }
-    );
-};
+            }),
+    });
 
 const GetInfoPac = async (nro, set, token, sede) => {
     const res = await GetInfoPacDefault(nro, token, sede);

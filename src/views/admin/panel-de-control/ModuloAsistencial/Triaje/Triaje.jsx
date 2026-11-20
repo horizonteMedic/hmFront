@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import {
     InputTextArea,
-    InputCheckbox,
     InputTextOneLine,
 } from '../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../components/reusableComponents/SectionFieldset';
@@ -10,6 +9,7 @@ import AccionesRegistroHeader from '../../../../components/reusableComponents/Ac
 import BotonesForm from '../../../../components/templates/BotonesForm';
 import { useForm } from '../../../../hooks/useForm';
 import { useRegistroEditable } from '../../../../hooks/useRegistroEditable';
+import { useFormLaArena } from '../../../../hooks/useLaArena';
 import { useSessionData } from '../../../../hooks/useSessionData';
 import { getToday, getFechaHoraActual } from '../../../../utils/helpers';
 import { buildAuditoria } from '../../../../utils/auditoriaUtils';
@@ -69,8 +69,9 @@ export default function TriajeAsistencial() {
         ocupacional: true,
         asistencial: false,
 
-        // Cliente La Arena: lo define el ticket (esArena, se marca en Ticket Asistencial) y se carga al buscarlo.
-        // Cambia el criterio de validación de Sat. O2 (solo UI, no se envía al backend).
+        // Cliente La Arena: lo define la sede seleccionada (LARE, desde que se abre el formulario) o el ticket buscado
+        // (esArena, se carga al buscarlo); `form.esArena` ya viene resuelto con ambos (useFormLaArena). Cambia el
+        // criterio de validación de Sat. O2 (solo UI, no se envía al backend).
         esArena: false,
 
         // Ticket / identificación del paciente
@@ -129,7 +130,7 @@ export default function TriajeAsistencial() {
     };
 
     const {
-        form,
+        form: formBase,
         setForm,
         handleChange,
         handleChangeNumber,
@@ -137,6 +138,9 @@ export default function TriajeAsistencial() {
         handleClear,
         handleChangeSimple,
     } = useForm(initialFormState, { storageKey: 'triaje_asistencial' });
+
+    // Con la sede La Arena seleccionada el formulario nace como La Arena (sin esperar a buscar un ticket).
+    const form = useFormLaArena(formBase);
 
     const {
         edicionHabilitada,
@@ -307,8 +311,6 @@ export default function TriajeAsistencial() {
                     onRevert={() => revertField('fechaExamen')}
                     labelWidth="120px"
                 />
-                {/* Solo informativo: viene del ticket (esArena), no se edita aquí. */}
-                <InputCheckbox label="La Arena" name="esArena" checked={form.esArena} disabled className="font-semibold w-fit" />
             </SectionFieldset>
             <DatosPersonalesLaboralesAsistencial form={form} />
 

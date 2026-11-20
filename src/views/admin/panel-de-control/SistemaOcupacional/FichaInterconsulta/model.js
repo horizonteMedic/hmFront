@@ -40,7 +40,7 @@ export function SubirInterconsulta(datos,user,token) {
         
     }
 
-export function ReadArchivos(norden,nomenclatura,token) {
+export function ReadArchivos(norden,nomenclatura) {
 
     const options = {
         method: 'GET', 

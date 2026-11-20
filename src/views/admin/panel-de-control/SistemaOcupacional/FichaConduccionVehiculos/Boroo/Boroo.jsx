@@ -4,7 +4,26 @@ import {
     InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function Boroo({ form, handleChange, handleChangeSimple, handleRadioButton, handleCheckBoxChange }) {
+export default function Boroo({
+    form,
+    handleChange,
+    handleChangeSimple,
+    handleRadioButton,
+    handleCheckBoxChange,
+    disabled = false,
+    isFieldEdited = () => false,
+    revertField = () => { },
+}) {
+    // Props comunes de un campo de texto: bloqueo, resaltado de cambios y botón de revertir.
+    const campo = (name, onChange = handleChange) => ({
+        name,
+        value: form?.[name],
+        onChange,
+        disabled,
+        edited: isFieldEdited(name),
+        onRevert: () => revertField(name),
+    });
+
     return (
         <div className="p-4 space-y-6">
             {/* Medidas Antropométricas y Signos Vitales */}
@@ -14,40 +33,33 @@ export default function Boroo({ form, handleChange, handleChangeSimple, handleRa
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                     <InputTextOneLine
                         label="Número de Licencia"
-                        name="numeroDeLicencia"
-                        value={form?.numeroDeLicencia}
-                        onChange={handleChange}
+                        {...campo("numeroDeLicencia")}
                     />
                     <InputTextOneLine
                         label="Clase de Licencia"
-                        name="claseLicencia"
-                        value={form?.claseLicencia}
-                        onChange={handleChange}
+                        {...campo("claseLicencia")}
                     />
                     <InputTextOneLine
                         label="Categoría de Licencia"
-                        name="categoriaLicencia"
-                        value={form?.categoriaLicencia}
-                        onChange={handleChange}
+                        {...campo("categoriaLicencia")}
                     />
                     <InputTextOneLine
                         label="Fecha de Revalidación de Licencia"
-                        name="fechaRevalidacionLicencia"
                         type="date"
-                        value={form?.fechaRevalidacionLicencia}
-                        onChange={handleChangeSimple}
+                        {...campo("fechaRevalidacionLicencia", handleChangeSimple)}
                     />
                     <InputTextOneLine
                         label="Procedencia Licencia"
-                        name="procedenciaLicencia"
-                        value={form?.procedenciaLicencia}
-                        onChange={handleChange}
+                        {...campo("procedenciaLicencia")}
                     />
                     <InputsRadioGroup
                         label="Máquina"
                         name="maquina"
                         value={form.maquina}
                         onChange={handleRadioButton}
+                        disabled={disabled}
+                        edited={isFieldEdited("maquina")}
+                        onRevert={() => revertField("maquina")}
                         options={[
                             { label: "Liviano", value: "LIVIANO" },
                             { label: "Pesado", value: "PESADO" },
@@ -58,11 +70,10 @@ export default function Boroo({ form, handleChange, handleChangeSimple, handleRa
                         checked={form.usoEstrictoLentesCorrectores}
                         name="usoEstrictoLentesCorrectores"
                         onChange={handleCheckBoxChange}
+                        disabled={disabled}
                     />
                 </div>
             </div>
         </div >
     );
 }
-
-

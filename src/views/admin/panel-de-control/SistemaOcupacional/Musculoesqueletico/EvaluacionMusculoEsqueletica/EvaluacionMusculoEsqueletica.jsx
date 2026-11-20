@@ -1,28 +1,65 @@
 import { useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import Swal from "sweetalert2";
 import ExamenFisicoI from "./ExamenFisicoI";
 import ExamenFisicoII from "./ExamenFisicoII";
 import ExamenFisicoIII from "./ExamenFisicoIII";
 import {
   PrintHojaR,
   SubmitDataService,
+  UpdateDataService,
   TABLA_EVALUACION_NORMAL,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica";
+import { EdicionContext } from "../EdicionContext";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import CIE10 from "../../Anexo16/CIE10/CIE10";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 
 const tabla = TABLA_EVALUACION_NORMAL;
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
+
+const OPCIONES_SI_NO = [
+  { label: "SI", value: "SI" },
+  { label: "NO", value: "NO" },
+];
+
+// Campos que NO edita el usuario (identidad, datos del paciente, control de UI y auditoría): el resto del
+// formulario se resalta/revierte al editar un registro existente.
+const CAMPOS_NO_EDITABLES = [
+  "norden",
+  "codEvaluacion",
+  "nombres",
+  "dni",
+  "edad",
+  "sexo",
+  "fechaNacimiento",
+  "lugarNacimiento",
+  "estadoCivil",
+  "nivelEstudios",
+  "empresa",
+  "contrata",
+  "ocupacion",
+  "cargoDesempenar",
+  "nombreMedico",
+  "tieneRegistro",
+  "userRegistro",
+  "fechaRegistro",
+  "usuarioActualizacion",
+  "fechaActualizacion",
+];
 
 function fixEncodingModern(str) {
   const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
@@ -41,11 +78,17 @@ export default function EvaluacionMusculoEsqueletica({ nOrdenInicial, onGuardado
     codEvaluacion: "",
     nombres: "",
     dni: "",
-    areaTrabajo: "",
     edad: "",
     sexo: "",
     fecha: today,
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
     empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
     tiempoServicio: "AÑOS",
 
     // Síntomas
@@ -182,6 +225,15 @@ export default function EvaluacionMusculoEsqueletica({ nOrdenInicial, onGuardado
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -193,22 +245,58 @@ export default function EvaluacionMusculoEsqueletica({ nOrdenInicial, onGuardado
     handleRadioButton,
     handleClear,
     handleClearnotO,
-  } = useForm(initialFormState);
+    handlePrintDefault,
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "evaluacionMusculoEsqueletica" });
+
+  const camposEditables = Object.keys(initialFormState).filter((k) => !CAMPOS_NO_EDITABLES.includes(k));
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+  // el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+  // Props comunes de un grupo SI/NO: bloqueo, resaltado de cambios y botón de revertir.
+  const radioSiNo = (name, extra = {}) => ({
+    name,
+    value: form[name],
+    onChange: handleRadioButton,
+    options: OPCIONES_SI_NO,
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+    ...extra,
+  });
+
+  // Props comunes de un campo de texto.
+  const campo = (name, onChange = handleChange) => ({
+    name,
+    value: form[name],
+    onChange,
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
 
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
   const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
 
+  const dniUsuario = userCompleto?.datos?.dni_user;
+
   const handleSave = () => {
-    SubmitDataService(
-      form,
-      token,
-      userlogued,
-      alRegistrar,
-      tabla,
-      datosFooter,
-      userCompleto?.datos?.dni_user
-    );
-    // Swal.fire("Éxito", "Datos guardados correctamente", "success");
+    SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter, dniUsuario);
+  };
+
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter, dniUsuario);
   };
 
   // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
@@ -218,444 +306,205 @@ export default function EvaluacionMusculoEsqueletica({ nOrdenInicial, onGuardado
     }
   }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
 
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  // ===== Impresión =====
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
+
+  // Al pasar los síntomas a NO se limpia el detalle ("Cuáles").
+  const handleSintomas = (e, value) => {
+    setForm((f) => ({
+      ...f,
+      sintomas: value,
+      ...(value === "NO" ? { cualesSintomas: "" } : {}),
+    }));
+  };
+
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const nordenDisabled = embebido || hayRegistroCargado;
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
 
   // Incrustado el ancho útil es el del panel (no el de la ventana): bajo 1600 px las columnas Izquierdo/Derecho
   // anidadas de los exámenes físicos quedan muy angostas y desbordan, así que se apilan.
   return (
-    <div className={embebido ? "w-full text-[11px] max-[1599px]:[&_.grid_.grid]:grid-cols-1" : "w-full text-[11px]"}>
-      {/* Header Form */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-blue-900 mb-4 border-b-2 pb-2">
-          FILIACIÓN
-        </h2>
-        <form className="p-4 rounded w-full border">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
-            {/* Primera fila: n° orden, nombres (largo), edad */}
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">N° Orden :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="norden"
-                value={form.norden || ""}
-                onChange={handleChangeNumber}
-                onKeyDown={handleSearch}
-                disabled={embebido}
-              />
-            </div>
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Nombres :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="nombres"
-                value={form.nombres || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Edad :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="edad"
-                value={form.edad ?? ""}
-                disabled
-              />
-            </div>
+    <div className={embebido ? "w-full space-y-3 max-[1599px]:[&_.grid_.grid]:grid-cols-1" : "w-full space-y-3"}>
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
+      />
 
-            {/* Segunda fila: dni, fecha, sexo, t. servicio */}
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">DNI :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="dni"
-                value={form.dni ?? ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Fecha :</label>
-              <input
-                type="date"
-                className="border rounded px-2 py-1 w-full"
-                name="fecha"
-                value={form.fecha || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">Sexo :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="sexo"
-                value={form.sexo || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">
-                T. Servicio :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="tiempoServicio"
-                value={form.tiempoServicio || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Tercera fila: área trabajo (largo), empresa (largo) */}
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px] max-w-[65px]">
-                Área Trabajo :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="areaTrabajo"
-                value={form.areaTrabajo || ""}
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Empresa :</label>
-              <input
-                className="border rounded px-2 py-1 w-full "
-                name="empresa"
-                value={form.empresa || ""}
-                disabled
-              />
-            </div>
-          </div>
-        </form>
-      </div>
-
-      {/* Síntomas Section */}
-      <div className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Columna 1: Síntomas */}
-          <div className="border rounded p-4 bg-blue-50">
-            <div className="text-blue-900 font-semibold text-center mb-3">
-              SÍNTOMAS
-            </div>
-            <div className="flex items-center gap-4 mb-3">
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="sintomas"
-                  checked={form.sintomas === "SI"}
-                  onChange={(e) => handleRadioButton(e, "SI")}
-                />
-                SI
-              </label>
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="sintomas"
-                  checked={form.sintomas === "NO"}
-                  onChange={(e) => {
-                    setForm({
-                      ...form,
-                      cualesSintomas: "",
-                    });
-                    handleRadioButton(e, "NO");
-                  }}
-                />
-                NO
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold text-[11px]">Cuales:</label>
-              <input
-                className="border rounded px-2 py-1 flex-1 text-[11px]"
-                name="cualesSintomas"
-                value={form.cualesSintomas}
-                onChange={handleChange}
-                disabled={form.sintomas == "NO"}
-              />
-            </div>
-          </div>
-
-          {/* Columna 2: Uso de Faja Lumbar */}
-          <div className="border rounded p-4 bg-blue-50">
-            <div className="text-blue-900 font-semibold text-center mb-3">
-              USO DE FAJA LUMBAR
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="usoFajaLumbar"
-                  checked={form.usoFajaLumbar === "SI"}
-                  onChange={(e) => handleRadioButton(e, "SI")}
-                />
-                SI
-              </label>
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="usoFajaLumbar"
-                  checked={form.usoFajaLumbar === "NO"}
-                  onChange={(e) => handleRadioButton(e, "NO")}
-                />
-                NO
-              </label>
-            </div>
-          </div>
-
-          {/* Columna 3: Técnica de Levantamiento */}
-          <div className="border rounded py-4 px-2 bg-blue-50">
-            <div className="text-blue-900 font-semibold text-center mb-3">
-              ADECUADA TÉCNICA DE LEVANTAMIENTO DE CARGA
-            </div>
-            <div className="flex items-center gap-4 px-3">
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="tecnicaLevantamiento"
-                  checked={form.tecnicaLevantamiento === "SI"}
-                  onChange={(e) => handleRadioButton(e, "SI")}
-                />
-                SI
-              </label>
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="tecnicaLevantamiento"
-                  checked={form.tecnicaLevantamiento === "NO"}
-                  onChange={(e) => handleRadioButton(e, "NO")}
-                />
-                NO
-              </label>
-            </div>
-          </div>
-
-          {/* Columna 4: Capacitación */}
-          <div className="border rounded p-4 bg-blue-50">
-            <div className="text-blue-900 font-semibold text-center mb-3">
-              CAPACITACIÓN EN LEVANTAMIENTO DE CARGA
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="capacitacionLevantamiento"
-                  checked={form.capacitacionLevantamiento === "SI"}
-                  onChange={(e) => handleRadioButton(e, "SI")}
-                />
-                SI
-              </label>
-              <label className="flex items-center gap-2 font-semibold">
-                <input
-                  type="radio"
-                  name="capacitacionLevantamiento"
-                  checked={form.capacitacionLevantamiento === "NO"}
-                  onChange={(e) => handleRadioButton(e, "NO")}
-                />
-                NO
-              </label>
-            </div>
-          </div>
+      {/* ===== SECCIÓN: FILIACIÓN ===== */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onKeyUp={handleSearch}
+            onChange={handleChangeNumber}
+            disabled={nordenDisabled}
+            labelWidth="100px"
+            className="w-full"
+          />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
-      </div>
-
-      {/* TÍTULO: EXAMEN FÍSICO I */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 1: EXAMEN FÍSICO I
-        </h2>
-        <ExamenFisicoI
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
+        <InputTextOneLine
+          label="Fecha"
+          type="date"
+          labelWidth="100px"
+          {...campo("fecha")}
         />
-      </div>
-
-      {/* TÍTULO: EXAMEN FÍSICO II */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 2: EXAMEN FÍSICO II
-        </h2>
-        <ExamenFisicoII
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
+        <InputTextOneLine
+          label="T. Servicio"
+          labelWidth="100px"
+          {...campo("tiempoServicio")}
         />
-      </div>
+      </SectionFieldset>
 
-      {/* TÍTULO: EXAMEN FÍSICO III */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          PARTE 3: EXAMEN FÍSICO III
-        </h2>
-        <ExamenFisicoIII
-          form={form}
-          handleRadioButton={handleRadioButton}
-          handleChange={handleChange}
-        />
-      </div>
+      <DatosPersonalesLaborales form={form} />
 
-      {/* CONCLUSIONES Y COMENTARIOS */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
-          CONCLUSIONES Y COMENTARIOS
-        </h2>
-        <div className="border rounded p-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="flex items-center gap-8 mb-3">
-                <span className="font-semibold w-[75px]">Tratamiento:</span>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="tratamiento"
-                    checked={form.tratamiento === "SI"}
-                    onChange={(e) => handleRadioButton(e, "SI")}
-                  />
-                  SI
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="tratamiento"
-                    checked={form.tratamiento === "NO"}
-                    onChange={(e) => handleRadioButton(e, "NO")}
-                  />
-                  NO
-                </label>
-              </div>
-
-              <div className="flex items-center gap-8 mb-3">
-                <span className="font-semibold w-[75px]">Conclusión:</span>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="conclusion"
-                    checked={form.conclusion === "SI"}
-                    onChange={(e) => handleRadioButton(e, "SI")}
-                  />
-                  SI
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="conclusion"
-                    checked={form.conclusion === "NO"}
-                    onChange={(e) => handleRadioButton(e, "NO")}
-                  />
-                  NO
-                </label>
-              </div>
-            </div>
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </div>
-          <div className="mb-3">
-            
-            <label className="font-semibold block mb-1">Diagnóstico:</label>
-            <textarea
-              className="border rounded px-3 py-1 w-full resize-none"
-              name="diagnostico"
-              rows={3}
-              value={form.diagnostico}
-              onChange={handleChange}
-            />
-            <div className="bg-green-200 p-3 rounded-xl col-span-3">
-              <CIE10List
-                value={form.diagnosticoCie10}
-                fieldName="diagnosticoCie10"
-                label="Diagnóstico CIE10"
-                token={token}
-                setForm={setForm}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="font-semibold block mb-1">
-              Recomendaciones y plan de acción:
-            </label>
-            <textarea
-              className="border rounded px-3 py-2 w-full h-24 resize-none"
-              name="recomendaciones"
-              rows={3}
-              value={form.recomendaciones}
-              onChange={handleChange}
-            />
-          </div>
+      {/* ===== SECCIÓN: SÍNTOMAS Y LEVANTAMIENTO DE CARGA ===== */}
+      <SectionFieldset legend="Síntomas y Levantamiento de Carga" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="space-y-3">
+          <InputsRadioGroup
+            label="Síntomas"
+            labelOnTop
+            {...radioSiNo("sintomas", {
+              onChange: handleSintomas,
+              onRevert: () => revertFields(["sintomas", "cualesSintomas"]),
+              edited: isFieldEdited("sintomas") || isFieldEdited("cualesSintomas"),
+            })}
+          />
+          <InputTextOneLine
+            label="Cuáles"
+            labelWidth="60px"
+            {...campo("cualesSintomas")}
+            disabled={camposDeshabilitados || form.sintomas === "NO"}
+          />
         </div>
-      </div>
+        <InputsRadioGroup label="Uso de Faja Lumbar" labelOnTop {...radioSiNo("usoFajaLumbar")} />
+        <InputsRadioGroup label="Adecuada Técnica de Levantamiento de Carga" labelOnTop {...radioSiNo("tecnicaLevantamiento")} />
+        <InputsRadioGroup label="Capacitación en Levantamiento de Carga" labelOnTop {...radioSiNo("capacitacionLevantamiento")} />
+      </SectionFieldset>
 
-      <div className="mb-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-6">
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Agregar/Actualizar
-            </button>
-            {!embebido && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            )}
+      {/* ===== SECCIÓN: EXÁMENES FÍSICOS =====
+          El bloqueo de edición va en un <fieldset disabled> (deshabilita todos sus radios/inputs sin hilar `disabled`
+          por cada grupo); el resaltado y la reversión por grupo salen del EdicionContext. */}
+      <EdicionContext.Provider value={{ isFieldEdited, revertField }}>
+        <SectionFieldset legend="Parte 1: Examen Físico I">
+          <fieldset disabled={camposDeshabilitados} className="m-0 p-0 border-0 min-w-0 text-[11px]">
+            <ExamenFisicoI form={form} handleRadioButton={handleRadioButton} handleChange={handleChange} />
+          </fieldset>
+        </SectionFieldset>
+
+        <SectionFieldset legend="Parte 2: Examen Físico II">
+          <fieldset disabled={camposDeshabilitados} className="m-0 p-0 border-0 min-w-0 text-[11px]">
+            <ExamenFisicoII form={form} handleRadioButton={handleRadioButton} handleChange={handleChange} />
+          </fieldset>
+        </SectionFieldset>
+
+        <SectionFieldset legend="Parte 3: Examen Físico III">
+          <fieldset disabled={camposDeshabilitados} className="m-0 p-0 border-0 min-w-0 text-[11px]">
+            <ExamenFisicoIII form={form} handleRadioButton={handleRadioButton} handleChange={handleChange} />
+          </fieldset>
+        </SectionFieldset>
+      </EdicionContext.Provider>
+
+      {/* ===== SECCIÓN: CONCLUSIONES Y COMENTARIOS ===== */}
+      <SectionFieldset legend="Conclusiones y Comentarios" className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <InputsRadioGroup label="Tratamiento" labelWidth="100px" {...radioSiNo("tratamiento")} />
+            <InputsRadioGroup label="Conclusión" labelWidth="100px" {...radioSiNo("conclusion")} />
           </div>
-
-          {!embebido && (
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
+          />
+        </div>
+        <InputTextArea label="Diagnóstico" rows={3} {...campo("diagnostico")} />
+        <div className="bg-green-200 p-3 rounded-xl flex items-start gap-2">
+          <div className="flex-1">
+            <CIE10List
+              value={form.diagnosticoCie10}
+              fieldName="diagnosticoCie10"
+              label="Diagnóstico CIE10"
+              token={token}
+              setForm={setForm}
+              disabled={camposDeshabilitados}
+            />
+          </div>
+          {isFieldEdited("diagnosticoCie10") && (
+            <RevertButton onClick={() => revertField("diagnosticoCie10")} />
           )}
         </div>
-      </div>
+        <InputTextArea label="Recomendaciones y plan de acción" rows={3} {...campo("recomendaciones")} />
+      </SectionFieldset>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
+        />
+      )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
+      />
     </div>
   );
 }

@@ -1,4 +1,13 @@
 import { getDatePlus364Days } from "../../../../../utils/helpers";
+import { crearRestriccionesFicha } from "../restriccionesFichaAptitud";
+
+const restriccionesFA16 = crearRestriccionesFicha("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
+
+export const RESTRICCIONES_FA16 = restriccionesFA16.restricciones;
+export const RESTRICCIONES_FA16_NAMES = restriccionesFA16.nombres;
+export const RESTRICCIONES_FA16_DESMARCADAS = restriccionesFA16.desmarcadas;
+export const armarRestriccionesFA16 = restriccionesFA16.armar;
+export const inferirRestriccionesFA16 = restriccionesFA16.inferir;
 
 export const getFA16InitialFormState = ({ today, userlogued, userName }) => ({
   norden: "",

@@ -18,7 +18,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
   let y = margin - 20;
 
   //DATOS JASPER
-  
+
 
   // Helper para cargar logo
   const loadImg = src =>
@@ -45,10 +45,10 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
 
       // Solo "Nro Orden:" normal, el número grande, negrita y subrayado
       const ordLabel = 'Nro Orden:';
-      const ordValue = orderNumber || '';
+      const ordValue = String(orderNumber) || '';
       doc.setFont('helvetica', 'bold').setFontSize(12);
       const labelWidth = doc.getTextWidth(ordLabel + ' ');
-      const ordX = pageW - margin - doc.getTextWidth(ordLabel + ' ' + ordValue)-25;
+      const ordX = pageW - margin - doc.getTextWidth(ordLabel + ' ' + ordValue) - 25;
       const ordY = y + logoH / 2 + 4;
       doc.text(ordLabel, ordX, ordY);
       // Número grande y subrayado
@@ -73,8 +73,8 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       // ----------- PÁRRAFO 1 -----------
       doc.setFont('helvetica', 'normal').setFontSize(11);
       const nombreText = String(nombre || '.................................................................');
-      const edadText   = jasper.edad   != null ? `${jasper.edad}` : '......';
-      const dniText    = String(dni || '...........................');
+      const edadText = jasper.edad != null ? `${jasper.edad}` : '......';
+      const dniText = String(dni || '...........................');
       const p1 =
         `Yo, ${nombreText}, de ${edadText} años de edad, identificado(a) con DNI N.° ${dniText}, ` +
         `autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión ` +
@@ -105,47 +105,47 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         day: 'numeric', month: 'long', year: 'numeric'
       }).format(new Date());
 
-      const boxSize       = 80;
-      const colGap        = 120;
-      const textOffset    = lineHeight;
-      const extraLines    = 3;       // firma + DNI + fecha
+      const boxSize = 80;
+      const colGap = 120;
+      const textOffset = lineHeight;
+      const extraLines = 3;       // firma + DNI + fecha
       const vertGapSigHue = 80;
-      const blockWidth    = boxSize * 2 + colGap;
-      const startX        = (pageW - blockWidth) / 2;
-      const col2X         = startX + boxSize + colGap;
-      let sectionY        = y+75;
+      const blockWidth = boxSize * 2 + colGap;
+      const startX = (pageW - blockWidth) / 2;
+      const col2X = startX + boxSize + colGap;
+      let sectionY = y + 75;
 
       // Centros de columna
       const center1 = startX + boxSize / 2;
-      const center2 = col2X  + boxSize / 2;
+      const center2 = col2X + boxSize / 2;
 
       // Líneas de firma
       doc.setLineWidth(1);
       // Firma Manuscrita
-      doc.line(startX -20 , sectionY, startX+ 20 + boxSize, sectionY);
+      doc.line(startX - 20, sectionY, startX + 20 + boxSize, sectionY);
       const labelSig1 = 'Firma Manuscrita del Paciente';
-      const wSig1     = doc.getTextWidth(labelSig1);
+      const wSig1 = doc.getTextWidth(labelSig1);
       doc.text(labelSig1, center1 - wSig1 / 2, sectionY + textOffset);
 
       // DNI y Fecha bajo Firma Manuscrita
-      const dniLine  = `DNI: ${dni || ''}`;
+      const dniLine = `DNI: ${dni || ''}`;
       const dateLine = `Fecha: ${jasper.fecha_examen}`;
-      const wDni1    = doc.getTextWidth(dniLine);
-      const wDate1   = doc.getTextWidth(dateLine);
-      doc.text(dniLine,  center1 - wDni1 / 2,  sectionY + textOffset * 2);
+      const wDni1 = doc.getTextWidth(dniLine);
+      const wDate1 = doc.getTextWidth(dateLine);
+      doc.text(dniLine, center1 - wDni1 / 2, sectionY + textOffset * 2);
       doc.text(dateLine, center1 - wDate1 / 2, sectionY + textOffset * 3);
 
       // Firma Electrónica
-      doc.line(col2X-20, sectionY, col2X+ 20 + boxSize, sectionY);
+      doc.line(col2X - 20, sectionY, col2X + 20 + boxSize, sectionY);
       const labelSig2 = 'Firma Electrónica del Paciente';
-      const wSig2     = doc.getTextWidth(labelSig2);
+      const wSig2 = doc.getTextWidth(labelSig2);
       doc.text(labelSig2, center2 - wSig2 / 2, sectionY + textOffset);
       if (firmaImg) {
         const firmaW = boxSize + 40;
         const firmaH = (firmaImg.height / firmaImg.width) * firmaW;
         const firmaX = col2X - 20;
         const firmaY = sectionY - firmaH - 1;
-      
+
         const canvas = document.createElement('canvas');
         canvas.width = firmaImg.width;
         canvas.height = firmaImg.height;
@@ -155,9 +155,9 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
       }
       // DNI y Fecha bajo Firma Electrónica
-      const wDni2  = doc.getTextWidth(dniLine);
+      const wDni2 = doc.getTextWidth(dniLine);
       const wDate2 = doc.getTextWidth(dateLine);
-      doc.text(dniLine,  center2 - wDni2  / 2, sectionY + textOffset * 2);
+      doc.text(dniLine, center2 - wDni2 / 2, sectionY + textOffset * 2);
       doc.text(dateLine, center2 - wDate2 / 2, sectionY + textOffset * 3);
 
       // Avanzar a huellas
@@ -168,7 +168,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       const hueH = boxSize + 40;
       doc.rect(startX, sectionY, hueW, hueH);
       const labelHue1 = 'Huella Manuscrita del Paciente';
-      const wHue1     = doc.getTextWidth(labelHue1);
+      const wHue1 = doc.getTextWidth(labelHue1);
       doc.text(labelHue1, center1 - wHue1 / 2, sectionY + hueH + textOffset);
 
       doc.rect(col2X, sectionY, hueW, hueH);
@@ -183,7 +183,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         doc.addImage(huellaBase64, 'PNG', col2X + 5, sectionY + 5, hueW - 10, hueH - 10);
       }
       const labelHue2 = 'Huella Electrónica del Paciente';
-      const wHue2     = doc.getTextWidth(labelHue2);
+      const wHue2 = doc.getTextWidth(labelHue2);
       doc.text(labelHue2, center2 - wHue2 / 2, sectionY + hueH + textOffset);
 
       // Actualiza Y para el footer
@@ -214,18 +214,18 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
 
       // ----------- GUARDAR PDF -----------
       const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
+      const pdfUrl = URL.createObjectURL(pdfBlob);
 
-        // Crear un iframe invisible para imprimir directamente
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = pdfUrl;
-        document.body.appendChild(iframe);
+      // Crear un iframe invisible para imprimir directamente
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = pdfUrl;
+      document.body.appendChild(iframe);
 
-        iframe.onload = function () {
+      iframe.onload = function () {
         iframe.contentWindow.focus();
         iframe.contentWindow.print();
-        };
+      };
     })
     .catch(err => {
       console.error(err);

@@ -10,6 +10,9 @@ export default function PersonalEmpleadoIV({
   setForm,
   handleChange,
   handleRadioButtonBoolean,
+  disabled = false,
+  isFieldEdited = () => false,
+  revertField = () => { },
 }) {
   return (
     <div className="space-y-3">
@@ -34,6 +37,9 @@ export default function PersonalEmpleadoIV({
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={(e, value) => {
               if (e.target.name === "alturaOtros" && !value) {
                 setForm(p => ({ ...p, alturaOtrosDescripcion: "" }));
@@ -47,8 +53,10 @@ export default function PersonalEmpleadoIV({
               label="Especifique"
               name="alturaOtrosDescripcion"
               value={form?.alturaOtrosDescripcion}
-              disabled={!form?.alturaOtros}
+              disabled={disabled || !form?.alturaOtros}
               onChange={handleChange}
+              edited={isFieldEdited("alturaOtrosDescripcion")}
+              onRevert={() => revertField("alturaOtrosDescripcion")}
             />
           </div>
         </SectionFieldset>
@@ -74,6 +82,9 @@ export default function PersonalEmpleadoIV({
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={(e, value) => {
               if (e.target.name === "probPulmonIndustrialesOtros" && !value) {
                 setForm(p => ({ ...p, probPulmonIndustrialesOtrosDescripcion: "" }));
@@ -87,8 +98,10 @@ export default function PersonalEmpleadoIV({
               label="Especifique"
               name="probPulmonIndustrialesOtrosDescripcion"
               value={form?.probPulmonIndustrialesOtrosDescripcion}
-              disabled={!form?.probPulmonIndustrialesOtros}
+              disabled={disabled || !form?.probPulmonIndustrialesOtros}
               onChange={handleChange}
+              edited={isFieldEdited("probPulmonIndustrialesOtrosDescripcion")}
+              onRevert={() => revertField("probPulmonIndustrialesOtrosDescripcion")}
             />
           </div>
         </SectionFieldset>
@@ -101,6 +114,9 @@ export default function PersonalEmpleadoIV({
             rows={4}
             value={form?.trabajosExpuestosPeligrosRespiratorios}
             onChange={handleChange}
+            disabled={disabled}
+            edited={isFieldEdited("trabajosExpuestosPeligrosRespiratorios")}
+            onRevert={() => revertField("trabajosExpuestosPeligrosRespiratorios")}
           />
 
           {/* 4 y 5. Servicio Militar / MATPEL */}
@@ -114,6 +130,9 @@ export default function PersonalEmpleadoIV({
               { label: "NO", value: false },
             ]}
             form={form}
+            disabled={disabled}
+            isFieldEdited={isFieldEdited}
+            onRevert={revertField}
             handleRadioButton={handleRadioButtonBoolean}
           />
         </SectionFieldset>

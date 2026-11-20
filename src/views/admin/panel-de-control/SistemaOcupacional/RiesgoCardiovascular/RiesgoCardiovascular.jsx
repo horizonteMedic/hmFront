@@ -1,13 +1,23 @@
 import { useEffect, useMemo } from "react";
 import { InputTextOneLine, InputsBooleanRadioGroup, SectionFieldset } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday } from "../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../utils/helpers";
+import { buildAuditoria } from "../../../../utils/auditoriaUtils";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerRiesgoCardiovascular";
-import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerRiesgoCardiovascular";
+import BotonesForm from "../../../../components/templates/BotonesForm";
+import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import SearchButton from "../../../../components/reusableComponents/SearchButton";
 
 const tabla = "riesgo_cardiovascular";
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios). El resto viene de otros
+// exámenes (Triaje, Perfil Lipídico, Antecedentes) o es el resultado calculado.
+const CAMPOS_EDITABLES = ["fecha", "user_medicoFirma", "nombre_medico"];
 
 const clampNumber = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -261,11 +271,33 @@ export default function RiesgoCardiovascular() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+        tieneRegistro: false,
+
+        // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
+        usuarioActualizacion: "",
+        fechaActualizacion: "",
     };
 
-    const { form, setForm, handleChangeSimple, handleChangeNumberDecimals, handleRadioButtonBoolean, handleClear, handleClearnotO, handlePrintDefault } = useForm(initialFormState, {
+    const { form, setForm, handleChangeSimple, handleChangeNumberDecimals, handleClear, handleClearnotO, handlePrintDefault } = useForm(initialFormState, {
         storageKey: "riesgo_cardiovascular",
     });
+
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se revierten ambos.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
 
     useEffect(() => {
         if (!form.sexo) return;
@@ -340,15 +372,37 @@ export default function RiesgoCardiovascular() {
         };
     }, [form]);
 
+    // ===== Búsqueda con boton =====
+    const executeSearch = () => {
+        handleClearnotO();
+        VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    };
+
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
-        if (e.key === "Enter") {
-            handleClearnotO();
-            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        if (!e || e.key === "Enter") {
+            executeSearch();
         }
     };
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleEdit = () => {
+        UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handlePrintNordenChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) return; // solo dígitos
+
+        const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+        if (hayDatosCargados && value !== form.norden) {
+            setForm({ ...initialFormState, norden: value });
+        } else {
+            setForm((f) => ({ ...f, norden: value }));
+        }
     };
 
     const handlePrint = () => {
@@ -357,7 +411,6 @@ export default function RiesgoCardiovascular() {
         });
     };
 
-    const sexoLabel = form.sexo === "MASCULINO" || form.sexo === "FEMENINO" ? form.sexo : "";
     const riesgoEventoCoronario10 = calculo.ready ? `${calculo.risk.display} %` : "";
     const riesgoPromedioEventoCoronario10 = calculo.ready ? `${calculo.comparative.avg} %` : "";
     const riesgoIdealEventoCoronario10 = calculo.ready ? `${calculo.comparative.low} %` : "";
@@ -383,23 +436,47 @@ export default function RiesgoCardiovascular() {
         });
     }, [riesgoEventoCoronario10, riesgoIdealEventoCoronario10, riesgoPromedioEventoCoronario10, riesgoPromedioEventoCoronarioSevero10, setForm]);
 
+    const hayRegistroCargado = Boolean(form.nombres || form.dni);
+    const nordenDisabled = hayRegistroCargado;
+
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <AccionesRegistroHeader
+                tieneRegistro={form.tieneRegistro}
+                hayRegistroCargado={hayRegistroCargado}
+                edicionHabilitada={edicionHabilitada}
+                onHabilitarEdicion={habilitarEdicion}
+                onLimpiar={handleClear}
+            />
+
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
-                />
+                <div className="flex gap-x-3 w-full">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumberDecimals}
+                        onKeyUp={handleSearch}
+                        disabled={nordenDisabled}
+                        labelWidth="120px"
+                        className="w-full"
+                    />
+                    <SearchButton onClick={executeSearch} className="lg:hidden" />
+                </div>
                 <InputTextOneLine
                     label="Fecha"
                     name="fecha"
                     type="date"
                     value={form.fecha}
                     onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isFieldEdited("fecha")}
+                    onRevert={() => revertField("fecha")}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -446,6 +523,8 @@ export default function RiesgoCardiovascular() {
                             value={form.colesterolTotal}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             70 - 1200 mg/dl
@@ -459,6 +538,8 @@ export default function RiesgoCardiovascular() {
                             value={form.colesterolHdl}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             20 - 150 mg/dl
@@ -472,6 +553,8 @@ export default function RiesgoCardiovascular() {
                             value={form.trigliceridos}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             25 - 1200 mg/dl
@@ -485,6 +568,8 @@ export default function RiesgoCardiovascular() {
                             value={form.colesterolLdl}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             6 - 540 mg/dl
@@ -503,6 +588,8 @@ export default function RiesgoCardiovascular() {
                             value={form.tensionSistolica}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             60 - 300 mm de Hg
@@ -516,6 +603,8 @@ export default function RiesgoCardiovascular() {
                             value={form.tensionDiastolica}
                             disabled
                             labelWidth="220px"
+                            stackOnMobile
+                            className="min-w-0 flex-1"
                         />
                         <span className="text-sm text-gray-600 whitespace-nowrap">
                             40 - 150 mm de Hg
@@ -535,6 +624,7 @@ export default function RiesgoCardiovascular() {
                                 value={form.riesgoEventoCoronario10}
                                 disabled
                                 labelWidth="350px"
+                                stackOnMobile
                             />
                             <InputTextOneLine
                                 label="El riesgo promedio de evento coronario a 10 años es de un"
@@ -542,6 +632,7 @@ export default function RiesgoCardiovascular() {
                                 value={form.riesgoPromedioEventoCoronario10}
                                 disabled
                                 labelWidth="350px"
+                                stackOnMobile
                             />
                             <InputTextOneLine
                                 label="El riesgo ideal de evento coronario a 10 años es de un"
@@ -549,6 +640,7 @@ export default function RiesgoCardiovascular() {
                                 value={form.riesgoIdealEventoCoronario10}
                                 disabled
                                 labelWidth="350px"
+                                stackOnMobile
                             />
                             <InputTextOneLine
                                 label="El riesgo promedio de evento coronario severo a 10 años es de un"
@@ -556,17 +648,48 @@ export default function RiesgoCardiovascular() {
                                 value={form.riesgoPromedioEventoCoronarioSevero10}
                                 disabled
                                 labelWidth="350px"
+                                stackOnMobile
                             />
                         </div>
                     </div>)
                 }
             </SectionFieldset>
-            <BotonesAccion
+
+            <SectionFieldset legend="Asignación de Médico" className="w-full">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    disabled={camposDeshabilitados}
+                    edited={isMedicoEdited}
+                    onRevert={revertMedico}
+                />
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+            {hayRegistroCargado && (
+                <AuditoriaRegistro
+                    mostrarEdicion={form.tieneRegistro}
+                    fechaCreacion={auditoria.fechaCreacion}
+                    fechaEdicion={auditoria.fechaActualizacion}
+                    usuarioRegistro={auditoria.usuarioRegistro}
+                    usuarioEdicion={auditoria.usuarioActualizacion}
+                />
+            )}
+
+            {/* ===== BOTONES DE ACCIÓN ===== */}
+            <BotonesForm
                 form={form}
-                handleSave={handleSave}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                onNordenChange={handlePrintNordenChange}
+                handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+                saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+                handleEdit={habilitarEdicion}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+                hideSave={form.tieneRegistro && !edicionHabilitada}
+                hideEdit={!form.tieneRegistro || edicionHabilitada}
             />
         </div>
     );

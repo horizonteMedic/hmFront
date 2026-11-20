@@ -11,34 +11,63 @@ import {
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
+  UpdateDataService,
   TABLA_RAYOS_X_TORAX_PA,
   VerifyTR,
 } from "./controllerRayoxXToraxPA";
 import Swal from "sweetalert2";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
-import { getToday } from "../../../../../utils/helpers";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
-import { handleSubirArchivo2 } from "../rayosXColumna/controllerRayosXColumna";
-import CIE10 from "../../Anexo16/CIE10/CIE10";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = TABLA_RAYOS_X_TORAX_PA;
+
+// Campos de la evaluación radiográfica (algunas casillas los cambian todos a la vez).
+const CAMPOS_EVALUACION = [
+  "vertices",
+  "hilios",
+  "senosCostofrenicos",
+  "camposPulmonares",
+  "mediastinos",
+  "siluetaCardiovascular",
+  "osteomuscular",
+  "conclusiones",
+  "conclusionesCie10",
+  "observaciones",
+];
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+const CAMPOS_EDITABLES = [
+  "fechaExam",
+  ...CAMPOS_EVALUACION,
+  "user_medicoFirma",
+  "nombre_medico",
+];
 
 // Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
 // no guarda su borrador, no muestra la búsqueda/historial y avisa con `onGuardado` al registrar el examen.
 export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
   const embebido = Boolean(nOrdenInicial);
   const [dataTabla, setDataTabla] = useState([]);
+  // Sube cada vez que se carga un registro desde la tabla (aunque sea el mismo), para volver a bloquear la edición
+  const [cargaId, setCargaId] = useState(0);
   const today = getToday();
 
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -86,7 +115,16 @@ export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
     user_medicoFirma: userlogued,
 
     SubirDoc: false,
-    nomenclatura: "RAYOS X TORAX"
+    nomenclatura: "RAYOS X TORAX",
+
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
@@ -97,14 +135,49 @@ export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
     handleChangeSimple,
     handleClear,
     handleClearnotO,
+    handlePrintDefault,
   } = useForm(initialFormState, { storageKey: embebido ? undefined : "rayosX_torax_PA" });
+
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, {
+    tieneRegistro: form.tieneRegistro,
+    camposEditables: CAMPOS_EDITABLES,
+    resetKey: cargaId,
+  });
+
+  // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+  // el id y se revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
+  // Props comunes de un campo de texto: bloqueo, resaltado de cambios y botón de revertir.
+  const campo = (name, onChange = handleChange) => ({
+    name,
+    value: form[name] ?? "",
+    onChange,
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
 
   const [visualerOpen, setVisualerOpen] = useState(null)
 
+  // ===== Búsqueda con boton =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
 
@@ -113,6 +186,29 @@ export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+  };
+
+  const handleEdit = () => {
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla, datosFooter);
+  };
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.dni || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  // ===== Impresión =====
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
   };
 
   const handleEjecutarConsulta = () => {
@@ -154,289 +250,299 @@ export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
     }
   }, [embebido, nOrdenInicial, selectedSede, token, setForm]);
 
+  const hayRegistroCargado = Boolean(form.nombres || form.dni);
+  const nordenDisabled = embebido || hayRegistroCargado;
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   return (
-    <div className={embebido ? "px-4 space-y-3" : "px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6"}>
-      {/* Columna izquierda: Formulario */}
-      <div className="space-y-3">
-        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumberDecimals}
-            onKeyUp={handleSearch}
-            disabled={embebido}
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fechaExam"
-            type="date"
-            value={form.fechaExam}
-            onChange={handleChangeSimple}
-          />
-          <InputTextOneLine
-            label="Tipo Examen"
-            name="nombreExamen"
-            value={form.nombreExamen}
-            disabled
-          />
-          <ButtonsPDF
-            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
-            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
-          />
-        </SectionFieldset>
+    <div className={embebido ? "px-4 space-y-3" : "px-4 max-w-[95%] mx-auto space-y-3"}>
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
+      />
 
-        <DatosPersonalesLaborales form={form} minSizePrincipal="none" />
-
-        <SectionFieldset
-          legend="Evaluación Radiográfica"
-          className="space-y-3"
-        >
-          <InputTextOneLine
-            label="Vértices"
-            name="vertices"
-            value={form.vertices ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <InputTextOneLine
-            label="Hilios"
-            name="hilios"
-            value={form.hilios ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <InputTextOneLine
-            label="Senos Costofrénicos"
-            name="senosCostofrenicos"
-            value={form.senosCostofrenicos ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <div className="space-y-2">
+      <div className={embebido ? "space-y-3" : "grid xl:grid-cols-2 gap-6 items-start"}>
+        {/* Columna izquierda: Formulario */}
+        <div className="space-y-3 min-w-0">
+          <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
+            <div className="flex gap-x-3 w-full">
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form.norden}
+                onChange={handleChangeNumberDecimals}
+                onKeyUp={handleSearch}
+                disabled={nordenDisabled}
+                className="w-full"
+              />
+              {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
+            </div>
             <InputTextOneLine
-              label="Campos Pulmonares"
-              name="camposPulmonares"
-              value={form.camposPulmonares ?? ""}
-              onChange={handleChange}
-              labelWidth="150px"
+              label="Fecha"
+              type="date"
+              {...campo("fechaExam", handleChangeSimple)}
             />
-
-            <InputCheckbox
-              label="Trama Broncovascular Acentuada en ACP"
-              name="tramaBroncovascular"
-              checked={
-                form.camposPulmonares ===
-                "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
-              }
-              onChange={(e) => {
-                setForm((prev) => ({
-                  ...prev,
-                  camposPulmonares: e.target.checked
-                    ? "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
-                    : "",
-                }));
-              }}
-              className="ml-[170px]"
+            <InputTextOneLine
+              label="Tipo Examen"
+              name="nombreExamen"
+              value={form.nombreExamen}
+              disabled
             />
-          </div>
+          </SectionFieldset>
 
-          <InputTextOneLine
-            label="Campos Mediastinos"
-            name="mediastinos"
-            value={form.mediastinos ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <InputTextOneLine
-            label="Silueta Cardiovascular"
-            name="siluetaCardiovascular"
-            value={form.siluetaCardiovascular ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <InputTextOneLine
-            label="Osteomuscular"
-            name="osteomuscular"
-            value={form.osteomuscular ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <InputTextOneLine
-            label="Conclusiones Radiográficas"
-            name="conclusiones"
-            value={form.conclusiones ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
-
-          <div className="bg-green-200 p-3 rounded-xl col-span-3">
-            <CIE10List
-              value={form.conclusionesCie10}
-              fieldName="conclusionesCie10"
-              label="Conclusiones CIE10"
-              token={token}
-              setForm={setForm}
+          <SectionFieldset legend="Documento de Radiografía">
+            <ButtonsPDF
+              {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
+              {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+              handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
             />
-          </div>
+          </SectionFieldset>
 
-          <div className="md:col-span-2 flex gap-x-4">
-            <InputTextArea
-              label="Observaciones"
-              name="observaciones"
-              value={form.observaciones ?? ""}
-              rows={3}
-              onChange={handleChange}
-            />
-            <div className="flex flex-col gap-y-2 mt-4 min-w-[190px]">
+          <DatosPersonalesLaborales form={form} minSizePrincipal="none" />
+
+          <SectionFieldset
+            legend="Evaluación Radiográfica"
+            className="space-y-3"
+            actions={
+              CAMPOS_EVALUACION.some(isFieldEdited) ? (
+                <RevertButton
+                  onClick={() => revertFields(CAMPOS_EVALUACION)}
+                  title="Revertir cambios de esta sección"
+                />
+              ) : null
+            }
+          >
+            <InputTextOneLine label="Vértices" labelWidth="150px" {...campo("vertices")} />
+
+            <InputTextOneLine label="Hilios" labelWidth="150px" {...campo("hilios")} />
+
+            <InputTextOneLine label="Senos Costofrénicos" labelWidth="150px" {...campo("senosCostofrenicos")} />
+
+            <div className="space-y-2">
+              <InputTextOneLine label="Campos Pulmonares" labelWidth="150px" {...campo("camposPulmonares")} />
+
               <InputCheckbox
-                label="Evaluación Anual"
-                name="evaluacionAnual"
-                checked={form.observaciones === "EVALUACIÓN ANUAL"}
+                label="Trama Broncovascular Acentuada en ACP"
+                name="tramaBroncovascular"
+                checked={
+                  form.camposPulmonares ===
+                  "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
+                }
+                disabled={camposDeshabilitados}
                 onChange={(e) => {
                   setForm((prev) => ({
                     ...prev,
-                    observaciones: e.target.checked
-                      ? "EVALUACIÓN ANUAL"
+                    camposPulmonares: e.target.checked
+                      ? "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
                       : "",
                   }));
                 }}
-              />
-              <InputCheckbox
-                label="No se Tomó Radiografía de Tórax"
-                name="noRadiografiaTorax"
-                checked={form.observaciones === "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
-                onChange={(e) => {
-                  const texto = e.target.checked
-                    ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
-                    : "";
-                  setForm((prev) => ({
-                    ...prev,
-                    vertices: texto,
-                    hilios: texto,
-                    senosCostofrenicos: texto,
-                    camposPulmonares: texto,
-                    mediastinos: texto,
-                    siluetaCardiovascular: texto,
-                    osteomuscular: texto,
-                    conclusiones: texto,
-                    observaciones: texto,
-                  }));
-                }}
-              />
-
-              <InputCheckbox
-                label="Evaluación por Neumología"
-                name="evaluacionNeumologia"
-                checked={form.observaciones === "EVALUACIÓN POR NEUMOLOGÍA"}
-                onChange={(e) => {
-                  setForm((prev) => ({
-                    ...prev,
-                    observaciones: e.target.checked
-                      ? "EVALUACIÓN POR NEUMOLOGÍA"
-                      : "",
-                  }));
-                }}
+                className="ml-[170px]"
               />
             </div>
-          </div>
-        </SectionFieldset>
-        <SectionFieldset legend="Asignación de Médico">
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            label="Especialista"
-            form={form}
-            onChange={handleChangeSimple}
-          />
-        </SectionFieldset>
 
-        <BotonesAccion
-          form={form}
-          handleSave={handleSave}
-          handleClear={handleClear}
-          handleChangeNumberDecimals={handleChangeNumberDecimals}
-          hidePrint
-          hideClear={embebido}
+            <InputTextOneLine label="Campos Mediastinos" labelWidth="150px" {...campo("mediastinos")} />
+
+            <InputTextOneLine label="Silueta Cardiovascular" labelWidth="150px" {...campo("siluetaCardiovascular")} />
+
+            <InputTextOneLine label="Osteomuscular" labelWidth="150px" {...campo("osteomuscular")} />
+
+            <InputTextOneLine label="Conclusiones Radiográficas" labelWidth="150px" {...campo("conclusiones")} />
+
+            <div className="bg-green-200 p-3 rounded-xl flex items-start gap-2">
+              <div className="flex-1">
+                <CIE10List
+                  value={form.conclusionesCie10}
+                  fieldName="conclusionesCie10"
+                  label="Conclusiones CIE10"
+                  token={token}
+                  setForm={setForm}
+                  disabled={camposDeshabilitados}
+                />
+              </div>
+              {isFieldEdited("conclusionesCie10") && (
+                <RevertButton onClick={() => revertField("conclusionesCie10")} />
+              )}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-x-4 gap-y-2">
+              <InputTextArea label="Observaciones" rows={3} {...campo("observaciones")} />
+              <div className="flex flex-col gap-y-2 mt-4 min-w-[190px]">
+                <InputCheckbox
+                  label="Evaluación Anual"
+                  name="evaluacionAnual"
+                  checked={form.observaciones === "EVALUACIÓN ANUAL"}
+                  disabled={camposDeshabilitados}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      observaciones: e.target.checked
+                        ? "EVALUACIÓN ANUAL"
+                        : "",
+                    }));
+                  }}
+                />
+                <InputCheckbox
+                  label="No se Tomó Radiografía de Tórax"
+                  name="noRadiografiaTorax"
+                  checked={form.observaciones === "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
+                  disabled={camposDeshabilitados}
+                  onChange={(e) => {
+                    const texto = e.target.checked
+                      ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                      : "";
+                    setForm((prev) => ({
+                      ...prev,
+                      vertices: texto,
+                      hilios: texto,
+                      senosCostofrenicos: texto,
+                      camposPulmonares: texto,
+                      mediastinos: texto,
+                      siluetaCardiovascular: texto,
+                      osteomuscular: texto,
+                      conclusiones: texto,
+                      observaciones: texto,
+                    }));
+                  }}
+                />
+
+                <InputCheckbox
+                  label="Evaluación por Neumología"
+                  name="evaluacionNeumologia"
+                  checked={form.observaciones === "EVALUACIÓN POR NEUMOLOGÍA"}
+                  disabled={camposDeshabilitados}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      observaciones: e.target.checked
+                        ? "EVALUACIÓN POR NEUMOLOGÍA"
+                        : "",
+                    }));
+                  }}
+                />
+              </div>
+            </div>
+          </SectionFieldset>
+          <SectionFieldset legend="Asignación de Médico">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChangeSimple}
+              disabled={camposDeshabilitados}
+              edited={isMedicoEdited}
+              onRevert={revertMedico}
+            />
+          </SectionFieldset>
+        </div>
+
+        {/* Columna derecha: Panel de historial/búsqueda (incrustado se omite) */}
+        {!embebido && (
+          <div className="space-y-3 min-w-0">
+            <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                  label="Nombre"
+                  labelOnTop
+                  name="nombres_search"
+                  value={form.nombres_search}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      obtenerInfoTabla();
+                    }
+                  }}
+                  onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
+                />
+                <InputTextOneLine
+                  label="Código"
+                  labelOnTop
+                  name="codigo_search"
+                  value={form.codigo_search}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter") {
+                      obtenerInfoTabla();
+                    }
+                  }}
+                  onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
+                />
+              </div>
+              <Table
+                data={dataTabla}
+                tabla={tabla}
+                set={setForm}
+                token={token}
+                clean={handleClear}
+                datosFooter={datosFooter}
+                onCargarRegistro={() => setCargaId((id) => id + 1)}
+              />
+            </SectionFieldset>
+
+            <SectionFieldset legend="Reportes por Fechas" className="grid grid-cols-1 md:grid-cols-10 gap-x-4 gap-y-3">
+              <InputTextOneLine
+                label="Fecha Desde"
+                labelOnTop
+                name="fechaDesde"
+                type="date"
+                value={form.fechaDesde}
+                onChange={handleChangeSimple}
+                className="md:col-span-4"
+              />
+              <InputTextOneLine
+                label="Fecha Hasta"
+                labelOnTop
+                name="fechaHasta"
+                type="date"
+                value={form.fechaHasta}
+                onChange={handleChangeSimple}
+                className="md:col-span-4"
+              />
+              <div className="flex justify-end pt-4 md:col-span-2">
+                <button
+                  type="button"
+                  onClick={handleEjecutarConsulta}
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
+                </button>
+              </div>
+            </SectionFieldset>
+          </div>
+        )}
+      </div>
+
+      {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+      {hayRegistroCargado && (
+        <AuditoriaRegistro
+          mostrarEdicion={form.tieneRegistro}
+          fechaCreacion={auditoria.fechaCreacion}
+          fechaEdicion={auditoria.fechaActualizacion}
+          usuarioRegistro={auditoria.usuarioRegistro}
+          usuarioEdicion={auditoria.usuarioActualizacion}
         />
-      </div>
-      {/* Columna derecha: Panel de historial/búsqueda (incrustado se omite) */}
-      {!embebido && (
-      <div className="space-y-3">
-        <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
-            <InputTextOneLine
-              label="Nombre"
-              labelOnTop
-              name="nombres_search"
-              value={form.nombres_search}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  obtenerInfoTabla();
-                }
-              }}
-              onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
-            />
-            <InputTextOneLine
-              label="Código"
-              labelOnTop
-              name="codigo_search"
-              value={form.codigo_search}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  obtenerInfoTabla();
-                }
-              }}
-              onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
-            />
-          </div>
-          <Table
-            data={dataTabla}
-            tabla={tabla}
-            set={setForm}
-            token={token}
-            clean={handleClear}
-            datosFooter={datosFooter}
-          />
-        </SectionFieldset>
-
-        <SectionFieldset legend="Reportes por Fechas" className="grid grid-cols-1 md:grid-cols-10 gap-x-4 gap-y-3">
-          <InputTextOneLine
-            label="Fecha Desde"
-            labelOnTop
-            name="fechaDesde"
-            type="date"
-            value={form.fechaDesde}
-            onChange={handleChangeSimple}
-            className="md:col-span-4"
-          />
-          <InputTextOneLine
-            label="Fecha Hasta"
-            labelOnTop
-            name="fechaHasta"
-            type="date"
-            value={form.fechaHasta}
-            onChange={handleChangeSimple}
-            className="md:col-span-4"
-          />
-          <div className="flex justify-end pt-4 md:col-span-2">
-            <button
-              type="button"
-              onClick={handleEjecutarConsulta}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
-            </button>
-          </div>
-        </SectionFieldset>
-      </div>
       )}
+
+      {/* ===== BOTONES DE ACCIÓN ===== */}
+      <BotonesForm
+        form={form}
+        onNordenChange={handlePrintNordenChange}
+        handleSave={form.tieneRegistro && edicionHabilitada ? handleEdit : handleSave}
+        saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+        handleEdit={habilitarEdicion}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        hideSave={form.tieneRegistro && !edicionHabilitada}
+        hideEdit={!form.tieneRegistro || edicionHabilitada}
+        hideClear={embebido}
+        hidePrint={embebido}
+      />
 
       {/* Visor del archivo subido (fuera de la columna derecha: también se usa incrustado) */}
       {visualerOpen && (
@@ -460,7 +566,7 @@ export default function RayosXToraxPA({ nOrdenInicial, onGuardado }) {
     </div>
   );
 }
-function Table({ data, tabla, set, token, clean, datosFooter }) {
+function Table({ data, tabla, set, token, clean, datosFooter, onCargarRegistro }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -478,6 +584,8 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
   };
 
   function clicktable(nro) {
+    // Cada carga vuelve a bloquear la edición, aunque se elija otra vez el mismo registro.
+    onCargarRegistro();
     clean();
     Loading("Importando Datos");
     GetInfoServicio(nro, tabla, set, token, () => {

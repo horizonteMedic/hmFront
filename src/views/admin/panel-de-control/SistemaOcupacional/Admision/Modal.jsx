@@ -1,109 +1,96 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import InputTextOneLine from '../../../../components/reusableComponents/InputTextOneLine';
+import { formatearFechaCorta } from '../../../../utils/formatDateUtils';
 import { SubmitDetalleCita } from './model/AdminCitas';
 
-const Modal = (props) => {
-  const [data, setData] = useState([]);
-  const [searchInput, setSearchInput] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
-  const [showNoResultsMessage, setShowNoResultsMessage] = useState(false); // Estado para mostrar mensaje de no resultados
+const COLUMNAS = ['Sede', 'DNI', 'Empresa', 'Contrata', 'Programador', 'Fecha'];
+const CELDA = 'px-2 py-[6px] text-slate-800';
+
+// Detalle de una reserva (POST citaOcupacional/detalleReserva: BackendDetalleReservaDTO), con filtro por DNI.
+// `user` es la fila elegida de ReservaPacientes: { usuario, nomensede, fechaReserva, ... }.
+const Modal = ({ user, onClose, token }) => {
+  const [detalle, setDetalle] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [dni, setDni] = useState('');
 
   useEffect(() => {
-    SubmitDetalleCita(props.user, props.token)
-      .then((res) => {
-        setData(res);
-        setFilteredData(res); // Inicialmente mostrar todos los datos
-      })
-      .catch(() => {
-        console.log('Ocurrió un terrible error');
-      });
-  }, []);
+    let vigente = true;
+    SubmitDetalleCita(user, token)
+      .then((res) => vigente && setDetalle(Array.isArray(res) ? res : []))
+      .catch(() => vigente && setDetalle([]))
+      .finally(() => vigente && setCargando(false));
+    return () => {
+      vigente = false;
+    };
+  }, [user, token]);
 
-  const handleInputChange = (e) => {
-    let inputValue = e.target.value;
-
-    // Validación para permitir solo números y máximo 8 dígitos
-    inputValue = inputValue.replace(/\D/g, ''); // Elimina caracteres no numéricos
-    if (inputValue.length > 8) {
-      inputValue = inputValue.slice(0, 8); // Limita a 8 dígitos
-    }
-
-    setSearchInput(inputValue); // Actualiza el estado del input
-
-    // Filtra los datos en tiempo real basándose en el DNI ingresado
-    const filtered = data.filter((item) => {
-      // Convertir el número de DNI a cadena para comparar
-      const dniString = item.dni.toString();
-      return dniString.includes(inputValue);
-    });
-
-    setFilteredData(filtered); // Actualiza los datos filtrados
-
-    // Mostrar mensaje de no resultados si no hay datos filtrados
-    if (filtered.length === 0) {
-      setShowNoResultsMessage(true);
-    } else {
-      setShowNoResultsMessage(false);
-    }
-  };
-
-  const handleClose = () => {
-    props.onClose();
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      props.onClose();
-    }
-  };
+  const visibles = useMemo(() => detalle.filter((fila) => String(fila.dni ?? '').includes(dni)), [detalle, dni]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 " onClick={handleClose}>
-      <div className="bg-white p-4 rounded shadow-lg max-w-[50%] w-full mx-auto" onClick={(e) => e.stopPropagation()} onKeyDown={handleKeyDown}>
-        <div className="flex justify-end">
-          <FontAwesomeIcon icon={faTimes} className="cursor-pointer mb-2" style={{ fontSize: '12px' }} onClick={handleClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={onClose}>
+      <div
+        className="mx-auto w-full max-w-[60%] rounded bg-white shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      >
+        <div className="flex items-center justify-between rounded-t bg-primario px-4 py-2 text-white">
+          <h2 className="mb-0 text-lg font-bold">Pacientes registrados por el usuario: {user?.usuario}</h2>
+          <button type="button" onClick={onClose} aria-label="Cerrar" className="text-white">
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
         </div>
-        
-        <div className="flex items-center mb-4">
-          <input
-            type="text"
+
+        <div className="space-y-3 p-4">
+          <InputTextOneLine
+            label="DNI"
+            name="busquedaDni"
+            value={dni}
+            onChange={(e) => setDni(e.target.value.replace(/\D/g, '').slice(0, 8))}
             placeholder="Buscar DNI..."
-            value={searchInput}
-            onChange={handleInputChange} 
-            className="mr-2 px-2 py-1 border border-gray-300 rounded w-full"
-            maxLength={8} 
+            inputMode="numeric"
+            maxLength={8}
+            labelWidth="50px"
+            className="sm:max-w-[320px]"
+            autocomplete="off"
           />
-      
-        </div>
-        {showNoResultsMessage && (
-          <p className="text-red-500 text-center mb-2">No se encontraron datos</p>
-        )}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="px-4 py-2 border border-gray-300">Sede</th>
-                <th className="px-4 py-2 border border-gray-300">DNI</th>
-                <th className="px-4 py-2 border border-gray-300">Empresa</th>
-                <th className="px-4 py-2 border border-gray-300">Contrata</th>
-                <th className="px-4 py-2 border border-gray-300">Programador</th>
-                <th className="px-4 py-2 border border-gray-300">Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((option, index) => (
-                <tr key={index} className="bg-white">
-                  <td className="px-4 py-2 border border-gray-300">{option.sede}</td>
-                  <td className="px-4 py-2 border border-gray-300">{option.dni}</td>
-                  <td className="px-4 py-2 border border-gray-300">{option.empresa}</td>
-                  <td className="px-4 py-2 border border-gray-300">{option.contrata}</td>
-                  <td className="px-4 py-2 border border-gray-300">{option.programador}</td>
-                  <td className="px-4 py-2 border border-gray-300">{option.fecha}</td>
+
+          <div className="max-h-[60vh] overflow-y-auto rounded-md border-[1px] border-slate-200">
+            <table className="w-full text-center text-base">
+              <thead>
+                <tr>
+                  {COLUMNAS.map((columna) => (
+                    <th
+                      key={columna}
+                      className="sticky top-0 z-10 bg-slate-100 px-2 py-[6px] font-bold text-slate-700 shadow-[inset_0_-1px_0_#cbd5e1]"
+                    >
+                      {columna}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {visibles.length === 0 && (
+                  <tr>
+                    <td colSpan={COLUMNAS.length} className="px-2 py-[28px] text-slate-500">
+                      {cargando ? 'Cargando...' : 'No se encontraron datos'}
+                    </td>
+                  </tr>
+                )}
+                {visibles.map((fila, index) => (
+                  <tr key={fila.idResp ?? index} className="border-b-[1px] border-slate-100">
+                    <td className={CELDA}>{fila.sede}</td>
+                    <td className={CELDA}>{fila.dni}</td>
+                    <td className={CELDA}>{fila.empresa}</td>
+                    <td className={CELDA}>{fila.contrata}</td>
+                    <td className={CELDA}>{fila.programador}</td>
+                    <td className={CELDA}>{formatearFechaCorta(fila.fecha) || fila.fecha}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

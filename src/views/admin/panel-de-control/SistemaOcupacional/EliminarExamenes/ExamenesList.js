@@ -59,6 +59,7 @@ export const EXAMENES_CONFIG = [
             { label: "Declaracion Antecedentes Personales", name: "DECLA_JURA_ANTECE_PERSON_FAM", tabla: "DECLA_JURA_ANTECE_PERSON_FAM" },
             { label: "Declaracion Aptitud Medico O.", name: "DECLA_INFO_APTITUD_MO", tabla: "DECLA_INFO_APTITUD_MO" },
             { label: "Const. Brigadista", name: "ConstBrigadista", tabla: "consta_brigadista" },
+            { label: "Registro Entrega Informe EMO", name: "registro_entrega_resultados_emo", tabla: "registro_entrega_resultados_emo" },
             { label: "Conformidad EMO ", name: "ConformidadEmo", tabla: "conformidad_emo" },
             { label: "Const. Uso de Firma y Huella", name: "ConstFirmaHuella", tabla: "consen_digit" }
         ],

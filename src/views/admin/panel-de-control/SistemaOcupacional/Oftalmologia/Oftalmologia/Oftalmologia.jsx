@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBroom,
   faChevronDown,
   faDownload,
-  faPrint,
-  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   handleSubirArchivo,
@@ -13,20 +10,49 @@ import {
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
+  UpdateDataService,
   TABLA_OFTALMOLOGIA,
   VerifyTR,
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import SearchButton from "../../../../../components/reusableComponents/SearchButton";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
+import RevertButton from "../../../../../components/reusableComponents/RevertButton";
+import AccionesRegistroHeader from "../../../../../components/reusableComponents/AccionesRegistroHeader";
+import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import CIE10List from "../../../../../components/reusableComponents/CIE10List";
+import {
+  CAMPOS_OFTALMOLOGIA_PARTE_I,
+  CAMPOS_OFTALMOLOGIA_PARTE_II,
+  CAMPOS_OFTALMOLOGIA_PARTE_III,
+} from "./camposOftalmologia";
 
 const tabla = TABLA_OFTALMOLOGIA;
 const today = getToday();
+
+// Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
+// Los campos de las pestañas se resaltan y revierten por pestaña (ver `tabs`).
+const CAMPOS_EDITABLES = [
+  "fechaExam",
+  "completo",
+  "user_medicoFirma",
+  "nombre_medico",
+  "user_doctorAsignado",
+  "nombre_doctorAsignado",
+  ...CAMPOS_OFTALMOLOGIA_PARTE_I,
+  ...CAMPOS_OFTALMOLOGIA_PARTE_II,
+  ...CAMPOS_OFTALMOLOGIA_PARTE_III,
+];
 
 // Con `nOrdenInicial` el formulario va incrustado (p. ej. Auditoría de Protocolos): carga esa orden al abrir,
 // no guarda su borrador y avisa con `onGuardado` al registrar o actualizar la evaluación oftalmológica.
@@ -176,22 +202,58 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
 
+    // Control de UI: false = mostrar Guardar (nuevo) / true = mostrar Editar (ya existe)
+    tieneRegistro: false,
+
+    // Auditoría
+    userRegistro: "",
+    fechaRegistro: "",
+    usuarioActualizacion: "",
+    fechaActualizacion: "",
   };
 
   const {
     form,
     setForm,
     handleChange,
-    handleChangeNumberDecimals,
+    handleChangeNumber,
     handleClear,
     handleChangeSimple,
     handleClearnotO,
-    handleFocusNext
-  } = useForm(initialFormState, { storageKey: embebido ? undefined : "antecedentes_altura" });
+  } = useForm(initialFormState, { storageKey: embebido ? undefined : "oftalmologia" });
 
+  const {
+    edicionHabilitada,
+    habilitarEdicion,
+    camposDeshabilitados,
+    isFieldEdited,
+    revertField,
+    revertFields,
+  } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES });
+
+  // Propiedades comunes de un campo editable: bloqueo, resaltado al modificarlo y botón de revertir.
+  const editable = (name) => ({
+    disabled: camposDeshabilitados,
+    edited: isFieldEdited(name),
+    onRevert: () => revertField(name),
+  });
+
+  // Cada médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por el id y se
+  // revierten ambos en conjunto.
+  const isMedicoEdited = isFieldEdited("user_medicoFirma");
+  const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+  const isDoctorEdited = isFieldEdited("user_doctorAsignado");
+  const revertDoctor = () => revertFields(["user_doctorAsignado", "nombre_doctorAsignado"]);
 
   // const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
+
+  const tabs = [
+    { label: "PARTE I", campos: CAMPOS_OFTALMOLOGIA_PARTE_I },
+    { label: "PARTE II", campos: CAMPOS_OFTALMOLOGIA_PARTE_II },
+    { label: "PARTE III", campos: CAMPOS_OFTALMOLOGIA_PARTE_III },
+  ];
+  const tabEditada = (t) => t.campos.some(isFieldEdited);
 
   const [visualerOpen, setVisualerOpen] = useState(null)
 
@@ -250,16 +312,45 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
   // const handleClearnotO = () => {
   //   setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   // };
+  // ===== Búsqueda con botón =====
+  const executeSearch = () => {
+    handleClearnotO();
+    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+  };
+
+  // ===== Búsqueda con enter =====
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    if (!e || e.key === "Enter") {
+      executeSearch();
     }
   };
+
+  const hayRegistroCargado = Boolean(form.nombres);
+
+  const handlePrintNordenChange = (e) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return; // solo dígitos
+
+    const hayDatosCargados = Boolean(form.nombres || form.tieneRegistro);
+    if (hayDatosCargados && value !== form.norden) {
+      setForm({ ...initialFormState, norden: value });
+    } else {
+      setForm((f) => ({ ...f, norden: value }));
+    }
+  };
+
+  const auditoria = buildAuditoria(form, {
+    usuarioActual: userlogued,
+    fechaHoraActual: getFechaHoraActual(),
+  });
+
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
   const alRegistrar = embebido ? () => onGuardado?.() : handleClear;
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, alRegistrar, tabla);
+  };
+  const handleUpdate = () => {
+    UpdateDataService(form, token, userlogued, alRegistrar, tabla);
   };
 
   // Incrustado: abre la orden recibida (datos del paciente si aún no hay evaluación; si ya existe, sus resultados)
@@ -349,6 +440,8 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
     return "";
   }
   useEffect(() => {
+    // Registro existente sin habilitar: se respeta el diagnóstico guardado en vez de regenerarlo al cargar.
+    if (camposDeshabilitados) return;
     setForm((prev) => ({
       ...prev,
       diagnostico: form.presenciaPterigion + "\n" + form.enfOculares
@@ -357,136 +450,137 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
 
   return (
     <div className="w-full text-[11px]">
-      <div className=" p-4 rounded w-full border mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
-          {/* Primera fila: solo los 4 campos principales */}
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">N° Orden :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="norden"
-              value={form?.norden}
-              onChange={handleChangeNumberDecimals}
-              onKeyUp={handleSearch}
-              disabled={embebido}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">Fecha Ex :</label>
-            <input
-              type="date"
-              className="border rounded px-2 py-1 w-full"
-              name="fechaExam"
-              value={form.fechaExam || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">Ex. Médico :</label>
-            <input
-              className="border rounded px-2 py-1  w-full"
-              name="nomExam"
-              value={form.nomExam || ""}
-              disabled
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">Fecha Nac :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="fechaNac"
-              value={form.fechaNac || ""}
-              disabled
-            />
-          </div>
-          {/* Segunda fila: Nombres, DNI */}
-          <div className="flex items-center gap-4 xl:col-span-3">
-            <label className="font-semibold min-w-[65px]">Nombres :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="nombres"
-              value={form.nombres || ""}
-              disabled
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">DNI :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="dni"
-              value={form.dni || ""}
-              disabled
-            />
-          </div>
-          {/* Tercera fila: Empresa, Contrata */}
-          <div className="flex items-center gap-4 xl:col-span-2">
-            <label className="font-semibold min-w-[65px]">Empresa :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="empresa"
-              value={form.empresa || ""}
-              disabled
-            />
-          </div>
-          <div className="flex items-center gap-4 xl:col-span-2">
-            <label className="font-semibold min-w-[65px]">Contrata :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
-              name="contrata"
-              value={form.contrata || ""}
-              disabled
-            />
-          </div>
-          <ButtonsPDF
-            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-          />
-          <div className="flex items-center gap-2 ">
-            <input
-              type="checkbox"
-              name="completo"
-              className="ml-2 text-[11px]"
-              checked={form.completo}
-              onChange={handleCheckBoxChange}
-            />
-            <span className="min-w-[70px] font-semibold">Examen Completo</span>
+      <AccionesRegistroHeader
+        tieneRegistro={form.tieneRegistro}
+        hayRegistroCargado={hayRegistroCargado}
+        edicionHabilitada={edicionHabilitada}
+        onHabilitarEdicion={habilitarEdicion}
+        onLimpiar={handleClear}
+        mostrarLimpiar={!embebido}
+      />
 
-          </div>
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-3 mb-4">
+        <div className="flex gap-x-3 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form?.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+            disabled={embebido || hayRegistroCargado}
+            labelWidth="90px"
+            className="w-full"
+          />
+          {!embebido && <SearchButton onClick={executeSearch} className="lg:hidden" />}
         </div>
-      </div>
+        <InputTextOneLine
+          label="Fecha Ex"
+          name="fechaExam"
+          type="date"
+          value={form.fechaExam || ""}
+          onChange={handleChange}
+          labelWidth="90px"
+          {...editable("fechaExam")}
+        />
+        <InputTextOneLine
+          label="Ex. Médico"
+          name="nomExam"
+          value={form.nomExam || ""}
+          disabled
+          labelWidth="90px"
+        />
+        <InputTextOneLine
+          label="Fecha Nac"
+          name="fechaNac"
+          value={form.fechaNac || ""}
+          disabled
+          labelWidth="90px"
+        />
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres"
+          value={form.nombres || ""}
+          disabled
+          labelWidth="90px"
+          className="xl:col-span-3"
+        />
+        <InputTextOneLine
+          label="DNI"
+          name="dni"
+          value={form.dni || ""}
+          disabled
+          labelWidth="90px"
+        />
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa || ""}
+          disabled
+          labelWidth="90px"
+          className="xl:col-span-2"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata || ""}
+          disabled
+          labelWidth="90px"
+          className="xl:col-span-2"
+        />
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+        />
+        <div className="flex items-center gap-2">
+          <InputCheckbox
+            label="Examen Completo"
+            name="completo"
+            checked={form.completo}
+            disabled={camposDeshabilitados}
+            onChange={handleCheckBoxChange}
+            className="font-semibold"
+          />
+          {isFieldEdited("completo") && (
+            <RevertButton onClick={() => revertField("completo")} title="Revertir cambio" />
+          )}
+        </div>
+      </SectionFieldset>
       {/* Tabs */}
       <div className="flex gap-1">
-        <button
-          onClick={() => setTab(0)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 0
-            ? "bg-[#233245] text-white font-bold"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } ${tab === 0 ? "border-b-0" : "border-b"}`}
-        >
-          PARTE I
-        </button>
-        <button
-          onClick={() => setTab(1)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 1
-            ? "bg-[#233245] text-white font-bold"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } ${tab === 1 ? "border-b-0" : "border-b"}`}
-        >
-          PARTE II
-        </button>
-        <button
-          onClick={() => setTab(2)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 2
-            ? "bg-[#233245] text-white font-bold"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } ${tab === 2 ? "border-b-0" : "border-b"}`}
-        >
-          PARTE III
-        </button>
+        {tabs.map((t, idx) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={() => setTab(idx)}
+            className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === idx
+              ? "bg-[#233245] text-white font-bold"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              } ${tab === idx ? "border-b-0" : "border-b"}`}
+          >
+            {t.label}
+            {tabEditada(t) && (
+              <span
+                className="ml-2 w-2.5 h-2.5 rounded-full bg-orange-500"
+                title="Pestaña con cambios"
+              />
+            )}
+          </button>
+        ))}
       </div>
       {/* Contenido de los tabs */}
       <div className="bg-white border  rounded-b-lg p-6 ">
+        {tabEditada(tabs[tab]) && (
+          <div className="flex items-center justify-end gap-2 mb-3 text-sm text-orange-700">
+            <span>Esta pestaña tiene cambios sin guardar</span>
+            <RevertButton
+              onClick={() => revertFields(tabs[tab].campos)}
+              title="Revertir los cambios de esta pestaña"
+            />
+          </div>
+        )}
+        {/* El fieldset bloquea los campos de la pestaña mientras el registro no esté habilitado */}
+        <fieldset disabled={camposDeshabilitados} className="min-w-0">
         {tab === 0 && (
           <div className={`grid grid-cols-1 gap-8 ${embebido ? "min-[1700px]:grid-cols-2" : "xl:grid-cols-2"}`}>
             {/* Columna 1: Todo el bloque oftalmológico */}
@@ -1676,6 +1770,7 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
                   label="Visión de Colores CIE10"
                   token={token}
                   setForm={setForm}
+                  disabled={camposDeshabilitados}
                 />
               </div>
             </div>
@@ -1716,6 +1811,7 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
                   label="Enferm. Oculares Lejos CIE10"
                   token={token}
                   setForm={setForm}
+                  disabled={camposDeshabilitados}
                 />
               </div>
             </div>
@@ -1810,6 +1906,7 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
                   label="Enferm. Oculares Cerca CIE10"
                   token={token}
                   setForm={setForm}
+                  disabled={camposDeshabilitados}
                 />
               </div>
             </div>
@@ -1901,12 +1998,16 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
             </div>
           </div>
         )}
+        </fieldset>
         <SectionFieldset legend="Asignación de Médico">
           <EmpleadoComboBox
             value={form.nombre_medico}
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+            disabled={camposDeshabilitados}
+            edited={isMedicoEdited}
+            onRevert={revertMedico}
           />
           <EmpleadoComboBox
             value={form.nombre_doctorAsignado}
@@ -1915,49 +2016,39 @@ export default function OftalmologiaOhla({ nOrdenInicial, onGuardado }) {
             onChange={handleChangeSimple}
             nameField="nombre_doctorAsignado"
             idField="user_doctorAsignado"
+            disabled={camposDeshabilitados}
+            edited={isDoctorEdited}
+            onRevert={revertDoctor}
           />
         </SectionFieldset>
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">
-          <div className=" flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            {!embebido && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            )}
-          </div>
-          {/* No va incrustado: Auditoría ya tiene "Ver reporte" */}
-          {!embebido && (
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
+        <div className="pt-2">
+          {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}
+          {hayRegistroCargado && (
+            <AuditoriaRegistro
+              className="mb-3"
+              mostrarEdicion={form.tieneRegistro}
+              fechaCreacion={auditoria.fechaCreacion}
+              fechaEdicion={auditoria.fechaActualizacion}
+              usuarioRegistro={auditoria.usuarioRegistro}
+              usuarioEdicion={auditoria.usuarioActualizacion}
+            />
           )}
+
+          {/* ===== BOTONES DE ACCIÓN ===== */}
+          <BotonesForm
+            form={form}
+            onNordenChange={handlePrintNordenChange}
+            handleSave={form.tieneRegistro && edicionHabilitada ? handleUpdate : handleSave}
+            saveLabel={form.tieneRegistro && edicionHabilitada ? "Guardar Cambios" : "Guardar"}
+            handleEdit={habilitarEdicion}
+            handleClear={handleClear}
+            handlePrint={handlePrint}
+            hideSave={form.tieneRegistro && !edicionHabilitada}
+            hideEdit={!form.tieneRegistro || edicionHabilitada}
+            hideClear={embebido}
+            hidePrint={embebido}
+            printLabel="Imprimir"
+          />
           {visualerOpen && (
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
               <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">

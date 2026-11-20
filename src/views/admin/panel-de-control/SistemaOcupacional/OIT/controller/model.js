@@ -1,6 +1,7 @@
 import { URLAzure } from "../../../../../config/config";
 
-export function SubmitOITModel(data, user, token) {
+// Campos propios del examen (sin auditoría): el usuario que registra lo agrega quien lo envía.
+export const construirBodyOIT = (data) => {
     const body = {
         "norden": data.norden,
         "nplaca": data.nplaca,
@@ -174,9 +175,13 @@ export function SubmitOITModel(data, user, token) {
         chk_28: data.chk_28,
         chk_29: data.chk_29,
         "txtSComentarios": data.txtSComentarios,
-        "userRegistro": user,
         usuarioFirma: data.user_medicoFirma,
     };
+    return body;
+};
+
+export function SubmitOITModel(data, user, token) {
+    const body = { ...construirBodyOIT(data), "userRegistro": user };
 
     const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`
     const options = {
@@ -194,16 +199,18 @@ export function SubmitOITModel(data, user, token) {
     }).then(response => response)
 }
 
+// Versión "Sin Datos": solo los datos de cabecera.
+export const construirBodyOITSinDatos = (data) => ({
+    "norden": data.norden,
+    "edad": data.edad,
+    "dniUser": data.dniUser,
+    "flectura": data.flectura,
+    "fradiografia": data.fradiografia,
+    usuarioFirma: data.user_medicoFirma,
+});
+
 export function SubmitOITModelSinDatos(data, user, token) {
-    const body = {
-        "norden": data.norden,
-        "edad": data.edad,
-        "dniUser": data.dniUser,
-        "userRegistro": user,
-        "flectura": data.flectura,
-        "fradiografia": data.fradiografia,
-        usuarioFirma: data.user_medicoFirma,
-    };
+    const body = { ...construirBodyOITSinDatos(data), "userRegistro": user };
 
     const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`
     const options = {

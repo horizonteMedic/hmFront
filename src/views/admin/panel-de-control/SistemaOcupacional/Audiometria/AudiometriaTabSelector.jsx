@@ -1,37 +1,20 @@
-import { useState } from "react";
 import Audiometria from "./Audiometria/Audiometria";
 import AudiometriaCuestionario from "./AudiometriaCuestionario/AudiometriaCuestionario";
-import { getAudiometriaCuestionarioInitialFormState } from "./AudiometriaCuestionario/audiometriaCuestionarioFormDefaults";
 import AudiometriaOhlaTabSelector from "./AudiometriaOhla/AudiometriaOhlaTabSelector";
 import AudiometriaOhlaN from "./AudiometriaOhlaN/AudiometriaOhlaN";
 import { useSessionData } from "../../../../hooks/useSessionData";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-
-
-
 export default function AudiometriaTabSelector({
   token,
-  userlogued2,
   selectedSede,
   listas,
   subTab,
 }) {
 
-  const { userName, userlogued } = useSessionData();
-  const initialFormStateCuestionarioAudio = getAudiometriaCuestionarioInitialFormState({
-    today,
-    userName,
-    userlogued,
-  });
+  const { userlogued } = useSessionData();
 
-  const [formCuestionarioAudio, setFormCuestionarioAudio] = useState(
-    initialFormStateCuestionarioAudio
-  );
+  // Cada formulario guarda su propio borrador (useForm con storageKey), así que no hace falta
+  // mantener su estado aquí para que sobreviva al cambiar de pestaña.
   return (
     <>
       {subTab === 0 && (
@@ -46,14 +29,7 @@ export default function AudiometriaTabSelector({
         />
       )}
       {subTab === 2 && (
-        <AudiometriaCuestionario
-          token={token}
-          userlogued={userlogued}
-          selectedSede={selectedSede}
-          initialFormState={initialFormStateCuestionarioAudio}
-          form={formCuestionarioAudio}
-          setForm={setFormCuestionarioAudio}
-        />
+        <AudiometriaCuestionario />
       )}
       {subTab === 3 && (
         <AudiometriaOhlaN />

@@ -17,6 +17,9 @@ const ultimoDetallePorDniUrl =
 const obtenerReporteUrl =
   "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional";
 
+// nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
+export const TABLA_HISTORIA_OCUPACIONAL = "historia_oc_info";
+
 // Reporte Jasper. El glob debe ser un literal para que Vite lo resuelva en build.
 const jasperModules = import.meta.glob(
   "../../../../../jaspers/HistoriaOcupacional/*.jsx"
@@ -61,7 +64,9 @@ const ordenarDetalles = (detalles = []) =>
 // ===== Verificación por N° Orden =====
 // Decide si el N° Orden corresponde a un registro NUEVO o EXISTENTE y delega la
 // carga en el mapeo correspondiente. Mantiene el flujo original (id === 0 -> nuevo).
-export const VerifyTR = (nro, tabla, token, set, sede, setTable) =>
+// `silencioso`: al encontrar un registro existente no avisa "ya cuenta con registros" (formulario incrustado,
+// donde el estado del registro ya se ve en pantalla).
+export const VerifyTR = (nro, tabla, token, set, sede, setTable, { silencioso = false } = {}) =>
   verificarRegistro({
     nro,
     tabla,
@@ -74,11 +79,13 @@ export const VerifyTR = (nro, tabla, token, set, sede, setTable) =>
     },
     onExistente: () => {
       // Registro EXISTENTE.
-      Swal.fire(
-        "Alerta",
-        "Este paciente ya cuenta con registros de Historia Ocupacional.",
-        "warning"
-      );
+      if (!silencioso) {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Historia Ocupacional.",
+          "warning"
+        );
+      }
       GetInfoServicioEditar(nro, tabla, set, token, setTable);
     },
   });

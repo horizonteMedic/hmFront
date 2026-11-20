@@ -3,8 +3,9 @@ const FONT = "helvetica";
 // Párrafo justificado con segmentos { texto, negrita } (p. ej. datos del paciente en negrita). Se parte en palabras
 // (una palabra puede mezclar estilos: un dato en negrita seguido de una coma), se reparten en líneas del ancho
 // disponible y en todas menos la última el espacio sobrante se reparte entre las palabras. Devuelve la Y siguiente.
-const parrafoJustificado = (doc, segmentos, y, { margin = 18, fontSize = 11, interlineado = 7 } = {}) => {
-  const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+// `anchoMaximo` (opcional) fija el ancho del párrafo, que empieza en `margin`; por defecto ocupa la página menos los dos márgenes.
+const parrafoJustificado = (doc, segmentos, y, { margin = 18, fontSize = 11, interlineado = 7, anchoMaximo } = {}) => {
+  const maxWidth = anchoMaximo ?? doc.internal.pageSize.getWidth() - 2 * margin;
   doc.setFontSize(fontSize);
 
   const anchoDe = (texto, negrita) => {

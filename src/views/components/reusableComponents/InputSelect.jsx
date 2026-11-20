@@ -29,6 +29,7 @@ export function SelectField({
     const select = (
         <div className="w-full flex items-center gap-1.5">
             <select
+                id={name}
                 name={name}
                 value={value}
                 onChange={onChange}

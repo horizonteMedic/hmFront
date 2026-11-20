@@ -103,49 +103,49 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
     }
   };
 
-  // === FUNCIONES DE PAGINACIÓN DE SECCIONES ===
-  const calcularAlturaTextoReal = (doc, texto, maxWidth, fontSize, lineHeight = null) => {
-    if (!texto) return 0;
-    doc.setFont("helvetica", "normal").setFontSize(fontSize);
-    const lh = lineHeight || fontSize * 0.4;
+  // // === FUNCIONES DE PAGINACIÓN DE SECCIONES ===
+  // const calcularAlturaTextoReal = (doc, texto, maxWidth, fontSize, lineHeight = null) => {
+  //   if (!texto) return 0;
+  //   doc.setFont("helvetica", "normal").setFontSize(fontSize);
+  //   const lh = lineHeight || fontSize * 0.4;
 
-    const parrafos = String(texto).split("\n");
-    let totalLineas = 0;
+  //   const parrafos = String(texto).split("\n");
+  //   let totalLineas = 0;
 
-    parrafos.forEach(parrafo => {
-      if (parrafo.trim() === "") {
-        totalLineas += 1;
-      } else {
-        const lines = doc.splitTextToSize(parrafo, maxWidth);
-        totalLineas += lines.length;
-      }
-    });
+  //   parrafos.forEach(parrafo => {
+  //     if (parrafo.trim() === "") {
+  //       totalLineas += 1;
+  //     } else {
+  //       const lines = doc.splitTextToSize(parrafo, maxWidth);
+  //       totalLineas += lines.length;
+  //     }
+  //   });
 
-    return totalLineas * lh;
-  };
+  //   return totalLineas * lh;
+  // };
 
-  const dibujarTextoCompleto = (doc, texto, x, y, maxWidth, fontSize, lineHeight = null) => {
-    if (!texto) return y;
-    doc.setFont("helvetica", "normal").setFontSize(fontSize);
-    const lh = lineHeight || fontSize * 0.4;
+  // const dibujarTextoCompleto = (doc, texto, x, y, maxWidth, fontSize, lineHeight = null) => {
+  //   if (!texto) return y;
+  //   doc.setFont("helvetica", "normal").setFontSize(fontSize);
+  //   const lh = lineHeight || fontSize * 0.4;
 
-    let yPos = y;
-    const parrafos = String(texto).split("\n");
+  //   let yPos = y;
+  //   const parrafos = String(texto).split("\n");
 
-    parrafos.forEach(parrafo => {
-      if (parrafo.trim() === "") {
-        yPos += lh;
-      } else {
-        const lines = doc.splitTextToSize(parrafo, maxWidth);
-        lines.forEach(line => {
-          doc.text(line, x, yPos);
-          yPos += lh;
-        });
-      }
-    });
+  //   parrafos.forEach(parrafo => {
+  //     if (parrafo.trim() === "") {
+  //       yPos += lh;
+  //     } else {
+  //       const lines = doc.splitTextToSize(parrafo, maxWidth);
+  //       lines.forEach(line => {
+  //         doc.text(line, x, yPos);
+  //         yPos += lh;
+  //       });
+  //     }
+  //   });
 
-    return yPos;
-  };
+  //   return yPos;
+  // };
 
   const dibujarSeccionPaginada = async (doc, titulo, texto, x, y, ancho, drawHeaderFn, numeroPaginaRef, altMinima = 18) => {
     const fontSize = 8;
@@ -486,19 +486,7 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
   doc.text(`${hemoVal}${separador}${hemtoVal}`, x2 + 150, yPos2 + 4);
   yPos2 += altSerologia;
 
-  // --- Grupo Sanguíneo | Factor RH ---
-  const altGrupoRH = 6;
-  doc.rect(x2, yPos2, ancho2, altGrupoRH);
-  doc.line(x2 + 90, yPos2, x2 + 90, yPos2 + altGrupoRH);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Grupo Sanguíneo:", x2 + 2, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.grupoSanguineo || "", x2 + 38, yPos2 + 4);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Factor RH:", x2 + 92, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.factorSanguineo ?? "", x2 + 115, yPos2 + 4);
-  yPos2 += altGrupoRH;
+  // MARSA: no se muestra Grupo Sanguíneo ni Factor RH
 
   // --- Orina: encabezado ---
   const altOrinaHeader = 5;
