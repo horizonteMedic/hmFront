@@ -1,4 +1,4 @@
-// Sticker de la ticketera Advance ADV-9026N: rollo de 80 x 50 mm.
+// Sticker de la ticketera Advance ADV-9026N (driver 4Barcode 3B-300B): rollo de 80 x 50 mm.
 //
 //   ┌──────────────────────────────────────────────┐
 //   │ PACIENTE                  ┊      N° ORDEN    │
@@ -10,14 +10,12 @@
 //   Filas a la izquierda (nombre, DNI, edad); a la derecha, separado por una línea vertical,
 //   el N° de orden grande y la fecha pequeña.
 //
-// Se imprime con el diálogo de impresión del navegador (en escritorio o en Android), así que la impresora
-// se elige ahí. Es una página HTML con `@page { size }` (y no PDF): el navegador le pide a la impresora o al
-// servicio de impresión exactamente 80 x 50 mm, en vez de adaptar la hoja a un papel más grande.
+// Se imprime como página HTML con `@page { size }` (y no como PDF): así el navegador le pide al driver
+// exactamente 80 x 50 mm en vez de adaptar la hoja al papel «USER» que tenga configurado el driver
+// (que giraba el ticket y gastaba varios stickers).
 
-import {
-    ANCHO, ALTO, MARGEN, COL_IZQUIERDA, COL_ETIQUETA, PADDING_COLUMNAS,
-    FUENTES_NOMBRE, FUENTES_DATO, FUENTES_ORDEN, INTERLINEADO_NOMBRE, prepararDatos,
-} from "./ticketComun";
+const ANCHO = 80;
+const ALTO = 50;
 
 // Giro del contenido, en grados horarios: 0, 90, 180 o 270.
 // Si el sticker sale girado, se corrige solo con este valor:
@@ -26,8 +24,36 @@ import {
 //   180 = igual que 0 pero de cabeza.
 const GIRO = 0;
 
+// Márgenes del sticker (mm). La impresora no imprime hasta el borde derecho, por eso ese margen es mayor.
+// Si algo sigue cortándose, se sube el margen del lado afectado.
+const MARGEN = { arriba: 3, derecho: 7, abajo: 3, izquierdo: 4 };
+
+// Ancho (mm) de la columna izquierda (filas de datos) y de las etiquetas «DNI» / «EDAD» dentro de ella.
+// El resto del ancho es para el N° de orden.
+const COL_IZQUIERDA = 42;
+const COL_ETIQUETA = 11;
+
+// Tamaños de letra (pt), del más grande al más pequeño. Se usa el primero que cabe.
+const FUENTES_NOMBRE = [10, 9, 8, 7];
+const FUENTES_DATO = [19, 17, 15, 13, 11, 9]; // DNI y edad
+const FUENTES_ORDEN = [52, 46, 40, 34, 30, 26];
+const INTERLINEADO_NOMBRE = 1.15;
+
 export default async function Ticket({ datos = null }) {
-    imprimir(construirHtml(prepararDatos(datos)));
+    const visita = datos?.visita ?? {};
+    const paciente = datos?.paciente ?? {};
+    const edad = calcularEdad(paciente.fechaNacimiento);
+    const norden = String(visita.norden ?? "");
+
+    imprimir(
+        construirHtml({
+            nombres: `${paciente.nombres ?? ""} ${paciente.apellidos ?? ""}`.trim().toUpperCase(),
+            edad: edad ? `${edad} años` : "-",
+            dni: paciente.dni || "S/D",
+            fecha: formatearFecha(visita.fechaVisita) || formatearFecha(new Date().toISOString()),
+            norden,
+        })
+    );
 }
 
 const escapar = (texto) =>
@@ -63,11 +89,11 @@ function construirHtml({ nombres, edad, dni, fecha, norden }) {
              transform-origin: top left; transform: ${transformacion()}; display: flex; flex-direction: column; }
   .etiqueta { font-size: 6pt; color: #6e6e6e; letter-spacing: .02em; }
   .cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: ${COL_IZQUIERDA}mm minmax(0, 1fr); }
-  .izquierda { display: flex; flex-direction: column; justify-content: center; gap: 3mm; padding-right: ${PADDING_COLUMNAS}mm; }
+  .izquierda { display: flex; flex-direction: column; justify-content: center; gap: 3mm; padding-right: 2mm; }
   .nombre { font-size: 10pt; font-weight: 700; line-height: ${INTERLINEADO_NOMBRE}; margin-top: 0.8mm; word-break: break-word; }
   .fila { display: grid; grid-template-columns: ${COL_ETIQUETA}mm minmax(0, 1fr); align-items: baseline; }
   .dato { font-size: ${FUENTES_DATO[0]}pt; font-weight: 700; line-height: 1.05; white-space: nowrap; }
-  .derecha { border-left: 0.3mm dashed #6e6e6e; padding-left: ${PADDING_COLUMNAS}mm; display: flex; flex-direction: column; text-align: center; }
+  .derecha { border-left: 0.3mm dashed #6e6e6e; padding-left: 2mm; display: flex; flex-direction: column; text-align: center; }
   .centro { flex: 1; display: flex; align-items: center; }
   .norden { width: 100%; font-size: ${FUENTES_ORDEN[0]}pt; font-weight: 700; line-height: 1; white-space: nowrap; }
   .fecha { font-size: 8pt; color: #333; }
@@ -124,6 +150,21 @@ function ajustarAncho(doc, ids, fuentes) {
         });
     const pt = fuentes.find(caben) ?? fuentes[fuentes.length - 1];
     elementos.forEach((el) => (el.style.fontSize = `${pt}pt`));
+}
+
+// "2026-11-19" (o con hora) -> "19/11/2026", por texto para no desfasar el día por zona horaria
+function formatearFecha(fecha) {
+    const [anio, mes, dia] = String(fecha ?? "").slice(0, 10).split("-");
+    return anio && mes && dia ? `${dia}/${mes}/${anio}` : "";
+}
+
+function calcularEdad(fechaNacimiento) {
+    const [anio, mes, dia] = String(fechaNacimiento ?? "").slice(0, 10).split("-").map(Number);
+    if (!anio || !mes || !dia) return "";
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - anio;
+    if (hoy.getMonth() + 1 < mes || (hoy.getMonth() + 1 === mes && hoy.getDate() < dia)) edad--;
+    return String(edad);
 }
 
 // Escribe el ticket en un iframe oculto y abre el diálogo de impresión del navegador
