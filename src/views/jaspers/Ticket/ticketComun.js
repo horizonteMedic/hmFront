@@ -1,6 +1,4 @@
-// Medidas y datos del sticker que comparten las dos formas de imprimirlo:
-//  - Ticket.jsx     : página HTML + diálogo de impresión del navegador (escritorio).
-//  - TicketTspl.js  : comandos TSPL enviados a RawBT (Android).
+// Medidas y datos del sticker (los usa Ticket.jsx).
 
 // Rollo de la ticketera Advance ADV-9026N: stickers de 80 x 50 mm.
 export const ANCHO = 80;

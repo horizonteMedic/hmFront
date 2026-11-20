@@ -10,39 +10,24 @@
 //   Filas a la izquierda (nombre, DNI, edad); a la derecha, separado por una línea vertical,
 //   el N° de orden grande y la fecha pequeña.
 //
-// Hay dos formas de imprimirlo, según desde dónde se abra el sistema:
-//  - Escritorio (driver 4Barcode 3B-300B): página HTML con `@page { size }` (y no PDF), para que el navegador
-//    le pida al driver exactamente 80 x 50 mm en vez de adaptar la hoja al papel «USER» del driver.
-//  - Android (RawBT por Bluetooth, ticketera TSPL): se envían los comandos TSPL directo a RawBT
-//    (ver TicketTspl.js), porque el servicio de impresión de Android no controla el alto de la etiqueta
-//    y la hoja salía de ~300 mm (unos 6 stickers).
+// Se imprime con el diálogo de impresión del navegador (en escritorio o en Android), así que la impresora
+// se elige ahí. Es una página HTML con `@page { size }` (y no PDF): el navegador le pide a la impresora o al
+// servicio de impresión exactamente 80 x 50 mm, en vez de adaptar la hoja a un papel más grande.
 
 import {
     ANCHO, ALTO, MARGEN, COL_IZQUIERDA, COL_ETIQUETA, PADDING_COLUMNAS,
     FUENTES_NOMBRE, FUENTES_DATO, FUENTES_ORDEN, INTERLINEADO_NOMBRE, prepararDatos,
 } from "./ticketComun";
-import { enviarTicketARawBT } from "./TicketTspl";
 
-// En Android se imprime con RawBT (TSPL). Poner false para usar siempre el diálogo de impresión del navegador.
-const USAR_RAWBT_EN_ANDROID = true;
-
-// Giro del contenido en la impresión por navegador, en grados horarios: 0, 90, 180 o 270.
+// Giro del contenido, en grados horarios: 0, 90, 180 o 270.
 // Si el sticker sale girado, se corrige solo con este valor:
 //   0   = el sticker se alimenta con el lado de 80 mm horizontal (lo normal).
 //   90 / 270 = el driver alimenta el lado de 80 mm en vertical: la página pasa a ser de 50 x 80 mm.
 //   180 = igual que 0 pero de cabeza.
 const GIRO = 0;
 
-const esAndroid = () => typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
-
 export default async function Ticket({ datos = null }) {
-    const ticket = prepararDatos(datos);
-
-    if (USAR_RAWBT_EN_ANDROID && esAndroid()) {
-        enviarTicketARawBT(ticket);
-        return;
-    }
-    imprimir(construirHtml(ticket));
+    imprimir(construirHtml(prepararDatos(datos)));
 }
 
 const escapar = (texto) =>
