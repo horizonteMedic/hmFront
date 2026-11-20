@@ -108,6 +108,7 @@ const urlsEliminar = {
     CONSENT_RECOM_MEDIC: "consentimientos/consentimientos-admision",
     DECLA_JURA_ANTECE_PERSON_FAM: "consentimientos/consentimientos-admision",
     DECLA_INFO_APTITUD_MO: "consentimientos/consentimientos-admision",
+    registro_entrega_resultados_emo: "ocupacional/registro-entrega-resultados",
     ConstBrigadista: "constaBrigadista/consta-brigadista",
     ConformidadEmo: "registroConformidadEmo/conformidad-emo",
     ConstFirmaHuella: "consentDigit",

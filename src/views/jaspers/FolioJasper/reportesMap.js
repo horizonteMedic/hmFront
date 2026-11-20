@@ -55,6 +55,7 @@ import LBioquimica_Digitalizado from "../AnalisisBioquimicos/LBioquimica_Digital
 import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_Digitalizado";
 import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
 import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
+import ConsentAdmisionRegistroEntregaInformeEMO from "../ModuloConsentimientos/ConsentAdmisRegistroEntregaInformeEMO/Consent_Admision_RegistroEntregaInformeEMO";
 import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
 import ResultadosPanel5d_Digitalizado from "../Toxicologia/ResultadosPanel5d_Digitalizado";
 import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExamComplementario/Informe_Psico_Exam_Complementario";
@@ -279,6 +280,8 @@ export const reportesMap = {
    consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
 
    DECLA_INFO_APTITUD_MO: ConsentAdmisionInformacionAptitudMedicoOcupacional,
+
+   registro_entrega_resultados_emo: ConsentAdmisionRegistroEntregaInformeEMO,
 
    consent_Boro: Consentimiento_Boro_Digitalizado,
 
