@@ -568,7 +568,7 @@ export default function FichaConduccionVehiculos() {
                     </div>
 
                     {/* ===== SECCIÓN: CONCLUSIÓN Y COMENTARIOS ===== */}
-                    <SectionFieldset legend="Conclusión y Comentarios" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <SectionFieldset legend="Conclusión y Comentarios" className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                         {/* Columna Izquierda - Conclusión */}
                         <div className="space-y-4">
                             <div>
@@ -617,11 +617,36 @@ export default function FichaConduccionVehiculos() {
                             </div>
                         </div>
 
-                        {/* Columna Central - Observaciones */}
-                        <div className="space-y-4">
+                        {/* Fila intermedia (a todo el ancho) - Médicos */}
+                        <div className="order-10 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            <EmpleadoComboBox
+                                value={form.nombre_medico}
+                                label="Especialista"
+                                form={form}
+                                onChange={handleChangeSimple}
+                                disabled={camposDeshabilitados}
+                                edited={isMedicoEdited}
+                                onRevert={revertMedico}
+                            />
+                            <EmpleadoComboBox
+                                value={form.nombre_doctorAsignado}
+                                label="Doctor Asignado"
+                                form={form}
+                                onChange={handleChangeSimple}
+                                nameField="nombre_doctorAsignado"
+                                idField="user_doctorAsignado"
+                                disabled={camposDeshabilitados}
+                                edited={isDoctorAsignadoEdited}
+                                onRevert={revertDoctorAsignado}
+                            />
+                        </div>
+
+                        {/* Fila inferior (a todo el ancho) - Observaciones y CIE10: ambos crecen con el contenido */}
+                        <div className="order-11 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                             <InputTextAreaUpper
                                 label="Observaciones y Recomendaciones"
-                                rows={6}
+                                rows={4}
+                                autoGrow
                                 name="observacionesRecomendaciones"
                                 value={form?.observacionesRecomendaciones}
                                 disabled={camposDeshabilitados}
@@ -652,26 +677,6 @@ export default function FichaConduccionVehiculos() {
                                     disabled={camposDeshabilitados}
                                 />
                             </div>
-                            <EmpleadoComboBox
-                                value={form.nombre_medico}
-                                label="Especialista"
-                                form={form}
-                                onChange={handleChangeSimple}
-                                disabled={camposDeshabilitados}
-                                edited={isMedicoEdited}
-                                onRevert={revertMedico}
-                            />
-                            <EmpleadoComboBox
-                                value={form.nombre_doctorAsignado}
-                                label="Doctor Asignado"
-                                form={form}
-                                onChange={handleChangeSimple}
-                                nameField="nombre_doctorAsignado"
-                                idField="user_doctorAsignado"
-                                disabled={camposDeshabilitados}
-                                edited={isDoctorAsignadoEdited}
-                                onRevert={revertDoctorAsignado}
-                            />
                         </div>
 
                         {/* Columna Derecha - Recomendaciones */}
