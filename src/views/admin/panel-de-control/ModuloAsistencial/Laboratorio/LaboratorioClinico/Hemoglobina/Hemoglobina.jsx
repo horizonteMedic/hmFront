@@ -236,7 +236,7 @@ export default function Hemoglobina() {
                     edited={isMedicoEdited}
                     onRevert={revertMedico}
                 />
-                <EmpleadoComboBox
+                {/* <EmpleadoComboBox
                     value={form.nombre_doctorAsignado}
                     label="Doctor Asignado"
                     form={form}
@@ -246,7 +246,7 @@ export default function Hemoglobina() {
                     disabled={camposDeshabilitados}
                     edited={isDoctorEdited}
                     onRevert={revertDoctor}
-                />
+                /> */}
             </SectionFieldset>
 
             {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}

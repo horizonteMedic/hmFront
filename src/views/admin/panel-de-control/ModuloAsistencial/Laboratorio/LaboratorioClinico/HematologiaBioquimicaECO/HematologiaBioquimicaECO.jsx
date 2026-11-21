@@ -786,7 +786,7 @@ export default function HematologiaBioquimicaECO() {
               edited={isMedicoEdited}
               onRevert={revertMedico}
             />
-            <EmpleadoComboBox
+            {/* <EmpleadoComboBox
               value={form.nombre_doctorAsignado}
               label="Doctor Asignado"
               form={form}
@@ -796,7 +796,7 @@ export default function HematologiaBioquimicaECO() {
               disabled
               edited={isDoctorEdited}
               onRevert={revertDoctor}
-            />
+            /> */}
           </SectionFieldset>
         </SectionFieldset>
 

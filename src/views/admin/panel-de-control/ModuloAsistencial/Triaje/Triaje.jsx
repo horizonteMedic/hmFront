@@ -488,7 +488,7 @@ export default function TriajeAsistencial() {
                 </SectionFieldset>
             </div>
 
-            <SectionFieldset legend="Asignación de Médico">
+            {/* <SectionFieldset legend="Asignación de Médico">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
                     label="Especialista"
@@ -498,7 +498,7 @@ export default function TriajeAsistencial() {
                     edited={isMedicoEdited}
                     onRevert={revertMedico}
                 />
-            </SectionFieldset>
+            </SectionFieldset> */}
 
             {hayRegistroCargado && (
                 <AuditoriaRegistro

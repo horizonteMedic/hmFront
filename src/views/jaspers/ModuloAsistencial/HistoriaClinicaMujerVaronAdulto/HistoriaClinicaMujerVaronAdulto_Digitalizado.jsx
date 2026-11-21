@@ -10,6 +10,8 @@ import FilaEtiquetaValorAsistencial, {
 import footerTR from "../../components/footerTR.jsx";
 import AntecedentesAdicionalesAsistencial from "../../components/antecedentesAdicionalesAsistencial.jsx";
 import dibujarCuadroTextoDinamico from "../../components/CuadroTextoDinamico.jsx";
+import { dibujarFirmas } from "../../../utils/dibujarFirmas";
+import { getSign } from "../../../utils/helpers";
 
 // Formato digitalizado de la hoja física "Historia Clínica de la Mujer y el Varón Adulto".
 //
@@ -502,9 +504,48 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
   //   doc.text("Sello y Firma del Médico", xCentro, yFirma + 8, { align: "center" });
   // };
 
+  // ===== Sello y firma del médico =====
+  // Con el sello digitalizado (SELLOFIRMADOCASIG) se dibuja igual que en la Historia del Adulto Mayor y el
+  // Triaje (ver dibujarFirmas). Si no hay sello, o la imagen no carga, queda la línea con el nombre para
+  // firmar a mano. Si no cabe al final de la hoja, pasa a una nueva con la misma cabecera.
+  const ALTO_FIRMA = 30;
+  const dibujarFirmaMedico = async (yInicio) => {
+    const y = await asegurarEspacio(yInicio + 3, ALTO_FIRMA);
+    doc.setDrawColor(0, 0, 0);
+    doc.setTextColor(0, 0, 0);
+    let firmaDibujada = false;
+    if (getSign(data, "SELLOFIRMADOCASIG")) {
+      try {
+        await dibujarFirmas({
+          doc,
+          datos: data,
+          y,
+          pageW: doc.internal.pageSize.getWidth(),
+          mostrarFirmaPaciente: false,
+        });
+        firmaDibujada = true;
+      } catch (error) {
+        console.error("No se pudo dibujar el sello del médico:", error);
+      }
+    }
+    if (!firmaDibujada) {
+      const yLinea = y + 15;
+      const xCentro = X + ANCHO * 0.75;
+      doc.setLineWidth(0.2);
+      doc.line(xCentro - 35, yLinea, xCentro + 35, yLinea);
+      fuente("bold", 8);
+      if (texto(data.nombre_medico)) {
+        textoAjustado(`Dr(a). ${texto(data.nombre_medico)}`, xCentro, yLinea + 4, 70, { align: "center" });
+      }
+      fuente("normal", 7);
+      doc.text("Sello y firma del médico", xCentro, yLinea + 8, { align: "center" });
+    }
+  };
+
   // ===== Armado del documento =====
   const yContenido = await dibujarEncabezado(1);
-  await dibujarPagina1(yContenido);
+  const yFinPagina1 = await dibujarPagina1(yContenido);
+  await dibujarFirmaMedico(yFinPagina1);
   footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
 
   // if (d.tienePagina2) {

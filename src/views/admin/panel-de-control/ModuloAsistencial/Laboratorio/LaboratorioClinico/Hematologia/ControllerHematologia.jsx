@@ -128,7 +128,7 @@ export const PrintHojaR = (numeroTicket, token) =>
     obtenerRegistro: obtenerRegistroReporte,
     jasperModules,
     rutaJasper,
-    ajustarDatos: ajustarDatosReporte(numeroTicket, token, { apellidosPrimero: false }),
+    ajustarDatos: ajustarDatosReporte(numeroTicket, token, { apellidosPrimero: false, medicoDelTicket: true }),
   });
 
 // Botón IMPRIMIR: pide confirmación y luego imprime.

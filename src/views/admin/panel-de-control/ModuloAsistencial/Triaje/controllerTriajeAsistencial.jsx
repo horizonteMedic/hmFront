@@ -11,10 +11,9 @@ import { ObtenerTicketPorNumero } from "../RegistroAtencion/TicketAsistencial/co
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { convertirGenero, fixEncodingModern } from "../../../../utils/helpers";
 import { useAuthStore } from "../../../../../store/auth";
+import { obtenerFirmaMedicoTicket } from "../../../../utils/registroAsistencialUtils";
 
 const triajeUrl = "/asistencial/triaje";
-const empleadoUrl = "/api/v01/st/empleado";
-const archivoEmpleadoUrl = "/api/v01/st/registros/detalleUrlArchivosEmpleados";
 
 // Reporte Jasper. El glob debe ser un literal para que Vite pueda resolverlo en build; por eso
 // se declara aquí (en el controller).
@@ -392,30 +391,15 @@ const nombreSedeActual = () => {
     return userlogued?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede ?? "";
 };
 
-// Sello y firma del médico asignado. A diferencia de los reportes ocupacionales, el Triaje no trae
-// "digitalizacion" desde el backend, así que se arma aquí con el mismo formato (lo lee dibujarFirmas):
-// usuarioMedicoFirma (username) -> idEmpleado (listaEmpleados de la sesión) -> DNI (GET empleado/{id})
-// -> URL del SELLOFIRMA del empleado. Si algo falla, el reporte se imprime sin sello.
-const obtenerDigitalizacionMedico = async (usuarioMedicoFirma, token) => {
-    if (!usuarioMedicoFirma) return [];
-    try {
-        const { listaEmpleados } = useAuthStore.getState();
-        const empleado = (listaEmpleados || []).find((emp) => emp.username === usuarioMedicoFirma);
-        if (!empleado?.idEmpleado) return [];
-
-        const datosEmpleado = await getFetch(`${empleadoUrl}/${empleado.idEmpleado}`, token);
-        const dni = datosEmpleado?.numDocumento;
-        if (!dni) return [];
-
-        const sello = await getFetch(`${archivoEmpleadoUrl}/${dni}/SELLOFIRMA`, token);
-        if (sello?.id !== 1 || !sello.mensaje) return [];
-
-        return [{ nombreDigitalizacion: "SELLOFIRMADOCASIG", url: sello.mensaje }];
-    } catch (error) {
-        console.error("No se pudo obtener el sello del médico:", error);
-        return [];
-    }
-};
+// Sello y firma del médico (SELLOFIRMADOCASIG). El Triaje no trae "digitalizacion" desde el backend: firma
+// el doctor del ticket y, en tickets sin doctor, el médico guardado en el Triaje (o quien lo registró).
+// Si algo falla, el reporte se imprime con la línea para firmar a mano.
+const obtenerDigitalizacionMedico = async (triaje, numeroTicket, token) =>
+    (
+        await obtenerFirmaMedicoTicket(numeroTicket, token, {
+            usuario: triaje.usuarioMedicoFirma || triaje.usuarioRegistro || triaje.userRegistro,
+        })
+    ).digitalizacion;
 
 // Datos que consume el Jasper: mismos nombres de campo del formulario, armados con los mappers de
 // arriba a partir del ticket y del Triaje guardado (así la impresión y la pantalla nunca se desalinean).
@@ -462,7 +446,7 @@ export const PrintTriaje = async (numeroTicket, token, datosFooter) => {
             return;
         }
 
-        const digitalizacion = await obtenerDigitalizacionMedico(triaje.usuarioMedicoFirma, token);
+        const digitalizacion = await obtenerDigitalizacionMedico(triaje, numeroTicket, token);
 
         await modulo.default({
             ...construirDatosImpresion(ticket, triaje, numeroTicket, digitalizacion),
@@ -523,11 +507,11 @@ export const PrintTicketAtencion = async (numeroTicket, token) => {
 
 // Impresiones disponibles del Triaje (ver MostrarOpcionesImpresion). Cada acción espera su propio aviso.
 const opcionesImpresion = (numeroTicket, token, datosFooter) => [
-    { etiqueta: "Historia asistencial", accion: () => PrintTriaje(numeroTicket, token, datosFooter) },
+    { etiqueta: "Triaje", accion: () => PrintTriaje(numeroTicket, token, datosFooter) },
     { etiqueta: "Ticket atención", accion: () => PrintTicketAtencion(numeroTicket, token) },
 ];
 
-// Botón IMPRIMIR: ofrece las impresiones disponibles (historia asistencial / ticket atención) por N° de Ticket.
+// Botón IMPRIMIR: ofrece las impresiones disponibles (triaje / ticket atención) por N° de Ticket.
 export const ConfirmarImpresion = async (numeroTicket, token, datosFooter) => {
     if (!numeroTicket) {
         await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");
