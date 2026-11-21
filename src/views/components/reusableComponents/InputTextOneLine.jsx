@@ -8,6 +8,7 @@ export default function InputTextOneLine({
   value,
   onChange,
   onKeyUp,
+  onKeyDown,
   onBlur,
   disabled = false,
   type = "text",
@@ -77,6 +78,7 @@ export default function InputTextOneLine({
             name={name}
             value={value ?? ""}
             onKeyUp={onKeyUp}
+            onKeyDown={onKeyDown}
             onChange={onChange}
             onBlur={onBlur}
             disabled={disabled}

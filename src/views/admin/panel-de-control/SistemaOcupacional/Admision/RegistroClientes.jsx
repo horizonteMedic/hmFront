@@ -270,7 +270,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="nombresPa"
           value={form.nombresPa}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('apellidosPa')}
+          onKeyDown={alPresionarEnter('apellidosPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           {...requerido('nombresPa')}
@@ -281,7 +281,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="apellidosPa"
           value={form.apellidosPa}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('fechaNaciminetoPa')}
+          onKeyDown={alPresionarEnter('fechaNaciminetoPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           {...revertible('apellidosPa')}
@@ -292,7 +292,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="fechaNaciminetoPa"
           value={form.fechaNaciminetoPa}
           onChange={(e) => setCampo('fechaNaciminetoPa', mascaraFechaNacimiento(e.target.value))}
-          onKeyUp={alPresionarEnter('sexoPa')}
+          onKeyDown={alPresionarEnter('sexoPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           placeholder="DD-MM-AAAA"
@@ -321,7 +321,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="emailPa"
           value={form.emailPa}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('lugarNacPa')}
+          onKeyDown={alPresionarEnter('lugarNacPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           {...revertible('emailPa')}
@@ -331,7 +331,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="lugarNacPa"
           value={form.lugarNacPa}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('nivelEstPa')}
+          onKeyDown={alPresionarEnter('nivelEstPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           {...requerido('lugarNacPa')}
@@ -390,7 +390,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="direccionPa"
           value={form.direccionPa}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('departamentoPa')}
+          onKeyDown={alPresionarEnter('departamentoPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           className="lg:col-span-2"
@@ -449,7 +449,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="caserioPA"
           value={form.caserioPA}
           onChange={handleChange}
-          onKeyUp={alPresionarEnter('telCasaPa')}
+          onKeyDown={alPresionarEnter('telCasaPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           {...revertible('caserioPA')}
@@ -460,7 +460,7 @@ const RegistroClientes = ({ listas, selectedSede, token, tabHC, ChangeDNI }) => 
           name="telCasaPa"
           value={form.telCasaPa}
           onChange={campoNumerico}
-          onKeyUp={alPresionarEnter('celPa')}
+          onKeyDown={alPresionarEnter('celPa')}
           disabled={camposDeshabilitados}
           labelWidth="120px"
           inputMode="numeric"
