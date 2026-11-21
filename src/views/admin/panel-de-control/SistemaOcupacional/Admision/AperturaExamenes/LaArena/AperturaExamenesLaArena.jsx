@@ -690,7 +690,14 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
       </div>
 
       {modal === 'contrata' && (
-        <ModalContrata onClose={cerrarModal} Swal={Swal} Get={getFetch} token={token} GetRazonS={(nombre) => setCampo('razonContrata', nombre)} />
+        <ModalContrata
+          onClose={cerrarModal}
+          Swal={Swal}
+          Get={getFetch}
+          token={token}
+          GetRazonS={(nombre) => setCampo('razonContrata', nombre)}
+          seleccionarAlAgregar
+        />
       )}
       {modal === 'preCarga' && <ModalPreCarga opcionesPreCarga={opcionesPreCarga} setModalPreCarga={cerrarModal} aplicarPreCarga={aplicarPreCarga} />}
       {modal === 'reportePacientes' && <ReportePacientes onClose={cerrarModal} sede={selectedSede} token={token} />}
