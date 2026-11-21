@@ -30,7 +30,7 @@ function Paso({ hecho, children }) {
 // Últimos tickets de la sede, con búsqueda por apellidos/nombres (al escribir) o por N° de ticket (Enter).
 // El estado y las consultas viven en `listado` (ver useListadoTickets).
 // Click derecho sobre una fila imprime ese ticket (`onImprimir` recibe su N° de ticket).
-export default function ListadoTickets({ listado, onSinResultado, onImprimir }) {
+export default function ListadoTickets({ listado, nombreMedico, onSinResultado, onImprimir }) {
     const { registros, cargando, busqueda } = listado;
 
     const buscarPorNumero = async (e) => {
@@ -110,7 +110,7 @@ export default function ListadoTickets({ listado, onSinResultado, onImprimir }) 
                                 <td className={`${CELDA} font-semibold`}>{formatearTicketAsistencial(t.numeroTicket)}</td>
                                 <td className={`${CELDA} whitespace-nowrap`}>{t.fechaTicket}</td>
                                 <td className={`${CELDA} text-left`}>{t.paciente}</td>
-                                <td className={`${CELDA} text-left`}>{t.medico}</td>
+                                <td className={`${CELDA} text-left`}>{nombreMedico(t)}</td>
                                 <td className={`${CELDA} text-left`}>{t.registradoPor}</td>
                                 <td className={CELDA}>
                                     <Paso hecho={t.pasoTriaje} />

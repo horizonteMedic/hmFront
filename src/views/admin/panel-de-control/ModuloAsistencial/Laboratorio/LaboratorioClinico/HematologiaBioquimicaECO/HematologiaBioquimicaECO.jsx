@@ -322,7 +322,7 @@ export default function HematologiaBioquimicaECO() {
             disabled
             labelWidth="120px"
           />
-        </SectionFieldset> 
+        </SectionFieldset>
         {/* Contenido principal en dos columnas */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Hematología */}
@@ -793,7 +793,7 @@ export default function HematologiaBioquimicaECO() {
               onChange={handleChangeSimple}
               nameField="nombre_doctorAsignado"
               idField="user_doctorAsignado"
-              disabled={camposDeshabilitados}
+              disabled
               edited={isDoctorEdited}
               onRevert={revertDoctor}
             />
