@@ -1,5 +1,6 @@
 import { useRef, useLayoutEffect } from "react";
 import RevertButton from "./RevertButton";
+import { useAutoGrow } from "../../hooks/useAutoGrow";
 
 /**
  * Igual que InputTextArea pero aplica toUpperCase() automáticamente
@@ -22,9 +23,11 @@ export default function InputTextAreaUpper({
     classNameArea = "",
     edited = false,
     onRevert,
+    // Crece según el contenido (rows pasa a ser la altura mínima).
+    autoGrow = false,
 }) {
     const showRevert = edited && typeof onRevert === "function";
-    const textareaRef = useRef(null);
+    const textareaRef = useAutoGrow(value, autoGrow);
     const cursorRef = useRef(null);
 
     useLayoutEffect(() => {
@@ -32,7 +35,7 @@ export default function InputTextAreaUpper({
             textareaRef.current.setSelectionRange(cursorRef.current, cursorRef.current);
             cursorRef.current = null;
         }
-    }, [value]);
+    }, [value, textareaRef]);
 
     const handleChange = (e) => {
         cursorRef.current = e.target.selectionStart;
@@ -61,7 +64,7 @@ export default function InputTextAreaUpper({
                 onKeyUp={onKeyUp}
                 onChange={handleChange}
                 disabled={disabled}
-                className={`border rounded px-2 py-1 w-full resize-none ${classNameArea} ${
+                className={`border rounded px-2 py-1 w-full resize-none ${autoGrow ? "overflow-hidden" : ""} ${classNameArea} ${
                     disabled ? "bg-gray-300" : ""
                 } ${edited ? "border-orange-600 bg-orange-100" : ""}`}
             />

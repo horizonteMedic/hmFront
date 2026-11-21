@@ -1,6 +1,7 @@
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RevertButton from "./RevertButton";
+import { useAutoGrow } from "../../hooks/useAutoGrow";
 
 export default function InputTextArea({
   label = "",
@@ -18,9 +19,12 @@ export default function InputTextArea({
   onRevert,
   required = false,
   error = "",
+  // Crece según el contenido (rows pasa a ser la altura mínima).
+  autoGrow = false,
 }) {
   const showRevert = edited && typeof onRevert === "function";
   const hasError = Boolean(error);
+  const textareaRef = useAutoGrow(value, autoGrow);
 
   // Prioridad de estilos del borde: error (rojo) > editado (naranja) > normal.
   const stateClasses = hasError
@@ -43,6 +47,7 @@ export default function InputTextArea({
         </div>
       )}
       <textarea
+        ref={textareaRef}
         id={name}
         name={name}
         rows={rows}
@@ -53,7 +58,7 @@ export default function InputTextArea({
         disabled={disabled}
         aria-invalid={hasError}
         aria-describedby={hasError ? `${name}-error` : undefined}
-        className={`border rounded px-2 py-1 w-full resize-none transition-colors duration-150 ${classNameArea} ${
+        className={`border rounded px-2 py-1 w-full resize-none transition-colors duration-150 ${autoGrow ? "overflow-hidden" : ""} ${classNameArea} ${
           disabled ? "bg-gray-300" : ""
         } ${stateClasses}`}
       />

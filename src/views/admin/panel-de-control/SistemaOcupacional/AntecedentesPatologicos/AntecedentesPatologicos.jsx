@@ -5,6 +5,7 @@ import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/Antecedente
 import IndicarEnfermedades from "./IndicarEnfermedades/IndicarEnfermedades"
 import Antecedentes from "./Antecedentes/Antecedentes";
 import DeclaracionJurada from "./DeclaracionJurada/DeclaracionJurada";
+import ExamenOcular from "./ExamenOcular/ExamenOcular";
 import {
   CAMPOS_DECLARACION_JURADA,
   DECLARACION_JURADA_INICIAL,
@@ -12,7 +13,6 @@ import {
 import AccionesRegistroHeader from "../../../../components/reusableComponents/AccionesRegistroHeader";
 import AuditoriaRegistro from "../../../../components/reusableComponents/AuditoriaRegistro";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SearchButton from "../../../../components/reusableComponents/SearchButton";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
@@ -646,49 +646,8 @@ export default function AntecedentesPatologicos({ nOrdenInicial, onGuardado }) {
         </div>
 
         {/* ===== BARRA LATERAL: EXAMEN OCULAR (solo lectura, Oftalmología / Laboratorio) ===== */}
-        <aside className="w-full lg:w-80 shrink-0 space-y-3">
-          <SectionFieldset legend="Examen Ocular">
-            <div className="space-y-4">
-              <div>
-                <div className="font-semibold mb-2 text-center">Sin Corregir</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <div className="font-semibold text-center">O.D</div>
-                    <InputTextOneLine label="V.C." name="vcOD" value={form.vcOD} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlOD" value={form.vlOD} disabled labelWidth="35px" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="font-semibold text-center">O.I</div>
-                    <InputTextOneLine label="V.C." name="vcOI" value={form.vcOI} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlOI" value={form.vlOI} disabled labelWidth="35px" />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="font-semibold mb-2 text-center">Corregida</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <div className="font-semibold text-center">O.D</div>
-                    <InputTextOneLine label="V.C." name="vcCorregidaOD" value={form.vcCorregidaOD} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlCorregidaOD" value={form.vlCorregidaOD} disabled labelWidth="35px" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="font-semibold text-center">O.I</div>
-                    <InputTextOneLine label="V.C." name="vcCorregidaOI" value={form.vcCorregidaOI} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlCorregidaOI" value={form.vlCorregidaOI} disabled labelWidth="35px" />
-                  </div>
-                </div>
-                <div className="mt-3 space-y-2">
-                  <InputTextOneLine label="V.Clrs" name="vclrs" value={form.vclrs} disabled labelWidth="50px" />
-                  <InputTextOneLine label="V.B." name="vb" value={form.vb} disabled labelWidth="50px" />
-                  <InputTextOneLine label="R.P." name="rp" value={form.rp} disabled labelWidth="50px" />
-                </div>
-              </div>
-              <InputTextArea label="Enfermedades Oculares" name="enfermedadesOculares" rows={4} value={form.enfermedadesOculares} disabled />
-              <InputTextOneLine label="Cocaína" labelOnTop name="cocaina" value={form.cocaina} disabled className={form.cocainaRed ? "text-red-500" : ""} />
-              <InputTextOneLine label="Marihuana" labelOnTop name="marihuana" value={form.marihuana} disabled className={form.marihuanaRed ? "text-red-500" : ""} />
-            </div>
-          </SectionFieldset>
+        <aside className="w-full lg:w-80 xl:w-96 shrink-0 space-y-3">
+          <ExamenOcular form={form} />
         </aside>
       </div>
 
