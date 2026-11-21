@@ -142,7 +142,8 @@ export const pacienteAFormulario = (res) => ({
     fechaRegistro: res.fechaRegistroPa
         ? `${String(res.fechaRegistroPa).slice(0, 10)}T${String(res.horaRegistroPa || '00:00:00').slice(0, 12)}`
         : '',
-    tieneRegistro: true,
+    // Solo existe en BD si tiene fecha de registro; los datos traídos del proveedor (RENIEC) no la tienen
+    tieneRegistro: Boolean(res.fechaRegistroPa),
 });
 
 // ===== Fecha de nacimiento: DD-MM-AAAA mientras se escribe =====
