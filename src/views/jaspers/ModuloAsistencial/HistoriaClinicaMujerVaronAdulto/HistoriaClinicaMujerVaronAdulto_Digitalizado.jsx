@@ -507,10 +507,26 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
   // ===== Sello y firma del médico =====
   // Con el sello digitalizado (SELLOFIRMADOCASIG) se dibuja igual que en la Historia del Adulto Mayor y el
   // Triaje (ver dibujarFirmas). Si no hay sello, o la imagen no carga, queda la línea con el nombre para
-  // firmar a mano. Si no cabe al final de la hoja, pasa a una nueva con la misma cabecera.
-  const ALTO_FIRMA = 30;
+  // firmar a mano. Va fija al pie de la misma hoja (justo encima del pie de página, como en el Triaje). Si
+  // el contenido ya ocupa ese espacio, la hoja se queda SIN pie de página y la firma usa ese lugar; solo si
+  // ni así entra pasa a una hoja nueva con la misma cabecera.
+  // Alto del bloque (ver dibujarFirmas): sello de 20 mm + línea + 2 renglones de texto.
+  // Devuelve si la hoja donde quedó la firma lleva pie de página.
+  const ALTO_FIRMA = 27;
+  const Y_FIRMA_AL_PIE = LIMITE_Y - ALTO_FIRMA;
+  // Tope sin pie de página: margen inferior de la hoja A4 (297 mm).
+  const LIMITE_Y_SIN_PIE = 290;
   const dibujarFirmaMedico = async (yInicio) => {
-    const y = await asegurarEspacio(yInicio + 3, ALTO_FIRMA);
+    let y;
+    let conPie = true;
+    if (yInicio + 2 <= Y_FIRMA_AL_PIE) {
+      y = Y_FIRMA_AL_PIE;
+    } else if (yInicio + 2 + ALTO_FIRMA <= LIMITE_Y_SIN_PIE) {
+      y = yInicio + 2;
+      conPie = false;
+    } else {
+      y = await asegurarEspacio(yInicio + 2, ALTO_FIRMA);
+    }
     doc.setDrawColor(0, 0, 0);
     doc.setTextColor(0, 0, 0);
     let firmaDibujada = false;
@@ -540,13 +556,15 @@ export default async function HistoriaClinicaMujerVaronAdulto_Digitalizado(data 
       fuente("normal", 7);
       doc.text("Sello y firma del médico", xCentro, yLinea + 8, { align: "center" });
     }
+    return conPie;
   };
 
   // ===== Armado del documento =====
   const yContenido = await dibujarEncabezado(1);
   const yFinPagina1 = await dibujarPagina1(yContenido);
-  await dibujarFirmaMedico(yFinPagina1);
-  footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
+  if (await dibujarFirmaMedico(yFinPagina1)) {
+    footerTR(doc, { footerData: data, footerOffsetY: PIE_OFFSET_Y });
+  }
 
   // if (d.tienePagina2) {
   //   doc.addPage();
