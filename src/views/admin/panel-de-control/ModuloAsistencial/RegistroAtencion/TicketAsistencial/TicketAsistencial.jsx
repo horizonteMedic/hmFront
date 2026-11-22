@@ -789,6 +789,8 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         const body = {
             pacienteId: form.idDatos,
             medicoUsuario: form.medicoUsuario || null,
+            // Nombre completo del médico elegido (se resuelve contra la lista por su usuario).
+            medico: medicos.find((m) => m.username === form.medicoUsuario)?.nombres || null,
             descuento: 0,
             fechaTicket: form.fecha,
             horaTicket,
