@@ -21,6 +21,7 @@ import TicketAsistencialA4 from "../../../../../jaspers/TicketAsistencial/Ticket
 import HistorialTickets from "./HistorialTickets";
 import ListadoTickets from "./ListadoTickets";
 import { useListadoTickets } from "./useListadoTickets";
+import { useMedicos } from "./useMedicos";
 import { ComboboxEmpresasMulti } from "../../../SistemaOcupacional/Admision/model/Combobox";
 
 const METODOS_PAGO = [
@@ -388,7 +389,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
     const today = getToday();
 
-    const { token, userlogued, userCompleto, selectedSede, userName } = useSessionData();
+    const { token, userlogued, userCompleto, selectedSede } = useSessionData();
 
     // Cliente La Arena: no usa código de vendedor, método de pago, autorizado por ni servicios.
     // Lo define la sede con la que se registra el ticket (LARE; no es un dato del formulario, así que
@@ -412,9 +413,9 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
         metodoPago: "",
         autorizadoPor: "",
 
-        // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
+        // Doctor del ticket //BUSCADOR (médicos y odontólogos): se guarda su usuario en `medicoUsuario`.
+        nombre_medico: "",
+        medicoUsuario: "",
 
         nombres: "",
         empresa: "",
@@ -451,6 +452,9 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
     // Últimos tickets de la sede (tabla al final del formulario)
     const listadoTickets = useListadoTickets(selectedSede, token);
+
+    // Doctores asignables al ticket y resolución usuario -> nombre para listado e impresión.
+    const { medicos, nombreMedico } = useMedicos(token);
 
     // Error inline del input "N° Ticket" de la sección IMPRIMIR (reimpresión manual).
     const [errorImprimirTicket, setErrorImprimirTicket] = useState("");
@@ -753,7 +757,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             if (!form.autorizadoPor) next.autorizadoPor = "Debe seleccionar quién autoriza el ticket.";
             if (!String(form.codVendedor ?? "").trim()) next.codVendedor = "El código de vendedor es obligatorio.";
         }
-        if (!form.user_medicoFirma) next.nombre_medico = "Debe asignar un doctor.";
+        if (!form.medicoUsuario) next.nombre_medico = "Debe asignar un doctor.";
         setErrors(next);
         return Object.keys(next).length === 0;
     };
@@ -784,7 +788,9 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
         const body = {
             pacienteId: form.idDatos,
-            medico: form.nombre_medico || null,
+            medicoUsuario: form.medicoUsuario || null,
+            // Nombre completo del médico elegido (se resuelve contra la lista por su usuario).
+            medico: medicos.find((m) => m.username === form.medicoUsuario)?.nombres || null,
             descuento: 0,
             fechaTicket: form.fecha,
             horaTicket,
@@ -860,7 +866,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             edad: ticket.pacienteEdad,
             cargo: ticket.cargo,
             area: ticket.area,
-            medico: ticket.medico,
+            medico: nombreMedico(ticket),
             fecha: ticket.fechaTicket,
             numeroTicket: ticket.numeroTicket,
             items: (ticket.contenidos || []).map((c) => ({
@@ -894,7 +900,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
             area: ticket.area,
             metodoPago: METODOS_PAGO.find((m) => m.value === ticket.modoPago)?.label ?? ticket.modoPago,
             autorizadoPor: AUTORIZADO_POR.find((a) => a.value === ticket.autoriza)?.label ?? ticket.autoriza,
-            medico: ticket.medico,
+            medico: nombreMedico(ticket),
         });
     };
 
@@ -1131,6 +1137,8 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
                     value={form.nombre_medico}
                     label="Doctor"
                     form={form}
+                    empleados={medicos}
+                    idField="medicoUsuario"
                     onChange={handleChangeSimple}
                     required
                     error={errors.nombre_medico}
@@ -1338,6 +1346,7 @@ export default function TicketAsistencial({ pacienteReciente = null, onPacienteR
 
             <ListadoTickets
                 listado={listadoTickets}
+                nombreMedico={nombreMedico}
                 onSinResultado={() => Swal.fire("Sin Resultado", "No se encontraron tickets con ese número", "warning")}
                 onImprimir={imprimirTicket}
             />

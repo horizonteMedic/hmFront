@@ -94,7 +94,8 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
   });
 
   const tieneSelloMedico = Boolean(getSign(data, "SELLOFIRMADOCASIG"));
-  const yLimiteDiagnostico = tieneSelloMedico ? Y_FIRMAS - 2 : Y_LIMITE_CONTENIDO;
+  // El bloque de firma siempre se reserva: con sello se dibuja la imagen y, sin él, la línea para firmar.
+  const yLimiteDiagnostico = Y_FIRMAS - 2;
 
   // ===== Diagnóstico =====
   // Igual que las "Observaciones" del ocupacional: solo se imprime si hay texto. Si es muy largo se
@@ -122,10 +123,11 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
   }
 
   // ===== Firma del médico asignado =====
-  // Si la imagen del sello no se puede cargar, se imprime el informe igual (sin sello).
+  // Si el médico no tiene sello (o la imagen no se puede cargar), queda la línea para firmar a mano.
+  doc.setDrawColor(0, 0, 0);
+  doc.setTextColor(0, 0, 0);
+  let selloDibujado = false;
   if (tieneSelloMedico) {
-    doc.setDrawColor(0, 0, 0);
-    doc.setTextColor(0, 0, 0);
     try {
       await dibujarFirmas({
         doc,
@@ -134,9 +136,18 @@ export default async function ReporteTriajeAsistencial(data = {}, docExistente =
         pageW: doc.internal.pageSize.getWidth(),
         mostrarFirmaPaciente: false,
       });
+      selloDibujado = true;
     } catch (error) {
       console.error("No se pudo dibujar el sello del médico:", error);
     }
+  }
+  if (!selloDibujado) {
+    const centroX = doc.internal.pageSize.getWidth() / 2;
+    const lineaY = Y_FIRMAS + 21;
+    doc.setLineWidth(0.2);
+    doc.line(centroX - 30, lineaY, centroX + 30, lineaY);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Firma y Sello del Médico", centroX, lineaY + 4, { align: "center" });
   }
 
   // ===== Pie =====

@@ -20,6 +20,7 @@ const ModalContrata = ({
   Get,
   token,
   GetRazonS,
+  seleccionarAlAgregar = false, // "Agregar" deja la contrata registrada en el formulario que abrió el modal y lo cierra
 }) => {
   const [formData, setFormData] = useState({
     ruc: "",
@@ -157,13 +158,18 @@ const ModalContrata = ({
       },
     });
 
-    SubmitNewContrata(datos, token).then((res) => {
-      if (res.rucContrata) {
+    SubmitNewContrata(datos, token)
+      .then((res) => {
+        if (!res?.rucContrata) {
+          return Swal.fire("Error", "No se pudo guardar la contrata", "error");
+        }
         Swal.fire("Exito!", `Se Registro/Actualizo con exito`, "success");
         setRefresh(refresh + 1);
+        // Con "Agregar" la razón social queda en el formulario de origen y el modal se cierra
+        if (seleccionarAlAgregar && text === "Registro") return ReturnRS(datos.razonContrata.trim());
         handleClear();
-      }
-    });
+      })
+      .catch(() => Swal.fire("Error", "No se pudo guardar la contrata", "error"));
   };
 
   const ReturnRS = (e) => {
@@ -235,8 +241,19 @@ const ModalContrata = ({
           <h2 className="text-blue-600 text-xl font-semibold">
             Agregar Contrata
           </h2>
-          <div className="text-sm text-gray-500">
-            Agregue su Contrata y ESC para Cerrar
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">
+              Agregue su Contrata y ESC para Cerrar
+            </span>
+            <button
+              type="button"
+              onClick={handleClose}
+              title="Cerrar"
+              aria-label="Cerrar"
+              className="flex h-10 w-10 items-center justify-center rounded text-xl text-gray-500 hover:bg-red-100 hover:text-red-600"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
           </div>
         </div>
 

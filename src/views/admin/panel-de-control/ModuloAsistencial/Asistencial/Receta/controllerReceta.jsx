@@ -2,7 +2,7 @@ import { formatearTicketAsistencial } from "../../../../../utils/ticketAsistenci
 import Swal from "sweetalert2";
 import { LoadingDefault, MostrarOpcionesImpresion } from "../../../../../utils/functionUtils";
 import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
-import { obtenerCmpMedico, obtenerDigitalizacionMedico, obtenerRegistroPorTicket } from "../../../../../utils/registroAsistencialUtils";
+import { obtenerCmpMedico, obtenerFirmaMedicoTicket, obtenerRegistroPorTicket } from "../../../../../utils/registroAsistencialUtils";
 import { ordenarInventarios } from "../../Inventario/Catalogo/Inventarios/controllerInventarios";
 import { consultarInventario, enviarInventario, escaparHtml, etiquetaMedicamento, inventarioUrl, limpiarTexto } from "../../Inventario/Compartido/inventarioUtils";
 
@@ -332,10 +332,9 @@ const imprimirReceta = async (receta, hc, token, datosFooter) => {
             return;
         }
 
-        const [digitalizacion, cmp] = await Promise.all([
-            obtenerDigitalizacionMedico(hc.nombre_medico, token),
-            obtenerCmpMedico(hc.nombre_medico, token),
-        ]);
+        // Firma el doctor del ticket; el médico de la Historia queda de respaldo para tickets sin doctor.
+        const { nombre: medico, digitalizacion } = await obtenerFirmaMedicoTicket(hc.n_hcl, token, { nombre: hc.nombre_medico });
+        const cmp = await obtenerCmpMedico(medico, token);
         await modulo.default({
             numeroTicket: hc.n_hcl,
             // El N° de historia clínica también viene (solo lectura) en la receta: respaldo si la Historia no lo trae.
@@ -351,7 +350,7 @@ const imprimirReceta = async (receta, hc, token, datosFooter) => {
             sexo: hc.sexo,
             empresa: hc.ticketEmpresa || hc.empresa,
             diagnostico: hc.diagnostico,
-            medico: hc.nombre_medico,
+            medico,
             cmp,
             medicamentos: (receta.detalles ?? []).map((detalle) => ({
                 nombre: detalle.medicamentoNombre,

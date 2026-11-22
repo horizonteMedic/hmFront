@@ -18,11 +18,13 @@ export default function EmpleadoComboBox({
     onRevert,
     required = false,
     error = "",
+    // Lista propia de opciones [{ nombres, username }]; por defecto, los empleados de la sesión.
+    empleados: empleadosProp,
 }) {
     const showRevert = edited && typeof onRevert === "function";
     const hasError = Boolean(error);
-    const { listaEmpleados: empleados, userlogued, userName } = useSessionData();
-    const safeEmpleados = empleados || [];
+    const { listaEmpleados: empleadosSesion, userlogued, userName } = useSessionData();
+    const safeEmpleados = empleadosProp ?? empleadosSesion ?? [];
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
 
     // Estado local para manejar la entrada del usuario y permitir escritura natural

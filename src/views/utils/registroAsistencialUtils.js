@@ -481,6 +481,56 @@ export const obtenerDigitalizacionMedico = async (nombreMedico, token) => {
   }
 };
 
+const mismoTexto = (a, b) => String(a ?? "").trim().toUpperCase() === String(b ?? "").trim().toUpperCase();
+
+/**
+ * Doctor elegido en el TICKET (GET /api/tickets/numero/{n}, campo `medicoUsuario`; ver Ticket Asistencial):
+ * { usuario, nombre }. El nombre sale de listaEmpleados de la sesión y, si no está, del texto `medico` de
+ * tickets antiguos. Campos vacíos si el ticket no tiene doctor (o la consulta falla).
+ */
+export const obtenerMedicoTicket = async (numeroTicket, token) => {
+  if (!numeroTicket) return { usuario: "", nombre: "" };
+  try {
+    const ticket = unwrap(await getFetch(`/api/tickets/numero/${numeroTicket}`, token));
+    const usuario = String(ticket?.medicoUsuario ?? "").trim();
+    const { listaEmpleados } = useAuthStore.getState();
+    const empleado = usuario ? (listaEmpleados || []).find((emp) => mismoTexto(emp.username, usuario)) : null;
+    return { usuario, nombre: String(empleado?.nombres ?? ticket?.medico ?? "").trim() };
+  } catch (error) {
+    console.error(`No se pudo obtener el doctor del ticket ${numeroTicket}:`, error);
+    return { usuario: "", nombre: "" };
+  }
+};
+
+/**
+ * Médico que firma un registro asistencial y su sello (SELLOFIRMADOCASIG). Los formularios ya no muestran
+ * "Asignación de médico", así que manda el doctor del TICKET; el `respaldo` ({ usuario?, nombre? }: el médico
+ * guardado en el registro) solo se usa en tickets sin doctor. Devuelve { usuario, nombre, digitalizacion };
+ * sin sello, `digitalizacion` queda [] y el reporte deja la línea para firmar a mano.
+ */
+export const obtenerFirmaMedicoTicket = async (numeroTicket, token, respaldo = {}) => {
+  const medico = await obtenerMedicoTicket(numeroTicket, token);
+  const { listaEmpleados } = useAuthStore.getState();
+  const lista = listaEmpleados || [];
+
+  const usuario =
+    medico.usuario ||
+    String(respaldo.usuario ?? "").trim() ||
+    String(lista.find((emp) => respaldo.nombre && mismoTexto(emp.nombres, respaldo.nombre))?.username ?? "");
+  const nombre =
+    medico.nombre ||
+    String(respaldo.nombre ?? "").trim() ||
+    String(lista.find((emp) => usuario && mismoTexto(emp.username, usuario))?.nombres ?? "");
+
+  let digitalizacion = [];
+  try {
+    digitalizacion = await completarSellosFirma({ doctorAsignado: usuario }, token);
+  } catch (error) {
+    console.error("No se pudo obtener el sello del médico:", error);
+  }
+  return { usuario, nombre, digitalizacion };
+};
+
 /**
  * FIRMAP y HUELLA del trabajador (paciente) por DNI, del mismo archivo que usan Admisión y los
  * consentimientos (GET detalleUrlArchivosEmpleados/{dni}/{tipo}). Los que no existan se omiten y el
@@ -532,9 +582,11 @@ export const obtenerCmpMedico = async (nombreMedico, token) => {
  *  - numeroHistoriaClinica y sede: prevalece el dato del reporte (`nombreSede` si lo trae, p. ej.
  *    Hemoglobina, que además declara `sede`); la sede de la sesión es el respaldo.
  *  - digitalizacion: si el reporte no trae el sello del especialista / doctor asignado, se busca en el
- *    archivo de empleados (como el Triaje asistencial).
+ *    archivo de empleados (como el Triaje asistencial). Con `medicoDelTicket: true` (formularios que ya no
+ *    muestran "Doctor Asignado") la segunda firma es la del doctor del TICKET; el doctorAsignado guardado
+ *    queda de respaldo para tickets sin doctor.
  */
-export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = true } = {}) => async (paciente, registro) => ({
+export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = true, medicoDelTicket = false } = {}) => async (paciente, registro) => ({
   numeroTicket,
   nombres:
     (apellidosPrimero
@@ -543,7 +595,12 @@ export const ajustarDatosReporte = (numeroTicket, token, { apellidosPrimero = tr
     ).trim() || registro.nombres,
   numeroHistoriaClinica: registro.numeroHistoriaClinica ?? paciente.numeroHistoriaClinica ?? "",
   ...(registro.nombreSede || registro.sede ? { sede: registro.nombreSede || registro.sede } : {}),
-  digitalizacion: await completarSellosFirma(registro, token),
+  digitalizacion: await completarSellosFirma(
+    medicoDelTicket
+      ? { ...registro, doctorAsignado: (await obtenerMedicoTicket(numeroTicket, token)).usuario || registro.doctorAsignado }
+      : registro,
+    token
+  ),
 });
 
 // Nombre de la sede de la sesión actual (misma fuente que el selector de sede del Navbar).
