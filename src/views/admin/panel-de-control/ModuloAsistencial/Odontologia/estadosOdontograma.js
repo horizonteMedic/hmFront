@@ -107,3 +107,31 @@ export const OPCIONES_MENU = ESTADOS.filter((estado) => !estado.legacy).reduce((
 
 // Leyenda y contadores: los estados ofrecidos y, solo si el odontograma actual los tiene, los que ya no se ofrecen.
 export const estadosVisibles = (form) => ESTADOS.filter((estado) => !estado.legacy || form[estado.clave] > 0);
+
+// ===== Hallazgos bucales y piezas por estado (ficha médica) =====
+// Los 6 hallazgos que se marcan con un check. El backend los guarda como booleanos con estos mismos nombres; el último
+// ("remanenteRadicularPresente") es independiente del contador `remanenteRadicular` (cuántos dientes tienen ese estado).
+// Se muestran en este orden en el formulario y en la ficha (2 filas de 3).
+export const HALLAZGOS_BUCALES = [
+  { clave: "gingivitis", label: "Gingivitis" },
+  { clave: "sarroDental", label: "Sarro dental" },
+  { clave: "placaBacteriana", label: "Placa bacteriana" },
+  { clave: "periodontitis", label: "Periodontitis" },
+  { clave: "necrosisPulpar", label: "Necrosis pulpar" },
+  { clave: "remanenteRadicularPresente", label: "Remanente radicular" },
+];
+export const CLAVES_HALLAZGOS = HALLAZGOS_BUCALES.map(({ clave }) => clave);
+export const HALLAZGOS_INICIALES = Object.fromEntries(CLAVES_HALLAZGOS.map((clave) => [clave, false]));
+
+// Numeración FDI de cada diente del formulario (d1 = 18 ... d8 = 11, d9 = 21 ... d16 = 28, d17 = 48 ... d24 = 41,
+// d25 = 31 ... d32 = 38): la misma de los lbl11..lbl48 del backend.
+export const FDI_POR_DIENTE = [
+  18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38,
+];
+
+// "18,28": piezas (numeración FDI, de menor a mayor) que tienen el estado `clave` de ESTADOS, a partir de d1..d32 del
+// formulario. El backend arma así "piezasConCaries" ("cariada") y "piezasAusentes" ("ausente"), de solo lectura.
+export const piezasConEstado = (form, clave) =>
+  FDI_POR_DIENTE.filter((_, i) => estadoDe(form[`d${i + 1}`])?.clave === clave)
+    .sort((a, b) => a - b)
+    .join(",");

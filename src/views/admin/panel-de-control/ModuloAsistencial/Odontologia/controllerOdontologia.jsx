@@ -4,10 +4,10 @@ import { getFetch } from "../../getFetch/getFetch";
 import { SubmitData } from "./model";
 import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
 import { actualizarRegistro, validarSede } from "../../../../utils/registroOcupacionalUtils";
-import { contadoresParaRegistrar, labelParaLeer, valorParaRegistrar } from "./estadosOdontograma";
+import { CLAVES_HALLAZGOS, contadoresParaRegistrar, labelParaLeer, valorParaRegistrar } from "./estadosOdontograma";
 import { getFetch as getFetchAsistencial } from "../../../../utils/apiHelpers";
 import { LoadingDefault, MostrarOpcionesImpresion, RegistrarServicioAsistencialDefault } from "../../../../utils/functionUtils";
-import { obtenerDigitalizacionMedico, obtenerDigitalizacionPaciente } from "../../../../utils/registroAsistencialUtils";
+import { hayRegistro, obtenerDigitalizacionMedico, obtenerDigitalizacionPaciente } from "../../../../utils/registroAsistencialUtils";
 import { convertirGenero } from "../../../../utils/helpers";
 import { esArenaDe } from "../Asistencial/ComplementosLaArena/controllerComplementos";
 import { formFromTicketInfo } from "../Asistencial/DescansoMedico/controllerDescansoMedico";
@@ -223,6 +223,10 @@ const formFromOdontograma = (resultado, prev) => {
     observaciones: resultado.txtObservaciones || "",
     observacionesCie10: resultado.observacionesCie10 || "",
     procedimiento: resultado.procedimiento || "",
+    // Ficha médica: los 6 hallazgos (booleanos) y las piezas con caries / ausentes (las calcula el backend)
+    ...Object.fromEntries(CLAVES_HALLAZGOS.map((clave) => [clave, Boolean(resultado[clave])])),
+    piezasConCaries: resultado.piezasConCaries ?? "",
+    piezasAusentes: resultado.piezasAusentes ?? "",
     ...medico,
     // Registro existente: queda bloqueado hasta "Habilitar edición" (useRegistroEditable) + auditoría
     tieneRegistro: true,
@@ -277,6 +281,8 @@ const construirBodyAsistencial = (form) => ({
   doctorAsignado: form.nombre_medico,
   usuarioFirma: form.user_medicoFirma,
   procedimiento: form.procedimiento,
+  // piezasConCaries / piezasAusentes son de solo lectura (las calcula el backend): no se envían.
+  ...Object.fromEntries(CLAVES_HALLAZGOS.map((clave) => [clave, Boolean(form[clave])])),
 });
 
 export const SubmitDataService = async (form, token, user, limpiar, datosFooter) => {
@@ -376,6 +382,74 @@ export const PrintOdontogramaAsistencial = async (numeroTicket, token, datosFoot
   }
 };
 
+// ===== Ficha Médica (reporte vertical) =====
+// GET /api/odontogramas-asistencial/ticket/{numeroTicket}/reporte devuelve UN registro plano (OdontogramaHistorialReporteDTO):
+// paciente, empresa, sede, las 32 piezas (lbl11..lbl48), contadores, observaciones, CIE-10, doctor, procedimiento, piezas con
+// caries / ausentes y los 6 hallazgos. Si el ticket no tiene odontograma guardado, responde error (404).
+const reporteTicketUrl = (numeroTicket) => `${odontogramaTicketUrl}/${numeroTicket}/reporte`;
+const jasperFicha = import.meta.glob("../../../../jaspers/ModuloAsistencial/Odontologia/FichaOdontologicaVertical.jsx");
+const rutaJasperFicha = "../../../../jaspers/ModuloAsistencial/Odontologia/FichaOdontologicaVertical.jsx";
+
+// El cargo del trabajador en la empresa sale del ticket (TicketDTO.cargo, dentro de `infoTicket` del odontograma del ticket):
+// el /reporte no lo trae. Si la consulta falla, la ficha se imprime sin cargo.
+const obtenerCargoDelTicket = async (numeroTicket, token) => {
+  try {
+    const res = await getFetchAsistencial(`${odontogramaTicketUrl}/${numeroTicket}`, token);
+    return res?.resultado?.infoTicket?.cargo ?? "";
+  } catch (error) {
+    console.error("No se pudo obtener el cargo del ticket:", error);
+    return "";
+  }
+};
+
+// Imprime la Ficha Médica del Odontograma GUARDADO de un ticket (siempre consulta al backend, no usa lo escrito en pantalla).
+export const PrintFichaOdontologica = async (numeroTicket, token, datosFooter) => {
+  if (!numeroTicket) {
+    await Swal.fire("Error", "Debe buscar un ticket con Odontograma registrado, o colocar su N° en IMPRIMIR N° TICKET.", "error");
+    return;
+  }
+
+  LoadingDefault("Cargando Formato a Imprimir");
+
+  try {
+    // El cargo se consulta del ticket al mismo tiempo que el reporte (si algún día el reporte lo trae, ése tiene prioridad).
+    const [res, cargoTicket] = await Promise.all([
+      getFetchAsistencial(reporteTicketUrl(numeroTicket), token),
+      obtenerCargoDelTicket(numeroTicket, token),
+    ]);
+    const resultado = res?.resultado;
+
+    if (!hayRegistro(resultado)) {
+      // 404 (o respuesta sin registro) = el ticket no tiene odontograma; otro error = falló la consulta.
+      if (res?.error && res.status !== 404) {
+        Swal.fire("Error", "No se pudo obtener el reporte del Odontograma. Intente nuevamente.", "error");
+      } else {
+        Swal.fire("Sin Odontograma", `El ticket N° ${formatearTicketAsistencial(numeroTicket)} todavía no tiene un Odontograma registrado.`, "warning");
+      }
+      return;
+    }
+
+    const modulo = await jasperFicha[rutaJasperFicha]();
+    // Firma y huella del paciente (por DNI) y sello del médico asignado: si alguno falta, el reporte deja el espacio en blanco.
+    const [firmaPaciente, selloMedico] = await Promise.all([
+      obtenerDigitalizacionPaciente(resultado.dni, token),
+      obtenerDigitalizacionMedico(resultado.doctorAsignado, token),
+    ]);
+
+    await modulo.default({
+      ...resultado,
+      numeroTicket: resultado.numeroTicket ?? numeroTicket,
+      cargo: resultado.cargo || cargoTicket,
+      digitalizacion: [...firmaPaciente, ...selloMedico],
+      ...datosFooter,
+    });
+    Swal.close();
+  } catch (error) {
+    console.error("Error al generar la ficha médica:", error);
+    Swal.fire("Error", "Ocurrió un error al generar el reporte.", "error");
+  }
+};
+
 // Datos del paciente y del ticket que imprime la Receta, con los nombres de campo del formulario que lee
 // ImprimirRecetaPorTicket (n_hcl, numeroHistoriaClinica, nombres, dni, edad, sexo, diagnostico, nombre_medico, ticket*).
 // Salen del odontograma del ticket (que responde siempre con el paciente y el ticket, haya o no odontograma). El
@@ -401,14 +475,16 @@ export const ObtenerDatosRecetaOdontologia = async (numeroTicket, token) => {
   };
 };
 
-// Botones de impresión de un ticket de La Arena: el Odontograma y la Receta (con varias recetas, ésta pregunta cuál).
+// Botones de impresión de un ticket de La Arena: el Odontograma, la Receta (con varias recetas, ésta pregunta cuál) y la
+// Ficha Médica (reporte vertical). Los usan el mensaje de éxito al guardar y el botón IMPRIMIR N° TICKET.
 const opcionesImpresion = (numeroTicket, token, datosFooter) => [
   { etiqueta: "Imprimir Odontograma", accion: () => PrintOdontogramaAsistencial(numeroTicket, token, datosFooter) },
   { etiqueta: "Imprimir Receta", accion: () => ImprimirRecetaPorTicket(numeroTicket, token, datosFooter, ObtenerDatosRecetaOdontologia) },
+  { etiqueta: "Imprimir Ficha Médica", accion: () => PrintFichaOdontologica(numeroTicket, token, datosFooter) },
 ];
 
 // Botón IMPRIMIR: pide confirmación y luego imprime el ticket indicado. Si el ticket es de La Arena (o la sede
-// seleccionada lo es: `esArenaSede`) el mensaje ofrece además imprimir la Receta del ticket.
+// seleccionada lo es: `esArenaSede`) el mensaje ofrece además imprimir la Receta y la Ficha Médica del ticket.
 export const ConfirmarImpresion = async (numeroTicket, token, datosFooter, esArenaSede = false) => {
   if (!numeroTicket) {
     await Swal.fire("Error", "Debe colocar un N° de Ticket", "error");

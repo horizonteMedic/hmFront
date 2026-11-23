@@ -124,6 +124,9 @@ const ModalContrata = ({
         ruc: selectedItem.rucContrata || "",
         razonSocial: selectedItem.razonContrata || "",
         direccion: selectedItem.direccionContrata || "",
+        distrito: selectedItem.distritoContrata || "",
+        provincia: selectedItem.provinciaContrata || "",
+        departamento: selectedItem.departamentoContrata || "",
         telefonos: selectedItem.telefonoContrata || "",
         responsable: selectedItem.responsableContrata || "",
         email: selectedItem.emailContrata || "",
@@ -142,6 +145,9 @@ const ModalContrata = ({
       rucContrata: formData.ruc,
       razonContrata: formData.razonSocial,
       direccionContrata: formData.direccion,
+      distritoContrata: formData.distrito,
+      provinciaContrata: formData.provincia,
+      departamentoContrata: formData.departamento,
       telefonoContrata: formData.telefonos,
       responsableContrata: formData.responsable,
       emailContrata: formData.email,
@@ -167,7 +173,7 @@ const ModalContrata = ({
         setRefresh(refresh + 1);
         // Con "Agregar" la razón social queda en el formulario de origen y el modal se cierra
         if (seleccionarAlAgregar && text === "Registro") return ReturnRS(datos.razonContrata.trim());
-        handleClear();
+        // handleClear();
       })
       .catch(() => Swal.fire("Error", "No se pudo guardar la contrata", "error"));
   };

@@ -270,6 +270,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
             protocolo: hc.protocolo ?? '',
           },
           registros: registrosRef.current,
+          sede: selectedSede,
           token,
         });
       } catch {
@@ -331,6 +332,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
           protocolo: envio.protocolo,
         },
         registros: registrosRef.current,
+        sede: selectedSede,
         token,
       }).catch(() => Swal.fire('Aviso', 'La historia se registró, pero no se pudo preparar la hoja de ruta', 'warning'));
     } catch {

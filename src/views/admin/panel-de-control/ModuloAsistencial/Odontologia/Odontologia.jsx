@@ -6,11 +6,13 @@ import {
   faUsers,
   faClipboardList,
   faCheckCircle,
+  faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   getInfoTabla,
   PrintConsultaEjecutada,
   ConfirmarImpresion,
+  PrintFichaOdontologica,
   SubmitDataService,
   SubmitDataServiceLO,
   TABLA_ODONTOLOGIA,
@@ -35,7 +37,7 @@ import BotonesForm from "../../../../components/templates/BotonesForm";
 import ComplementosDesplegables from "../Asistencial/ComplementosLaArena/ComplementosDesplegables";
 import { RECETA_ESTADO_INICIAL } from "../Asistencial/Receta/controllerReceta";
 import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
-import { CONTADORES_INICIALES } from "./estadosOdontograma";
+import { CLAVES_HALLAZGOS, CONTADORES_INICIALES, HALLAZGOS_INICIALES } from "./estadosOdontograma";
 
 const tabla = TABLA_ODONTOLOGIA;
 const tablaLO = "odontograma_lo";
@@ -47,6 +49,7 @@ const CAMPOS_EDITABLES = [
   ...CAMPOS_DIENTES,
   ...CAMPOS_OBSERVACIONES,
   "procedimiento",
+  ...CLAVES_HALLAZGOS,
   "user_medicoFirma",
   "nombre_medico",
 ];
@@ -110,6 +113,12 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
     observaciones: "",
     observacionesCie10: "",
     noPasoExamen: false,
+
+    // Ficha médica: los 6 hallazgos bucales se marcan (booleanos); las piezas con caries / ausentes las calcula el
+    // backend (solo lectura) y aquí se derivan de los dientes (ver OdontogramaAdultos).
+    ...HALLAZGOS_INICIALES,
+    piezasConCaries: "",
+    piezasAusentes: "",
 
     // Receta de La Arena (la misma de las Historias Clínicas): n_hcl es el N° de ticket que usa la receta; esArena lo
     // carga la búsqueda del ticket (ver useFormLaArena) y los `receta*` son su estado (RECETA_ESTADO_INICIAL).
@@ -243,6 +252,12 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
 
   const handlePrint = () => {
     ConfirmarImpresion(form.ticketImprimir, token, datosFooter, esArenaSede);
+  };
+
+  // Ficha Médica: reporte vertical del odontograma GUARDADO (lo consulta de nuevo al backend). Imprime el ticket de la
+  // casilla IMPRIMIR N° TICKET (se llena sola al cargar un odontograma y se puede cambiar) o, si está vacía, el buscado.
+  const handlePrintFicha = () => {
+    PrintFichaOdontologica(form.ticketImprimir || form.numeroTicket, token, datosFooter);
   };
 
   // Incrustado no se limpia el formulario al registrar: se avisa para que el contenedor muestre el nuevo estado
@@ -525,7 +540,22 @@ export default function Odontologia({ nOrdenInicial, onGuardado }) {
                       hideClear={embebido}
                       printField="ticketImprimir"
                       printLabel="IMPRIMIR N° TICKET"
-                    />
+                    >
+                      {/* Ficha Médica: reporte vertical del odontograma guardado (ver handlePrintFicha) */}
+                      <button
+                        type="button"
+                        onClick={handlePrintFicha}
+                        className="
+                          bg-green-600 hover:bg-green-700
+                          text-white text-base px-6 py-2 rounded
+                          flex items-center gap-2
+                          transition-all duration-150 ease-out
+                          hover:shadow-lg
+                          active:scale-95 active:shadow-inner"
+                      >
+                        <FontAwesomeIcon icon={faPrint} /> Imprimir Ficha Médica
+                      </button>
+                    </BotonesForm>
                   </div>
                 </div>
               </>
