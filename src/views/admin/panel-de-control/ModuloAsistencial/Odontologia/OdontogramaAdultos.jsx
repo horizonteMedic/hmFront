@@ -3,7 +3,15 @@ import "./OdontogramaAdultos.css";
 import CIE10List from "../../../../components/reusableComponents/CIE10List";
 import RevertButton from "../../../../components/reusableComponents/RevertButton";
 import { CAMPOS_DIENTES, CAMPOS_OBSERVACIONES } from "./camposOdontologia";
-import { contarEstados, estadoDe, estadosVisibles } from "./estadosOdontograma";
+import {
+  CLAVES_HALLAZGOS,
+  HALLAZGOS_BUCALES,
+  HALLAZGOS_INICIALES,
+  contarEstados,
+  estadoDe,
+  estadosVisibles,
+  piezasConEstado,
+} from "./estadosOdontograma";
 import MenuContextualOdontograma, { posicionMenu } from "./MenuContextualOdontograma";
 
 export default function OdontogramaAdultos({
@@ -104,7 +112,13 @@ export default function OdontogramaAdultos({
   };
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, ...contarEstados(form) }));
+    // Contadores y listas de piezas (con caries / ausentes) se derivan de los 32 dientes, nunca se escriben a mano.
+    setForm((prev) => ({
+      ...prev,
+      ...contarEstados(form),
+      piezasConCaries: piezasConEstado(form, "cariada"),
+      piezasAusentes: piezasConEstado(form, "ausente"),
+    }));
   }, [
     // Se puede hacer dinámicamente si tienes todos los nombres como "d1" a "d32"
     ...Array.from({ length: 32 }, (_, i) => form[`d${i + 1}`]),
@@ -241,6 +255,51 @@ export default function OdontogramaAdultos({
           <div key={opcion.key}>{renderInput(opcion.label, opcion.key)}</div>
         ))}
       </div>
+      {/*HALLAZGOS BUCALES (ficha médica): piezas con caries / ausentes (derivadas del odontograma) y los 6 checks*/}
+      <div className="mt-4 px-6 text-[11px]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="observaciones-label !mb-0 text-[11px]">Hallazgos bucales</span>
+          {CLAVES_HALLAZGOS.some(isFieldEdited) && (
+            <RevertButton
+              onClick={() => revertFields(CLAVES_HALLAZGOS)}
+              title="Revertir los hallazgos bucales"
+            />
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-3">
+          {[
+            ["Piezas con caries:", form.piezasConCaries],
+            ["Piezas ausentes:", form.piezasAusentes],
+          ].map(([label, valor]) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className="font-semibold text-[11px] w-[110px] shrink-0">{label}</span>
+              <input
+                type="text"
+                value={valor || ""}
+                disabled
+                className="w-full border border-gray-300 rounded px-2 py-1 text-[11px] bg-gray-50"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 mb-2">
+          {HALLAZGOS_BUCALES.map(({ clave, label }) => (
+            <label
+              key={clave}
+              className={`flex items-center gap-2 font-medium cursor-pointer pl-2 text-[11px] ${isFieldEdited(clave) ? "ring-2 ring-orange-500 rounded" : ""}`}
+            >
+              <input
+                type="checkbox"
+                name={clave}
+                checked={Boolean(form[clave])}
+                disabled={disabled}
+                onChange={handleCheckBoxChange}
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+      </div>
       {/*OBSERVACIONES & NO PASO EXAMEN*/}
       <div className="mt-4 px-6 text-[11px]">
         <div className="observaciones-section">
@@ -297,6 +356,7 @@ export default function OdontogramaAdultos({
                 setForm((prev) => ({
                   ...prev,
                   ...(e.target.checked ? Object.fromEntries(CAMPOS_DIENTES.map((campo) => [campo, "Normal"])) : {}),
+                  ...(e.target.checked ? HALLAZGOS_INICIALES : {}),
                   observaciones: e.target.checked ? "NO PASO EXAMEN ODONTOLOGICO" : "",
                 }));
                 handleCheckBoxChange(e);

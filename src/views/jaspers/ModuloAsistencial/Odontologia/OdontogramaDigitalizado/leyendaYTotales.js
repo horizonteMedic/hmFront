@@ -14,7 +14,7 @@ import { dibujarEstadoVectorial } from "./estadosVectoriales.js";
 // (ver estadosVectoriales).
 export const ICONO_PNG = {
   Ausente: "ausente",
-  "Carie Dental": "cariada",
+  "Caries Dental": "cariada", // el estado se llama así desde que se renombró en estadosOdontograma.js (antes "Carie Dental")
   Puente: "puente",
   "P.Total": "p_total",
   Normal: "normal",
@@ -68,19 +68,30 @@ const columnasDerecha = (doc) => {
   return { inicioX, ancho: pageW - inicioX - MARGEN };
 };
 
-// Reparte `n` elementos en 4 columnas, llenando de arriba hacia abajo: devuelve cuántos caben por columna.
-const FILAS = (n) => Math.ceil(n / 4);
+// Zona donde se dibuja la leyenda / los totales y en cuántas columnas se reparten. Por defecto es la columna derecha de
+// las fichas horizontales, en 4 columnas; la ficha vertical pasa su propia `{ inicioX, ancho, columnas }`.
+const zonaDeDibujo = (doc, opciones = {}) => {
+  const base = columnasDerecha(doc);
+  return {
+    inicioX: opciones.inicioX ?? base.inicioX,
+    ancho: opciones.ancho ?? base.ancho,
+    columnas: opciones.columnas ?? 4,
+  };
+};
+
+// Reparte `n` elementos en `columnas` columnas, llenando de arriba hacia abajo: devuelve cuántos caben por columna.
+const FILAS = (n, columnas = 4) => Math.ceil(n / columnas);
 
 // Leyenda: un ícono por cada estado que se ofrece (y los antiguos solo si este odontograma los trae).
 // Devuelve la Y donde sigue el contenido.
-export const drawLeyenda = async (doc, datos, yPosInicial) => {
-  const { inicioX, ancho } = columnasDerecha(doc);
+export const drawLeyenda = async (doc, datos, yPosInicial, opciones) => {
+  const { inicioX, ancho, columnas } = zonaDeDibujo(doc, opciones);
   const estados = estadosVisibles(contarEstados(estadosDeDientes(datos)));
 
   const iconSize = 5.5;
-  const colSpacing = ancho / 4;
+  const colSpacing = ancho / columnas;
   const rowSpacing = 6;
-  const filas = FILAS(estados.length);
+  const filas = FILAS(estados.length, columnas);
   const alturaLeyenda = filas * rowSpacing + 2;
 
   let yPos = yPosInicial + 4;
@@ -121,8 +132,8 @@ export const drawLeyenda = async (doc, datos, yPosInicial) => {
 };
 
 // Totales: piezas en mal estado y cuántos dientes tiene cada estado. Devuelve la Y donde sigue el contenido.
-export const drawEstadisticas = (doc, datos, yPosInicial) => {
-  const { inicioX, ancho } = columnasDerecha(doc);
+export const drawEstadisticas = (doc, datos, yPosInicial, opciones) => {
+  const { inicioX, ancho, columnas } = zonaDeDibujo(doc, opciones);
   const conteo = contarEstados(estadosDeDientes(datos));
   const totales = [
     { label: "Piezas en mal estado", valor: conteo.malEstado },
@@ -130,8 +141,8 @@ export const drawEstadisticas = (doc, datos, yPosInicial) => {
   ];
 
   const filaAltura = 4;
-  const colWidth = ancho / 4;
-  const filas = FILAS(totales.length);
+  const colWidth = ancho / columnas;
+  const filas = FILAS(totales.length, columnas);
   const startY = yPosInicial + 4;
 
   totales.forEach(({ label, valor }, i) => {

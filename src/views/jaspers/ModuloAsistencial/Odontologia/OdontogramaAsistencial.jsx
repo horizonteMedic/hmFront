@@ -7,8 +7,10 @@ import { drawEstadisticas, drawLeyenda, estadosDeDientes, ICONO_PNG } from './Od
 import { dibujarEstadoVectorial, tieneDibujoVectorial } from './OdontogramaDigitalizado/estadosVectoriales.js';
 
 // Ficha Odontológica Asistencial (por N° de Ticket). Recibe lo que arma PrintOdontogramaAsistencial (controller del
-// formulario) a partir de GET /api/odontogramas-asistencial/ticket/{numeroTicket}: numeroTicket, nombres, dni, edad, sexo,
-// empresa, sede, fechaOd, lbl11..lbl48, txtObservaciones, procedimiento, digitalizacion (firmas/sello) y los datos del pie.
+// formulario) a partir de GET /api/odontogramas-asistencial/ticket/{numeroTicket}: numeroTicket, sede, fechaOd,
+// lbl11..lbl48, txtObservaciones, procedimiento, digitalizacion (firmas/sello) y los datos del pie.
+// Esta ficha ya NO imprime los datos personales del paciente (nombres, DNI, edad, sexo, empresa): ahora los lleva la Ficha
+// Médica (FichaOdontologicaVertical), antes del punto 1.
 
 // Header con logo, color box y título
 const drawHeader = async (doc, datos = {}) => {
@@ -47,56 +49,6 @@ const drawHeader = async (doc, datos = {}) => {
       textPosition: 0.9
     });
   }
-};
-
-// Función para dibujar datos personales en formato horizontal
-const drawPatientData = (doc, datos = {}) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  // Dejar 45% del ancho a la izquierda para el odontograma
-  const espacioIzquierdo = pageW * 0.45; // 45% del ancho
-  const inicioX = espacioIzquierdo; // Desde aquí empiezan los datos
-  let yPos = 40;
-  const lineHeight = 6;
-
-  // Preparar datos
-  const nombres = String(datos.nombres || "");
-  const dni = String(datos.dni || "");
-  const edad = String(datos.edad || datos.edadOd || "").replace(" años", "").trim();
-  const sexo = datos.sexo === 'F' || datos.sexo === 'Femenino' ? 'FEMENINO' : datos.sexo === 'M' || datos.sexo === 'Masculino' ? 'MASCULINO' : '';
-  const empresa = String(datos.empresa || "");
-
-  // Fila 1: Nombres y Apellidos
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Nombres y Apellidos:", inicioX, yPos);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(nombres, inicioX + 45, yPos);
-  yPos += lineHeight;
-
-  // Fila 2: DNI | Edad | Sexo
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("DNI:", inicioX, yPos);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(dni, inicioX + 12, yPos);
-  
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Edad:", inicioX + 45, yPos);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((edad ? edad + " AÑOS" : ''), inicioX + 55, yPos);
-  
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Sexo:", inicioX + 85, yPos);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(sexo, inicioX + 95, yPos);
-  yPos += lineHeight;
-
-  // Fila 3: Empresa
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empresa:", inicioX, yPos);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(empresa, inicioX + 22, yPos);
-  yPos += lineHeight;
-
-  return yPos;
 };
 
 // Función para dibujar el odontograma en la parte izquierda
@@ -487,23 +439,20 @@ export default async function OdontogramaAsistencial(datos = {}, docExistente = 
   // 3) Odontograma en la parte izquierda (con iconos de dientes)
   await drawOdontograma(doc, 40, datos);
 
-  // 4) Datos personales
-  const yPosDatos = drawPatientData(doc, datos);
+  // 4) Leyenda de iconos (la columna derecha arranca a la altura del odontograma: ya no lleva los datos personales)
+  const yPosLeyenda = await drawLeyenda(doc, datos, 40);
 
-  // 5) Leyenda de iconos
-  const yPosLeyenda = await drawLeyenda(doc, datos, yPosDatos);
-
-  // 6) Tabla de estadísticas dentales
+  // 5) Tabla de estadísticas dentales
   const yPosEstadisticas = drawEstadisticas(doc, datos, yPosLeyenda);
 
-  // 7) Procedimiento y observaciones
+  // 6) Procedimiento y observaciones
   const yPosProcedimiento = drawCuadroTexto(doc, "Procedimiento:", datos.procedimiento, yPosEstadisticas);
   const yPosObservaciones = drawCuadroTexto(doc, "Observaciones:", datos.txtObservaciones, yPosProcedimiento);
 
-  // 8) Lugar y fecha
+  // 7) Lugar y fecha
   const yPosLugarFecha = drawLugarFecha(doc, datos, yPosObservaciones);
 
-  // 9) Firmas en la columna derecha
+  // 8) Firmas en la columna derecha
   await drawFirmasColumnaDerecha(doc, datos, yPosLugarFecha);
 
   if (docExistente) {
