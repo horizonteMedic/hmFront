@@ -360,7 +360,7 @@ export default function HojaReferencia() {
       </SectionFieldset>
 
       {/* ===== SECCIÓN: PERSONA QUE INDICA EL TRASLADO ===== */}
-      <SectionFieldset legend="Persona que Indica el Traslado">
+      {/* <SectionFieldset legend="Persona que Indica el Traslado">
         <EmpleadoComboBox
           value={form.nombre_medico}
           label="Usuario"
@@ -370,7 +370,7 @@ export default function HojaReferencia() {
           edited={isPersonaEdited}
           onRevert={revertPersona}
         />
-      </SectionFieldset>
+      </SectionFieldset> */}
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO (usuario y fecha-hora de creación) ===== */}
       {hayRegistroCargado && (

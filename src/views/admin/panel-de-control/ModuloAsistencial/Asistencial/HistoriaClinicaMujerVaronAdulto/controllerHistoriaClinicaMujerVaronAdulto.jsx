@@ -10,6 +10,7 @@ import {
     mensajeDiagnosticoTratamiento,
     mensajeEdadFueraDeRango,
     MENSAJE_FECHA_VACUNA_FUTURA,
+    obtenerFirmaMedicoTicket,
     RANGO_EDAD_HC,
 } from "../../../../../utils/registroAsistencialUtils";
 import {
@@ -531,7 +532,15 @@ export const PrintHojaR = async (numeroTicket, token, datosFooter) => {
             return;
         }
 
-        await modulo.default({ ...construirDatosImpresion(data), ...datosFooter });
+        // El GET no trae "digitalizacion": firma el doctor del ticket (el doctorAsignado guardado, que viaja
+        // como NOMBRE, queda de respaldo) y su sello se arma en el front como en el Triaje y los laboratorios.
+        const medico = await obtenerFirmaMedicoTicket(numeroTicket, token, { nombre: data.doctorAsignado });
+        await modulo.default({
+            ...construirDatosImpresion(data),
+            nombre_medico: medico.nombre,
+            digitalizacion: medico.digitalizacion,
+            ...datosFooter,
+        });
         Swal.close();
     } catch (error) {
         console.error("Error al generar el reporte:", error);

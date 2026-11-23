@@ -796,7 +796,7 @@ export default function HistoriaClinicaAdultoMayor() {
         </div>
       </SectionFieldset>
 
-      <SectionFieldset legend="Asignación de Médico">
+      {/* <SectionFieldset legend="Asignación de Médico">
         <EmpleadoComboBox
           value={form.nombre_medico}
           label="Especialista"
@@ -806,7 +806,7 @@ export default function HistoriaClinicaAdultoMayor() {
           edited={isMedicoEdited}
           onRevert={revertMedico}
         />
-      </SectionFieldset>
+      </SectionFieldset> */}
 
       {/* Receta, Descanso Médico e Informe de Accidente (La Arena): aparecen al pulsar «Generar…», se guardan con el
           Guardar de la Historia Clínica y se imprimen desde las opciones del mensaje de éxito o del botón IMPRIMIR N° TICKET. */}

@@ -246,7 +246,7 @@ export default function PerfilRenal() {
           edited={isMedicoEdited}
           onRevert={revertMedico}
         />
-        <EmpleadoComboBox
+        {/* <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
           label="Doctor Asignado"
           form={form}
@@ -256,7 +256,7 @@ export default function PerfilRenal() {
           disabled={camposDeshabilitados}
           edited={isDoctorEdited}
           onRevert={revertDoctor}
-        />
+        /> */}
       </SectionFieldset>
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}

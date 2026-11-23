@@ -299,7 +299,7 @@ export default function PerfilHepatico() {
           edited={isMedicoEdited}
           onRevert={revertMedico}
         />
-        <EmpleadoComboBox
+        {/* <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
           label="Doctor Asignado"
           form={form}
@@ -309,7 +309,7 @@ export default function PerfilHepatico() {
           disabled={camposDeshabilitados}
           edited={isDoctorEdited}
           onRevert={revertDoctor}
-        />
+        /> */}
       </SectionFieldset>
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}

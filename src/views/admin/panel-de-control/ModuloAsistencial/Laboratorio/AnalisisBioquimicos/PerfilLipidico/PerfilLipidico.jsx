@@ -306,7 +306,7 @@ export default function PerfilLipidico() {
           edited={isMedicoEdited}
           onRevert={revertMedico}
         />
-        <EmpleadoComboBox
+        {/* <EmpleadoComboBox
           value={form.nombre_doctorAsignado}
           form={form}
           label="Doctor Asignado"
@@ -316,7 +316,7 @@ export default function PerfilLipidico() {
           disabled={camposDeshabilitados}
           edited={isDoctorEdited}
           onRevert={revertDoctor}
-        />
+        /> */}
       </SectionFieldset>
 
       {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */}

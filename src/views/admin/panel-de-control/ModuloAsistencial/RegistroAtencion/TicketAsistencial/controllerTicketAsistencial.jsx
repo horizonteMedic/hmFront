@@ -10,6 +10,23 @@ const ticketsUrl = "/api/tickets";
 const historialUrl = "/api/tickets/historial";
 const reporteFiltrosUrl = "/api/tickets/reporte/filtros";
 const pacientesUrl = "/api/pacientes-asistencial";
+const medicosUrl = "/api/v01/st/empleado/listadoMedicosYOdontologos";
+
+// Médicos y odontólogos asignables a un ticket: [{ idEmpleado, nombres, username }]. Mismo formato
+// que el listado de empleados de la sesión (nombres en mayúsculas, como lo usa EmpleadoComboBox).
+// Devuelve [] si la consulta falla: el combo queda sin opciones y el ticket exige elegir doctor.
+export const ListarMedicosYOdontologos = async (token) => {
+  try {
+    const res = await getFetch(medicosUrl, token);
+    // El backend puede devolver la lista directa o envuelta en { resultado }.
+    const lista = Array.isArray(res) ? res : res?.resultado;
+    if (!Array.isArray(lista)) return [];
+
+    return lista.map((item) => ({ ...item, nombres: item.nombres ? item.nombres.toUpperCase() : "" }));
+  } catch {
+    return [];
+  }
+};
 
 
 export const BuscarPacientes = async (texto, token) => {
