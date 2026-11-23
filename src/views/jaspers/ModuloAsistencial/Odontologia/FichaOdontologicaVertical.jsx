@@ -489,7 +489,7 @@ export default async function FichaOdontologicaVertical(datos = {}, docExistente
   // 1) Cabecera y título
   await drawHeader(doc, datos, doc.internal.getNumberOfPages());
   doc.setFont(FONT, "bold").setFontSize(14);
-  doc.text("FICHA ODONTOLOGICA ASISTENCIAL", pageW / 2, 33, { align: "center" });
+  doc.text("HISTORIA ODONTOLOGICA ASISTENCIAL", pageW / 2, 33, { align: "center" });
 
   // 2) Datos personales (antes del punto 1)
   let y = drawDatosPersonales(doc, datos, CONTENIDO_Y);
