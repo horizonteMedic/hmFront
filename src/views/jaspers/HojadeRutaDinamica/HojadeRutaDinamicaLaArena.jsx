@@ -9,6 +9,7 @@ import hojaTomaMuestra from "../components/hojaTomaMuestra";
 // grandes entren en la misma hoja.
 const FONT_CUADRO = 6.5;
 const INTERLINEADO = 1.15; // el que usa jsPDF-autotable por defecto
+const FILA_CONTACTO = 4.5; // alto que agrega headerHR con datosContacto (lineHeight + 0.5)
 const ORDEN_AREAS = [
     "LABORATORIO",
     "LABORATORIO PLOMO",
@@ -194,9 +195,9 @@ export default async function HojadeRutaDinamicaLaArena(datos = {}) {
     // ==========================================
     const doc = new jsPDF();
 
-    await headerHR(doc, datos, { fechaEnFilaSede: true, tamanoTipoEx: 7.5 });
+    await headerHR(doc, datos, { fechaEnFilaSede: true, tamanoTipoEx: 7.5, datosContacto: true });
 
-    const startY = 62;
+    const startY = 62 + FILA_CONTACTO; // la fila de nacimiento / celular baja el resto del encabezado
 
     doc.setFillColor(245, 245, 245);
     doc.rect(10, startY, 120, 18, 'F');

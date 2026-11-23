@@ -4,6 +4,7 @@ import drawQr from "./drawQr";
 // opciones.qr = true → en lugar del cuadro de color se dibuja un QR con el N° de orden
 // opciones.fechaEnFilaSede = true → la fecha va en la fila de la sede y el N° de orden (no en la de TIPO EX)
 // opciones.tamanoTipoEx → tamaño de letra del valor de TIPO EX (por defecto 9)
+// opciones.datosContacto = true → agrega una fila con datos.fechaNacimiento (DD/MM/AAAA) y datos.celular (+4.5 mm de alto)
 const headerHR = (doc, datos, opciones = {}) => {
   // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
   const formatearFecha = (fecha) => {
@@ -211,8 +212,33 @@ const headerHR = (doc, datos, opciones = {}) => {
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.gruposan || "-"}`, margin + 175, y3);
 
+  // Fila 3b (opciones.datosContacto): Fecha de nacimiento / Celular. Desplaza hacia abajo las filas siguientes
+  let yUltima = y3;
+  if (opciones.datosContacto) {
+    yUltima = y3 + lineHeight + 0.5;
+    doc.setFont("helvetica", "bold");
+    doc.text("F. NACIMIENTO:", margin, yUltima);
+    doc.setFont("helvetica", "normal");
+    const nacimientoText = `${datos.fechaNacimiento || ""}`;
+    const xNacimiento = margin + 30;
+    doc.setFillColor(255, 255, 0);
+    doc.rect(xNacimiento, yUltima - 4.2, doc.getTextWidth(nacimientoText), 6, "F");
+    doc.setTextColor(0, 0, 0);
+    doc.text(nacimientoText, xNacimiento, yUltima);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("CELULAR:", margin + 100, yUltima);
+    doc.setFont("helvetica", "normal");
+    const celularText = `${datos.celular || ""}`;
+    const xCelular = margin + 120;
+    doc.setFillColor(255, 255, 0);
+    doc.rect(xCelular, yUltima - 4.2, doc.getTextWidth(celularText), 6, "F");
+    doc.setTextColor(0, 0, 0);
+    doc.text(celularText, xCelular, yUltima);
+  }
+
   // Fila 4: Empresa (SEDE eliminada)
-  const y4 = y3 + lineHeight + 0.5;
+  const y4 = yUltima + lineHeight + 0.5;
   doc.setFont("helvetica", "bold");
   doc.text("EMPRESA:", margin, y4);
   doc.setFont("helvetica", "normal");

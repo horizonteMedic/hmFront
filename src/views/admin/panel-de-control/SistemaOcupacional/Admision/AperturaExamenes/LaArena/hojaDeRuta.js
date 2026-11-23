@@ -1,6 +1,7 @@
 import Swal from 'sweetalert2';
 import { format } from 'date-fns';
 import { getFetch } from '../../../../getFetch/getFetch.js';
+import { SearchPacienteDNI } from '../../model/AdminPaciente';
 import { datosConDocumento, obtenerDocumentoPorOrden } from '../../../../../../utils/documentoPaciente.js';
 import HojadeRutaDinamicaLaArena from '../../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamicaLaArena.jsx';
 
@@ -46,15 +47,35 @@ const numeroOrdenDelDia = (registros, nOrden) => {
   return registros.filter((r) => r.fecha_apertura_po === hoy).length + 1;
 };
 
+// AAAA-MM-DD[...] → DD/MM/AAAA ('' si no es una fecha)
+const fechaDDMMAAAA = (fecha) => {
+  const [anio, mes, dia] = String(fecha ?? '').slice(0, 10).split('-');
+  return anio && mes && dia ? `${dia}/${mes}/${anio}` : '';
+};
+
+// Fecha de nacimiento y celular del paciente (la hoja de ruta del backend no los trae). Sin documento o si
+// la consulta falla, quedan vacíos: no debe impedir imprimir la hoja de ruta.
+const obtenerContactoPaciente = async (documento, sede, token) => {
+  if (!documento?.nroDoc || !sede) return {};
+  try {
+    const paciente = await SearchPacienteDNI(sede, documento.nroDoc, token, documento.tipoDoc);
+    if (!paciente || paciente.error || paciente.ok === false) return {};
+    return { fechaNacimiento: fechaDDMMAAAA(paciente.fechaNaciminetoPa), celular: String(paciente.celPa ?? '').trim() };
+  } catch {
+    return {};
+  }
+};
+
 // El formato dinámico rotula el documento según su tipo (DNI / CE / PAS): el tipo sale de documento/orden
-const imprimirPorProtocolo = async (nOrden, token) => {
+const imprimirPorProtocolo = async (nOrden, sede, token) => {
   const [res, documento] = await Promise.all([
     getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${nOrden}`, token),
     obtenerDocumentoPorOrden(nOrden, token),
   ]);
   if (res?.codigo !== 200) return Swal.close();
+  const contacto = await obtenerContactoPaciente(documento, sede, token);
   const { isConfirmed } = await confirmarImpresion(nOrden);
-  if (isConfirmed) HojadeRutaDinamicaLaArena(datosConDocumento(res.resultado, documento));
+  if (isConfirmed) HojadeRutaDinamicaLaArena({ ...datosConDocumento(res.resultado, documento), ...contacto });
 };
 
 /**
@@ -62,9 +83,10 @@ const imprimirPorProtocolo = async (nOrden, token) => {
  * jasper que indica el backend según examen/empresa/psicosensometría/test de altura).
  * `hc`: { n_orden, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres, protocolo }
  * `registros`: lista actual de historias, para calcular el N° de atención del día.
+ * `sede`: sede actual, para consultar los datos del paciente (fecha de nacimiento y celular) de la hoja por protocolo.
  */
-export const imprimirHojaDeRuta = async ({ hc, registros, token }) => {
-  if (hc.protocolo) return imprimirPorProtocolo(hc.n_orden, token);
+export const imprimirHojaDeRuta = async ({ hc, registros, sede, token }) => {
+  if (hc.protocolo) return imprimirPorProtocolo(hc.n_orden, sede, token);
 
   const nombre = await getFetch(
     `/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${encodeURIComponent(hc.nomExamen ?? '')}` +
