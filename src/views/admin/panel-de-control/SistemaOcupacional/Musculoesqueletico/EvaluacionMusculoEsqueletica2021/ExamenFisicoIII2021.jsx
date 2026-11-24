@@ -1,6 +1,6 @@
 import React from "react";
 
-const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChangeNumber }) => {
+const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChangeNumber, ocultarEvalDinamica = false }) => {
   return (
     <div className="space-y-6">
       {/* Contenido principal - 2 columnas */}
@@ -143,7 +143,7 @@ const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChan
         </div>
         
         {/* COLUMNA DERECHA - EVAL. DINAMICA DE ARTICULACIONES */}
-        <div className="border rounded-lg p-6 bg-gray-50">
+        {!ocultarEvalDinamica && (<div className="border rounded-lg p-6 bg-gray-50">
           <h3 className="text-xl font-bold text-blue-900 text-center mb-4">
             EVAL. DINAMICA DE ARTICULACIONES
           </h3>
@@ -526,7 +526,7 @@ const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChan
               </tbody>
             </table>
           </div>
-        </div>
+        </div>)}
       </div>
     </div>
   );
