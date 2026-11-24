@@ -5,7 +5,8 @@ import Swal from "sweetalert2";
  * Importación de resultados de Hematología desde el Excel que imprime el analizador hematológico.
  *
  * El Excel NO identifica al paciente (Nombre/ID/Código de barras vienen vacíos y el nombre del archivo varía),
- * por eso el paciente se busca antes con el N° Orden y aquí solo se leen los resultados. Los valores se cargan TAL COMO vienen en el Excel (sin convertir unidades).
+ * por eso el paciente se busca antes con el N° Orden y aquí solo se leen los resultados. El único control de
+ * identidad es que el "Nº serie" del Excel sea igual al N° Orden consultado (`coincideSerie`). Los valores se cargan TAL COMO vienen en el Excel (sin convertir unidades).
  */
 
 // Ítem del Excel -> campo del formulario. `items`: nombres que se reconocen (el que va antes del paréntesis,
@@ -37,7 +38,7 @@ const normalizar = (texto) =>
     .toUpperCase()
     .trim();
 
-const escapar = (texto) =>
+export const escapar = (texto) =>
   String(texto ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 // "LEU (WBC)" -> ["LEU", "WBC"]; "NEU% (NEU%)" -> ["NEU%", "NEU%"]
@@ -51,6 +52,13 @@ const clavesDelItem = (item) => {
 const numeroValido = (texto) => {
   const limpio = String(texto ?? "").trim().replace(",", ".");
   return /^\d+(\.\d+)?$/.test(limpio) ? limpio : null;
+};
+
+// ¿El "Nº serie" del Excel es el N° Orden consultado? Se ignoran espacios y ceros a la izquierda ("064" = "64").
+const sinCerosIzquierda = (texto) => String(texto ?? "").trim().replace(/^0+(?=\d)/, "");
+export const coincideSerie = (serie, norden) => {
+  const s = sinCerosIzquierda(serie);
+  return s !== "" && s === sinCerosIzquierda(norden);
 };
 
 /**

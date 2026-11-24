@@ -24,7 +24,7 @@ import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsP
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { textoDocumento } from '../../../../../../utils/documentoPaciente';
-import { confirmarImportacionHematologia, ErrorArchivoExcel, leerExcelHematologia } from "./importarExcelHematologia";
+import { coincideSerie, confirmarImportacionHematologia, ErrorArchivoExcel, escapar, leerExcelHematologia } from "./importarExcelHematologia";
 
 const tabla = TABLA_LAB_CLINICO;
 
@@ -346,8 +346,8 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
   };
 
   // ===== Importar resultados de Hematología desde el Excel del analizador =====
-  // El Excel no identifica al paciente: se exige tener primero el N° Orden buscado y se avisa si el nombre del
-  // archivo no coincide. Si el registro ya existe, al confirmar se habilita la edición para reemplazar los valores.
+  // El Excel no identifica al paciente: se exige tener primero el N° Orden buscado y que el Nº serie del Excel
+  // coincida con él. Si el registro ya existe, al confirmar se habilita la edición para reemplazar los valores.
   const inputExcelRef = useRef(null);
 
   const handleImportarExcel = async (e) => {
@@ -357,6 +357,17 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
 
     try {
       const resultado = await leerExcelHematologia(archivo);
+
+      // El Nº serie del Excel debe ser el N° Orden consultado; si no, no se carga nada.
+      if (!coincideSerie(resultado.serie, form.norden)) {
+        Swal.fire({
+          icon: "error",
+          title: "El N° Serie no coincide",
+          html: `El Excel trae el N° Serie <b>${escapar(resultado.serie) || "(vacío)"}</b> y el N° Orden consultado es <b>${escapar(form.norden)}</b>.<br>Verifique que sea el archivo del paciente correcto.`,
+        });
+        return;
+      }
+
       const confirmado = await confirmarImportacionHematologia({
         resultado,
         nombreArchivo: archivo.name,
