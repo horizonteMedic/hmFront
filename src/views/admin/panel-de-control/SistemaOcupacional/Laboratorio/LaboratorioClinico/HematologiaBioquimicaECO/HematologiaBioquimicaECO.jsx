@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch";
 import {
@@ -24,6 +24,7 @@ import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsP
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { textoDocumento } from '../../../../../../utils/documentoPaciente';
+import { confirmarImportacionHematologia, ErrorArchivoExcel, leerExcelHematologia } from "./importarExcelHematologia";
 
 const tabla = TABLA_LAB_CLINICO;
 
@@ -344,6 +345,46 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
     }
   };
 
+  // ===== Importar resultados de Hematología desde el Excel del analizador =====
+  // El Excel no identifica al paciente: se exige tener primero el N° Orden buscado y se avisa si el nombre del
+  // archivo no coincide. Si el registro ya existe, al confirmar se habilita la edición para reemplazar los valores.
+  const inputExcelRef = useRef(null);
+
+  const handleImportarExcel = async (e) => {
+    const archivo = e.target.files?.[0];
+    e.target.value = ""; // permite volver a elegir el mismo archivo
+    if (!archivo) return;
+
+    try {
+      const resultado = await leerExcelHematologia(archivo);
+      const confirmado = await confirmarImportacionHematologia({
+        resultado,
+        nombreArchivo: archivo.name,
+        nombresPaciente: form.nombres,
+        sobrescribe: form.tieneRegistro,
+      });
+      if (!confirmado) return;
+
+      if (form.tieneRegistro) habilitarEdicion();
+      setForm((prev) => ({ ...prev, ...resultado.valores }));
+    } catch (error) {
+      if (!(error instanceof ErrorArchivoExcel)) console.error("Error al importar el Excel:", error);
+      Swal.fire(
+        "Error",
+        error instanceof ErrorArchivoExcel ? error.message : "No se pudo importar el archivo.",
+        "error"
+      );
+    }
+  };
+
+  const abrirSelectorExcel = () => {
+    if (!hayRegistroCargado) {
+      Swal.fire("Paciente no cargado", "Primero busque el N° Orden del paciente y luego importe el Excel.", "warning");
+      return;
+    }
+    inputExcelRef.current?.click();
+  };
+
   // ===== Búsqueda con botón =====
   const executeSearch = () => {
     handleClearnotO();
@@ -584,7 +625,21 @@ export default function HematologiaBioquimicaECO({ nOrdenInicial, onGuardado }) 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Hematología */}
             <SectionFieldset legend="Hematología" className="space-y-3">
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
+                <input
+                  ref={inputExcelRef}
+                  type="file"
+                  accept=".xlsx,.xls"
+                  className="hidden"
+                  onChange={handleImportarExcel}
+                />
+                <button
+                  type="button"
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-md"
+                  onClick={abrirSelectorExcel}
+                >
+                  Importar Excel
+                </button>
                 <button
                   type="button"
                   disabled={camposDeshabilitados}
