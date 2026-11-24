@@ -5,6 +5,7 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { rangoMesActual } from "../../Inventario/Compartido/inventarioUtils";
 import { GenerarExcelAtenciones, GenerarPdfAtenciones } from "./controllerAtenciones";
+import LibroAtencionesDiarias from "./LibroAtencionesDiarias";
 
 const CLASES_BOTON = `
     flex items-center justify-center gap-2 text-white font-semibold px-6 py-2.5 rounded-md
@@ -27,6 +28,7 @@ export default function Atenciones() {
     };
 
     return (
+        <>
         <div className="mx-auto max-w-2xl py-4">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-5">
@@ -84,5 +86,7 @@ export default function Atenciones() {
                 </div>
             </div>
         </div>
+        <LibroAtencionesDiarias />
+        </>
     );
 }

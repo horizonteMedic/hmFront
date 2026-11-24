@@ -25,8 +25,13 @@ export const nuevoLibro = () => new ExcelJS.Workbook();
 //   subtitulos: líneas de texto bajo el título (inventario, rango, totales...)
 //   totales:    { etiqueta, valores: { [key]: número } }
 //   alturaFila: alto de las filas de datos (más alto si llevan texto largo o una imagen)
+//   colorTitulo: fondo (ARGB) de la fila del título; por defecto el azul oscuro común a los reportes
+//   colorCabecera: fondo (ARGB) de las cabeceras de las columnas; por defecto el naranja común a los reportes
 // Devuelve { hoja, primeraFilaDatos } (número de fila de Excel, base 1).
-export const agregarHojaTabla = (libro, { nombre, titulo, subtitulos = [], columnas, filas, totales, alturaFila = 18 }) => {
+export const agregarHojaTabla = (
+    libro,
+    { nombre, titulo, subtitulos = [], columnas, filas, totales, alturaFila = 18, colorTitulo = COLOR_TITULO, colorCabecera = COLOR_CABECERA }
+) => {
     const hoja = libro.addWorksheet(nombre);
     const totalColumnas = columnas.length;
     hoja.columns = columnas.map((columna) => ({ width: columna.width }));
@@ -36,7 +41,7 @@ export const agregarHojaTabla = (libro, { nombre, titulo, subtitulos = [], colum
     celdaTitulo.value = titulo;
     celdaTitulo.font = { bold: true, size: 13, color: { argb: "FFFFFFFF" } };
     celdaTitulo.alignment = { horizontal: "center", vertical: "middle" };
-    celdaTitulo.fill = relleno(COLOR_TITULO);
+    celdaTitulo.fill = relleno(colorTitulo);
     hoja.getRow(1).height = 25;
 
     subtitulos.forEach((texto, i) => {
@@ -54,7 +59,7 @@ export const agregarHojaTabla = (libro, { nombre, titulo, subtitulos = [], colum
         celda.value = columna.label;
         celda.font = { bold: true, size: 9, color: { argb: "FFFFFFFF" } };
         celda.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-        celda.fill = relleno(COLOR_CABECERA);
+        celda.fill = relleno(colorCabecera);
         celda.border = bordes("thin", "FFFFFFFF");
     });
     filaCabecera.height = 22;
