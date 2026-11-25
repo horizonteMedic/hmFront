@@ -15,7 +15,9 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica2021";
 
-const TABLA_EVALUACION_NORMAL = "evaluacion_musculo_esqueletica";
+// Formato que se imprime cuando el backend no manda `nameJasper` (o manda uno desconocido)
+const JASPER_POR_DEFECTO = "EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
+const TABLA_EVALUACION_NORMAL ="evaluacion_musculo_esqueletica";
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_EVALUACION_2021 = "evaluacion_musculo_esqueletica2021";
 const MENSAJE_BLOQUEO_EVALUACION_NORMAL =
@@ -441,36 +443,43 @@ export const UpdateDataService = (form, token, user, limpiar, tabla, datosFooter
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
+  // Si hubo un error se muestra su aviso y no se cierra encima al terminar
+  let huboError = false;
 
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
+        // El backend decide qué formato imprimir: el boro o el de MARSA (EvaluacionMuscoloEsqueletica2021_Marsa).
+        // Sin nombre (o con uno que no existe) se usa el boro de siempre.
         const jasperModules = import.meta.glob(
-          "../../../../../jaspers/MusculoEsqueletica/**/*.jsx"
+          "../../../../../jaspers/MusculoEsqueletica/*.jsx"
         );
-        // Determinar la ruta según el nombre del jasper
-        let rutaArchivo;
-        if (nombre === "EvaluacionMuscoloEsqueletica2021_Digitalizado_boro") {
-          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
-        } else {
-          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
-        }
-        const modulo = await jasperModules[rutaArchivo]();
+        const rutaDe = (n) => `../../../../../jaspers/MusculoEsqueletica/${n}.jsx`;
+        const nombre = res.nameJasper && jasperModules[rutaDe(res.nameJasper)]
+          ? res.nameJasper
+          : JASPER_POR_DEFECTO;
+        const modulo = await jasperModules[rutaDe(nombre)]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
+          await modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`
           );
         }
+      } else {
+        huboError = true;
+        Swal.fire("Error", "No se encontraron datos para imprimir.", "error");
       }
     })
+    .catch((error) => {
+      console.error("Error al imprimir la Evaluación Músculo Esquelética:", error);
+      huboError = true;
+      Swal.fire("Error", "Ocurrió un error al generar el formato a imprimir.", "error");
+    })
     .finally(() => {
-      Swal.close();
+      if (!huboError) Swal.close();
     });
 };
 

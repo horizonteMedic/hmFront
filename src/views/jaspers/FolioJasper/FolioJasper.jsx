@@ -107,6 +107,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     const jaspersConOpcionMultiple = [
         "informe_electrocardiograma",
+        "evaluacion_musculo_esqueletica2021", // boro o MARSA según nameJasper
         "resumen_medico_poderosa",
         "oftalmologia2021",
         "antecedentes_patologicos",
@@ -229,7 +230,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             let generador = null;
 
             if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
-                generador = reportesMap[examen.tabla][data.nameJasper];
+                generador = reportesMap[examen.tabla][data.nameJasper] ?? reportesMap[examen.tabla].default;
             } else {
                 generador = reportesMap[examen.tabla];
             }

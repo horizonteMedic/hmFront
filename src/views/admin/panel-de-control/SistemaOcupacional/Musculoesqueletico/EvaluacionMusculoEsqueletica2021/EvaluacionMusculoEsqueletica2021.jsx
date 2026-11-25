@@ -3,6 +3,8 @@ import ExamenFisicoI2021 from "./ExamenFisicoI2021";
 import ExamenFisicoII2021 from "./ExamenFisicoII2021";
 import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
+import { esEmpresaMarsa } from "../../../../../utils/declaracionJuradaSaludUtils";
+import SeccionMarsa2021,{ MARSA_MSK_INICIAL } from "./SeccionMarsa2021";
 import {
   PrintHojaR,
   SubmitDataService,
@@ -65,6 +67,12 @@ const PARTE_4 = [
   "irradiacionTobilloDerecho", "irradiacionTobilloIzquierdo", "altMasaMuscularTobilloDerecho", "altMasaMuscularTobilloIzquierdo",
 ];
 
+// Evaluación dinámica de articulaciones (cadera, rodilla y tobillo): en MARSA se edita desde su sección propia
+const CAMPOS_ARTICULACIONES = [
+  ...PARTE_3.filter((c) => !/^(tinnel|finkelsTein)/.test(c)),
+  ...PARTE_4,
+];
+
 // Campos que NO edita el usuario (identidad, datos del paciente, control de UI y auditoría): el resto del
 // formulario se resalta/revierte al editar un registro existente.
 const CAMPOS_NO_EDITABLES = [
@@ -83,6 +91,7 @@ const CAMPOS_NO_EDITABLES = [
   "ocupacion",
   "cargoDesempenar",
   "nombreMedico",
+  "marsaMsk",
   "tieneRegistro",
   "userRegistro",
   "fechaRegistro",
@@ -232,6 +241,9 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     altMasaMuscularTobilloDerecho: "0",
     altMasaMuscularTobilloIzquierdo: "0",
 
+    // Sección exclusiva MARSA (tareas, columna vertebral y articulaciones)
+    marsaMsk: MARSA_MSK_INICIAL,
+
     cie10: "Z00",
     nombreMedico: `${fixEncodingModern(
       userCompleto?.datos?.nombres_user ?? ""
@@ -262,6 +274,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     handleRadioButton,
     handleClear,
     handleClearnotO,
+    handleFocusNext,
     handlePrintDefault,
   } = useForm(initialFormState, { storageKey: embebido ? undefined : "evaluacionMusculoEsqueletica2021" });
 
@@ -358,6 +371,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
   });
 
   // Props comunes de los exámenes físicos
+  const esMarsa = esEmpresaMarsa(form.empresa);
   const propsExamen = { form, handleRadioButton, handleChange, handleChangeNumber };
   const examenClass = "m-0 p-0 border-0 min-w-0 text-[11px]";
 
@@ -418,20 +432,36 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
 
       <SectionFieldset legend="Parte 3: Examen Físico III" actions={revertirParte(PARTE_3)}>
         <fieldset disabled={camposDeshabilitados} className={examenClass}>
-          <ExamenFisicoIII2021 {...propsExamen} />
+          <ExamenFisicoIII2021 {...propsExamen} ocultarEvalDinamica={esMarsa} />
         </fieldset>
       </SectionFieldset>
 
-      <SectionFieldset legend="Parte 4: Examen Físico IV" actions={revertirParte(PARTE_4)}>
-        <fieldset disabled={camposDeshabilitados} className={examenClass}>
-          <ExamenFisicoIV2021 {...propsExamen} />
-        </fieldset>
+      {/* Para MARSA las evaluaciones dinámicas de articulaciones (cadera/rodilla/tobillo) se llenan en la sección MARSA
+          (mismas variables), por eso aquí se ocultan. */}
+      {!esMarsa && (
+        <SectionFieldset legend="Parte 4: Examen Físico IV" actions={revertirParte(PARTE_4)}>
+          <fieldset disabled={camposDeshabilitados} className={examenClass}>
+            <ExamenFisicoIV2021 {...propsExamen} />
+          </fieldset>
+        </SectionFieldset>
+      )}
+
+      {/* ===== SECCIÓN: SOLO MARSA (cerrada y bloqueada si la empresa del N° de orden no es MARSA) =====
+          `key` remonta la sección al cambiar de empresa para que abra/cierre según corresponda. */}
+      <SectionFieldset
+        key={esMarsa ? "marsa" : "no-marsa"}
+        legend="Descripción de Tareas y Evaluación de Columna (MARSA)"
+        collapsible
+        defaultOpen={esMarsa}
+        actions={esMarsa ? revertirParte(CAMPOS_ARTICULACIONES) : null}
+      >
+        <SeccionMarsa2021 form={form} setForm={setForm} handleChange={handleChange} handleFocusNext={handleFocusNext} esMarsa={esMarsa} disabled={camposDeshabilitados} />
       </SectionFieldset>
 
       {/* ===== SECCIÓN: CONCLUSIONES Y COMENTARIOS ===== */}
       <SectionFieldset legend="Conclusiones y Comentarios" className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputTextOneLine label="CIE 10" labelWidth="80px" inputClassName="capitalize" {...campo("cie10")} />
+          {/* <InputTextOneLine label="CIE 10" labelWidth="80px" inputClassName="capitalize" {...campo("cie10")} /> */}
           <EmpleadoComboBox
             value={form.nombre_medico}
             form={form}

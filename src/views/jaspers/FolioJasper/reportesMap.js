@@ -62,6 +62,7 @@ import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExam
 import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
+import EvaluacionMuscoloEsqueletica2021_Marsa from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Marsa";
 import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_boro";
@@ -175,7 +176,12 @@ export const reportesMap = {
 
    evaluacion_musculo_esqueletica: EvaluacionMuscoloEsqueletica,
 
-   evaluacion_musculo_esqueletica2021: EvaluacionMuscoloEsqueletica2021_Digitalizado_boro,
+   // Se elige por `nameJasper` (ver jaspersConOpcionMultiple en FolioJasper); sin nombre conocido usa el boro
+   evaluacion_musculo_esqueletica2021: {
+      EvaluacionMuscoloEsqueletica2021_Digitalizado_boro,
+      EvaluacionMuscoloEsqueletica2021_Marsa,
+      default: EvaluacionMuscoloEsqueletica2021_Digitalizado_boro,
+   },
 
    resumen_medico_poderosa: {
       ResumenAnexo7C_OHLA_Digitalizado,

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
 
-export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data = {}, docExistente = null) {
+export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data = {}, docExistente = null, opciones = {}) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -359,7 +359,8 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
   const yOffset = pageH - imgHeight; // Posicionar desde la parte inferior
 
   try {
-    doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+    if (opciones.fondoPagina1) doc.addImage(opciones.fondoPagina1, "PNG", xOffset, yOffset, imgWidth, opciones.fondoPagina1Alto);
+    else doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
     doc.text("Imagen de evaluación músculo esquelética no disponible", margin, yOffset + 10);
   }
@@ -459,6 +460,8 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesRangosArticulares || "", xObservacionesRangos, yObservacionesRangos, { maxWidth: 51, align: "justify" });
 
+  // Con `opciones.marsa` no se pintan la columna vertebral ni las maniobras de miembros superiores
+  if (!opciones.marsa) {
   // === SECCIÓN: COLUMNA VERTEBRAL - HALLAZGOS ===
   doc.setFont("helvetica", "bold").setFontSize(10);
 
@@ -715,6 +718,11 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
     }
   }
 
+  } // fin !opciones.marsa (columna vertebral y maniobras de miembros superiores)
+
+  // Reporte MARSA: solo la evaluación básica (aptitud espalda y rangos articulares); el resto lo arma el reporte MARSA
+  if (opciones.marsa) return doc;
+
   // === PÁGINA 2 ===
   doc.addPage();
 
@@ -733,7 +741,8 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
   const yOffset2 = 0; // Desde la parte superior
 
   try {
-    doc.addImage(fondoImg2, "PNG", xOffset2, yOffset2, imgWidth2, imgHeight2);
+    if (opciones.fondoPagina2) doc.addImage(opciones.fondoPagina2, "PNG", xOffset2, yOffset2, imgWidth2, opciones.fondoPagina2Alto);
+    else doc.addImage(fondoImg2, "PNG", xOffset2, yOffset2, imgWidth2, imgHeight2);
   } catch (e) {
     doc.text("Imagen de página 2 no disponible", margin, margin + 10);
   }
@@ -981,6 +990,8 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
     }
   }
 
+  // Con `opciones.marsa` las tablas de cadera/rodilla/tobillo no se pintan (van en la sección MARSA)
+  if (!opciones.marsa) {
   // === 3) EVALUACIÓN MÚSCULO ESQUELÉTICA DE CADERA Y MIEMBROS INFERIORES ===
   doc.setFont("helvetica", "bold").setFontSize(10);
 
@@ -1324,6 +1335,11 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
     doc.text(dato.valor, dato.x, dato.y, { align: "center" });
   });
 
+  } // fin !opciones.marsa
+
+  // Reporte MARSA: aquí termina la parte básica; las articulaciones, conclusiones y firmas las arma el reporte MARSA
+  if (opciones.marsa) return doc;
+
   // === SECCIÓN XI: CONCLUSIONES Y RECOMENDACIONES ===
 
   // Coordenadas para las columnas de conclusiones y recomendaciones
@@ -1392,7 +1408,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
     imprimir(doc);
   }
 }
-function footerTR(doc, datos) {
+export function footerTR(doc, datos) {
   const pageHeight = doc.internal.pageSize.getHeight();
   // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
   const marginBottom = 25;
@@ -1460,7 +1476,7 @@ function imprimir(doc) {
   iframe.onload = () => iframe.contentWindow.print();
 }
 
-function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+export function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
   const addSello = (imagenUrl, x, y, maxw = 100) => {
     return new Promise((resolve) => {
       const img = new Image();
