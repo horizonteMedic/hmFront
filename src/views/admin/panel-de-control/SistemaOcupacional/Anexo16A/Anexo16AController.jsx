@@ -8,6 +8,8 @@ import {
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { esEmpresaMarsa } from "../../../../utils/declaracionJuradaSaludUtils";
+import { siNoABooleano } from "../../../../utils/helpers";
 
 // nameService del examen (también lo usa Auditoría de Protocolos para abrir el reporte)
 export const TABLA_ANEXO16A = "anexo16a";
@@ -296,6 +298,8 @@ export const GetInfoServicioEditar = async (
             temperatura: res.temperaturaTriaje_temperatura,
             peso: res.pesoTriaje_peso,
             talla: res.tallaTriaje_talla,
+            // Solo MARSA. El backend lo devuelve como texto (Anexo16aReporteDTO.anemiaPolicitemia, «SI»/«NO»).
+            anemiaPolicitemia: siNoABooleano(res.anemiaPolicitemia) ?? false,
             cirugiaMayor: res.cirujiaMayorRecienteSiAnexo16a_si1,
             desordenesCoagulacion: res.desordenCoagulacionSiAnexo16a_si2,
             diabetes: res.diabetesMellitusSiAnexo16a_si3,
@@ -352,6 +356,9 @@ export const construirBodyAnexo16A = (form, user) => ({
     direccionClinica: form.medicoDireccion,
     apto: form.apto,
     noApto: !form.apto,
+    // Solo MARSA: «Anemia o policitemia». El Anexo16aDTO la define como texto y no documenta los valores: se envía
+    // «SI»/«NO» (supuesto a confirmar con el backend). Solo con empresa MARSA, para no grabar un «NO» en los demás registros.
+    ...(esEmpresaMarsa(form.empresa) && { anemiaPolicitemia: form.anemiaPolicitemia ? "SI" : "NO" }),
     cirujiaMayorRecienteNo: !form.cirugiaMayor,
     cirujiaMayorRecienteSi: form.cirugiaMayor,
     desordenCoagulacionNo: !form.desordenesCoagulacion,

@@ -11,6 +11,7 @@ import {
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 import { sellarAuditoria } from "../../../../utils/auditoriaUtils";
+import { camposCuestionarioGeneral } from "../../../../utils/espirometriaCuestionarioUtils";
 import {
     guardarRegistro,
     actualizarRegistro,
@@ -145,6 +146,8 @@ export const GetInfoServicioEditar = async (
         ohlaFumoCigarroCuantos: res.ohlaFumoCigarroCuantos ?? "",
         ohlaEjercicioFisico: res.ohlaEjercicioFisico ?? null,
         ohlaResultadoPrueba: res.ohlaResultadoPrueba ?? "",
+        // Cuestionario versión general (sin OHLA): excl* y preg*
+        ...camposCuestionarioGeneral(res),
 
         // Auditoría REAL (obtenerReporte). Se guarda CRUDA (la vista la formatea: UTC -> local).
         fechaRegistro: res.fechaRegistro ?? "",
@@ -189,6 +192,9 @@ const construirBase = (form) => ({
     ohlaFumoCigarroCuantos: form.ohlaFumoCigarroCuantos,
     ohlaEjercicioFisico: form.ohlaEjercicioFisico,
     ohlaResultadoPrueba: form.ohlaResultadoPrueba,
+    // Versión general (sin OHLA): cuadro del profesional (excl*) y preguntas a los entrevistados (preg*).
+    // Con OHLA no se envían (no se muestran).
+    ...(form.esOHLA !== true && camposCuestionarioGeneral(form)),
 });
 
 // Body completo (creación / actualización). El backend de este módulo espera la
@@ -202,7 +208,7 @@ const construirBody = (form, user, esActualizacion) =>
         campoUserRegistro: "usuarioRegistro",
     });
 
-// ===== Impresión (solo formato OHLA / Cuestionario Platino) =====
+// ===== Impresión (Cuestionario Platino - Espirometría: el reporte elige la variante OHLA o general según `esOHLA`) =====
 export const PrintHojaR = (nro, token, tabla) => {
     Loading("Cargando Formato a Imprimir");
     getFetch(
@@ -210,14 +216,6 @@ export const PrintHojaR = (nro, token, tabla) => {
         token
     ).then(async (res) => {
         if (res?.norden) {
-            if (!res.esOHLA) {
-                Swal.fire(
-                    "Alerta",
-                    "El paciente no cuenta con registros de cuestionario.",
-                    "warning"
-                );
-                return;
-            }
             const nombre = "Espirometria_OHLA_Digitalizado";
             const jasperModules = import.meta.glob("../../../../jaspers/Espirometria/*.jsx");
             const modulo = await jasperModules[`../../../../jaspers/Espirometria/${nombre}.jsx`]();

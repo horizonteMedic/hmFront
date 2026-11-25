@@ -19,6 +19,8 @@ export const getAnexo16AInitialFormState = ({ today, userlogued, userName, userD
   peso: "",
   talla: "",
   medicoDireccion: userDireccion,
+  // Solo MARSA: primera pregunta de «presenta o ha presentado en los 6 últimos meses» (false = NO)
+  anemiaPolicitemia: false,
   cirugiaMayor: false,
   desordenesCoagulacion: false,
   diabetes: false,

@@ -1,4 +1,5 @@
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import { esEmpresaMarsa } from "../../../../../utils/declaracionJuradaSaludUtils";
 import { Opt } from "./NordicoUI";
 
 /**
@@ -8,6 +9,9 @@ import { Opt } from "./NordicoUI";
  * preguntas arrancan en la misma vertical y todas las respuestas también.
  * Los campos de texto usan el reutilizable `InputTextOneLine`; el de horas
  * replica su mismo diseño (`border rounded px-2 py-1`).
+ *
+ * Solo con empresa MARSA se antepone una fila de solo lectura con año de nacimiento,
+ * peso y talla (los mismos datos que el reporte imprime para esa empresa).
  */
 const Cuestionario = ({ form, setForm, handleChangeNumber }) => {
   // Diestro / Zurdo: excluyentes entre sí (se comportan como un grupo de radios).
@@ -25,8 +29,45 @@ const Cuestionario = ({ form, setForm, handleChangeNumber }) => {
     });
   };
 
+  // Solo MARSA. El año sale de la fecha de nacimiento que ya muestra «Datos Personales» (dd/MM/yyyy).
+  const esMarsa = esEmpresaMarsa(form.empresa);
+  const anioNacimiento = String(form.fechaNacimiento ?? "").match(/\d{4}/)?.[0] ?? "";
+
   return (
     <div className="grid gap-x-[24px] gap-y-[16px] text-xl text-gray-700 sm:grid-cols-[440px_1fr] sm:items-center">
+      {/* 0 · Solo MARSA: datos del paciente en una misma fila (solo lectura) */}
+      {esMarsa && (
+        <div className="flex flex-wrap items-center gap-x-[20px] gap-y-[12px] sm:col-span-2">
+          <InputTextOneLine
+            label="Año de nacimiento"
+            name="anioNacimiento"
+            value={anioNacimiento}
+            disabled
+            labelWidth="130px"
+            inputClassName="text-xl"
+            className="w-[270px]"
+          />
+          <InputTextOneLine
+            label="Peso (kg)"
+            name="peso"
+            value={form.peso}
+            disabled
+            labelWidth="72px"
+            inputClassName="text-xl"
+            className="w-[200px]"
+          />
+          <InputTextOneLine
+            label="Talla (m)"
+            name="talla"
+            value={form.talla}
+            disabled
+            labelWidth="72px"
+            inputClassName="text-xl"
+            className="w-[200px]"
+          />
+        </div>
+      )}
+
       {/* 1 · Años y meses en el puesto */}
       <span className="font-semibold text-primario">
         ¿Cuántos años y meses ha estado Ud. haciendo el presente tipo de trabajo?
