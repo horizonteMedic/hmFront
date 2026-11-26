@@ -614,36 +614,37 @@ export default function Espirometria({ nOrdenInicial, onGuardado }) {
                                 disabled={camposDeshabilitados}
                                 labelOnTop
                             />
+                            <InputsRadioGroup
+                                name="ohlaResultadoPrueba"
+                                label="5. Resultado de la Prueba"
+                                labelOnTop
+                                value={form.ohlaResultadoPrueba}
+                                onChange={handleRadioButton}
+                                disabled={camposDeshabilitados}
+                                vertical
+                                options={[
+                                    { label: "Prueba completa", value: "COMPLETA" },
+                                ]}
+                            />
+                            <p className="font-semibold text-md text-primario">
+                                Prueba incompleta (Marque una de las opciones de abajo)
+                            </p>
+                            <InputsRadioGroup
+                                name="ohlaResultadoPrueba"
+                                value={form.ohlaResultadoPrueba}
+                                onChange={handleRadioButton}
+                                disabled={camposDeshabilitados}
+                                vertical
+                                options={[
+                                    { label: "Incompleta: El(la) entrevistado(a) no entendió las instrucciones", value: "INCOMPLETA_NO_ENTENDIO" },
+                                    { label: "Incompleta: El(la) entrevistado(a) fue excluido por razones médicas (no elegible)", value: "INCOMPLETA_EXCLUIDO_MEDICO" },
+                                    { label: "Incompleta: El(la) entrevistado(a) no fue capaz de realizar la prueba (otras razones)", value: "INCOMPLETA_NO_CAPAZ" },
+                                    { label: "Incompleta: El(la) entrevistado(a) rechazó", value: "INCOMPLETA_RECHAZO" },
+                                ]}
+                            />
                         </>
                     )}
-                    <InputsRadioGroup
-                        name="ohlaResultadoPrueba"
-                        label={form.esOHLA ? "5. Resultado de la Prueba" : "8. Resultado de la Prueba"}
-                        labelOnTop
-                        value={form.ohlaResultadoPrueba}
-                        onChange={handleRadioButton}
-                        disabled={camposDeshabilitados}
-                        vertical
-                        options={[
-                            { label: "Prueba completa", value: "COMPLETA" },
-                        ]}
-                    />
-                    <p className="font-semibold text-md text-primario">
-                        Prueba incompleta (Marque una de las opciones de abajo)
-                    </p>
-                    <InputsRadioGroup
-                        name="ohlaResultadoPrueba"
-                        value={form.ohlaResultadoPrueba}
-                        onChange={handleRadioButton}
-                        disabled={camposDeshabilitados}
-                        vertical
-                        options={[
-                            { label: "Incompleta: El(la) entrevistado(a) no entendió las instrucciones", value: "INCOMPLETA_NO_ENTENDIO" },
-                            { label: "Incompleta: El(la) entrevistado(a) fue excluido por razones médicas (no elegible)", value: "INCOMPLETA_EXCLUIDO_MEDICO" },
-                            { label: "Incompleta: El(la) entrevistado(a) no fue capaz de realizar la prueba (otras razones)", value: "INCOMPLETA_NO_CAPAZ" },
-                            { label: "Incompleta: El(la) entrevistado(a) rechazó", value: "INCOMPLETA_RECHAZO" },
-                        ]}
-                    />
+
                 </SectionFieldset>
             </SectionFieldset>
 

@@ -315,26 +315,28 @@ export default async function Espirometria_OHLA_Digitalizado(datos = {}, docExis
     });
   }
 
-  // Resultado de la prueba (5 con OHLA; 8 en la versión general, a continuación de sus 7 preguntas)
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const resultadoLines = doc.splitTextToSize(`${esOHLA ? 5 : 8}. Resultado de la Prueba:`, tablaAncho - 4);
-  const alturaOpciones = RESULTADO_PRUEBA_OPCIONES.length * lineHTable;
-  const rowHResultado = resultadoLines.length * lineHTable + alturaOpciones + paddingTop + paddingBottom;
+  // Resultado de la prueba (5): solo con OHLA, igual que el formulario. La versión general no lo lleva.
+  if (esOHLA) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const resultadoLines = doc.splitTextToSize(`5. Resultado de la Prueba:`, tablaAncho - 4);
+    const alturaOpciones = RESULTADO_PRUEBA_OPCIONES.length * lineHTable;
+    const rowHResultado = resultadoLines.length * lineHTable + alturaOpciones + paddingTop + paddingBottom;
 
-  doc.rect(tablaInicioX, y, tablaAncho, rowHResultado);
-  doc.setFont("helvetica", "bold");
-  resultadoLines.forEach((line, i) => {
-    doc.text(line, tablaInicioX + 2, y + paddingTop + lineHTable - 1 + i * lineHTable);
-  });
+    doc.rect(tablaInicioX, y, tablaAncho, rowHResultado);
+    doc.setFont("helvetica", "bold");
+    resultadoLines.forEach((line, i) => {
+      doc.text(line, tablaInicioX + 2, y + paddingTop + lineHTable - 1 + i * lineHTable);
+    });
 
-  let yOpcion = y + paddingTop + resultadoLines.length * lineHTable;
-  doc.setFont("helvetica", "normal");
-  RESULTADO_PRUEBA_OPCIONES.forEach((opcion) => {
-    const marcado = datos.ohlaResultadoPrueba === opcion.value;
-    doc.text(`( ${marcado ? "X" : " "} ) ${opcion.label}`, tablaInicioX + 6, yOpcion + lineHTable - 1);
-    yOpcion += lineHTable;
-  });
-  y += rowHResultado;
+    let yOpcion = y + paddingTop + resultadoLines.length * lineHTable;
+    doc.setFont("helvetica", "normal");
+    RESULTADO_PRUEBA_OPCIONES.forEach((opcion) => {
+      const marcado = datos.ohlaResultadoPrueba === opcion.value;
+      doc.text(`( ${marcado ? "X" : " "} ) ${opcion.label}`, tablaInicioX + 6, yOpcion + lineHTable - 1);
+      yOpcion += lineHTable;
+    });
+    y += rowHResultado;
+  }
 
   // Firmas y Footer (solo SELLOFIRMA y SELLOFIRMADOCASIG, sin firma/huella del paciente)
   y += 10;
