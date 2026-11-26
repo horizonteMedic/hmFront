@@ -97,7 +97,6 @@ export const TABLA_FECHA_MAP = {
     "lhepatitis": { fechaField: "fecha", vencimientoField: null }, // INMUNOLOGIA - HEPATITIS A
     "microbiologia": { fechaField: "fecha", vencimientoField: null }, // INMUNOLOGIA BK-KOH
     "odontograma": { fechaField: "fechaExamen", vencimientoField: null }, // ODONTROGRAMA
-    "oftalmologia": { fechaField: "fechaOf", vencimientoField: null }, // FICHA OFTALMOLOGICA
     "oftalmologia2021": { fechaField: "fechaOf", vencimientoField: null }, // OFTALMOLOGIA
     "oit": { fechaField: "fradiografia", vencimientoField: null, extraFechaFields: ["flectura"] }, // OIT
     "panel10d": { fechaField: "fecha", vencimientoField: null }, // PANEL 10D

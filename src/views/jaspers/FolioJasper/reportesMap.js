@@ -336,7 +336,7 @@ export const reportesMap = {
       "Audiometria2021-_Digitalizado": Audiometria2021
    },
 
-   oftalmologia: Oftalmologia,
+   // oftalmologia: Oftalmologia,
 
    odontograma: Odontograma_Digitalizado,
 

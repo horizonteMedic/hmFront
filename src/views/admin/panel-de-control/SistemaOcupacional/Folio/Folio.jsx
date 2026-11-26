@@ -252,7 +252,7 @@ const ExamenesListAPENDICE_MARSA = buildExamenesList([ // Apéndice de EMO MARSA
     "CUESTIONARIO_NORDICO",                               // 8
     "EVALUACION_MUSCULO_ESQUELETICA_BOROO",               // 9  (el backend elige el formato MARSA)
     "TRIAJE",                                             // 10 Constancia de evaluación antropométrica
-    "FICHA_OFTALMOLOGICA",                                // 11 Ficha oftalmológica simple
+    "OFTALMOLOGIA_SIMPLE",                                // 11 Ficha oftalmológica simple (datos de Oftalmología)
     "ANEXO_16A",                                          // 12
     "PSICOLOGIA_ANEXO_03",                                // 13
     "OIT",                                                // 14

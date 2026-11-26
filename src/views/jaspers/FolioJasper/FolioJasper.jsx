@@ -63,6 +63,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "certificado_exposicion_al_calor",
         "riesgo_electrico",
         "declaracion_jurada_salud",
+        "registro_entrega_resultados_emo",
     ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
@@ -175,6 +176,10 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 // Declaración Jurada de Salud como hoja suelta: sede y color de la cabecera salen de Antecedentes
                 if (examen.tabla === TABLA_DECLARACION_JURADA_SALUD) {
                     data = { ...data, ...(await datosCabeceraDeclaracionJurada(nro, token, signal)) };
+                }
+                // El catálogo puede fijar el formato, en lugar del que indique el backend
+                if (examen.nameJasper) {
+                    data = { ...data, nameJasper: examen.nameJasper };
                 }
                 return { ...data, ...datosFooter };
             } catch (err) {

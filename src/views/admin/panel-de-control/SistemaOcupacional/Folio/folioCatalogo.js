@@ -775,10 +775,18 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
     },
 
-    FICHA_OFTALMOLOGICA: {
-        nombre: "FICHA OFTALMOLOGICA",
-        tabla: "oftalmologia",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    // FICHA_OFTALMOLOGICA: {
+    //     nombre: "FICHA OFTALMOLOGICA",
+    //     tabla: "oftalmologia",
+    //     url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    // },
+
+    // Datos de la pestaña Oftalmología, impresos siempre con el formato simple (`nameJasper` fijo)
+    OFTALMOLOGIA_SIMPLE: {
+        nombre: "FICHA OFTALMOLOGICA SIMPLE",
+        tabla: "oftalmologia2021",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+        nameJasper: "Oftalmologia",
     },
 
     ODONTOGRAMA: {
