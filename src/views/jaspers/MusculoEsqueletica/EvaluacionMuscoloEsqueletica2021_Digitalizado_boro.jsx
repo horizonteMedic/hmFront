@@ -345,7 +345,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
-  headerEvaluacionMuscoloEsqueletica(doc, data, true, 1);
+  headerEvaluacionMuscoloEsqueletica(doc, data, true, 1, opciones.fondoCabecera);
 
   // === 1) Imagen de fondo para la evaluación músculo esquelética ===
   const fondoImg = "/img/Pagina1_EvaluacionMusculoEsqueletica_boro.png";
@@ -359,7 +359,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
   const yOffset = pageH - imgHeight; // Posicionar desde la parte inferior
 
   try {
-    if (opciones.fondoPagina1) doc.addImage(opciones.fondoPagina1, "PNG", xOffset, yOffset, imgWidth, opciones.fondoPagina1Alto);
+    if (opciones.fondoPagina1) doc.addImage(opciones.fondoPagina1, "JPEG", xOffset, yOffset, imgWidth, opciones.fondoPagina1Alto);
     else doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
     doc.text("Imagen de evaluación músculo esquelética no disponible", margin, yOffset + 10);
@@ -1476,7 +1476,7 @@ function imprimir(doc) {
   iframe.onload = () => iframe.contentWindow.print();
 }
 
-export function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
   const addSello = (imagenUrl, x, y, maxw = 100) => {
     return new Promise((resolve) => {
       const img = new Image();

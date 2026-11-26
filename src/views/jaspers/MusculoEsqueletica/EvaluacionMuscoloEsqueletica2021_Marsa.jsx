@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import EvaluacionBasicaBoro, { footerTR, agregarFirmas } from "./EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
+import EvaluacionBasicaBoro, { footerTR } from "./EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
 import headerEvaluacion from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
 
 // Evaluación Músculo Esquelética 2021 - formato MARSA. Orden del reporte:
@@ -11,6 +11,7 @@ import headerEvaluacion from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_
 // Datos MARSA: `data.adicional` (mismas claves que `form.marsaMsk`); cadera/rodilla/tobillo salen de los campos de siempre.
 
 const IMG_PAGINA1 = "/img/Pagina1_EvaluacionMusculoEsqueletica_boro.png";
+const IMG_CABECERA = "/img/header_EvaluacionMusculoEsqueletica_boro.png";
 // Fondo de la página 1 (boro): solo hasta los rangos articulares; la columna vertebral y las maniobras de
 // miembros superiores no van en el reporte MARSA
 const TOPE_PAGINA1 = 0.5;
@@ -18,20 +19,64 @@ const TOPE_PAGINA1 = 0.5;
 const MARGEN = 10;
 const ANCHO = 190;
 
-const recortarImagen = (url, desde, hasta) =>
+// ===== Imágenes =====
+// jsPDF incrusta los PNG con transparencia sin comprimir y los decodifica en JavaScript (una página de fondo pesa
+// ~17 MB y tarda en generarse, imprimirse y unirse en el Folio). Por eso toda imagen se pasa antes por un canvas:
+// se aplana sobre blanco, se limita su ancho y se entrega en JPEG, que jsPDF incrusta tal cual.
+const cargarImagen = (url) =>
   new Promise((resolve) => {
     const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const alto = Math.round((hasta - desde) * img.height);
-      canvas.width = img.width;
-      canvas.height = alto;
-      canvas.getContext("2d").drawImage(img, 0, Math.round(desde * img.height), img.width, alto, 0, 0, img.width, alto);
-      resolve(canvas.toDataURL("image/png"));
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      console.error("Error al cargar la imagen:", url);
+      resolve(null);
     };
-    img.onerror = () => resolve(null);
     img.src = url;
   });
+
+// Devuelve { data, ancho, alto } (ancho/alto originales) o null si no se pudo cargar
+const aJpeg = async (url, { desde = 0, hasta = 1, maxAncho = 1700 } = {}) => {
+  const img = await cargarImagen(url);
+  if (!img) return null;
+  const altoOrigen = Math.round((hasta - desde) * img.height);
+  const escala = Math.min(1, maxAncho / img.width);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(img.width * escala);
+  canvas.height = Math.round(altoOrigen * escala);
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, Math.round(desde * img.height), img.width, altoOrigen, 0, 0, canvas.width, canvas.height);
+  return { data: canvas.toDataURL("image/jpeg", 0.9), ancho: img.width, alto: img.height };
+};
+
+// Los fondos son fijos: se preparan una sola vez y se reutilizan (p. ej. al generar varias órdenes seguidas)
+const fondos = new Map();
+const fondoJpeg = (url, opciones) => {
+  const clave = url + JSON.stringify(opciones ?? {});
+  if (!fondos.has(clave)) {
+    fondos.set(clave, aJpeg(url, opciones).then((r) => {
+      if (!r) fondos.delete(clave); // si falló se reintenta la próxima vez
+      return r?.data;
+    }));
+  }
+  return fondos.get(clave);
+};
+
+// Firmas, huella y sello: se descargan en paralelo y se ubican igual que en el formato boro (máx. 35 mm de alto)
+const agregarFirmas = async (doc, digitalizacion, firmas) => {
+  const urls = Object.fromEntries(digitalizacion.map((d) => [d.nombreDigitalizacion, d.url]));
+  const listas = await Promise.all(
+    firmas.map(async (f) => ({ ...f, img: urls[f.nombre] ? await aJpeg(urls[f.nombre], { maxAncho: 600 }) : null }))
+  );
+  listas.filter((f) => f.img).forEach(({ img, x, y, maxw }) => {
+    const escala = Math.min(maxw / img.ancho, 35 / img.alto, 1);
+    const w = img.ancho * escala;
+    const h = img.alto * escala;
+    doc.addImage(img.data, "JPEG", x, y + (35 - h) / 2, w, h);
+  });
+};
 
 const COLUMNAS = [["cervical", "Columna cervical"], ["dorsal", "Columna dorsal"], ["lumbar", "Columna lumbar"]];
 const MOV_COLUMNA = ["Flexión", "Extensión", "Lateraliz. Derecha", "Lateraliz. Izquierda", "Rotación Derecha", "Rotación Izquierda", "Irradiación", "Alt. masa Muscular."];
@@ -166,10 +211,14 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   const opcionesTabla = { ...ESTILO_TABLA, didParseCell: pintarX, didDrawPage: cabeceraPaginasNuevas };
 
   // === 1) Página 1 (datos del paciente + evaluación básica: aptitud espalda y rangos articulares) ===
-  const fondoPagina1 = await recortarImagen(IMG_PAGINA1, 0, TOPE_PAGINA1);
+  const [fondoPagina1, fondoCabecera] = await Promise.all([
+    fondoJpeg(IMG_PAGINA1, { hasta: TOPE_PAGINA1 }),
+    fondoJpeg(IMG_CABECERA),
+  ]);
   await EvaluacionBasicaBoro(data, doc, {
     marsa: true,
-    fondoPagina1: fondoPagina1 || undefined,
+    fondoPagina1,
+    fondoCabecera,
     fondoPagina1Alto: TOPE_PAGINA1 * 0.85 * pageH,
   });
 

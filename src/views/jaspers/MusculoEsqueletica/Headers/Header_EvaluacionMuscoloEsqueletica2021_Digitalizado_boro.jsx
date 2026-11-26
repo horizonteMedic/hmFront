@@ -1,4 +1,4 @@
-const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
+const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1, fondo) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -18,11 +18,11 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   if (mostrarFrame) {
-    const fondoImg = "/img/header_EvaluacionMusculoEsqueletica_boro.png";
+    const fondoImg = fondo || "/img/header_EvaluacionMusculoEsqueletica_boro.png"; // `fondo`: versión ya preparada (JPEG)
     const fondoH = 47; // altura aproximada de la cabecera en mm (ajusta si es necesario)
     let yHeader = 0; // Pegado a la parte superior
     try {
-      doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
+      doc.addImage(fondoImg, fondo ? "JPEG" : "PNG", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
     } catch (e) {
       doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
     }
