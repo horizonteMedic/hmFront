@@ -51,11 +51,17 @@ const dia = (v) => texto(v).slice(0, 10); // "2026-11-17T20:33:56" -> "2026-11-1
  * @param {jsPDF}  docExistente  Si viene, la declaración se agrega como página nueva y se devuelve el doc; si no, se
  *                       crea el PDF y se imprime.
  * @param {number} numeroPaginaInicial  N° con el que se rotula la página ("Pag. 03").
+ * @param {boolean} agregarPagina  false cuando `docExistente` ya trae la página en blanco donde dibujar (Folio).
  */
-export default async function DeclaracionJuradaSalud_MARSA(data = {}, docExistente = null, numeroPaginaInicial = 1) {
+export default async function DeclaracionJuradaSalud_MARSA(
+  data = {},
+  docExistente = null,
+  numeroPaginaInicial = 1,
+  { agregarPagina = true } = {}
+) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   // Agregada a un reporte existente: página nueva y siempre vertical
-  if (docExistente) doc.addPage("a4", "portrait");
+  if (docExistente && agregarPagina) doc.addPage("a4", "portrait");
   const pageW = doc.internal.pageSize.getWidth();
   let pagina = numeroPaginaInicial;
 

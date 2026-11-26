@@ -133,6 +133,7 @@ import ficha_antecedente_patologico_boro_nuevo from "../Poderosa/CertificadoMedi
 import CAMO_Administrativo16_MARSA from "../CAMOAdmin/CAMO_Administrativo16_MARSA";
 import CAMO_Administrativo16_Simple from "../CAMOAdmin/CAMO_Administrativo16_Simple";
 import ReporteTriaje from "../Triaje/ReporteTriaje";
+import DeclaracionJuradaSalud_MARSA from "../DeclaracionJuradaSalud/DeclaracionJuradaSalud_MARSA";
 
 export const reportesMap = {
    /* =========================
@@ -284,6 +285,10 @@ export const reportesMap = {
       CONSENTIMIENTOS
    ========================= */
    consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
+
+   // El folio ya deja la página en blanco: no se agrega otra
+   declaracion_jurada_salud: (data, doc) =>
+      DeclaracionJuradaSalud_MARSA(data, doc, 1, { agregarPagina: false }),
 
    DECLA_INFO_APTITUD_MO: ConsentAdmisionInformacionAptitudMedicoOcupacional,
 
