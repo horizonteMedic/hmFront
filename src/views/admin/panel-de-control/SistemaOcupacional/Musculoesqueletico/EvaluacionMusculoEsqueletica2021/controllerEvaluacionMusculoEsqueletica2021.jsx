@@ -8,6 +8,8 @@ import {
   actualizarRegistro,
   validarSede,
 } from "../../../../../utils/registroOcupacionalUtils";
+import { esEmpresaMarsa } from "../../../../../utils/declaracionJuradaSaludUtils";
+import { MARSA_MSK_INICIAL } from "./SeccionMarsa2021";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -53,6 +55,13 @@ const leerBoolPOSITIVO = (res, name) => {
   }
   return "";
 };
+
+// Datos de la sección MARSA (`adicional` en el DTO, mismas claves que `form.marsaMsk`). Lo que venga nulo o no
+// venga (p. ej. un registro anterior a estos campos) toma el valor inicial del formulario.
+const leerAdicionalMarsa = (adicional) =>
+  Object.fromEntries(
+    Object.entries(MARSA_MSK_INICIAL).map(([campo, inicial]) => [campo, adicional?.[campo] ?? inicial])
+  );
 
 export const GetInfoServicio = (
   nro,
@@ -215,6 +224,9 @@ export const GetInfoServicio = (
           irradiacionTobilloIzquierdo: res.tobilloIzquierdoIrradiacion,
           altMasaMuscularTobilloDerecho: res.tobilloDerechoMasaMuscular,
           altMasaMuscularTobilloIzquierdo: res.tobilloIzquierdoMasaMuscular,
+
+          // Sección exclusiva MARSA
+          marsaMsk: leerAdicionalMarsa(res.adicional),
 
           cie10: res.cie10,
           conclusiones: res.conclusiones,
@@ -391,6 +403,9 @@ const construirBase = (form, dniUser) => {
 
     usuarioFirma: form.user_medicoFirma,
     dniUser: dniUser,
+
+    // Sección exclusiva MARSA: las demás empresas no la llenan
+    adicional: esEmpresaMarsa(form.empresa) ? leerAdicionalMarsa(form.marsaMsk) : null,
   };
   return body;
 };

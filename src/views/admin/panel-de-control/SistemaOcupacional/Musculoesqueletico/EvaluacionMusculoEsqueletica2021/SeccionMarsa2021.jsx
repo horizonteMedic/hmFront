@@ -102,7 +102,14 @@ const OPC_ANTERO = [
   { label: "Disminuida", value: "disminuida" },
 ];
 
-export default function SeccionMarsa2021({ form, setForm, handleChange, handleFocusNext, esMarsa, disabled }) {
+// Color de un campo modificado respecto al registro guardado (igual que en los inputs reutilizables)
+const CLASE_EDITADO = "border-orange-400 bg-orange-100";
+
+export default function SeccionMarsa2021({
+  form, setForm, handleChange, handleFocusNext, esMarsa, disabled,
+  isMarsaEdited = () => false, revertMarsa, // campos de `marsaMsk`
+  isFieldEdited = () => false, // campos del form (cadera, rodilla y tobillo)
+}) {
   const bloqueado = disabled || !esMarsa;
   const d = { ...MARSA_MSK_INICIAL, ...(form.marsaMsk || {}) };
   const set = (campo, valor) =>
@@ -119,16 +126,14 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
       value={d[campo]}
       onChange={(_, v) => set(campo, v)}
       disabled={bloqueado}
+      edited={isMarsaEdited(campo)}
+      onRevert={() => revertMarsa(campo)}
     />
   );
   const check = (campo, label) => (
     <InputCheckbox label={label} name={`marsa_${campo}`} checked={d[campo]} disabled={bloqueado}
+      className={isMarsaEdited(campo) ? `rounded px-1 ${CLASE_EDITADO}` : ""}
       onChange={(e) => set(campo, e.target.checked)} />
-  );
-  const texto = (campo, label) => (
-    <InputTextOneLine key={campo} name={`marsa_${campo}`} label={label} labelOnTop labelClassName="text-xs"
-      placeholder="Grado" inputMode="numeric" disabled={bloqueado} value={d[campo]}
-      onChange={(e) => set(campo, e.target.value)} />
   );
 
   return (
@@ -148,7 +153,8 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <InputTextOneLine name="marsa_horasDia" label="Horas/día en el trabajo" stackOnMobile labelWidth="170px"
-              inputMode="numeric" disabled={bloqueado} value={d.horasDia} onChange={(e) => set("horasDia", e.target.value)} />
+              inputMode="numeric" disabled={bloqueado} value={d.horasDia} onChange={(e) => set("horasDia", e.target.value)}
+              edited={isMarsaEdited("horasDia")} onRevert={() => revertMarsa("horasDia")} />
             {radio("tiempoTarea", OPC_TIEMPO, "Tiempo de tarea")}
           </div>
           <div className="space-y-2">
@@ -175,6 +181,8 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
             groupLabel="Desviaciones del eje lateral"
             labelColumns={2}
             disabled={bloqueado}
+            isFieldEdited={isMarsaEdited}
+            onRevert={revertMarsa}
             stackOnMobile
           />
           <RadioTable
@@ -185,6 +193,8 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
             groupLabel="Desviación del eje antero-posterior"
             labelColumns={2}
             disabled={bloqueado}
+            isFieldEdited={isMarsaEdited}
+            onRevert={revertMarsa}
             stackOnMobile
           />
         </div>
@@ -222,7 +232,7 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
                         name={`marsa_${c}Din${i}`}
                         aria-label={`${nombre} - ${m}`}
                         placeholder="Grado"
-                        className={`w-full border rounded px-1 py-1 text-center ${bloqueado ? "bg-gray-300" : ""}`}
+                        className={`w-full border rounded px-1 py-1 text-center ${bloqueado ? "bg-gray-300" : ""} ${isMarsaEdited(`${c}Din${i}`) ? CLASE_EDITADO : ""}`}
                         disabled={bloqueado}
                         onKeyDown={handleFocusNext}
                         value={d[`${c}Din${i}`]}
@@ -260,6 +270,7 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
                     // Rodilla: abducción y aducción no se evalúan (siguen vacías y bloqueadas)
                     const rodillaBloqueada = joint === "Rodilla" && (m === "abduccion" || m === "aduccion");
                     const off = bloqueado || rodillaBloqueada;
+                    const editado = joint ? isFieldEdited(name) : isMarsaEdited(`${k}_${m}`);
                     return (
                       <td key={m} className="py-1 px-1">
                         <input
@@ -268,7 +279,7 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
                           name={name}
                           aria-label={`${label} - ${ml}`}
                           placeholder="Grado"
-                          className={`w-full border rounded px-1 py-1 text-center ${off ? "bg-gray-300" : ""}`}
+                          className={`w-full border rounded px-1 py-1 text-center ${off ? "bg-gray-300" : ""} ${editado ? CLASE_EDITADO : ""}`}
                           disabled={off}
 
                           onKeyDown={handleFocusNext}
@@ -295,7 +306,8 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
           <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-3 md:items-center">
             <span className="font-medium">{texto}</span>
             <InputTextOneLine name={`marsa_hallazgoGrado${i}`} disabled={bloqueado} onKeyDown={handleFocusNext} placeholder="Descripción de hallazgos"
-              value={d[`hallazgoGrado${i}`]} onChange={(e) => set(`hallazgoGrado${i}`, e.target.value)} />
+              value={d[`hallazgoGrado${i}`]} onChange={(e) => set(`hallazgoGrado${i}`, e.target.value)}
+              edited={isMarsaEdited(`hallazgoGrado${i}`)} onRevert={() => revertMarsa(`hallazgoGrado${i}`)} />
           </div>
         ))}
       </SectionFieldset>
@@ -309,6 +321,8 @@ export default function SeccionMarsa2021({ form, setForm, handleChange, handleFo
           value={d.valoracion}
           onChange={(_, v) => set("valoracion", v)}
           disabled={bloqueado}
+          edited={isMarsaEdited("valoracion")}
+          onRevert={() => revertMarsa("valoracion")}
         />
       </SectionFieldset>
     </div>

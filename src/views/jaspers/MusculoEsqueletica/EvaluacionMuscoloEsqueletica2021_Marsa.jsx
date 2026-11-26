@@ -8,7 +8,7 @@ import headerEvaluacion from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_
 //  2) Contenido MARSA: descripción de las tareas, columna vertebral (estática y dinámica), evaluación dinámica de
 //     articulaciones, puntuación de referencia / descripción de hallazgos y valoración.
 //  3) Conclusiones y recomendaciones (tabla propia, sin CIE 10) + firmas.
-// Datos MARSA: `data.marsaMsk` (mismas claves que el formulario); cadera/rodilla/tobillo salen de los campos de siempre.
+// Datos MARSA: `data.adicional` (mismas claves que `form.marsaMsk`); cadera/rodilla/tobillo salen de los campos de siempre.
 
 const IMG_PAGINA1 = "/img/Pagina1_EvaluacionMusculoEsqueletica_boro.png";
 // Fondo de la página 1 (boro): solo hasta los rangos articulares; la columna vertebral y las maniobras de
@@ -157,7 +157,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageH = doc.internal.pageSize.getHeight();
   const pageW = doc.internal.pageSize.getWidth();
-  const m = data.marsaMsk || {};
+  const m = data.adicional || {};
 
   const cabeceraPaginasNuevas = (d) => {
     // La página 1 ya trae su cabecera del formato boro

@@ -91,7 +91,6 @@ const CAMPOS_NO_EDITABLES = [
   "ocupacion",
   "cargoDesempenar",
   "nombreMedico",
-  "marsaMsk",
   "tieneRegistro",
   "userRegistro",
   "fechaRegistro",
@@ -287,6 +286,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     isFieldEdited,
     revertField,
     revertFields,
+    valoresOriginales,
   } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables });
 
   // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
@@ -299,6 +299,13 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     campos.some(isFieldEdited) ? (
       <RevertButton onClick={() => revertFields(campos)} title="Revertir cambios de esta parte" />
     ) : null;
+
+  // Campos de la sección MARSA (viven dentro de `marsaMsk`): se resaltan y revierten uno por uno.
+  const originalMarsa = valoresOriginales?.marsaMsk;
+  const isMarsaEdited = (campoMarsa) =>
+    Boolean(originalMarsa) && originalMarsa[campoMarsa] !== form.marsaMsk?.[campoMarsa];
+  const revertMarsa = (campoMarsa) =>
+    setForm((f) => ({ ...f, marsaMsk: { ...f.marsaMsk, [campoMarsa]: originalMarsa[campoMarsa] } }));
 
   // Props comunes de un campo de texto.
   const campo = (name, onChange = handleChange) => ({
@@ -446,17 +453,25 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
         </SectionFieldset>
       )}
 
-      {/* ===== SECCIÓN: SOLO MARSA (cerrada y bloqueada si la empresa del N° de orden no es MARSA) =====
-          `key` remonta la sección al cambiar de empresa para que abra/cierre según corresponda. */}
-      <SectionFieldset
-        key={esMarsa ? "marsa" : "no-marsa"}
-        legend="Descripción de Tareas y Evaluación de Columna (MARSA)"
-        collapsible
-        defaultOpen={esMarsa}
-        actions={esMarsa ? revertirParte(CAMPOS_ARTICULACIONES) : null}
-      >
-        <SeccionMarsa2021 form={form} setForm={setForm} handleChange={handleChange} handleFocusNext={handleFocusNext} esMarsa={esMarsa} disabled={camposDeshabilitados} />
-      </SectionFieldset>
+      {/* ===== SECCIÓN: SOLO MARSA (no aparece salvo que la empresa del N° de orden sea MARSA) ===== */}
+      {esMarsa && (
+        <SectionFieldset
+          legend="Descripción de Tareas y Evaluación de Columna (MARSA)"
+          actions={revertirParte(["marsaMsk", ...CAMPOS_ARTICULACIONES])}
+        >
+          <SeccionMarsa2021
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleFocusNext={handleFocusNext}
+            esMarsa={esMarsa}
+            disabled={camposDeshabilitados}
+            isMarsaEdited={isMarsaEdited}
+            revertMarsa={revertMarsa}
+            isFieldEdited={isFieldEdited}
+          />
+        </SectionFieldset>
+      )}
 
       {/* ===== SECCIÓN: CONCLUSIONES Y COMENTARIOS ===== */}
       <SectionFieldset legend="Conclusiones y Comentarios" className="space-y-4">

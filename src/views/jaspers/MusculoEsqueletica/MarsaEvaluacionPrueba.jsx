@@ -49,7 +49,7 @@ export const datosPrueba = () => ({
   cie10: "Z00",
   recomendaciones: "- EVALUACIÓN ANUAL",
 
-  marsaMsk: {
+  adicional: {
     horasDia: "8",
     tiempoTarea: "continuo4",
     movHombro: true, movPronosupinacion: false, repetidas: true, contraResistencia: false, posturasForzadas: true,
