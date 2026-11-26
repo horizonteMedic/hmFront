@@ -143,6 +143,13 @@ export const EXAMENES_CATALOGO = {
         masivo: true,
     },
 
+    DECLARACION_JURADA_SALUD_MARSA: {
+        nombre: "DECLARACION JURADA DE SALUD MARSA",
+        tabla: "declaracion_jurada_salud",
+        url: "/api/v01/ct/ocupacional/declaracion-jurada-salud/obtenerReporte",
+        esJasper: true,
+    },
+
     /* =========================
        ALTURA / VEHÍCULOS
     ========================= */
@@ -768,11 +775,11 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
     },
 
-    // FICHA_OFTALMOLOGICA: {
-    //     nombre: "FICHA OFTALMOLOGICA",
-    //     tabla: "oftalmologia",
-    //     url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
-    // },
+    FICHA_OFTALMOLOGICA: {
+        nombre: "FICHA OFTALMOLOGICA",
+        tabla: "oftalmologia",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    },
 
     ODONTOGRAMA: {
         nombre: "ODONTROGRAMA",
