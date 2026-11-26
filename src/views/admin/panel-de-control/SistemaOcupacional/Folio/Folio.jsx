@@ -241,6 +241,27 @@ const ExamenesListCOMPLETO_MARSA = buildExamenesList(
     ).filter((item, index, arr) => arr.indexOf(item) === index) // deduplica RESUMEN_MEDICO_MARSA
 );
 
+const ExamenesListAPENDICE_MARSA = buildExamenesList([ // Apéndice de EMO MARSA
+    "CONSENT_REG_ENTREGA_RESULTADOS_EMO",                 // 1
+    "CERTIFICADO_APTITUD_ANEXO_16",                       // 2
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL", // 3
+    "DECLARACION_JURADA_SALUD_MARSA",                     // 4
+    "RESUMEN_MEDICO_MARSA",                               // 5
+    "HISTORIA_OCUPACIONAL",                               // 6
+    "ANEXO_16",                                           // 7
+    "CUESTIONARIO_NORDICO",                               // 8
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",               // 9  (el backend elige el formato MARSA)
+    "TRIAJE",                                             // 10 Constancia de evaluación antropométrica
+    "OFTALMOLOGIA_SIMPLE",                                // 11 Ficha oftalmológica simple (datos de Oftalmología)
+    "ANEXO_16A",                                          // 12
+    "PSICOLOGIA_ANEXO_03",                                // 13
+    "OIT",                                                // 14
+    "ODONTOGRAMA",                                        // 15
+    "AUDIOMETRIA_OHLA",                                   // 16
+    "ESPIROMETRIA_CUESTIONARIO_OHLA",                     // 17
+    "ESPIROMETRIA_ARCHIVO",                               // 18
+]);
+
 const ExamenesListPsicologia = buildExamenesList([
     "INFORME_PSICOLOGICO",
     "PSICOLOGIA_ANEXO_02",
@@ -348,6 +369,7 @@ export const ListaPorPlantilla = {
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     "COMPLETO MARSA": ExamenesListCOMPLETO_MARSA,
+    "APENDICE MARSA": ExamenesListAPENDICE_MARSA,
     "MANEJO ALIMENTOS GREEN": ExamenesListMANEJO_ALIMENTOS_GREEN,
     "PSICOSENSOMETRICO PODEROSA": ExamenesListPSICOSENSOMETRICO_ADMISION,
     "TEST ALTURA PODEROSA": ExamenesListTEST_ALTURA_ADMISION,

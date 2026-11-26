@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import { getFetch, getFetchPdf } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
-import { datosDeclaracionJuradaParaReporte } from "../../utils/declaracionJuradaSaludUtils";
+import { datosCabeceraDeclaracionJurada, datosDeclaracionJuradaParaReporte, TABLA_DECLARACION_JURADA_SALUD } from "../../utils/declaracionJuradaSaludUtils";
 import { PDFDocument } from "pdf-lib";
 // import * as pdfjsLib from "pdfjs-dist";
 // import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
@@ -62,6 +62,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "riesgo_cardiovascular",
         "certificado_exposicion_al_calor",
         "riesgo_electrico",
+        "declaracion_jurada_salud",
+        "registro_entrega_resultados_emo",
     ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
@@ -107,6 +109,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     const jaspersConOpcionMultiple = [
         "informe_electrocardiograma",
+        "evaluacion_musculo_esqueletica2021", // boro o MARSA según nameJasper
         "resumen_medico_poderosa",
         "oftalmologia2021",
         "antecedentes_patologicos",
@@ -170,6 +173,14 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 if (examen.tabla === "antecedentes_patologicos") {
                     data = { ...data, ...(await datosDeclaracionJuradaParaReporte(data, nro, token, signal)) };
                 }
+                // Declaración Jurada de Salud como hoja suelta: sede y color de la cabecera salen de Antecedentes
+                if (examen.tabla === TABLA_DECLARACION_JURADA_SALUD) {
+                    data = { ...data, ...(await datosCabeceraDeclaracionJurada(nro, token, signal)) };
+                }
+                // El catálogo puede fijar el formato, en lugar del que indique el backend
+                if (examen.nameJasper) {
+                    data = { ...data, nameJasper: examen.nameJasper };
+                }
                 return { ...data, ...datosFooter };
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);
@@ -229,7 +240,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             let generador = null;
 
             if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
-                generador = reportesMap[examen.tabla][data.nameJasper];
+                generador = reportesMap[examen.tabla][data.nameJasper] ?? reportesMap[examen.tabla].default;
             } else {
                 generador = reportesMap[examen.tabla];
             }

@@ -356,3 +356,12 @@ export async function imagenToPdfA4(file) {
 
     return await pdfDoc.save();
 }
+
+// Texto SI/NO que devuelve el backend (p. ej. «SI», «NO», «true») -> true / false; vacío o desconocido -> null (sin responder).
+export const siNoABooleano = (valor) => {
+    if (typeof valor === "boolean") return valor;
+    const texto = String(valor ?? "").trim().toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (["SI", "S", "TRUE", "1"].includes(texto)) return true;
+    if (["NO", "N", "FALSE", "0"].includes(texto)) return false;
+    return null;
+};

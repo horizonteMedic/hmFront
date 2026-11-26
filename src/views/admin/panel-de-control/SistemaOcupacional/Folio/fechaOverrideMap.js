@@ -23,6 +23,7 @@ export const TABLA_FECHA_MAP = {
     "anexo_agroindustrial": { fechaField: "fechaAnexo_fecha", vencimientoField: "fechaHasta_fechahasta", extraFechaFields: ["fechaDesde_fechadesde"] }, // ANEXO 02
     "antece_enfermedades_altura": { fechaField: "antecedentes.fechaAntecedente", vencimientoField: null }, // ENFERMEDADES EN ALTURA
     "antecedentes_patologicos": { fechaField: "fechaAntecedentesPatologicos_fecha_ap", vencimientoField: null }, // ANTECEDENTES PATOLOGICOS
+    "declaracion_jurada_salud": { fechaField: "fechaDeclaracion", vencimientoField: null, extraFechaFields: ["fechaEmo"] }, // DECLARACION JURADA DE SALUD MARSA
     "aptitud_altura_poderosa": { fechaField: "fechaExamen", vencimientoField: "fechaHasta" }, // CERTIFICADO APTITUD ALTURA PODEROSA
     "aptitud_licencia_conduciri": { fechaField: "fechaExamen", vencimientoField: "fechaHasta" }, // LICENCIA PARA CONDUCIR INTERNA PODEROSA
     "aptitud_medico_ocupacional_agro": { fechaField: "fechaDesde", vencimientoField: "fechaHasta" }, // CERTIFICADO MEDICO OCUPACIONAL ANEXO 02

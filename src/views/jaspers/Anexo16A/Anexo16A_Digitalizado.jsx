@@ -1,10 +1,11 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
+import { getSign, convertirGenero, getSignCompressed, siNoABooleano } from "../../utils/helpers";
 import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { esEmpresaMarsa } from "../../utils/declaracionJuradaSaludUtils.js";
 
 export default async function Anexo16A_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -31,6 +32,8 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
       imc: String(data.imcTriaje_imc || "")
     },
     condiciones: {
+      // Solo MARSA. El backend lo devuelve como texto (anemiaPolicitemia, «SI»/«NO»); sin valor queda null: no se marca ni SI ni NO.
+      anemiaPolicitemia: siNoABooleano(data.anemiaPolicitemia),
       cirugiaMayor: data.cirujiaMayorRecienteSiAnexo16a_si1 || false,
       desordenesCoagulacion: data.desordenCoagulacionSiAnexo16a_si2 || false,
       diabetes: data.diabetesMellitusSiAnexo16a_si3 || false,
@@ -75,6 +78,7 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
   const datosFinales = datosReales;
 
   const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contrata);
+  const esMARSA = esEmpresaMarsa(datosFinales.empresa);
 
   // === FUNCIONES AUXILIARES ===
   // Función para calcular altura necesaria para un texto sin dibujarlo
@@ -400,6 +404,8 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
 
   // Lista de condiciones médicas
   const condiciones = [
+    // Solo MARSA: primera pregunta de la lista
+    ...(esMARSA ? [{ texto: "Anemia o policitemia", campo: "anemiaPolicitemia" }] : []),
     { texto: "Cirugía mayor reciente", campo: "cirugiaMayor" },
     { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion" },
     { texto: "Diabetes Mellitus", campo: "diabetes" },

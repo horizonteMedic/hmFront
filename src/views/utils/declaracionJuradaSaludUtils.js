@@ -226,3 +226,21 @@ export const datosDeclaracionJuradaParaReporte = async (reporte, nOrden, token, 
   const declaracion = await obtenerDeclaracionJuradaSalud(nOrden, token, { esJasper: true, signal });
   return existeDeclaracionJurada(declaracion) ? { declaracionJuradaSalud: declaracion } : {};
 };
+
+// Datos de cabecera (sede y color) que el endpoint de la declaración no trae, para imprimirla como hoja suelta en
+// Folio: salen del reporte de Antecedentes Patológicos. Si no responde, la hoja se imprime sin ellos.
+export const datosCabeceraDeclaracionJurada = async (nOrden, token, signal) => {
+  try {
+    const reporte = await getFetch(
+      `/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos?nOrden=${nOrden}&nameService=antecedentes_patologicos&esJasper=true`,
+      token,
+      signal
+    );
+    return Object.fromEntries(
+      ["sede", "codigoColor", "textoColor"].filter((campo) => reporte?.[campo]).map((campo) => [campo, reporte[campo]])
+    );
+  } catch (error) {
+    if (error?.name !== "AbortError") console.error("No se pudo cargar la cabecera de la Declaración Jurada:", error);
+    return {};
+  }
+};

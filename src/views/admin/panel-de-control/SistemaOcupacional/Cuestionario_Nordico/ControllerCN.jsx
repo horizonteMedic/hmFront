@@ -99,6 +99,9 @@ export const GetInfoPac = (nro, set, token, sede) => {
         lugarNacimiento: res.lugarNacimiento ?? "",
         estadoCivil: res.estadoCivil ?? "",
         nivelEstudios: res.nivelEstudios ?? "",
+        // Solo MARSA: «Datos Personales del Trabajo» los muestra (solo lectura)
+        peso: res.peso ?? "",
+        talla: res.talla ?? "",
         // Datos laborales
         empresa: res.empresa ?? "",
         contrata: res.contrata ?? "",
@@ -138,6 +141,8 @@ export const GetInfoCuestionarioNordic = (nro, tabla, set, token) => {
         lugarNacimiento: res.lugarNacimientoPaciente ?? res.lugarNacimiento ?? "",
         estadoCivil: res.estadoCivilPaciente ?? res.estadoCivil ?? "",
         nivelEstudios: res.nivelEstudioPaciente ?? res.nivelEstudios ?? "",
+        peso: res.peso ?? "",
+        talla: res.talla ?? "",
         empresa: res.empresa ?? "",
         contrata: res.contrata ?? "",
         ocupacion: res.ocupacionPaciente ?? res.areaO ?? "",

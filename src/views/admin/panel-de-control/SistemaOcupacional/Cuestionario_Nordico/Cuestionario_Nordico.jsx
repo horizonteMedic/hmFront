@@ -75,6 +75,9 @@ const Cuestionario_Nordico = ({ nOrdenInicial, onGuardado }) => {
     lugarNacimiento: "",
     estadoCivil: "",
     nivelEstudios: "",
+    // Solo se muestran con empresa MARSA (solo lectura): vienen del paciente (registro nuevo) o del reporte (existente).
+    peso: "",
+    talla: "",
 
     // Datos laborales
     empresa: "",

@@ -39,9 +39,9 @@ export default async function ConsentAdmisionRegistroEntregaInformeEMO(data = {}
   const { dia, mes, anio } = obtenerDiaMesAnio(fechaEntrega);
 
   // Header
-  const drawHeader = () => {
-    // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+  const drawHeader = async () => {
+    // Logo y membrete (CabeceraLogo es async: hay que esperarlo o el PDF se genera sin logo)
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Título (dos líneas)
     doc.setFont("helvetica", "bold").setFontSize(13);
@@ -83,7 +83,7 @@ export default async function ConsentAdmisionRegistroEntregaInformeEMO(data = {}
     });
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
   let yPos = 72;

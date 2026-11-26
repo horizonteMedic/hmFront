@@ -9,6 +9,7 @@ import {
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { deleteArchivoPorOrdenNomenclatura, getFetch, SubmitData, SubmitDataManejo } from "../../../../utils/apiHelpers";
 import { Loading } from "../Anexo2/controllerAnexo2";
+import { existeDeclaracionJurada, obtenerDeclaracionJuradaSalud, TABLA_DECLARACION_JURADA_SALUD } from "../../../../utils/declaracionJuradaSaludUtils";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
@@ -208,6 +209,16 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                     imprimir: match ? match.existe : false,
                 };
             });
+        }
+
+        // 🔹 Declaración Jurada de Salud: si el servicio de existencias no la informa, se consulta su registro
+        if (listaActualizada.some((examen) => examen.tabla === TABLA_DECLARACION_JURADA_SALUD && !examen.resultado)) {
+            const existe = existeDeclaracionJurada(await obtenerDeclaracionJuradaSalud(nro, token));
+            listaActualizada = listaActualizada.map((examen) =>
+                examen.tabla === TABLA_DECLARACION_JURADA_SALUD
+                    ? { ...examen, resultado: existe, imprimir: existe }
+                    : examen
+            );
         }
 
         // 🔹 Procesar INTERCONSULTAS

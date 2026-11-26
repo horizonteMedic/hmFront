@@ -21,6 +21,7 @@ import { PrintHojaR, SubmitDataService, TABLA_ANEXO16A, VerifyTR } from "./Anexo
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { getAnexo16AInitialFormState } from "./anexo16aFormDefaults";
+import { esEmpresaMarsa } from "../../../../utils/declaracionJuradaSaludUtils";
 import CargaMasivaAnexo16A from "./CargaMasivaAnexo16A/CargaMasivaAnexo16A";
 
 const tabla = TABLA_ANEXO16A;
@@ -80,6 +81,9 @@ export default function Anexo16A({ nOrdenInicial, onGuardado }) {
       PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
+
+  // Solo MARSA: la lista «presenta o ha presentado en los 6 últimos meses» empieza con «Anemia o policitemia»
+  const esMarsa = esEmpresaMarsa(form?.empresa);
 
   // Textos específicos para cada checkbox
   const checkboxTexts = {
@@ -250,6 +254,17 @@ export default function Anexo16A({ nOrdenInicial, onGuardado }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Columna Izquierda */}
               <div className="space-y-2">
+                {/* Solo MARSA: primera pregunta de la lista */}
+                {esMarsa && (
+                  <div className="flex items-center justify-between">
+                    <span>Anemia o policitemia</span>
+                    <InputsBooleanRadioGroup
+                      name="anemiaPolicitemia"
+                      value={form?.anemiaPolicitemia ?? false}
+                      onChange={handleRadioButtonBoolean}
+                    />
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span >Cirugía Mayor Reciente</span>
                   <InputsBooleanRadioGroup

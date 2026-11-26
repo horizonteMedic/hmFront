@@ -339,21 +339,32 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
   doc.text(data.areaPaciente || "", x2 + 14, yPos2 + 4);
   yPos2 += filaDP;
 
-  // --- Empresa (fila completa) ---
-  doc.rect(x2, yPos2, ancho2, filaDP);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empresa:", x2 + 2, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.empresa || "", x2 + 22, yPos2 + 4);
-  yPos2 += filaDP;
+  // Fila completa para textos largos (razones sociales): primero se reduce la letra para que quepa en una línea y,
+  // si ni con la mínima alcanza, el texto baja de línea y la fila crece.
+  const dibujarFilaAjustada = (etiqueta, valor) => {
+    const anchoValor = ancho2 - 24;
+    const texto = String(valor ?? "").trim();
+    doc.setFont("helvetica", "normal");
+    let tam = 8;
+    doc.setFontSize(tam);
+    while (tam > 6.5 && doc.getTextWidth(texto) > anchoValor) {
+      tam -= 0.25;
+      doc.setFontSize(tam);
+    }
+    const lineas = doc.splitTextToSize(texto, anchoValor);
+    const interlinea = 3;
+    const alto = filaDP + Math.max(0, lineas.length - 1) * interlinea;
 
-  // --- Contrata (fila completa) ---
-  doc.rect(x2, yPos2, ancho2, filaDP);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contrata:", x2 + 2, yPos2 + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.contrata || "", x2 + 22, yPos2 + 4);
-  yPos2 += filaDP;
+    doc.rect(x2, yPos2, ancho2, alto);
+    lineas.forEach((linea, i) => doc.text(linea, x2 + 22, yPos2 + 4 + i * interlinea));
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(etiqueta, x2 + 2, yPos2 + 4);
+    yPos2 += alto;
+  };
+
+  // --- Empresa y Contrata (fila completa) ---
+  dibujarFilaAjustada("Empresa:", data.empresa);
+  dibujarFilaAjustada("Contrata:", data.contrata);
 
   yPos2 += 3;
 

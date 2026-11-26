@@ -3,6 +3,8 @@ import ExamenFisicoI2021 from "./ExamenFisicoI2021";
 import ExamenFisicoII2021 from "./ExamenFisicoII2021";
 import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
+import { esEmpresaMarsa } from "../../../../../utils/declaracionJuradaSaludUtils";
+import SeccionMarsa2021,{ MARSA_MSK_INICIAL } from "./SeccionMarsa2021";
 import {
   PrintHojaR,
   SubmitDataService,
@@ -63,6 +65,12 @@ const PARTE_4 = [
   "flexionTobilloDerecho", "flexionTobilloIzquierdo", "extensionTobilloDerecho", "extensionTobilloIzquierdo",
   "rotacionExternaTobilloDerecho", "rotacionExternaTobilloIzquierdo", "rotacionInternaTobilloDerecho", "rotacionInternaTobilloIzquierdo",
   "irradiacionTobilloDerecho", "irradiacionTobilloIzquierdo", "altMasaMuscularTobilloDerecho", "altMasaMuscularTobilloIzquierdo",
+];
+
+// Evaluación dinámica de articulaciones (cadera, rodilla y tobillo): en MARSA se edita desde su sección propia
+const CAMPOS_ARTICULACIONES = [
+  ...PARTE_3.filter((c) => !/^(tinnel|finkelsTein)/.test(c)),
+  ...PARTE_4,
 ];
 
 // Campos que NO edita el usuario (identidad, datos del paciente, control de UI y auditoría): el resto del
@@ -232,6 +240,9 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     altMasaMuscularTobilloDerecho: "0",
     altMasaMuscularTobilloIzquierdo: "0",
 
+    // Sección exclusiva MARSA (tareas, columna vertebral y articulaciones)
+    marsaMsk: MARSA_MSK_INICIAL,
+
     cie10: "Z00",
     nombreMedico: `${fixEncodingModern(
       userCompleto?.datos?.nombres_user ?? ""
@@ -262,6 +273,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     handleRadioButton,
     handleClear,
     handleClearnotO,
+    handleFocusNext,
     handlePrintDefault,
   } = useForm(initialFormState, { storageKey: embebido ? undefined : "evaluacionMusculoEsqueletica2021" });
 
@@ -274,6 +286,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     isFieldEdited,
     revertField,
     revertFields,
+    valoresOriginales,
   } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables });
 
   // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
@@ -286,6 +299,13 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
     campos.some(isFieldEdited) ? (
       <RevertButton onClick={() => revertFields(campos)} title="Revertir cambios de esta parte" />
     ) : null;
+
+  // Campos de la sección MARSA (viven dentro de `marsaMsk`): se resaltan y revierten uno por uno.
+  const originalMarsa = valoresOriginales?.marsaMsk;
+  const isMarsaEdited = (campoMarsa) =>
+    Boolean(originalMarsa) && originalMarsa[campoMarsa] !== form.marsaMsk?.[campoMarsa];
+  const revertMarsa = (campoMarsa) =>
+    setForm((f) => ({ ...f, marsaMsk: { ...f.marsaMsk, [campoMarsa]: originalMarsa[campoMarsa] } }));
 
   // Props comunes de un campo de texto.
   const campo = (name, onChange = handleChange) => ({
@@ -358,6 +378,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
   });
 
   // Props comunes de los exámenes físicos
+  const esMarsa = esEmpresaMarsa(form.empresa);
   const propsExamen = { form, handleRadioButton, handleChange, handleChangeNumber };
   const examenClass = "m-0 p-0 border-0 min-w-0 text-[11px]";
 
@@ -418,20 +439,44 @@ const EvaluacionMusculoEsqueletica2021 = ({ nOrdenInicial, onGuardado }) => {
 
       <SectionFieldset legend="Parte 3: Examen Físico III" actions={revertirParte(PARTE_3)}>
         <fieldset disabled={camposDeshabilitados} className={examenClass}>
-          <ExamenFisicoIII2021 {...propsExamen} />
+          <ExamenFisicoIII2021 {...propsExamen} ocultarEvalDinamica={esMarsa} />
         </fieldset>
       </SectionFieldset>
 
-      <SectionFieldset legend="Parte 4: Examen Físico IV" actions={revertirParte(PARTE_4)}>
-        <fieldset disabled={camposDeshabilitados} className={examenClass}>
-          <ExamenFisicoIV2021 {...propsExamen} />
-        </fieldset>
-      </SectionFieldset>
+      {/* Para MARSA las evaluaciones dinámicas de articulaciones (cadera/rodilla/tobillo) se llenan en la sección MARSA
+          (mismas variables), por eso aquí se ocultan. */}
+      {!esMarsa && (
+        <SectionFieldset legend="Parte 4: Examen Físico IV" actions={revertirParte(PARTE_4)}>
+          <fieldset disabled={camposDeshabilitados} className={examenClass}>
+            <ExamenFisicoIV2021 {...propsExamen} />
+          </fieldset>
+        </SectionFieldset>
+      )}
+
+      {/* ===== SECCIÓN: SOLO MARSA (no aparece salvo que la empresa del N° de orden sea MARSA) ===== */}
+      {esMarsa && (
+        <SectionFieldset
+          legend="Descripción de Tareas y Evaluación de Columna (MARSA)"
+          actions={revertirParte(["marsaMsk", ...CAMPOS_ARTICULACIONES])}
+        >
+          <SeccionMarsa2021
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleFocusNext={handleFocusNext}
+            esMarsa={esMarsa}
+            disabled={camposDeshabilitados}
+            isMarsaEdited={isMarsaEdited}
+            revertMarsa={revertMarsa}
+            isFieldEdited={isFieldEdited}
+          />
+        </SectionFieldset>
+      )}
 
       {/* ===== SECCIÓN: CONCLUSIONES Y COMENTARIOS ===== */}
       <SectionFieldset legend="Conclusiones y Comentarios" className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InputTextOneLine label="CIE 10" labelWidth="80px" inputClassName="capitalize" {...campo("cie10")} />
+          {/* <InputTextOneLine label="CIE 10" labelWidth="80px" inputClassName="capitalize" {...campo("cie10")} /> */}
           <EmpleadoComboBox
             value={form.nombre_medico}
             form={form}
