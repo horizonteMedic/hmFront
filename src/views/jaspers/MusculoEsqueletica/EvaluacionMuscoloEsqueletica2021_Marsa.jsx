@@ -18,6 +18,9 @@ const TOPE_PAGINA1 = 0.5;
 
 const MARGEN = 10;
 const ANCHO = 190;
+// El reporte entra en 2 hojas: el contenido llega hasta aquí (debajo va el footer)
+const Y_LIMITE = 266;
+const ALTO_FIRMA = 27; // alto máximo de las imágenes de firma, huella y sello
 
 // ===== Imágenes =====
 // jsPDF incrusta los PNG con transparencia sin comprimir y los decodifica en JavaScript (una página de fondo pesa
@@ -64,17 +67,17 @@ const fondoJpeg = (url, opciones) => {
   return fondos.get(clave);
 };
 
-// Firmas, huella y sello: se descargan en paralelo y se ubican igual que en el formato boro (máx. 35 mm de alto)
+// Firmas, huella y sello: se descargan en paralelo y se centran en una caja de ALTO_FIRMA mm de alto
 const agregarFirmas = async (doc, digitalizacion, firmas) => {
   const urls = Object.fromEntries(digitalizacion.map((d) => [d.nombreDigitalizacion, d.url]));
   const listas = await Promise.all(
     firmas.map(async (f) => ({ ...f, img: urls[f.nombre] ? await aJpeg(urls[f.nombre], { maxAncho: 600 }) : null }))
   );
   listas.filter((f) => f.img).forEach(({ img, x, y, maxw }) => {
-    const escala = Math.min(maxw / img.ancho, 35 / img.alto, 1);
+    const escala = Math.min(maxw / img.ancho, ALTO_FIRMA / img.alto, 1);
     const w = img.ancho * escala;
     const h = img.alto * escala;
-    doc.addImage(img.data, "JPEG", x, y + (35 - h) / 2, w, h);
+    doc.addImage(img.data, "JPEG", x, y + (ALTO_FIRMA - h) / 2, w, h);
   });
 };
 
@@ -106,9 +109,9 @@ const GRADOS = [
 
 const ESTILO_TABLA = {
   theme: "grid",
-  styles: { fontSize: 7, cellPadding: 1.1, lineColor: [0, 0, 0], lineWidth: 0.2, textColor: [0, 0, 0], valign: "middle", halign: "center" },
+  styles: { fontSize: 7, cellPadding: 0.8, lineColor: [0, 0, 0], lineWidth: 0.2, textColor: [0, 0, 0], valign: "middle", halign: "center" },
   headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: "bold", lineColor: [0, 0, 0], lineWidth: 0.2 },
-  margin: { top: 28, left: MARGEN, right: MARGEN, bottom: 30 },
+  margin: { top: 28, left: MARGEN, right: MARGEN, bottom: 297 - Y_LIMITE },
 };
 
 // Las "X" se pintan en azul, como en el resto de formatos boro
@@ -137,8 +140,8 @@ const dibujarTareas = (doc, m, y0) => {
   const colW = ANCHO / 2;
   const xL = MARGEN;
   const xR = MARGEN + colW;
-  const fila = 4.6;
-  const tituloH = 6;
+  const fila = 4.3;
+  const tituloH = 5.5;
 
   // Título general
   doc.setFillColor(217, 217, 217).setDrawColor(0, 0, 0).setLineWidth(0.25);
@@ -201,14 +204,26 @@ const dibujarTareas = (doc, m, y0) => {
 export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageH = doc.internal.pageSize.getHeight();
-  const pageW = doc.internal.pageSize.getWidth();
   const m = data.adicional || {};
 
-  const cabeceraPaginasNuevas = (d) => {
-    // La página 1 ya trae su cabecera del formato boro
-    if (d.pageNumber > 1) headerEvaluacion(doc, data, false, d.pageNumber);
+  // En el Folio `doc` ya trae otros reportes: cabecera, numeración y footer se cuentan desde la hoja donde empieza este
+  const paginaInicial = doc.internal.getCurrentPageInfo().pageNumber;
+  const cabecera = () => headerEvaluacion(doc, data, false, doc.internal.getNumberOfPages() - paginaInicial + 1);
+  const nuevaPagina = () => {
+    doc.addPage();
+    cabecera();
+    return 28;
   };
-  const opcionesTabla = { ...ESTILO_TABLA, didParseCell: pintarX, didDrawPage: cabeceraPaginasNuevas };
+  // Cada bloque se mantiene completo: si no entra en lo que queda de la hoja, empieza en una nueva
+  const yPara = (yDeseada, alto) => (yDeseada + alto <= Y_LIMITE ? yDeseada : nuevaPagina());
+  const opcionesTabla = {
+    ...ESTILO_TABLA,
+    didParseCell: pintarX,
+    // `pageNumber` es la hoja dentro de la tabla: solo hace falta la cabecera si la tabla continúa en otra
+    didDrawPage: (d) => {
+      if (d.pageNumber > 1) cabecera();
+    },
+  };
 
   // === 1) Página 1 (datos del paciente + evaluación básica: aptitud espalda y rangos articulares) ===
   const [fondoPagina1, fondoCabecera] = await Promise.all([
@@ -228,14 +243,6 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
 
   y = dibujarTareas(doc, m, y) + 3;
 
-  // Cada tabla se mantiene completa: si no entra en lo que queda de la página, empieza en una nueva
-  const yPara = (yDeseada, alto) => {
-    if (yDeseada + alto <= pageH - 30) return yDeseada;
-    doc.addPage();
-    headerEvaluacion(doc, data, false, doc.internal.getNumberOfPages());
-    return 28;
-  };
-
   // Evaluación estática de columna vertebral
   const estatica = COLUMNAS.map(([c, nombre]) => [
     nombre,
@@ -245,7 +252,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   ]);
   autoTable(doc, {
     ...opcionesTabla,
-    startY: yPara(y, 40),
+    startY: yPara(y, 30),
     head: [
       [{ content: "COLUMNA VERTEBRAL", colSpan: 9 }],
       [
@@ -263,7 +270,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   // Evaluación dinámica de columna vertebral
   autoTable(doc, {
     ...opcionesTabla,
-    startY: yPara(doc.lastAutoTable.finalY + 3, 30),
+    startY: yPara(doc.lastAutoTable.finalY + 3, 22),
     head: [
       [{ content: "EVALUACIÓN\nDINÁMICA", rowSpan: 2 }, { content: "MOVILIDAD - DOLOR", colSpan: 8 }],
       MOV_COLUMNA,
@@ -275,16 +282,9 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   // Evaluación dinámica de articulaciones (hombro/codo/muñeca/manos desde marsaMsk; el resto, campos de siempre)
   const valorArticulacion = ([clave, , prefijo], [mov, , sufijo]) =>
     prefijo ? (data[`${prefijo}${sufijo}`] ?? "") : (m[`${clave}_${mov}`] ?? "");
-  // La tabla de articulaciones (~90 mm) se mantiene completa: si no entra en la página, empieza en una nueva
-  let yArticulaciones = doc.lastAutoTable.finalY + 3;
-  if (yArticulaciones + 90 > pageH - 30) {
-    doc.addPage();
-    headerEvaluacion(doc, data, false, doc.internal.getNumberOfPages());
-    yArticulaciones = 28;
-  }
   autoTable(doc, {
     ...opcionesTabla,
-    startY: yArticulaciones,
+    startY: yPara(doc.lastAutoTable.finalY + 3, 72),
     head: [
       [{ content: "EVALUACIÓN\nDINÁMICA DE ARTICULACIONES", rowSpan: 2 }, { content: "MOVILIDAD - DOLOR", colSpan: 8 }],
       MOVIMIENTOS.map(([, titulo]) => titulo),
@@ -312,12 +312,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
 
   // === 3) Conclusiones y recomendaciones + firmas (bloque del formato boro) ===
   // Valoración (apto / no apto / en observación)
-  let yVal = doc.lastAutoTable.finalY + 3;
-  if (yVal + 9 > pageH - 30) {
-    doc.addPage();
-    headerEvaluacion(doc, data, false, doc.internal.getNumberOfPages());
-    yVal = 28;
-  }
+  const yVal = yPara(doc.lastAutoTable.finalY + 3, 8);
   doc.setDrawColor(0, 0, 0).setLineWidth(0.2).setTextColor(0, 0, 0);
   doc.rect(MARGEN, yVal, ANCHO, 8);
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -328,15 +323,22 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
     doc.text(texto, x, yVal + 5.2);
     casilla(doc, x + doc.getTextWidth(texto) + 3, yVal + 2, m.valoracion === valor);
   });
-  let yConc = yVal + 8 + 6;
-  // Alto del bloque: título + tabla + firmas. El footer ocupa desde ~267 mm: si no entra, va en una página nueva
-  const ALTO_TABLA = 44;
-  const ALTO_FIRMAS = 52;
-  if (yConc + 7 + ALTO_TABLA + ALTO_FIRMAS > 266) {
-    doc.addPage();
-    headerEvaluacion(doc, data, false, doc.internal.getNumberOfPages());
-    yConc = 28;
-  }
+  // Bloque final: título (3) + tabla (alto variable) + firmas (35). Mínimo con una tabla de 24 mm
+  const RESTO_BLOQUE = 3 + 35;
+  const yConc = yPara(yVal + 8 + 5, RESTO_BLOQUE + 24);
+
+  // La tabla crece con el texto hasta donde alcance la hoja; si aun así no entra, se reduce la letra
+  const anchoTexto = ANCHO / 2 - 6;
+  const maxAltoTabla = Y_LIMITE - yConc - RESTO_BLOQUE;
+  const textos = [data.conclusiones || "", data.recomendaciones || ""];
+  const altoNecesario = (tamano) => {
+    doc.setFont("helvetica", "normal").setFontSize(tamano);
+    const lineas = Math.max(...textos.map((t) => doc.splitTextToSize(t, anchoTexto).length));
+    return 12 + lineas * tamano * 0.41;
+  };
+  let tamanoTexto = 8;
+  while (tamanoTexto > 5 && altoNecesario(tamanoTexto) > maxAltoTabla) tamanoTexto -= 0.5;
+  const altoTabla = Math.min(Math.max(altoNecesario(tamanoTexto), 36), maxAltoTabla);
 
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(0, 0, 0);
@@ -345,37 +347,38 @@ export default async function EvaluacionMuscoloEsqueletica2021_Marsa(data = {}, 
   // Tabla de conclusiones y recomendaciones (sin columna CIE 10)
   const yTabla = yConc + 3;
   doc.setDrawColor(0, 0, 0).setLineWidth(0.25);
-  doc.rect(MARGEN, yTabla, ANCHO, ALTO_TABLA);
-  doc.line(MARGEN + ANCHO / 2, yTabla, MARGEN + ANCHO / 2, yTabla + ALTO_TABLA);
+  doc.rect(MARGEN, yTabla, ANCHO, altoTabla);
+  doc.line(MARGEN + ANCHO / 2, yTabla, MARGEN + ANCHO / 2, yTabla + altoTabla);
   doc.line(MARGEN, yTabla + 7, MARGEN + ANCHO, yTabla + 7);
   doc.setFont("helvetica", "bold").setFontSize(8.5);
   doc.text("CONCLUSIONES", MARGEN + ANCHO / 4, yTabla + 4.8, { align: "center" });
   doc.text("RECOMENDACIONES - RESTRICCIONES", MARGEN + (ANCHO * 3) / 4, yTabla + 4.8, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.conclusiones || "", MARGEN + 3, yTabla + 12, { maxWidth: ANCHO / 2 - 6, align: "justify" });
-  doc.text(data.recomendaciones || "", MARGEN + ANCHO / 2 + 3, yTabla + 12, { maxWidth: ANCHO / 2 - 6, align: "justify" });
+  doc.setFont("helvetica", "normal").setFontSize(tamanoTexto);
+  textos.forEach((t, i) => {
+    doc.text(t, MARGEN + (ANCHO / 2) * i + 3, yTabla + 11, { maxWidth: anchoTexto });
+  });
 
   // Líneas y rótulos de firmas
-  const yLinea = yTabla + ALTO_TABLA + 40;
+  const yLinea = yTabla + altoTabla + 30;
   doc.setLineWidth(0.8);
   doc.line(MARGEN + 16, yLinea, MARGEN + 84, yLinea);
   doc.line(MARGEN + 108, yLinea, MARGEN + 176, yLinea);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Firma del Trabajador - Huella digital", MARGEN + 50, yLinea + 5, { align: "center" });
-  doc.text("Firma y Sello del Médico Evaluador", MARGEN + 142, yLinea + 5, { align: "center" });
+  doc.text("Firma del Trabajador - Huella digital", MARGEN + 50, yLinea + 4, { align: "center" });
+  doc.text("Firma y Sello del Médico Evaluador", MARGEN + 142, yLinea + 4, { align: "center" });
 
-  // Footer en todas las hojas (la última queda activa para pintar las firmas)
+  // Footer en las hojas de este reporte (la última queda activa para pintar las firmas)
   const totalPaginas = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= totalPaginas; i++) {
+  for (let i = paginaInicial; i <= totalPaginas; i++) {
     doc.setPage(i);
     footerTR(doc, data);
   }
   doc.setPage(totalPaginas);
-  // Las imágenes de firma van justo encima de sus líneas (cada una ocupa hasta 35 mm de alto)
+  // Las imágenes de firma van justo encima de sus líneas
   await agregarFirmas(doc, data?.digitalizacion || [], [
-    { nombre: "FIRMAP", x: MARGEN + 20, y: yLinea - 36, maxw: 50 },
-    { nombre: "HUELLA", x: MARGEN + 82, y: yLinea - 36, maxw: 15 },
-    { nombre: "SELLOFIRMA", x: MARGEN + 118, y: yLinea - 36, maxw: 50 },
+    { nombre: "FIRMAP", x: MARGEN + 20, y: yLinea - ALTO_FIRMA - 1, maxw: 50 },
+    { nombre: "HUELLA", x: MARGEN + 82, y: yLinea - ALTO_FIRMA - 1, maxw: 15 },
+    { nombre: "SELLOFIRMA", x: MARGEN + 118, y: yLinea - ALTO_FIRMA - 1, maxw: 50 },
   ]);
 
   if (docExistente) return doc;
