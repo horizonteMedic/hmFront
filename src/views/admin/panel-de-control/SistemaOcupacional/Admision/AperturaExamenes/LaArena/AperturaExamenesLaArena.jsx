@@ -30,6 +30,7 @@ import ModalPreCarga from '../modals/modalPreCargaTable/ModalPreCargaTable.jsx';
 import ReportePacientes from '../modals/modalReportePacientes/ModalReportePacientes.jsx';
 import ReportePacientes2 from '../modals/modalReportePacientes2/ModalReportePacientes2.jsx';
 import ModalContabilidad from '../modals/modalContabilidad/ModalContabilidad.jsx';
+import ModalAtencionesAdmision from '../modals/modalAtencionesAdmision/ModalAtencionesAdmision.jsx';
 import TablaHistorias from './TablaHistorias.jsx';
 import { useListadoHistorias } from './useListadoHistorias.js';
 import { imprimirHojaDeRuta } from './hojaDeRuta.js';
@@ -72,7 +73,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
   const [dniEditado, setDniEditado] = useState(false); // tras habilitar y cambiar el documento se puede "Agregar" como nueva
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
   const [mostrarErrores, setMostrarErrores] = useState(false);
-  const [modal, setModal] = useState(null); // 'contrata' | 'preCarga' | 'reportePacientes' | 'reportePacientes2' | 'contabilidad'
+  const [modal, setModal] = useState(null); // 'contrata' | 'preCarga' | 'reportePacientes' | 'reportePacientes2' | 'contabilidad' | 'atencionesAdmision'
   const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
   const [cargaId, setCargaId] = useState(0); // cambia cada vez que se carga una historia de la tabla (aunque sea la misma)
 
@@ -678,6 +679,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
               <button type="button" onClick={() => setModal('reportePacientes')} className="verde-btn rounded px-3 py-1">Reporte de Pacientes</button>
               <button type="button" onClick={() => setModal('reportePacientes2')} className="verde-btn rounded px-3 py-1">Reporte de Pacientes 2</button>
               <button type="button" onClick={() => setModal('contabilidad')} className="verde-btn rounded px-3 py-1">Reporte Contabilidad</button>
+              <button type="button" onClick={() => setModal('atencionesAdmision')} className="verde-btn rounded px-3 py-1">Reporte Atenciones - Admision</button>
             </div>
           </div>
 
@@ -705,6 +707,7 @@ const AperturaExamenesLaArena = ({ listas, DNIG, selectedSede, token, userlogued
       {modal === 'reportePacientes' && <ReportePacientes onClose={cerrarModal} sede={selectedSede} token={token} />}
       {modal === 'reportePacientes2' && <ReportePacientes2 onClose={cerrarModal} sede={selectedSede} token={token} />}
       {modal === 'contabilidad' && <ModalContabilidad onClose={cerrarModal} sede={selectedSede} token={token} />}
+      {modal === 'atencionesAdmision' && <ModalAtencionesAdmision onClose={cerrarModal} sede={selectedSede} token={token} />}
     </div>
   );
 };
